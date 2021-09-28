@@ -1,9 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { hidePopup, showPopup } from '../../store/actions/app';
-import { setSwapFromInputValue, setSwapRate, setSwapToInputValue, showSwapFromSelect, showSwapToSelect } from '../../store/actions/swap';
-import { setPoolFromInputValue, setPoolRate, setPoolToInputValue, showPoolFromSelect, showPoolToSelect } from '../../store/actions/pool';
+import { showPopup } from '../../store/actions/app';
+import { setSwapRate } from '../../store/actions/swap';
+import { setPoolRate } from '../../store/actions/pool';
 
 import Select from '../Select/Select'
 import './OrdersInput.scss';
@@ -14,8 +14,6 @@ import {
     showOrdersFromSelect,
     showOrdersToSelect
 } from "../../store/actions/limitOrders";
-
-// import { getPairReserves } from '../../extensions/sdk/run3';
 import getTruncatedNum from "../../utils/getTruncatedNum";
 
 function OrdersInput(props) {
@@ -34,23 +32,18 @@ function OrdersInput(props) {
     const swapFromToken = useSelector(state => state.limitOrders.fromToken);
     const swapToToken = useSelector(state => state.limitOrders.toToken);
 
-    const swapFromValue = useSelector(state => state.limitOrders.fromInputValue);
-    const swapToValue = useSelector(state => state.limitOrders.toInputValue);
-
     const poolFromToken = useSelector(state => state.poolReducer.fromToken);
     const poolToToken = useSelector(state => state.poolReducer.toToken);
-
-    const poolFromValue = useSelector(state => state.poolReducer.fromInputValue);
-    const poolToValue = useSelector(state => state.poolReducer.toInputValue);
 
     const pairsList = useSelector(state => state.walletReducer.pairsList);
 
     const swapRate = useSelector(state => state.limitOrders.rate);
-    const poolRate = useSelector(state => state.poolReducer.rate);
     //console.log(pairsList, swapRate, poolRate, poolFromToken, poolToToken, poolFromValue, swapFromValue, swapFromToken, poolToValue, swapToValue);
-    const [value, setValue] = useState(props.value);
 
     const fromInputValue = useSelector(state => state.limitOrders.fromInputValue);
+    const toInputValue = useSelector(state => state.limitOrders.toInputValue);
+
+    const [value, setValue] = useState(props.type === "from" ? fromInputValue : toInputValue);
 
     useEffect(async () => {
         if (location.pathname.includes('orders') && swapFromToken.symbol && swapToToken.symbol) {
@@ -74,25 +67,22 @@ function OrdersInput(props) {
     }, [swapFromToken, swapToToken, poolFromToken, poolToToken, pairsList])
 
     useEffect(() => {
-        // if(revertValue){
-        //   console.log("revert", revertValue)
-        //   changeValue(revertValue);
-        // }else{
-        console.log("revert +++++++", props.token.balance)
-        changeValue(props.token.balance);
-        // }
-
-    }, [value, swapRate, poolRate])
-
-    // useEffect(() => {
-    //   changeValue(revertValue);
-    // }, [revertValue])
+        if (props.type === "from") // props.type === "from" just to make sure it was called only once
+            dispatch(setOrdersToInputValue(getTruncatedNum(fromInputValue * swapRate)));
+    }, [swapRate]);
 
     useEffect(() => {
-        if (swapRate)
+        if (props.type === "from") // props.type === "from" just to make sure it was called only once
             dispatch(setOrdersToInputValue(getTruncatedNum(fromInputValue * swapRate)));
+
+        if (props.type === "from")
+            setValue(fromInputValue);
     }, [fromInputValue]);
 
+    useEffect(() => {
+        if (props.type === "to")
+            setValue(toInputValue);
+    }, [toInputValue]);
 
     async function handleClick() {
         try {
@@ -106,48 +96,14 @@ function OrdersInput(props) {
         }
     }
 
-    function changeValue(curValue) {
-        if (location.pathname.includes('orders')) {
-            if (props.type === 'from') {
-                console.log("hange vvalue", props.token.balance)
-                // if(curValue && value > curValue) {
-                let val = Number(value) * swapRate;
-                val = getTruncatedNum(val);
+    function handleChange(event) {
+        const numValue = Number(event.target.value);
 
-          let val2 = Number(value)
-          val2 = getTruncatedNum(val2);                
-          if (location.pathname.includes('swap')) {
-          dispatch(setSwapFromInputValue(val2));
-          dispatch(setSwapToInputValue(val));
-                    }
-                if (location.pathname.includes('orders')) {
-                    dispatch(setOrdersFromInputValue(val2));
-                    dispatch(setOrdersToInputValue(val));
-                }
-          console.log("val2",val2)
-        // }
-        // else  {
-        //   dispatch(setSwapFromInputValue(value));
-        //   let val = value * swapRate;
-        //   let val1 = 0;
-        //   if(val < 0.0001) val1 = parseFloat(val.toFixed(8))
-        //   else val1 = parseFloat(val.toFixed(4))
-        //   dispatch(setSwapToInputValue(val1));
-        // }
-
-                // } else if(props.type === 'to') {
-                // dispatch(setSwapToInputValue(value));
-                // dispatch(setSwapFromInputValue(parseFloat((value / swapRate).toFixed(4))));
-            }
-        } else if (location.pathname.includes('add-liquidity')) {
-            if (props.type === 'from') {
-                dispatch(setPoolFromInputValue(value));
-                let val = value * poolRate;
-                let val1 = 0;
-                if (val < 0.0001) val1 = parseFloat(val.toFixed(8))
-                else val1 = parseFloat(val.toFixed(4))
-                dispatch(setPoolToInputValue(val1));
-            }
+        if (props.type === "from") {
+            setValue(numValue);
+            dispatch(setOrdersFromInputValue(numValue));
+        } else if (props.type === "to") {} else {
+            throw new Error('OrdersInput type can only be "from" or "to"');
         }
     }
 
@@ -203,9 +159,9 @@ function OrdersInput(props) {
                     <input
                         type="number"
                         className={props.value > 0 ? "input-field" : "input-field input-field--zero"}
-                        value={props.value}
-                        onChange={event => setChanger(+event.target.value)}
-                        onKeyPress={event => handleKeyPress(event)}
+                        value={value}
+                        onChange={handleChange}
+                        onKeyPress={handleKeyPress}
                         min="0"
                         autoFocus={props.autoFocus || false}
                         placeholder="0"
