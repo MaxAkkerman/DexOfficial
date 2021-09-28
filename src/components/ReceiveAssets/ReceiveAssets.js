@@ -33,7 +33,7 @@ function ReceiveAssets() {
     }
 
     async function handleCopy() {
-        copyToClipboard(currentTokenForReceive.walletAddress)
+        copyToClipboard(currentTokenForReceive.owner_address)
             .then(() => console.log('text copied !'))
             .catch(() => console.log('error'));
         // await navigator.clipboard.writeText(currentTokenForReceive.walletAddress ? currentTokenForReceive.walletAddress : "")
@@ -90,7 +90,7 @@ function ReceiveAssets() {
                                 <>
                                     <div className={"send_copy_address"}>
                                         <button style={{fontSize: "20px", width: '100%'}}
-                                                onClick={() => copyToClipboard(currentTokenForReceive.walletAddress || "")}
+                                                onClick={() => copyToClipboard(currentTokenForReceive.owner_address || "")}
                                                 className="btn wallet-btn">Copy address
                                         </button>
 
@@ -102,7 +102,7 @@ function ReceiveAssets() {
                             leftBlockBottom={
                                 <div className="receive_balance_block">
                                     <div className="receive_balance">
-                                        {tokenForReceiveSetted ? handleCutAddress(currentTokenForReceive.walletAddress) : "0:..."}
+                                        {tokenForReceiveSetted ? handleCutAddress(currentTokenForReceive.owner_address) : "0:..."}
                                         <div className="copybtn_wrapper hidden" style={{marginLeft: "5px"}}>
                                             <button className="arrow_back copybtn" onClick={() => handleCopy()}>
                                                 <img className={"textOnHover"} src={copybtn} alt={"arrow"}/>
@@ -131,7 +131,7 @@ function ReceiveAssets() {
                                     }}>
                                         <div>Give this QR-code to Sender</div>
                                         <QRCode style={{marginTop: "20px"}} size={200}
-                                                value={currentTokenForReceive.walletAddress || "0"}/>
+                                                value={currentTokenForReceive.owner_address || "0"}/>
                                     </div>
 
                                 </div>

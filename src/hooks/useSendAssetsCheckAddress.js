@@ -1,11 +1,11 @@
 import { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import tonClient, { getDetailsFromTONtokenWallet } from "../extensions/webhook/script";
+import tonClient, {getDetailsFromTONtokenWallet, getExpectedWalletAddressByOwner} from "../extensions/webhook/script";
 import { Account } from "@tonclient/appkit";
 import { TONTokenWalletContract } from "../extensions/contracts/TONTokenWallet";
 
 const DEFAULT_VALIDATION_MSG = "Incorrect address"
-const VALIDATION_MSG_ROOTS_ERROR = "Incorrect token wallet address"
+const VALIDATION_MSG_ROOTS_ERROR = "Incorrect wallet owner address"
 const VALIDATION_MSG_ROOTS_SUC = "Complete"
 const INCORRECT_LENGTH = "Incorrect address length"
 const NOT_TON_VALID_ADDRESS = "Incorrect TON blockchain address"
@@ -25,7 +25,7 @@ const re = /.:.{64}/
  * @property {boolean} isLoading
  * @property {string} validationMsg
  */
-export default function useSendAssetsCheckAddress() {
+export default function useSendAssetsCheckAddress(props) {
 	const [state, setState] = useState({ isInvalid: undefined, isLoading: false, validationMsg: DEFAULT_VALIDATION_MSG });
 
 	const addressToSend = useSelector(state => state.walletSeedReducer.addressToSend);
@@ -74,7 +74,11 @@ export default function useSendAssetsCheckAddress() {
 
 			if (currentTokenForSend.type === "PureToken") {
 				const tokenForSendRoot = currentTokenForSend.rootAddress;
-				const addressToSendRoot = await getDetailsFromTONtokenWallet(addressToSend)
+				setState({ isInvalid: undefined, isLoading: true });
+				const walletAddrByOwner = await getExpectedWalletAddressByOwner(currentTokenForSend.rootAddress, addressToSend)
+console.log("walletAddrByOwner",walletAddrByOwner)
+				const addressToSendRoot = await getDetailsFromTONtokenWallet(walletAddrByOwner.name)
+				console.log("addressToSendRoot",addressToSendRoot)
 				if (tokenForSendRoot === addressToSendRoot) {
 					setState({ isInvalid: false, isLoading: false, validationMsg: VALIDATION_MSG_ROOTS_SUC });
 				} else {

@@ -300,6 +300,7 @@ export async function getAllClientWallets(clientAddress) {
             itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
             itemData.tokenName = getFullName(itemData.symbol)
             itemData.type = "PureToken"
+            itemData.owner_address = curWalletData.decoded.output.value0.owner_address
             itemData.decimals = curRootData.decoded.output.value0.decimals
             itemData.icon = iconGenerator(itemData.symbol)
             itemData.rootAddress = curWalletData.decoded.output.value0.root_address;
@@ -484,7 +485,16 @@ export async function getDetailsFromTokenRoot(address) {
     }
 
 }
+export async function getExpectedWalletAddressByOwner(rootAddress, toAddress) {
+    const rootAcc = new Account(RootTokenContract, {address: rootAddress, client});
 
+    let walletAddress = await rootAcc.runLocal("getWalletAddress", {_answer_id: 0,wallet_public_key_:0,owner_address_:toAddress})
+    console.log("walletAddress.decoded.output.value0.address", walletAddress.decoded.output)
+    return {
+        name: walletAddress.decoded.output.value0,
+    }
+
+}
 export async function getRootFromTonWallet(address) {
 
 
@@ -499,14 +509,17 @@ export async function getDetailsFromTONtokenWallet(address) {
 
 console.log("address",address)
     const tokenWalletAcc = new Account(TONTokenWalletContract, {address: address, client});
-
+try {
     let tokenWalletDetails = await tokenWalletAcc.runLocal("getDetails", {_answer_id: 0})
-    console.log("atokenWalletDetails.decoded.output.value0.root_addressddress",tokenWalletDetails)
-    if(!tokenWalletDetails.decoded.output.value0.root_address){
+    console.log("atokenWalletDetails.decoded.output.value0.root_addressddress", tokenWalletDetails)
+    if (!tokenWalletDetails.decoded.output.value0.root_address) {
         return undefined
     }
     return tokenWalletDetails.decoded.output.value0.root_address
-
+}catch(e){
+    console.log("eee",e)
+    return e
+}
 }
 
 // // const transListReceiveTokens = useSelector(state => state.walletReducer.transListReceiveTokens);

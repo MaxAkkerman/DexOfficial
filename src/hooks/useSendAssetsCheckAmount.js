@@ -36,6 +36,7 @@ export default function useSendAssetsCheckAmount() {
 
 	return {
 		isInvalid,
+		// isLoadingCheckAmount,
 		validationMsg
 	}
 }

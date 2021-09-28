@@ -36,6 +36,9 @@
 .amount_wrapper_error {
   border-color: var(--error);
 }
+.amount_wrapper_success {
+  border-color: green;
+}
 
 .amount_input {
   color: #626262;

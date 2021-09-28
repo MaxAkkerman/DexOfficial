@@ -717,7 +717,7 @@ export async function sendToken(curExt, tokenRootAddress, addressTo, tokensAmoun
             grams: gramsForSend
         });
 
-        console.log("sendTokensres", sendTokensres)
+        console.log("tokensAmount * getDecimals(selectedToken.decimals)",tokensAmount * getDecimals(selectedToken.decimals),"tokenRootAddress", tokenRootAddress,"addressTo",addressTo,"tokensAmount",tokensAmount)
         return sendTokensres
     } catch (e) {
         console.log("catch E", e);
