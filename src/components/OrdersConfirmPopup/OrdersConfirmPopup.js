@@ -28,8 +28,8 @@ function OrdersConfirmPopup(props) {
 
        const res = await makeLimitOrder({
             price: rate,
-            qty: toValue,
-            tokenSymbol: toToken.symbol,
+            qty: fromValue,
+            tokenSymbol: fromToken.symbol,
             pairAddr: pairId,
         }, {
             clientKeyPair: keyPair,
