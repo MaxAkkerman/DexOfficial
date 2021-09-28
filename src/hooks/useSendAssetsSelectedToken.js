@@ -1,19 +1,23 @@
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import useTokensList from "./useTokensList";
+import {useEffect, useState} from "react";
+import {useSelector} from "react-redux";
+import useTokenList from "./useTokenList";
 
 export default function useSendAssetsSelectedToken() {
-    const currentTokenForSend = useSelector(state => state.walletSeedReducer.currentTokenForSend);
-    const { tokensList } = useTokensList();
+	const currentTokenForSend = useSelector(
+		(state) => state.walletSeedReducer.currentTokenForSend,
+	);
+	const {tokenList} = useTokenList();
 
 	const [selectedToken, setSelectedToken] = useState(selectToken());
 
 	useEffect(() => {
 		setSelectedToken(selectToken());
-	}, [currentTokenForSend, tokensList]);
+	}, [currentTokenForSend, tokenList]);
 
 	function selectToken() {
-		const inListToken = tokensList.find(token => token.tokenName === currentTokenForSend.tokenName); 
+		const inListToken = tokenList.find(
+			(token) => token.tokenName === currentTokenForSend.tokenName,
+		);
 
 		return inListToken || currentTokenForSend;
 	}
