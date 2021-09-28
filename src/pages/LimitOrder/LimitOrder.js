@@ -22,6 +22,7 @@ import SwapConfirmPopup from "../../components/SwapConfirmPopup/SwapConfirmPopup
 import OrdersConfirmPopup from "../../components/OrdersConfirmPopup/OrdersConfirmPopup";
 import { iconGenerator } from "../../iconGenerator";
 import WaitingPopup from '../../components/WaitingPopup/WaitingPopup';
+import useLimitOrderValidation from "../../hooks/useLimitOrderValidation";
 
 function LimitOrder() {
     const history = useHistory();
@@ -47,10 +48,10 @@ function LimitOrder() {
     const ordersConfirmPopupIsVisible = useSelector(state => state.limitOrders.ordersConfirmPopupVisible);
     const [connectAsyncIsWaiting, setconnectAsyncIsWaiting] = useState(false);
     const [curExist, setExistsPair] = useState(false);
-    const [slippage, setSlippage] = useState("");
     const [notDeployedWallets, setNotDeployedWallets] = useState([]);
     const [connectPairStatusText, setconnectPairStatusText] = useState("");
     const [incorrectBalance, setincorrectBalance] = useState(false)
+    const { isInvalid } = useLimitOrderValidation();
 
     useEffect(() => {
         if (!pairsList.length || !pairId) {
@@ -74,17 +75,9 @@ function LimitOrder() {
     }, [toToken, tokenList, pairId])
 
     function handleConfirm() {
-        if (fromValue > fromToken.balance) {
-            setincorrectBalance(true)
-            setTimeout(() => setincorrectBalance(false), 200);
-            return
-        }
-        if (fromToken.symbol && toToken.symbol && fromValue) {
-            console.log("3453453495834058dgjfjgfdjg")
-            dispatch(showOrdersConfirmPopup());
-        } else {
-            dispatch(showPopup({ type: 'error', message: 'Fields should not be empty' }));
-        }
+        if (isInvalid) return;
+
+        dispatch(showOrdersConfirmPopup());
     }
 
     async function handleConnectPair() {
@@ -163,15 +156,15 @@ function LimitOrder() {
     function getCurBtn() {
         if (curExist && fromToken.symbol && toToken.symbol && !notDeployedWallets.length) {
             return <button
-                className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"}
+                className={isInvalid ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"}
                 onClick={() => handleConfirm()}>Create limit order</button>
         } else if ((!curExist || notDeployedWallets.length) && fromToken.symbol && toToken.symbol) {
             return <button
-                className={(fromToken.symbol && toToken.symbol) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"}
+                className={isInvalid ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"}
                 onClick={() => handleConnectPair()}>Connect pair</button>
         }
         return <button
-            className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"}
+            className={isInvalid ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"}
             onClick={() => handleConfirm()}>Create limit order</button>
     }
 
@@ -192,7 +185,6 @@ function LimitOrder() {
                                     type={'from'}
                                     text={'From'}
                                     token={fromToken}
-                                    value={fromValue}
                                     incorrectBalance={incorrectBalance}
                                 />
                                 <SwapBtn
@@ -204,7 +196,6 @@ function LimitOrder() {
                                     type={'to'}
                                     text={toValue > 0 ? <>To <span>(estimated)</span></> : 'To'}
                                     token={toToken}
-                                    value={toValue}
                                     incorrectBalance={false}
 
                                 />
@@ -213,7 +204,14 @@ function LimitOrder() {
                                     <Stack direction={"column"} spacing={1} sx={{ marginBottom: "15px" }}>
                                         <div>Price</div>
                                         <div className={"orders__icon_box"}>
-                                            <input id="enterPrice" type={"number"} autoComplete="false" className={"orders__input"} onChange={(e) => dispatch(setOrdersRate(Number(e.target.value)))} />
+                                            <input 
+                                                id="enterPrice" 
+                                                type="number" 
+                                                autoComplete="false" 
+                                                className="orders__input"
+                                                onChange={(e) => dispatch(setOrdersRate(Number(e.target.value)))} 
+                                                value={rate}
+                                            />
                                             {toToken && toToken.symbol && <div className="input-select">
                                                 <img src={iconGenerator(toToken.symbol)} alt={toToken.symbol}
                                                     className="input-token-img" />
