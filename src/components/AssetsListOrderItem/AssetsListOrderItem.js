@@ -19,7 +19,6 @@ const SYMBOL_ICON_MAP = {
 	"WBTC": SvgWBtc,
 };
 
-
 export default function AssetsListOrderItem({
 	orderAsset,
 }) {
@@ -43,8 +42,6 @@ export default function AssetsListOrderItem({
 
 	const iconA = SYMBOL_ICON_MAP[symbolA];
 	const iconB = SYMBOL_ICON_MAP[symbolB];
-
-	const appTheme = useSelector(state => state.appReducer.appTheme);
 
 	const [open, setOpen] = useState(false);
 
@@ -80,7 +77,7 @@ export default function AssetsListOrderItem({
 					component="span"
 					className={classes.amount}
 				>
-					{amount} {symbolA}
+					{amount / 1e9} {symbolA}
 				</Typography>
 			</Stack>
 			<Collapse in={open}>
@@ -123,7 +120,7 @@ export default function AssetsListOrderItem({
 						component="span"
 						className={classes.amount}
 					>
-						{amount * price} {symbolB}
+						{amount * price / 1e9} {symbolB}
 					</Typography>
 				</Stack>
 			</Collapse>
