@@ -21,7 +21,7 @@ import {
   SHOW_ORDERS_FROM_SELECT,
   HIDE_ORDERS_FROM_SELECT,
   SHOW_ORDERS_TO_SELECT,
-  HIDE_ORDERS_TO_SELECT, SHOW_ORDERS_CONFIRM_POPUP, HIDE_ORDERS_CONFIRM_POPUP, SET_ORDER_LIST
+  HIDE_ORDERS_TO_SELECT, SHOW_ORDERS_CONFIRM_POPUP, HIDE_ORDERS_CONFIRM_POPUP, SET_ORDER_LIST, SET_ORDERS_ASYNC_IS_WAITING
 } from '../actions/types';
 
 const initialState = {
@@ -113,6 +113,11 @@ const limitOrders = (state = initialState, { type, payload }) => {
       return {
         ...state,
         orderList: payload
+      }
+    case SET_ORDERS_ASYNC_IS_WAITING:
+      return {
+        ...state,
+        ordersAsyncIsWaiting: payload
       }
     default:
       return state;

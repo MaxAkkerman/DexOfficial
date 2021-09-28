@@ -18,6 +18,7 @@ function PoolConfirmPopup(props) {
 
     const fromValue = useSelector(state => state.poolReducer.fromInputValue);
     const toValue = useSelector(state => state.poolReducer.toInputValue);
+    const tokenList = useSelector(state => state.walletReducer.tokenList);
 
 
     const transactionsList = useSelector(state => state.walletReducer.transactionsList);
@@ -33,7 +34,13 @@ function PoolConfirmPopup(props) {
     let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword)
     dispatch(setPoolAsyncIsWaiting(true));
     props.hideConfirmPopup();
-      let poolStatus = await processLiquidity(curExt, pairId, (fromValue * 1000000000).toFixed(), (toValue * 1000000000).toFixed(),decrypted.phrase);
+
+      let fromtokenData = tokenList.filter(item=>item.symbol===fromToken.symbol)
+
+      let toTokenData = tokenList.filter(item=>item.symbol===toToken.symbol)
+
+
+      let poolStatus = await processLiquidity(curExt, pairId, fromValue, toValue,decrypted.phrase,fromtokenData[0],toTokenData[0]);
       console.log("poolStatus",poolStatus)
       dispatch(setPoolAsyncIsWaiting(false))
       if(!poolStatus.code){

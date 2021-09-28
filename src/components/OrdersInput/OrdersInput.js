@@ -16,6 +16,7 @@ import {
 } from "../../store/actions/limitOrders";
 
 // import { getPairReserves } from '../../extensions/sdk/run3';
+import getTruncatedNum from "../../utils/getTruncatedNum";
 
 function OrdersInput(props) {
     const dispatch = useDispatch();
@@ -48,6 +49,8 @@ function OrdersInput(props) {
     const poolRate = useSelector(state => state.poolReducer.rate);
     //console.log(pairsList, swapRate, poolRate, poolFromToken, poolToToken, poolFromValue, swapFromValue, swapFromToken, poolToValue, swapToValue);
     const [value, setValue] = useState(props.value);
+
+    const fromInputValue = useSelector(state => state.limitOrders.fromInputValue);
 
     useEffect(async () => {
         if (location.pathname.includes('orders') && swapFromToken.symbol && swapToToken.symbol) {
@@ -85,6 +88,11 @@ function OrdersInput(props) {
     //   changeValue(revertValue);
     // }, [revertValue])
 
+    useEffect(() => {
+        if (swapRate)
+            dispatch(setOrdersToInputValue(getTruncatedNum(fromInputValue * swapRate)));
+    }, [fromInputValue]);
+
 
     async function handleClick() {
         try {
@@ -104,12 +112,11 @@ function OrdersInput(props) {
                 console.log("hange vvalue", props.token.balance)
                 // if(curValue && value > curValue) {
                 let val = Number(value) * swapRate;
-                val < 0.0001 ? val = parseFloat(val.toFixed(8)) : val = parseFloat(val.toFixed(4))
-
+                val = getTruncatedNum(val);
 
           let val2 = Number(value)
-          val2 < 0.0001 ? val2 = parseFloat(Number(value).toFixed(8)) : val2 = parseFloat(Number(value).toFixed(4))
-                if (location.pathname.includes('swap')) {
+          val2 = getTruncatedNum(val2);                
+          if (location.pathname.includes('swap')) {
           dispatch(setSwapFromInputValue(val2));
           dispatch(setSwapToInputValue(val));
                     }

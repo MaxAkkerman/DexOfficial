@@ -6,7 +6,8 @@ import {
     SET_ORDERS_FROM_INPUT_VALUE,
     SET_ORDERS_TO_INPUT_VALUE,
     SET_ORDERS_FROM_TOKEN,
-    SET_ORDERS_TO_TOKEN, SET_ORDERS_RATE, SET_ORDERS_PAIR_ID, HIDE_ORDERS_CONFIRM_POPUP, SHOW_ORDERS_CONFIRM_POPUP, SET_ORDER_LIST
+    SET_ORDERS_TO_TOKEN, SET_ORDERS_RATE, SET_ORDERS_PAIR_ID, HIDE_ORDERS_CONFIRM_POPUP, SHOW_ORDERS_CONFIRM_POPUP, SET_ORDER_LIST,
+    SET_ORDERS_ASYNC_IS_WAITING,
 } from './types';
 
 export function setOrdersFromInputValue(payload) {
@@ -61,4 +62,8 @@ export function showOrdersConfirmPopup() {
 
 export function hideOrdersConfirmPopup() {
     return {type: HIDE_ORDERS_CONFIRM_POPUP}
+}
+
+export function setOrdersAsyncIsWaiting(payload) {
+    return {type: SET_ORDERS_ASYNC_IS_WAITING, payload}
 }

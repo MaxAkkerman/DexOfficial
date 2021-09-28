@@ -10,12 +10,10 @@ import calculateTimeLeft from "../../hooks/useTimer";
 import CalculateTimeLeft from "../../hooks/useTimer";
 import AssetsListOrderItem from '../AssetsListOrderItem/AssetsListOrderItem';
 import { Divider } from '@mui/material';
+import { useSelector } from 'react-redux';
 
-// function deepEqual (obj1, obj2){
-//     return JSON.stringify(obj1)===JSON.stringify(obj2);
-// }
 function AssetsList(props) {
-    console.log("menyyyyy", props)
+	const pairList = useSelector(state => state.walletReducer.pairsList);
 
     return (
         <div className={props.assetWrap ? props.assetWrap + " assets_wrapper" : "assets_wrapper"}
@@ -188,13 +186,10 @@ function AssetsList(props) {
                 </div>
             ))}
 
-            {props.orderAssetsArray && props.orderAssetsArray.length >= 1 && (
-                <>
-                    <Divider />
-                    {props.orderAssetsArray.map((orderAsset, idx) => (
-                        <AssetsListOrderItem key={idx} orderAsset={orderAsset} />
-                    ))}
-                </>
+            {props.orderAssetsArray && props.orderAssetsArray.length >= 1 && pairList.length >= 1 && (
+                orderList.map((orderAsset, idx) => (
+                    <AssetsListOrderItem key={idx} orderAsset={orderAsset} />
+                ))
             )}
         </div>
     )

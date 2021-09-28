@@ -77,6 +77,7 @@ import AssetsListForDeploy from "./components/AssetsListForDeploy/AssetsListForD
 import { useSnackbar } from 'notistack';
 import {getAllPairsAndSetToStore, getAllTokensAndSetToStore} from "./reactUtils/reactUtils";
 import LimitOrder from "./pages/LimitOrder/LimitOrder";
+import useFetchAppState from './hooks/useFetchAppState';
 
 
 function App() {
@@ -109,6 +110,7 @@ function App() {
         localStorage.setItem("chrome", "true");
     }
 
+    useFetchAppState();
     /*
         get pairs from dexroot
     */

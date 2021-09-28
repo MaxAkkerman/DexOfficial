@@ -49,6 +49,7 @@ function Manage() {
 
     const handleChange = value => {
         setRangeValue(value)
+        console.log("((fromToken.reserve * percent) / 100) * value) / 100",(((fromToken.reserve * percent) / 100) * value) / 100)
         setQtyA((((fromToken.reserve * percent) / 100) * value) / 100)
         setQtyB((((toToken.reserve * percent) / 100) * value) / 100)
     }
@@ -88,12 +89,12 @@ function Manage() {
     }
     function handleCloseReturnConfirm(){
         setshowReturnLiqidPopup(false)
-
-        setQtyA(0)
-        setQtyB(0)
     }
     const [showReturnLiqidPopup, setshowReturnLiqidPopup] = useState(false)
     function handleClose(){
+        setRangeValue(0)
+        setQtyA(0)
+        setQtyB(0)
         dispatch(setManageAsyncIsWaiting(false))
     }
 
@@ -169,6 +170,8 @@ function Manage() {
                     setRangeValue={setRangeValue}
                     qtyA={qtyA}
                     qtyB={qtyB}
+                    setQtyA={setQtyA}
+                    setQtyB={setQtyB}
                     rangeValue={rangeValue}
                     fromToken={fromToken}
                     toToken={toToken}
@@ -176,7 +179,9 @@ function Manage() {
             /> : null}
 
             {manageAsyncIsWaiting && <WaitingPopup
-                text={`Removing ${qtyA < 0.0001 ? parseFloat(qtyA.toFixed(8)) : parseFloat(qtyA.toFixed(4))} ${fromToken.symbol} and ${qtyB < 0.0001 ? parseFloat(qtyB.toFixed(8)) : parseFloat(qtyB.toFixed(4))} ${toToken.symbol}`}
+                text={`Removing ${qtyA.toFixed(4)} ${fromToken.symbol} and ${qtyB.toFixed(4)} ${toToken.symbol}`}
+
+                // text={`Removing ${qtyA < 0.0001 ? parseFloat(qtyA.toFixed(8)) : parseFloat(qtyA.toFixed(4))} ${fromToken.symbol} and ${qtyB < 0.0001 ? parseFloat(qtyB.toFixed(8)) : parseFloat(qtyB.toFixed(4))} ${toToken.symbol}`}
                 handleClose={()=>handleClose()}
             />}
         </div>

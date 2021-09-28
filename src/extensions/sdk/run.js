@@ -506,13 +506,19 @@ export async function returnLiquidity(curExt, pairAddr, tokens, phrase) {
  * @param qtyA
  * @param qtyB
  * @param phrase
+ * @param toTokenData
+ * @param fromtokenData
  */
 
-export async function processLiquidity(curExt, pairAddr, qtyA, qtyB, phrase) {
+export async function processLiquidity(curExt, pairAddr, qtyA, qtyB, phrase,fromtokenData,toTokenData) {
+    const {pubkey} = curExt._extLib
+
     let qtyAnum = Number(qtyA)
     let qtyBnum = Number(qtyB)
-    console.log(pairAddr, qtyAnum, qtyBnum, "===============")
-    const {pubkey, contract, SendTransfer, callMethod} = curExt._extLib
+
+    const qtyAfixed = Math.round(qtyAnum * getDecimals(fromtokenData.decimals))
+    const qtyBfixed = Math.round(qtyBnum * getDecimals(toTokenData.decimals))
+
 
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     const keys = await getClientKeys(phrase)
@@ -524,8 +530,12 @@ export async function processLiquidity(curExt, pairAddr, qtyA, qtyB, phrase) {
         client,
         signer: signerKeys(keys),
     });
+
+
+
+    console.log("qtyAfixed",qtyAfixed, "qtyBfixed",qtyBfixed, "fromtokenData",fromtokenData,"toTokenData",toTokenData)
     try {
-        return await acc.run("processLiquidity", {pairAddr: pairAddr, qtyA: qtyAnum.toFixed(), qtyB: qtyBnum.toFixed()})
+        return await acc.run("processLiquidity", {pairAddr: pairAddr, qtyA: qtyAfixed, qtyB: qtyBfixed})
     } catch (e) {
         console.log("catch E processLiquidity", e);
         return e

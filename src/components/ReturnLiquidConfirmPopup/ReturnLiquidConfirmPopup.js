@@ -22,14 +22,14 @@ function ReturnLiquidConfirmPopup(props) {
 
 
   async function handleRemoveConfirm() {
-props.setRangeValue(0)
+
 
     let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword)
     props.hideConfirmPopup()
     dispatch(setManageAsyncIsWaiting(true));
     let returnStatus = await returnLiquidity(curExt, pairId, ((balance * props.rangeValue) / 100) * 1000000000, decrypted.phrase);
     console.log("returnStatus",returnStatus)
-      dispatch(setManageAsyncIsWaiting(false    ));
+      dispatch(setManageAsyncIsWaiting(false));
     if(!returnStatus.code){
       dispatch(setTips(
           {
@@ -45,7 +45,9 @@ props.setRangeValue(0)
           }
       ))
     }
-
+    props.setQtyA(0)
+      props.setQtyB(0)
+      props.setRangeValue(0)
     // let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword)
     // dispatch(setPoolAsyncIsWaiting(true));
     // props.hideConfirmPopup();

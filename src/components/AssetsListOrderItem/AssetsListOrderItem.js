@@ -25,7 +25,6 @@ export default function AssetsListOrderItem({
 }) {
 	const {
 		addrPair,
-		addrOwner,
 		amount,
 		price,
 		directionPair,
@@ -55,115 +54,79 @@ export default function AssetsListOrderItem({
 	const CopyIcon = (props) =>
 		<SvgIcon component={SvgCopy} viewBox="0 0 14 14" {...props} />;
 
-	const clientData = useSelector(state => state.walletReducer.clientData);
-
-	const ownOrder = clientData.address === addrOwner;
-
 	return (
-		<>
-			<Box
-				className={cls(
-					classes.wrapper,
-					classes.wrapper_resetButton,
-					open && classes.wrapper_notClickable,
-				)}
-				component="button"
-				onClick={() => setOpen(true)}
+		<Box
+			className={classes.wrapper}
+			onClick={() => setOpen(!open)}
+		>
+			<Stack
+				direction="row"
+				className={classes.container}
 			>
+				<Box>
+					<img src={iconA} alt={symbolA} className={cls(classes.icon, classes.icon_first)} />
+					<img src={iconB} alt={symbolB} className={classes.icon} />
+				</Box>
+				<Stack alignItems="flex-start" className={classes.content}>
+					<Typography
+						className={classes.header}
+						component="h2"
+					>
+						{symbolA} - {symbolB}
+					</Typography>
+					<Typography className={classes.subheader} component="span">Limit order</Typography>
+				</Stack>
+				<Typography
+					component="span"
+					className={classes.amount}
+				>
+					{amount} {symbolA}
+				</Typography>
+			</Stack>
+			<Collapse in={open}>
 				<Stack
 					direction="row"
-					className={classes.container}
+					className={cls(classes.container, classes.container_second)}
 				>
-					<Box>
-						<img src={iconA} alt={symbolA} className={cls(classes.icon, classes.icon_first)} />
-						<img src={iconB} alt={symbolB} className={classes.icon} />
-					</Box>
-					<Box className={classes.content}>
-						<Typography
-							className={cls(
-								classes.font_large,
-								classes.text_bold,
-								appTheme === "light"
-									? classes.textColor_light
-									: classes.textColor_dark
-							)}
-							component="h2"
-						>
-							{symbolA} - {symbolB}
-						</Typography>
-						<Typography className={classes.content__subheader}>Limit order</Typography>
-					</Box>
-					<Typography
-						className={cls(
-							classes.amount,
-							classes.font_small,
-							classes.text_bold,
-							appTheme === "light"
-								? classes.textColor_light
-								: classes.textColor_dark
-						)}
+					<Stack
+						direction="flow"
+						alignItems="flex-start"
 					>
-						{amount} {symbolA}
+						<Tooltip title="Delete order">
+							<button className={cls(classes.btn, classes.btn_first)}>
+								<CrossIcon
+									className={cls(classes.icon_close, classes.icon_white)}
+								/>
+							</button>
+						</Tooltip>
+						<Tooltip title="Update order">
+							<button className={classes.btn} color="primary">
+								<CopyIcon
+									className={cls(classes.icon_copy, classes.icon_white)}
+								/>
+							</button>
+						</Tooltip>
+					</Stack>
+					<Stack alignItems="flex-start" className={classes.content}>
+						<Typography
+							component="span"
+							className={classes.header}
+						>
+							{price} {symbolB}
+						</Typography>
+						<Typography
+							className={classes.subheader}
+							component="span"
+						>Price</Typography>
+					</Stack>
+					<Typography
+						component="span"
+						className={classes.amount}
+					>
+						{amount * price} {symbolB}
 					</Typography>
 				</Stack>
-				<Collapse in={open}>
-					<Stack
-						direction="row"
-						className={cls(classes.container, classes.container_second)}
-					>
-						<Stack 
-							direction="flow" 
-							alignItems="flex-start" 
-							sx={{ visibility: ownOrder ? "visible" : "hidden" }}
-						>
-							<Tooltip title="Delete order">
-								<button className={cls(classes.btn, classes.btn_first)}>
-									<CrossIcon
-										className={cls(classes.icon_close, classes.icon_white)}
-									/>
-								</button>
-							</Tooltip>
-							<Tooltip title="Update order">
-								<button className={classes.btn} color="primary">
-									<CopyIcon
-										className={cls(classes.icon_copy, classes.icon_white)}
-									/>
-								</button>
-							</Tooltip>
-						</Stack>
-						<Box className={classes.content}>
-							<Typography
-								className={cls(
-									classes.font_medium,
-									classes.text_bold,
-									appTheme === "light"
-										? classes.textColor_light
-										: classes.textColor_dark
-								)}
-							>
-								{price} {symbolB}
-							</Typography>
-							<Typography
-								className={classes.content__subheader}
-								component="h3"
-							>Price</Typography>
-						</Box>
-						<Typography
-							className={cls(
-								classes.amount,
-								classes.font_medium,
-								classes.text_bold,
-								appTheme === "light"
-									? classes.textColor_light
-									: classes.textColor_dark
-							)}
-						>
-							{amount * price} {symbolB}
-						</Typography>
-					</Stack>
-				</Collapse>
-			</Box>
-			<Divider />
-		</>
+			</Collapse>
+		</Box>
 	)
 }

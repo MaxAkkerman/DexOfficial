@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {useHistory} from 'react-router-dom';
-import {useDispatch, useSelector} from 'react-redux';
-import {showPopup} from '../../store/actions/app';
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { showPopup } from '../../store/actions/app';
 import MainBlock from './../../components/MainBlock/MainBlock';
 import SwapBtn from '../../components/SwapBtn/SwapBtn';
 import './LimitOrder.scss';
@@ -12,15 +12,16 @@ import {
     getClientForConnect,
     setCreator
 } from "../../extensions/sdk/run"
-import {checkClientPairExists, getAllClientWallets, getClientKeys, subscribe} from "../../extensions/webhook/script";
-import {setSlippageValue, setSwapAsyncIsWaiting} from "../../store/actions/swap";
-import {decrypt} from "../../extensions/seedPhrase";
-import {Box, Stack, TextField, Typography} from "@material-ui/core";
+import { checkClientPairExists, getAllClientWallets, getClientKeys, subscribe } from "../../extensions/webhook/script";
+import { setSlippageValue, setSwapAsyncIsWaiting } from "../../store/actions/swap";
+import { decrypt } from "../../extensions/seedPhrase";
+import { Box, Stack, TextField, Typography } from "@material-ui/core";
 import OrdersInput from "../../components/OrdersInput/OrdersInput";
-import {hideOrdersConfirmPopup, setOrdersRate, showOrdersConfirmPopup} from "../../store/actions/limitOrders";
+import { hideOrdersConfirmPopup, setOrdersRate, showOrdersConfirmPopup } from "../../store/actions/limitOrders";
 import SwapConfirmPopup from "../../components/SwapConfirmPopup/SwapConfirmPopup";
 import OrdersConfirmPopup from "../../components/OrdersConfirmPopup/OrdersConfirmPopup";
-import {iconGenerator} from "../../iconGenerator";
+import { iconGenerator } from "../../iconGenerator";
+import WaitingPopup from '../../components/WaitingPopup/WaitingPopup';
 
 function LimitOrder() {
     const history = useHistory();
@@ -38,7 +39,7 @@ function LimitOrder() {
     const rate = useSelector(state => state.limitOrders.rate);
 
     const pairId = useSelector(state => state.limitOrders.pairId);
-    const swapAsyncIsWaiting = useSelector(state => state.limitOrders.swapAsyncIsWaiting);
+    const ordersAsyncIsWaiting = useSelector(state => state.limitOrders.ordersAsyncIsWaiting);
 
     const encryptedSeedPhrase = useSelector(state => state.enterSeedPhrase.encryptedSeedPhrase);
     const clientData = useSelector(state => state.walletReducer.clientData);
@@ -82,7 +83,7 @@ function LimitOrder() {
             console.log("3453453495834058dgjfjgfdjg")
             dispatch(showOrdersConfirmPopup());
         } else {
-            dispatch(showPopup({type: 'error', message: 'Fields should not be empty'}));
+            dispatch(showPopup({ type: 'error', message: 'Fields should not be empty' }));
         }
     }
 
@@ -174,19 +175,15 @@ function LimitOrder() {
             onClick={() => handleConfirm()}>Create limit order</button>
     }
 
-    function handleSetSlippage(e){
-        setSlippage(e.target.value);
-    }
-
     return (
         <div className="container" onClick={() => console.log("clientadad", clientData)}>
-            {(!swapAsyncIsWaiting && !connectAsyncIsWaiting) && (
+            {(!ordersAsyncIsWaiting && !connectAsyncIsWaiting) && (
                 <MainBlock
                     smallTitle={false}
                     content={
                         <div>
-                            <div className="head_wrapper" style={{marginBottom: "40px"}}>
-                                <div className="left_block" style={{color: "var(--mainblock-title-color)"}}>
+                            <div className="head_wrapper" style={{ marginBottom: "40px" }}>
+                                <div className="left_block" style={{ color: "var(--mainblock-title-color)" }}>
                                     Limit order
                                 </div>
                             </div>
@@ -213,13 +210,13 @@ function LimitOrder() {
                                 />
 
                                 <div className={"orders__price_box"}>
-                                    <Stack direction={"column"} spacing={1} sx={{marginBottom: "15px"}}>
+                                    <Stack direction={"column"} spacing={1} sx={{ marginBottom: "15px" }}>
                                         <div>Price</div>
                                         <div className={"orders__icon_box"}>
                                             <input id="enterPrice" type={"number"} autoComplete="false" className={"orders__input"} onChange={(e) => dispatch(setOrdersRate(Number(e.target.value)))} />
                                             {toToken && toToken.symbol && <div className="input-select">
                                                 <img src={iconGenerator(toToken.symbol)} alt={toToken.symbol}
-                                                     className="input-token-img"/>
+                                                    className="input-token-img" />
                                                 <span>{toToken && toToken.symbol}</span>
                                             </div>}
                                         </div>
@@ -228,29 +225,28 @@ function LimitOrder() {
                                     <button className="btn orders" onClick={() => history.push('/account')}>Set to market</button>
                                 </div>
 
-                                {/*{walletIsConnected ?*/}
-                                {/*    getCurBtn()*/}
-                                {/*    :*/}
-                                {/*    <button className="btn mainblock-btn"*/}
-                                {/*            onClick={() => history.push('/account')}>Connect*/}
-                                {/*        wallet</button>*/}
-                                {/*}*/}
-                                <button className="btn mainblock-btn btn--disabled" disabled>Coming soon</button>
-
-
+                                {walletIsConnected ?
+                                    getCurBtn()
+                                    :
+                                    <button className="btn mainblock-btn"
+                                            onClick={() => history.push('/account')}>Connect
+                                        wallet</button>
+                                }
+                                {/*<button className="btn mainblock-btn btn--disabled" disabled>Coming soon</button>*/}
 
 
                                 {(fromToken.symbol && toToken.symbol) &&
-                                <p className="swap-rate">Price <span>{parseFloat(rate).toFixed(rate > 0.0001 ? 4 : 6)} {toToken.symbol}</span> per <span>1 {fromToken.symbol}</span>
-                                </p>}
-
+                                    <p className="swap-rate">Price <span>{parseFloat(rate).toFixed(rate > 0.0001 ? 4 : 6)} {toToken.symbol}</span> per <span>1 {fromToken.symbol}</span>
+                                    </p>}
                             </div>
-                            {ordersConfirmPopupIsVisible &&
-                            <OrdersConfirmPopup hideConfirmPopup={hideOrdersConfirmPopup}/>}
                         </div>
                     }
                 />
             )}
+            {ordersConfirmPopupIsVisible &&
+                <OrdersConfirmPopup hideConfirmPopup={hideOrdersConfirmPopup} />}
+            {ordersAsyncIsWaiting &&
+                <WaitingPopup text={`Creating limit order of ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`} />}
         </div>
     )
 }
