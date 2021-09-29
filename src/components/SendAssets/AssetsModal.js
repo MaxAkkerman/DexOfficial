@@ -11,7 +11,7 @@ import {
 	setTokenSetted,
 } from "../../store/actions/walletSeed";
 import SearchInput from "../SearchInput/SearchInput";
-import useTokenList from "../../hooks/useTokenList";
+import useAssetList from "../../hooks/useAssetList";
 
 import CloseBtn from "../CloseBtn/CloseBtn";
 import MainBlock from "../MainBlock/MainBlock";
@@ -60,7 +60,7 @@ function AssetsModal() {
 	//         settokensWithNativeTons(withNative)
 	//
 	// =======
-	const {tokenList} = useTokenList();
+	const {assetList} = useAssetList();
 	// >>>>>>> origin/liketurbo
 
 	// }, [clientData, tokenList])
@@ -134,7 +134,7 @@ function AssetsModal() {
 							<AssetsList
 								handleClickNFT={(item) => handleSetNFT(item)}
 								handleClickToken={(item) => handleSetToken(item)}
-								TokenAssetsArray={[...tokenList, ...liquidityList]}
+								TokenAssetsArray={[...assetList, ...liquidityList]}
 								NFTassetsArray={NFTassets}
 								orderAssetsArray={null}
 								showItBeShown={false}

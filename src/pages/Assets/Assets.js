@@ -11,7 +11,7 @@ import AssetsList from "../../components/AssetsList/AssetsList";
 
 import {useDispatch, useSelector} from "react-redux";
 import {showTip} from "../../store/actions/app";
-import useTokenList from "../../hooks/useTokenList";
+import useAssetList from "../../hooks/useAssetList";
 import {setTokenList} from "../../store/actions/wallet";
 import {unWrapTons, wrapTons} from "../../extensions/sdk/run";
 import {decrypt} from "../../extensions/seedPhrase";
@@ -78,7 +78,7 @@ function Assets() {
 	function handleClickToken(curItem) {
 		if (curItem.type !== "Native Tons") return;
 		console.log("curItem", curItem);
-		const copyAssets = JSON.parse(JSON.stringify(tokenList));
+		const copyAssets = JSON.parse(JSON.stringify(assetList));
 		copyAssets.map((item) => {
 			if ("Native Tons" === item.type) {
 				item.showWrapMenu = !item.showWrapMenu;
@@ -93,7 +93,7 @@ function Assets() {
 	const [currentTokenForWrap, setcurrentTokenForWrap] = useState({});
 	const [viewData, setViewData] = useState({});
 	async function handleWrapTons() {
-		const tonObj = tokenList.filter((item) => item.type === "Native Tons");
+		const tonObj = assetList.filter((item) => item.type === "Native Tons");
 		console.log("tonObj", tonObj);
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
@@ -107,7 +107,7 @@ function Assets() {
 		// console.log("wrapRes",wrapRes)
 	}
 	async function handleUnWrapTons() {
-		const tonObj = tokenList.filter((item) => item.symbol === "WTON");
+		const tonObj = assetList.filter((item) => item.symbol === "WTON");
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
 			type: "unwrap",
@@ -140,7 +140,7 @@ function Assets() {
 	//
 	//
 	//     }, []);
-	const {tokenList} = useTokenList();
+	const {assetList} = useAssetList();
 	return (
 		<>
 			{showWrapMenu ? (
@@ -229,10 +229,10 @@ function Assets() {
 								{walletIsConnected ? (
 									<>
 										{(NFTassets && NFTassets.length) ||
-										(tokenList && tokenList.length) ||
+										(assetList && assetList.length) ||
 										(orderList && orderList.length) ? (
 											<AssetsList
-												TokenAssetsArray={[...tokenList, ...liquidityList]}
+												TokenAssetsArray={[...assetList, ...liquidityList]}
 												orderAssetsArray={orderList}
 												NFTassetsArray={assets}
 												handleClickNFT={(item) => handleShowNFTData(item)}

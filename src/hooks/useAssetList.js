@@ -2,7 +2,7 @@ import {useState, useEffect} from "react";
 import {useSelector} from "react-redux";
 import TONicon from "../images/tonCrystalDefault.svg";
 
-export default function useTokenList() {
+export default function useAssetList() {
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const liquidityList = useSelector(
 		(state) => state.walletReducer.liquidityList,
@@ -48,6 +48,6 @@ export default function useTokenList() {
 	}, [tokenList, clientData, updatedWallet]);
 
 	return {
-		tokenList: fullSetOfAssets,
+		assetList: fullSetOfAssets,
 	};
 }
