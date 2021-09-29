@@ -87,6 +87,7 @@ import {
 } from "./reactUtils/reactUtils";
 import LimitOrder from "./pages/LimitOrder/LimitOrder";
 import useFetchLimitOrders from "./hooks/useFetchLimitOrders";
+import useSubLimitOrders from "./hooks/useSubLimitOrders";
 
 function App() {
 	const {enqueueSnackbar} = useSnackbar();
@@ -135,6 +136,8 @@ function App() {
 	}
 
 	useFetchLimitOrders();
+	useSubLimitOrders();
+
 	/*
         get pairs from dexroot
     */
