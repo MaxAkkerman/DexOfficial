@@ -22,9 +22,6 @@ function OrdersConfirmPopup() {
 	const toValue = useSelector((state) => state.limitOrders.toInputValue);
 	const pairId = useSelector((state) => state.limitOrders.pairId);
 	const clientData = useSelector((state) => state.walletReducer.clientData);
-	const ordersAsyncIsWaiting = useSelector(
-		(state) => state.limitOrders.ordersAsyncIsWaiting,
-	);
 
 	const {keyPair} = useKeyPair();
 
@@ -46,7 +43,7 @@ function OrdersConfirmPopup() {
 			},
 		);
 
-		if (ordersAsyncIsWaiting) dispatch(setOrdersAsyncIsWaiting(false));
+		dispatch(setOrdersAsyncIsWaiting(false));
 	}
 
 	return (
