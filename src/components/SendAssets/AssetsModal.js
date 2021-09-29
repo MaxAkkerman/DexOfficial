@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import "./SendAssets.scss";
 import arrowBack from "../../images/arrowBack.png";
@@ -16,6 +16,7 @@ import useAssetList from "../../hooks/useAssetList";
 import CloseBtn from "../CloseBtn/CloseBtn";
 import MainBlock from "../MainBlock/MainBlock";
 import {useMediatedState} from "react-use";
+import includesTextInToken from "../../utils/includesTextInToken";
 
 function AssetsModal() {
 	const history = useHistory();
@@ -61,6 +62,8 @@ function AssetsModal() {
 	//
 	// =======
 	const {assetList} = useAssetList();
+
+	const [filter, setFilter] = useState("");
 	// >>>>>>> origin/liketurbo
 
 	// }, [clientData, tokenList])
@@ -103,12 +106,7 @@ function AssetsModal() {
 	//     setShowNFTdata(!showNFTdata)
 	//
 	// }
-	function handleSearch(text) {
-		// const assetsArrCopy = JSON.parse(JSON.stringify(assetsArr))
-		// const arr = assetsArrCopy.filter(item=>text===item.name)
-		//
-		// setAssetsArr(arr)
-	}
+
 	function handleClose() {
 		dispatch(setInputNFTDisabled(null));
 		history.push("/wallet/send");
@@ -129,12 +127,14 @@ function AssetsModal() {
 							{/*        <img src={arrowBack} alt={"arrow"}/>*/}
 							{/*    </button>*/}
 							{/*</div>*/}
-							<SearchInput func={(text) => handleSearch(text)} />
+							<SearchInput func={setFilter} />
 
 							<AssetsList
 								handleClickNFT={(item) => handleSetNFT(item)}
 								handleClickToken={(item) => handleSetToken(item)}
-								TokenAssetsArray={[...assetList, ...liquidityList]}
+								TokenAssetsArray={[...assetList, ...liquidityList]
+									.sort((a, b) => b.balance - a.balance)
+									.filter((t) => includesTextInToken(t, filter))}
 								NFTassetsArray={NFTassets}
 								orderAssetsArray={null}
 								showItBeShown={false}
