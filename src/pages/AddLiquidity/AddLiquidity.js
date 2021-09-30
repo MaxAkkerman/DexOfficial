@@ -174,7 +174,6 @@ function AddLiquidity() {
             return
         }
 
-
         if (fromToken.symbol && toToken.symbol && fromValue) {
             // if(fromValue > fromToken.balance ) {
             //   dispatch(showPopup({type: 'error', message: 'Excess of balance'}));
@@ -254,7 +253,7 @@ function AddLiquidity() {
 
                                         <div>
                         <span>{
-
+//todo check
                             (getTotalLP(fromValue * 1000000000, toValue * 1000000000, ratesData.reservesA * 1000000000, ratesData.reservesB * 1000000000, ratesData.totalSupply * 1000000000) / 1000000000) !== 0
                                 ?
                                 (getTotalLP(fromValue * 1000000000, toValue * 1000000000, ratesData.reservesA * 1000000000, ratesData.reservesB * 1000000000, ratesData.totalSupply * 1000000000) / 1000000000) < 0.0001 ? (getTotalLP(fromValue * 1000000000, toValue * 1000000000, ratesData.reservesA * 1000000000, ratesData.reservesB * 1000000000, ratesData.totalSupply * 1000000000) / 1000000000).toFixed(6) : (getTotalLP(fromValue * 1000000000, toValue * 1000000000, ratesData.reservesA * 1000000000, ratesData.reservesB * 1000000000, ratesData.totalSupply * 1000000000) / 1000000000).toFixed(4)

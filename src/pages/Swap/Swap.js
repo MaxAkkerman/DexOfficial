@@ -262,15 +262,15 @@ function Swap() {
                                     Swap
                                 </div>
 
-                                {/*<div className={"settings_btn_container"}>*/}
-                                {/*    <button*/}
-                                {/*        aria-describedby={popperState.id}*/}
-                                {/*        className="settings_btn"*/}
-                                {/*        onClick={popperState.handleClick}*/}
-                                {/*    >*/}
-                                {/*        <img src={settingsBtn} alt={"settings"} />*/}
-                                {/*    </button>*/}
-                                {/*</div>*/}
+                                <div className={"settings_btn_container"}>
+                                    <button
+                                        aria-describedby={popperState.id}
+                                        className="settings_btn"
+                                        onClick={popperState.handleClick}
+                                    >
+                                        <img src={settingsBtn} alt={"settings"} />
+                                    </button>
+                                </div>
 
                             </div>
                             <div>

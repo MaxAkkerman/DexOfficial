@@ -121,10 +121,10 @@ function EnterPassword(props) {
 
         if (decrypted.valid === false) setDecryptResult(false)
         if (decrypted.valid === true) {
-            setDecryptResult(true)
-            dispatch(hideEnterSeedPhraseUnlock());
-
             setloadingUserDataIsWaiting(true)
+            setDecryptResult(true)
+
+
             /*
                 check client and extension
             */
@@ -170,7 +170,7 @@ function EnterPassword(props) {
                 // localStorage.setItem('setSubscribeReceiveTokens', JSON.stringify([]))
 
                 const receiveTokensData = JSON.parse(localStorage.getItem("setSubscribeReceiveTokens"))
-                if(receiveTokensData){
+                if (receiveTokensData) {
                     dispatch(setSubscribeReceiveTokens(receiveTokensData))
                 }
 
@@ -179,6 +179,7 @@ function EnterPassword(props) {
 
             }
             setloadingUserDataIsWaiting(false)
+            dispatch(hideEnterSeedPhraseUnlock());
             history.push("/wallet")
         }
     }
@@ -211,82 +212,81 @@ function EnterPassword(props) {
     };
 
     const [loadingUserDataIsWaiting, setloadingUserDataIsWaiting] = useState(false)
-    return ReactDOM.createPortal(
+    return (
         <div className="select-wrapper">
-            {loadingUserDataIsWaiting &&
-            <WaitingPopup text={`Loading user data...`}/>}
+            {loadingUserDataIsWaiting ?
+                <WaitingPopup title={"Connecting to blockchain"} text={`Loading user data...`}/>
 
+                :
+                <MainBlock
+                    title={'Unlock your wallet'}
+                    content={
+                        <>
+                            <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
 
-            {/*<Snackbar open={snackbarOpened} autoHideDuration={6000} onClose={snackbarHandleClose}>*/}
-            {/*    <Alert onClose={snackbarHandleClose} severity={snackbarSeverity} sx={{width: '100%'}}>*/}
-            {/*        {snackbarMessage}*/}
-            {/*    </Alert>*/}
-            {/*</Snackbar>*/}
-            <MainBlock
-                title={'Unlock your wallet'}
-                content={
-                    <>
-                        <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+                                <TextField
+                                    label="Decryption password"
+                                    error={!validPassword}
+                                    sx={{width: "100%"}}
+                                    placeholder={"Your seed phrase will be decrypted with this password"}
+                                    type="password"
+                                    onChange={passwordChange}
+                                    inputRef={(input) => {
+                                        if (input != null) {
+                                            input.focus();
+                                        }
+                                    }}
+                                    value={seedPhrasePassword}
+                                    onKeyDown={enterClick}
+                                    autoFocus
+                                />
+                            </Box>
+                            <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
 
-                            <TextField
-                                label="Decryption password"
-                                error={!validPassword}
-                                sx={{width: "100%"}}
-                                placeholder={"Your seed phrase will be decrypted with this password"}
-                                type="password"
-                                onChange={passwordChange}
-                                inputRef={(input) => {
-                                    if (input != null) {
-                                        input.focus();
-                                    }
-                                }}
-                                value={seedPhrasePassword}
-                                onKeyDown={enterClick}
-                                autoFocus
-                            />
-                        </Box>
-                        <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+                                <Alert severity="info">
+                                    <AlertTitle>Security policy</AlertTitle>
+                                    <strong>DefiSpace does not store your password.</strong><br/>
+                                    It is used exclusively for local decryption of the seed phrase stored in the browser
+                                    storage.
+                                </Alert>
+                            </Box>
+                            <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
 
-                            <Alert severity="info">
-                                <AlertTitle>Security policy</AlertTitle>
-                                <strong>DefiSpace does not store your password.</strong><br/>
-                                It is used exclusively for local decryption of the seed phrase stored in the browser
-                                storage.
-                            </Alert>
-                        </Box>
-                        <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+                                <Alert
+                                    style={{width: "100%"}}
+                                    severity={decryptResult === null && "info" || decryptResult === false && "error" || decryptResult === true && "success"}>
+                                    <AlertTitle>{decryptResult === null && "Wait to unlock" || decryptResult === false && "Incorrect password" || decryptResult === true && "All right"}</AlertTitle>
+                                    {decryptResult === null && "Please, enter your password and click to button below."
+                                    || decryptResult === false && "Oh! You're enter incorrect password! Try enter again or Clear your saved account."
+                                    || decryptResult === true && "Yeah! Your wallet have been unlocked! Please wait, we check additional information. Be patient."}
+                                </Alert>
+                            </Box>
+                            <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+                                <Grid container spacing={3} sx={{justifyContent: "space-between"}}>
+                                    <Grid item>
+                                        <button style={{fontSize: "24px"}} onClick={clear}
+                                                className="btn-error wallet-btn">Log out and Delete
+                                        </button>
+                                    </Grid>
 
-                            <Alert
-                                style={{width:"100%"}}
-                                severity={decryptResult === null && "info" || decryptResult === false && "error" || decryptResult === true && "success"}>
-                                <AlertTitle>{decryptResult === null && "Wait to unlock" || decryptResult === false && "Incorrect password" || decryptResult === true && "All right"}</AlertTitle>
-                                {decryptResult === null && "Please, enter your password and click to button below."
-                                || decryptResult === false && "Oh! You're enter incorrect password! Try enter again or Clear your saved account."
-                                || decryptResult === true && "Yeah! Your wallet have been unlocked! Please wait, we check additional information. Be patient."}
-                            </Alert>
-                        </Box>
-                        <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
-                            <Grid container spacing={3} sx={{justifyContent: "space-between"}}>
-                                <Grid item>
-                                    <button style={{fontSize: "24px"}} onClick={clear}
-                                            className="btn-error wallet-btn">Log out and Delete
-                                    </button>
+                                    <Grid item>
+                                        <button style={{fontSize: "24px"}} onClick={login}
+                                                className="btn wallet-btn">Unlock
+                                        </button>
+                                    </Grid>
                                 </Grid>
 
-                                <Grid item>
-                                    <button style={{fontSize: "24px"}} onClick={login}
-                                            className="btn wallet-btn">Unlock
-                                    </button>
-                                </Grid>
-                            </Grid>
+                            </Box>
+                        </>
+                    }
+                />
 
-                        </Box>
-                    </>
-                }
-            />
-        </div>,
-        document.querySelector('body')
-    );
+            }
+
+        </div>
+    )
+    //     document.querySelector('body')
+    // );
 }
 
 export default EnterPassword;

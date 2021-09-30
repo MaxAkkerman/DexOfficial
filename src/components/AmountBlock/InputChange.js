@@ -6,6 +6,8 @@ function InputChange() {
     const dispatch = useDispatch();
 
     function handleChangeAmount(e) {
+        console.log("i am on inp change")
+
         dispatch(setAmountForSend(e.currentTarget.value))
     }
 

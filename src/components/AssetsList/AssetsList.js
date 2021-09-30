@@ -18,7 +18,8 @@ function AssetsList(props) {
     return (
         <div className={props.assetWrap ? props.assetWrap + " assets_wrapper" : "assets_wrapper"}
              onClick={() => console.log("props", props)}>
-            {props.TokenAssetsArray.sort((a, b) => (b.balance || 0) - (a.balance || 0)).map((item, i) => (
+            {props.TokenAssetsArray.sort((a, b) => (b.balance || 0) - (a.balance || 0))
+                .map((item, i) => (
                 <div className="assets_item_wrapper" onClick={() => props.handleClickToken(item)}
                      key={i}>
                     <div style={{width: "100%"}}>

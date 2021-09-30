@@ -9,7 +9,7 @@ function WaitingPopup(props) {
             content={
                 <div className="popup-content">
                     <Loader/>
-                    <p className="popup-loading-text">Sending message to blockchain</p>
+                    <p className="popup-loading-text">{props.title ? props.title : "Sending message to blockchain"}</p>
                     {props.text && <p className="popup-loading-text popup-loading-descr">{props.text}</p>}
                     <button className="btn popup-btn" onClick={() => props.handleClose()
 

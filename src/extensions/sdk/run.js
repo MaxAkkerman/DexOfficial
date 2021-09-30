@@ -456,10 +456,10 @@ export async function swapB(curExt, pairAddr, qtyB, slippage = 2, phrase, qtyA,f
  */
 
 
-export async function returnLiquidity(curExt, pairAddr, tokens, phrase) {
+export async function returnLiquidity(curExt, pairAddr, tokens, keys) {
     const {pubkey, contract, SendTransfer, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
-    const keys = await getClientKeys(phrase)
+    // const keys = await getClientKeys(phrase)
 
     if (getClientAddressFromRoot.status === false) {
         return getClientAddressFromRoot
@@ -521,7 +521,9 @@ export async function processLiquidity(curExt, pairAddr, qtyA, qtyB, phrase,from
 
 
     let getClientAddressFromRoot = await checkPubKey(pubkey)
+
     const keys = await getClientKeys(phrase)
+
     if (getClientAddressFromRoot.status === false) {
         return getClientAddressFromRoot
     }

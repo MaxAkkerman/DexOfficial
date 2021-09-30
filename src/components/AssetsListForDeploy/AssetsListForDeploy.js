@@ -9,8 +9,11 @@ import {decrypt} from "../../extensions/seedPhrase";
 import "./AssetsListForDeploy.scss"
 import SearchInput from "../SearchInput/SearchInput";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
+import arrowBack from "../../images/arrowBack.png";
+import {useHistory} from "react-router-dom";
 
 function AssetsListForDeploy() {
+    const history = useHistory();
 
     const encryptedSeedPhrase = useSelector(state => state.enterSeedPhrase.encryptedSeedPhrase);
     const seedPhrasePassword = useSelector(state => state.enterSeedPhrase.seedPhrasePassword);
@@ -59,6 +62,9 @@ const [deployWalletIsWaiting,setdeployWalletIsWaiting] = useState(false)
     function handleClose(){
         setdeployWalletIsWaiting(false)
     }
+    function handleBack(){
+        history.push("/wallet")
+    }
     return (
 
         <>
@@ -84,6 +90,9 @@ const [deployWalletIsWaiting,setdeployWalletIsWaiting] = useState(false)
                     content={
                         <div>
                             <div className="head_wrapper" style={{marginBottom:"40px"}}>
+                                <button className="arrow_back" onClick={() => handleBack()}>
+                                    <img src={arrowBack} alt={"arrow"}/>
+                                </button>
                                 <div className="left_block">
                                     Assets Inspector
                                 </div>

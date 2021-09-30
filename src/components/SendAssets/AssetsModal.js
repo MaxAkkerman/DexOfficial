@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import './SendAssets.scss';
 import arrowBack from '../../images/arrowBack.png';
@@ -78,7 +78,7 @@ function AssetsModal() {
 
     function handleSetNFT(item) {
         dispatch(setAmountForSend(""))
-
+console.log("i am on vft")
         dispatch(setInputNFTDisabled("disabled"))
         dispatch(setAmountForSend(item.stakeTotal))
         dispatch(setCurrentTokenForSend(item))
@@ -103,7 +103,9 @@ function AssetsModal() {
     //     setShowNFTdata(!showNFTdata)
     //
     // }
+    const [filter,setFilter] = useState("")
     function handleSearch(text) {
+        setFilter(text)
         // const assetsArrCopy = JSON.parse(JSON.stringify(assetsArr))
         // const arr = assetsArrCopy.filter(item=>text===item.name)
         //
@@ -131,7 +133,7 @@ function AssetsModal() {
                             {/*        <img src={arrowBack} alt={"arrow"}/>*/}
                             {/*    </button>*/}
                             {/*</div>*/}
-                            <SearchInput func={(text) => handleSearch(text)}/>
+                            <SearchInput func={(e) => handleSearch(e)}/>
 
                             <AssetsList
                                 handleClickNFT={(item) => handleSetNFT(item)}
@@ -140,6 +142,7 @@ function AssetsModal() {
                                 NFTassetsArray={NFTassets}
                                 orderAssetsArray={null}
                                 showItBeShown={false}
+                                filter={filter}
                                 // showNFTdata={false}
                             />
 

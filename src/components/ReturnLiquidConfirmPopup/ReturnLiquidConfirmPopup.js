@@ -7,6 +7,7 @@ import {decrypt} from "../../extensions/seedPhrase";
 import "./ReturnLiquidConfirmPopup.scss"
 import {setTips} from "../../store/actions/app";
 import {setManageAsyncIsWaiting} from "../../store/actions/manage";
+import useKeyPair from "../../hooks/useKeyPair";
 
 function ReturnLiquidConfirmPopup(props) {
   const dispatch = useDispatch();
@@ -16,18 +17,18 @@ function ReturnLiquidConfirmPopup(props) {
   const balance = useSelector(state => state.manageReducer.balance);
   const pairId = useSelector(state => state.manageReducer.pairId);
 
-  const encryptedSeedPhrase = useSelector(state => state.enterSeedPhrase.encryptedSeedPhrase);
-  const seedPhrasePassword = useSelector(state => state.enterSeedPhrase.seedPhrasePassword);
+  // const encryptedSeedPhrase = useSelector(state => state.enterSeedPhrase.encryptedSeedPhrase);
+  // const seedPhrasePassword = useSelector(state => state.enterSeedPhrase.seedPhrasePassword);
   const manageAsyncIsWaiting = useSelector(state => state.manageReducer.manageAsyncIsWaiting);
 
-
+    const { keyPair } = useKeyPair();
   async function handleRemoveConfirm() {
 
 
-    let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword)
+    // let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword)
     props.hideConfirmPopup()
     dispatch(setManageAsyncIsWaiting(true));
-    let returnStatus = await returnLiquidity(curExt, pairId, ((balance * props.rangeValue) / 100) * 1000000000, decrypted.phrase);
+    let returnStatus = await returnLiquidity(curExt, pairId, ((balance * props.rangeValue) / 100) * 1000000000, keyPair);
     console.log("returnStatus",returnStatus)
       dispatch(setManageAsyncIsWaiting(false));
     if(!returnStatus.code){

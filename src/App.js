@@ -374,23 +374,39 @@ function App() {
                 <Route exact path="/manage" component={Manage}/>
                 <Route exact path="/add-liquidity" component={AddLiquidity}/>
 
-                {/*<Route exact path="/stacking" component={Stacking}/>*/}
-
                 <Route exact path="/staking" component={Stacking}/>
-                <Route exact path="/wallet/settings/keys" component={KeysBlock}/>
-                <Route exact path="/wallet/send" component={SendAssets}/>
-                <Route exact path="/wallet/receive" component={ReceiveAssets}/>
-                <Route exact path="/wallet/settings" component={WalletSettings}/>
-                <Route exact path="/wallet/deployAssets" component={AssetsListForDeploy}/>
-                <Route exact path="/wallet/receive/receive-modal" component={AssetsModalReceive}/>
-                <Route exact path="/wallet/send/send-modal" component={AssetsModal}/>
                 <Route exact path="/wallet" component={Assets}/>
-
                 <Route exact path="/orders" component={LimitOrder} />
                 <Route exact path="/">
                     <Redirect from="/" to="/wallet" />
                 </Route>
 
+                {walletIsConnected ?
+                    <>
+                    {/*<Route exact path="/native-login" component={NativeLogin}/>*/}
+                    {/*<Route exact path="/pool-explorer" component={PoolExplorer}/>*/}
+                    {/*<Route exact path="/pool" component={Pool}/>*/}
+                    {/*<Route exact path="/account" component={Account}/>*/}
+                    {/*<Route exact path="/swap" component={Swap}/>*/}
+                    {/*<Route exact path="/manage" component={Manage}/>*/}
+                    {/*<Route exact path="/add-liquidity" component={AddLiquidity}/>*/}
+
+                    {/*<Route exact path="/staking" component={Stacking}/>*/}
+                    {/*<Route exact path="/wallet" component={Assets}/>*/}
+                    {/*<Route exact path="/orders" component={LimitOrder} />*/}
+
+                    <Route exact path="/wallet/settings/keys" component={KeysBlock}/>
+                    <Route exact path="/wallet/send" component={SendAssets}/>
+                    <Route exact path="/wallet/receive" component={ReceiveAssets}/>
+                    <Route exact path="/wallet/settings" component={WalletSettings}/>
+                    <Route exact path="/wallet/deployAssets" component={AssetsListForDeploy}/>
+                    <Route exact path="/wallet/receive/receive-modal" component={AssetsModalReceive}/>
+                    <Route exact path="/wallet/send/send-modal" component={AssetsModal}/>
+
+
+                    </>
+                    : null
+                }
             </Switch>
             {popup.isVisible ? <Popup type={popup.type} message={popup.message} link={popup.link}/> : null}
             {revealSeedPhraseIsVisible ? <RevealSeedPhrase/> : null}
