@@ -11,25 +11,28 @@ dayjs.extend(duration);
  * @returns {number}
  */
 export function getDurationFromSeconds(seconds, convertUnit) {
-    console.log("dayjs.duration({ seconds }).asSeconds()",dayjs.duration({ seconds }).asSeconds())
-    switch (convertUnit) {
-        case "seconds":
-            return dayjs.duration({ seconds }).asSeconds();
-        case "minutes":
-            return dayjs.duration({ seconds }).asMinutes();
-        case "hours":
-            return dayjs.duration({ seconds }).asHours();
-        case "days":
-            return dayjs.duration({ seconds }).asDays();
-        case "weeks":
-            return dayjs.duration({ seconds }).asWeeks();
-        case "months":
-            return dayjs.duration({ seconds }).asMonths();
-        case "years":
-            return dayjs.duration({ seconds }).asYears();
-        default:
-            throw new Error("Unknown convert unit");
-    }
+	console.log(
+		"dayjs.duration({ seconds }).asSeconds()",
+		dayjs.duration({seconds}).asSeconds(),
+	);
+	switch (convertUnit) {
+		case "seconds":
+			return dayjs.duration({seconds}).asSeconds();
+		case "minutes":
+			return dayjs.duration({seconds}).asMinutes();
+		case "hours":
+			return dayjs.duration({seconds}).asHours();
+		case "days":
+			return dayjs.duration({seconds}).asDays();
+		case "weeks":
+			return dayjs.duration({seconds}).asWeeks();
+		case "months":
+			return dayjs.duration({seconds}).asMonths();
+		case "years":
+			return dayjs.duration({seconds}).asYears();
+		default:
+			throw new Error("Unknown convert unit");
+	}
 }
 
 /**
@@ -39,5 +42,5 @@ export function getDurationFromSeconds(seconds, convertUnit) {
  * @returns {string}
  */
 export function getFormattedDate(timestamp) {
-    return dayjs(Number(timestamp) * 1000).format("DD.MM.YYYY HH:MM")
+	return dayjs(Number(timestamp) * 1000).format("DD.MM.YYYY HH:MM");
 }

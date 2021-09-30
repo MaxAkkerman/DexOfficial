@@ -1,5 +1,5 @@
-import { useSelector } from "react-redux";
-import { useState } from "react";
+import {useSelector} from "react-redux";
+import {useState} from "react";
 
 const VALIDATION_MSG = "Not enough tokens in your account";
 
@@ -20,7 +20,9 @@ const VALIDATION_MSG = "Not enough tokens in your account";
  */
 export default function useCheckAmount(amount) {
 	const clientData = useSelector((state) => state.walletReducer.clientData);
-	const currentTokenForSend = useSelector(state => state.walletSeedReducer.currentTokenForSend);
+	const currentTokenForSend = useSelector(
+		(state) => state.walletSeedReducer.currentTokenForSend,
+	);
 
 	const [isInvalid, setIsInvalid] = useState(checkIfAmountExceeds(amount));
 
@@ -31,14 +33,14 @@ export default function useCheckAmount(amount) {
 		return amount > currentTokenForSend.balance;
 	}
 	function validate(amount, type) {
-		if(type === "PureToken"){
-			checkIfTokenAmountExceeds(amount) ? setIsInvalid(true) : setIsInvalid(false)
-			return
+		if (type === "PureToken") {
+			checkIfTokenAmountExceeds(amount)
+				? setIsInvalid(true)
+				: setIsInvalid(false);
+			return;
 		}
-		if (checkIfAmountExceeds(amount))
-			setIsInvalid(true);
-		else
-			setIsInvalid(false);
+		if (checkIfAmountExceeds(amount)) setIsInvalid(true);
+		else setIsInvalid(false);
 	}
 
 	return {

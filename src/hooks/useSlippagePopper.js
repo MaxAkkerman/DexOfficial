@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 
 export default function useSlippagePopper() {
 	const [anchorEl, setAnchorEl] = useState(null);
@@ -10,7 +10,7 @@ export default function useSlippagePopper() {
 
 	const open = Boolean(anchorEl);
 
-	const id = open ? 'simple-popper' : undefined;
+	const id = open ? "simple-popper" : undefined;
 
 	return {
 		slippageState: {

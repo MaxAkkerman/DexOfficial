@@ -1,4 +1,5 @@
 # DEX frontend
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -27,6 +28,7 @@ Globally allows dex client to connect to pair including sharding optimization of
 ## API methods
 
 ### getCurrentExtension()
+
 Returns object with unified current extension main methods
 
 ```
@@ -66,13 +68,14 @@ async function broxus() {
     return curExtenson
 }
 ```
+
 ```
 async function extraton() {
     const provider = getProvider();
     const signer = await provider.getSigner();
     const network = await provider.getNetwork();
     let wallet = signer.getWallet()
-    
+
     let curExtenson = {};
     curExtenson.network = network.server;
     curExtenson.name = "extraton";
@@ -93,13 +96,15 @@ async function extraton() {
     return curExtenson
 }
 ```
+
 ### setCreator()
+
 Function to deploy dex client - it is performed in several stages:
 
-+ first step - check client exists on dex root as creator(need to send few tons as pay for register your pubkey on dex root)
-    + if false will offer you to send transfer
-+ second step - get shard arg
-+ last one - createDEXclient methos that you should sign in extension.
+- first step - check client exists on dex root as creator(need to send few tons as pay for register your pubkey on dex root)
+  - if false will offer you to send transfer
+- second step - get shard arg
+- last one - createDEXclient methos that you should sign in extension.
 
 Dex client will be deployes in few seconds.
 
@@ -107,12 +112,14 @@ Dex client will be deployes in few seconds.
 
 Function to connect to dex pair - it is performed in several stages:
 
-+ first step - connectPair, pair sets it`s data to dex client
-+ second step - get shard arg for all wallets that need to deploy - depends on pair token roots
-+ last step - deploy wallets that client does not have
+- first step - connectPair, pair sets it`s data to dex client
+- second step - get shard arg for all wallets that need to deploy - depends on pair token roots
+- last step - deploy wallets that client does not have
 
 ### swapA()/swapB()
+
 Allows user to use processSwapA/processSwapB call method on dex client smart contract
+
 ```
 export async function swapA(curExt,pairAddr, qtyA) {
     const {pubkey, contract, callMethod,SendTransfer} = curExt._extLib
@@ -133,8 +140,11 @@ export async function swapA(curExt,pairAddr, qtyA) {
     }
 }
 ```
+
 ### processLiquidity()
+
 Push liquidity to pair, it turns out LP tokens for some amount of qtyA & qtyB tokens
+
 ```
 
 export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
@@ -156,8 +166,11 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     }
 }
 ```
+
 ### returnLiquidity()
+
 Return liquidity from pair, it turns out tokens of pair for LP tokens or pair
+
 ```
 export async function returnLiquidity(curExt,pairAddr, tokens) {
     const {pubkey, contract, SendTransfer, callMethod} = curExt._extLib
@@ -177,3 +190,4 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
         return e
     }
 }
+```

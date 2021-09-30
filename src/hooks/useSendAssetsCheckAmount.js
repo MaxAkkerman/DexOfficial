@@ -1,5 +1,5 @@
-import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import {useSelector} from "react-redux";
+import {useEffect} from "react";
 import useCheckAmount from "./useCheckAmount";
 
 /**
@@ -12,31 +12,30 @@ import useCheckAmount from "./useCheckAmount";
  * @property {string} validationMsg
  */
 export default function useSendAssetsCheckAmount() {
-	const amountToSend = useSelector(state => state.walletSeedReducer.amountToSend);
-	const currentTokenForSend = useSelector(state => state.walletSeedReducer.currentTokenForSend);
+	const amountToSend = useSelector(
+		(state) => state.walletSeedReducer.amountToSend,
+	);
+	const currentTokenForSend = useSelector(
+		(state) => state.walletSeedReducer.currentTokenForSend,
+	);
 
-	const amountToSendNum = Number(amountToSend)
+	const amountToSendNum = Number(amountToSend);
 
-	const {
-		isInvalid,
-		validationMsg,
-		validate,
-	} = useCheckAmount(amountToSendNum)
+	const {isInvalid, validationMsg, validate} = useCheckAmount(amountToSendNum);
 
 	useEffect(() => {
-		if(currentTokenForSend.symbol === "DP"){
-			validate(0)
-		}else if(currentTokenForSend.type === "PureToken"){
-			validate(Number(amountToSendNum), currentTokenForSend.type)
-		}else{
-			validate(Number(amountToSendNum))
+		if (currentTokenForSend.symbol === "DP") {
+			validate(0);
+		} else if (currentTokenForSend.type === "PureToken") {
+			validate(Number(amountToSendNum), currentTokenForSend.type);
+		} else {
+			validate(Number(amountToSendNum));
 		}
-
-	}, [amountToSend])
+	}, [amountToSend]);
 
 	return {
 		isInvalid,
 		// isLoadingCheckAmount,
-		validationMsg
-	}
+		validationMsg,
+	};
 }

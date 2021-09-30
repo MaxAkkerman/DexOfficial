@@ -1,5 +1,5 @@
-import NumberFormat from 'react-number-format';
-import { TextField } from "@material-ui/core";
+import NumberFormat from "react-number-format";
+import {TextField} from "@material-ui/core";
 
 export default function PercentageTextField(props) {
 	return (
@@ -11,8 +11,8 @@ export default function PercentageTextField(props) {
 			fixedDecimalScale
 			allowNegative={false}
 			allowLeadingZeros={false}
-			isAllowed={({ floatValue }) => floatValue <= 100}
+			isAllowed={({floatValue}) => floatValue <= 100}
 			{...props}
 		/>
-	)
+	);
 }
