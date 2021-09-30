@@ -301,7 +301,7 @@ function LimitOrder() {
 										spacing={1}
 										sx={{marginBottom: "3%"}}
 									>
-										<div>Price</div>
+										<div>Limit order price</div>
 										<div className={"orders__icon_box"}>
 											<input
 												id="enterPrice"
@@ -320,16 +320,6 @@ function LimitOrder() {
 														className="input-token-img"
 													/>
 													<span>{toToken && toToken.symbol}</span>
-												</div>
-											)}
-											{!toToken.symbol && (
-												<div className="input-select center margin">
-													<img
-														src={iconGenerator("QUESTION")}
-														alt={toToken.symbol}
-														className="input-token-img"
-													/>
-													<span>Select token</span>
 												</div>
 											)}
 										</div>
