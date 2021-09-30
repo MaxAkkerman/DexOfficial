@@ -19,15 +19,16 @@ function PoolExplorerItem(props) {
 							src={iconGenerator(props.pair.symbolA)}
 							alt={props.pair.symbolA}
 						/>
+						<img
+							className="poolExplorer__icon_margin"
+							style={{marginLeft: "-15px"}}
+							src={iconGenerator(props.pair.symbolB)}
+							alt={props.pair.symbolB}
+						/>
 						<b>{props.pair.symbolA}</b>
 					</div>
 					<span className="poolExplorer__box_text">/</span>
 					<div className="poolExplorer__box_pair">
-						<img
-							className="poolExplorer__icon_margin"
-							src={iconGenerator(props.pair.symbolB)}
-							alt={props.pair.symbolB}
-						/>
 						<b>{props.pair.symbolB}</b>
 					</div>
 				</div>
@@ -46,7 +47,7 @@ function PoolExplorerItem(props) {
 					{/*</div>*/}
 					<div className="poolExplorer__pair_rate">
 						<div className="poolExplorer__reserve">
-							<span className="select-item-descr">
+							<span className="select-item-description">
 								<div>
 									1 {props.pair.symbolA} ={" "}
 									<b>
@@ -59,7 +60,7 @@ function PoolExplorerItem(props) {
 							</span>
 						</div>
 						<div className="poolExplorer__reserve">
-							<span className="select-item-descr">
+							<span className="select-item-description">
 								<div>
 									1 {props.pair.symbolB} ={" "}
 									<b>
@@ -73,6 +74,11 @@ function PoolExplorerItem(props) {
 						</div>
 					</div>
 
+					<div className={"PoolExplorerItem_pair_reserve_box"}>
+						<span>Pair</span>
+						<span>reserve</span>
+					</div>
+
 					<div className="poolExplorer__fixed_width">
 						<div className="poolExplorer__reserve">
 							<img
@@ -83,6 +89,9 @@ function PoolExplorerItem(props) {
 							{Number(
 								(parseFloat(props.pair.reserveA) / 1e9).toFixed(4),
 							).toLocaleString("ru-RU")}
+							<div className={"PoolExplorerItem_pair_margin_left"}>
+								{props.pair.symbolA}
+							</div>
 						</div>
 						<div className="poolExplorer__reserve">
 							<img
@@ -93,6 +102,9 @@ function PoolExplorerItem(props) {
 							{Number(
 								(parseFloat(props.pair.reservetB) / 1e9).toFixed(4),
 							).toLocaleString("ru-RU")}
+							<div className={"PoolExplorerItem_pair_margin_left"}>
+								{props.pair.symbolB}
+							</div>
 						</div>
 					</div>
 

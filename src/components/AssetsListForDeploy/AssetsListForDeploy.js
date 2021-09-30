@@ -45,8 +45,6 @@ function AssetsListForDeploy() {
 	}
 	const [deployWalletIsWaiting, setdeployWalletIsWaiting] = useState(false);
 
-	const [filter, setFilter] = useState("");
-
 	async function handleDeployAsset() {
 		console.log("curAssetForDeploy", curAssetForDeploy);
 		if (clientData.balance < 4) return;
@@ -99,16 +97,14 @@ function AssetsListForDeploy() {
 									<button className="arrow_back" onClick={() => handleBack()}>
 										<img src={arrowBack} alt={"arrow"} />
 									</button>
-									<div className="left_block">Assets Inspector</div>
+									<div className="left_block boldFont">Assets Inspector</div>
 								</div>
 
-								<SearchInput func={setFilter} />
+								<SearchInput func={() => console.log("func")} />
 								{assetsFromGraphQL.length ? (
 									<AssetsList
 										assetWrap="heightfixWrap"
-										TokenAssetsArray={assetsFromGraphQL
-											.sort((a, b) => b.balance - a.balance)
-											.filter((t) => includesTextInToken(t, filter))}
+										TokenAssetsArray={assetsFromGraphQL}
 										NFTassetsArray={null}
 										handleClickNFT={() => console.log("token item")}
 										// showNFTdata={showNFTdata}

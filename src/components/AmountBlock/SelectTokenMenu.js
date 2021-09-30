@@ -8,7 +8,7 @@ function SelectTokenMenu(props) {
 			className="send_select_btn"
 		>
 			<div className="send_set_token">Select asset</div>
-			<div className="send_arrow_bottom_wrapper">
+			<div className="send_arrow_bottom_wrapper nofilter">
 				<img src={arrowBottom} alt={"arrow"} />
 			</div>
 		</div>

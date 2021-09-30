@@ -721,7 +721,7 @@ function EnterSeedPhrase(props) {
 													dispatch(wordOneEnterSeedPhrase(newValue));
 												}}
 												getOptionLabel={(option) => option}
-												sx={{width: 100, height: 50}}
+												sx={{width: 160}}
 												renderInput={(params) => (
 													<CssTextField
 														{...params}
@@ -745,7 +745,7 @@ function EnterSeedPhrase(props) {
 													dispatch(wordTwoEnterSeedPhrase(newValue));
 												}}
 												getOptionLabel={(option) => option}
-												sx={{width: 100, height: 50}}
+												sx={{width: 160}}
 												renderInput={(params) => (
 													<CssTextField
 														{...params}
@@ -769,7 +769,7 @@ function EnterSeedPhrase(props) {
 													dispatch(wordThreeEnterSeedPhrase(newValue));
 												}}
 												getOptionLabel={(option) => option}
-												sx={{width: 100, height: 50}}
+												sx={{width: 160}}
 												renderInput={(params) => (
 													<CssTextField
 														{...params}
@@ -793,7 +793,7 @@ function EnterSeedPhrase(props) {
 													dispatch(wordFourEnterSeedPhrase(newValue));
 												}}
 												getOptionLabel={(option) => option}
-												sx={{width: 100, height: 50}}
+												sx={{width: 160}}
 												renderInput={(params) => (
 													<CssTextField
 														{...params}
@@ -817,7 +817,7 @@ function EnterSeedPhrase(props) {
 													dispatch(wordFiveEnterSeedPhrase(newValue));
 												}}
 												getOptionLabel={(option) => option}
-												sx={{width: 100, height: 50}}
+												sx={{width: 160}}
 												renderInput={(params) => (
 													<CssTextField
 														{...params}
@@ -841,7 +841,7 @@ function EnterSeedPhrase(props) {
 													dispatch(wordSixEnterSeedPhrase(newValue));
 												}}
 												getOptionLabel={(option) => option}
-												sx={{width: 100, height: 50}}
+												sx={{width: 160}}
 												renderInput={(params) => (
 													<CssTextField
 														{...params}
@@ -865,7 +865,7 @@ function EnterSeedPhrase(props) {
 													dispatch(wordSevenEnterSeedPhrase(newValue));
 												}}
 												getOptionLabel={(option) => option}
-												sx={{width: 100, height: 50}}
+												sx={{width: 160}}
 												renderInput={(params) => (
 													<CssTextField
 														{...params}
@@ -889,7 +889,7 @@ function EnterSeedPhrase(props) {
 													dispatch(wordEightEnterSeedPhrase(newValue));
 												}}
 												getOptionLabel={(option) => option}
-												sx={{width: 100, height: 50}}
+												sx={{width: 160}}
 												renderInput={(params) => (
 													<CssTextField
 														{...params}
@@ -913,7 +913,7 @@ function EnterSeedPhrase(props) {
 													dispatch(wordNineEnterSeedPhrase(newValue));
 												}}
 												getOptionLabel={(option) => option}
-												sx={{width: 100, height: 50}}
+												sx={{width: 160}}
 												renderInput={(params) => (
 													<CssTextField
 														{...params}
@@ -937,7 +937,7 @@ function EnterSeedPhrase(props) {
 													dispatch(wordTenEnterSeedPhrase(newValue));
 												}}
 												getOptionLabel={(option) => option}
-												sx={{width: 100, height: 50}}
+												sx={{width: 160}}
 												renderInput={(params) => (
 													<CssTextField
 														{...params}
@@ -961,7 +961,7 @@ function EnterSeedPhrase(props) {
 													dispatch(wordElevenEnterSeedPhrase(newValue));
 												}}
 												getOptionLabel={(option) => option}
-												sx={{width: 100, height: 50}}
+												sx={{width: 160}}
 												renderInput={(params) => (
 													<CssTextField
 														{...params}
@@ -985,7 +985,7 @@ function EnterSeedPhrase(props) {
 													dispatch(wordTwelveEnterSeedPhrase(newValue));
 												}}
 												getOptionLabel={(option) => option}
-												sx={{width: 100, height: 50}}
+												sx={{width: 160}}
 												renderInput={(params) => (
 													<CssTextField
 														{...params}

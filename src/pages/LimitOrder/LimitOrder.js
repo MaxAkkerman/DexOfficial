@@ -75,7 +75,6 @@ function LimitOrder() {
 	const [notDeployedWallets, setNotDeployedWallets] = useState([]);
 	const [connectPairStatusText, setconnectPairStatusText] = useState("");
 	const [incorrectBalance, setincorrectBalance] = useState(false);
-	const {invalid} = useLimitOrderValidation();
 
 	useEffect(() => {
 		if (!pairsList.length || !pairId) {
@@ -101,9 +100,19 @@ function LimitOrder() {
 	}, [toToken, tokenList, pairId]);
 
 	function handleConfirm() {
-		if (invalid) return;
-
-		dispatch(showOrdersConfirmPopup());
+		if (fromValue > fromToken.balance) {
+			setincorrectBalance(true);
+			setTimeout(() => setincorrectBalance(false), 200);
+			return;
+		}
+		if (fromToken.symbol && toToken.symbol && fromValue) {
+			console.log("3453453495834058dgjfjgfdjg");
+			dispatch(showOrdersConfirmPopup());
+		} else {
+			dispatch(
+				showPopup({type: "error", message: "Fields should not be empty"}),
+			);
+		}
 	}
 
 	async function handleConnectPair() {
@@ -198,7 +207,9 @@ function LimitOrder() {
 			return (
 				<button
 					className={
-						invalid ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"
+						fromToken.symbol && toToken.symbol && fromValue && toValue
+							? "btn mainblock-btn"
+							: "btn mainblock-btn btn--disabled"
 					}
 					onClick={() => handleConfirm()}
 				>
@@ -213,7 +224,9 @@ function LimitOrder() {
 			return (
 				<button
 					className={
-						invalid ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"
+						fromToken.symbol && toToken.symbol
+							? "btn mainblock-btn"
+							: "btn mainblock-btn btn--disabled"
 					}
 					onClick={() => handleConnectPair()}
 				>
@@ -224,7 +237,9 @@ function LimitOrder() {
 		return (
 			<button
 				className={
-					invalid ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"
+					fromToken.symbol && toToken.symbol && fromValue && toValue
+						? "btn mainblock-btn"
+						: "btn mainblock-btn btn--disabled"
 				}
 				onClick={() => handleConfirm()}
 			>
@@ -284,19 +299,18 @@ function LimitOrder() {
 									<Stack
 										direction={"column"}
 										spacing={1}
-										sx={{marginBottom: "15px"}}
+										sx={{marginBottom: "3%"}}
 									>
 										<div>Price</div>
 										<div className={"orders__icon_box"}>
 											<input
 												id="enterPrice"
-												type="number"
+												type={"number"}
 												autoComplete="false"
-												className="orders__input"
+												className={"orders__input"}
 												onChange={(e) =>
 													dispatch(setOrdersRate(Number(e.target.value)))
 												}
-												value={rate}
 											/>
 											{toToken && toToken.symbol && (
 												<div className="input-select">
@@ -308,18 +322,31 @@ function LimitOrder() {
 													<span>{toToken && toToken.symbol}</span>
 												</div>
 											)}
+											{!toToken.symbol && (
+												<div className="input-select center margin">
+													<img
+														src={iconGenerator("QUESTION")}
+														alt={toToken.symbol}
+														className="input-token-img"
+													/>
+													<span>Select token</span>
+												</div>
+											)}
 										</div>
 									</Stack>
 									<button
-										className="btn orders"
+										className="btn orders btn--disabled"
+										disabled
 										onClick={() => history.push("/account")}
 									>
-										Set to market
+										Set to market (Coming soon)
 									</button>
 								</div>
 
 								{walletIsConnected ? (
-									getCurBtn()
+									<button className="btn mainblock-btn btn--disabled" disabled>
+										Coming soon
+									</button> //TODO: getCurBtn()
 								) : (
 									<button
 										className="btn mainblock-btn"
@@ -345,11 +372,12 @@ function LimitOrder() {
 					}
 				/>
 			)}
-			{ordersConfirmPopupIsVisible && <OrdersConfirmPopup />}
+			{ordersConfirmPopupIsVisible && (
+				<OrdersConfirmPopup hideConfirmPopup={hideOrdersConfirmPopup} />
+			)}
 			{ordersAsyncIsWaiting && (
 				<WaitingPopup
 					text={`Creating limit order of ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`}
-					handleClose={() => dispatch(setOrdersAsyncIsWaiting(false))}
 				/>
 			)}
 		</div>

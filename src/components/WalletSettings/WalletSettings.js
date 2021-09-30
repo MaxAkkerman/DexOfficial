@@ -55,7 +55,7 @@ function WalletSettings() {
 							<button className="arrow_back" onClick={() => handleBack(false)}>
 								<img src={arrowBack} alt={"arrow"} />
 							</button>
-							<div className="left_block">Settings</div>
+							<div className="left_block boldFont">Settings</div>
 						</div>
 						{/*<div className="recipient_wrapper">*/}
 						{/*    <div className="send_text_headers">*/}
@@ -77,18 +77,18 @@ function WalletSettings() {
 						{/*</div>*/}
 
 						<div className="bottomBtnsWrapper">
-							<div className="btn_wrapper">
+							<div className="btn_wrapper full_width">
 								<button
-									className="btn wallet-btn"
+									className="btn wallet-btn full-width"
 									onClick={() => openRevealSeedPhrase()}
 									style={{boxShadow: "0px 14px 44px rgba(69, 88, 255, 0.23)"}}
 								>
 									Reveal Seed Phrase
 								</button>
 							</div>
-							<div className="btn_wrapper">
+							<div className="btn_wrapper full_width">
 								<button
-									className="btn wallet-btn"
+									className="btn wallet-btn full-width"
 									onClick={() => handlePushToKeys()}
 									style={{boxShadow: "0px 14px 44px rgba(69, 88, 255, 0.23)"}}
 								>

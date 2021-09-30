@@ -54,7 +54,7 @@ function KeysBlock() {
 							<button className="arrow_back" onClick={() => handleBack(false)}>
 								<img src={arrowBack} alt={"arrow"} />
 							</button>
-							<div className="left_block">Keys</div>
+							<div className="left_block boldFont">Keys</div>
 						</div>
 
 						<BlockItem

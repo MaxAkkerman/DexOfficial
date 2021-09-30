@@ -66,8 +66,8 @@ function SendAssets() {
 	const {isInvalid: isInvalidAmount, validationMsg: validationMsgForAmount} =
 		useSendAssetsCheckAmount();
 	const {
-		invalid: invalidAddress,
-		loading,
+		isInvalid: isInvalidAddress,
+		isLoading: isLoading,
 		validationMsg: validationMsgForAddress,
 	} = useSendAssetsCheckAddress();
 	const {selectedToken} = useSendAssetsSelectedToken();
@@ -288,12 +288,12 @@ function SendAssets() {
 								>
 									<img src={arrowBack} alt={"arrow"} />
 								</button>
-								<div className="left_block">Send asset</div>
+								<div className="left_block boldFont">Send asset</div>
 							</div>
 							<div
 								className={cls("recipient_wrapper", {
-									amount_wrapper_error: invalidAddress,
-									amount_wrapper_success: !invalidAddress && !loading,
+									amount_wrapper_error: isInvalidAddress,
+									amount_wrapper_success: !isInvalidAddress && !isLoading,
 								})}
 							>
 								<div className="send_text_headers">Recipient address</div>
@@ -305,6 +305,7 @@ function SendAssets() {
 											className="recipient_input"
 											placeholder={"0:..."}
 										/>
+
 										<CloseIcon
 											// style=
 											fontSize="medium"
@@ -314,7 +315,7 @@ function SendAssets() {
 									<div></div>
 								</div>
 							</div>
-							{invalidAddress && (
+							{isInvalidAddress && (
 								<FormHelperText
 									style={{marginLeft: "27px", marginTop: "4px"}}
 									error
@@ -323,7 +324,7 @@ function SendAssets() {
 									{validationMsgForAddress}
 								</FormHelperText>
 							)}
-							{console.log(invalidAddress, validationMsgForAddress)}
+							{console.log(isInvalidAddress, validationMsgForAddress)}
 							<BlockItem
 								leftTitle={"Amount"}
 								// currentToken={currentToken}
@@ -357,7 +358,7 @@ function SendAssets() {
 								<button
 									onClick={() => handleSetSendPopupVisibility()}
 									className={`btn mainblock-btn ${
-										loading ? "btn--disabled" : ""
+										isLoading ? "btn--disabled" : ""
 									}`}
 								>
 									Send

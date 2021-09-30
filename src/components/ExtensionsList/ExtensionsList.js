@@ -119,7 +119,7 @@ function ExtensionsList() {
 								<button
 									style={{
 										fontSize: "16px",
-										width: "fit-content",
+										width: "100%",
 										marginBottom: "40px",
 									}}
 									className="btn wallet-btn"
@@ -128,7 +128,7 @@ function ExtensionsList() {
 									Login using Seed Phrase
 								</button>
 								<button
-									style={{fontSize: "16px", width: "fit-content"}}
+									style={{fontSize: "16px", width: "100%"}}
 									className="btn wallet-btn"
 									onClick={() => dispatch(showEnterSeedPhraseRegister())}
 								>

@@ -36,6 +36,7 @@ import {
 	getAllTokensAndSetToStore,
 } from "../../reactUtils/reactUtils";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
+import styled from "@emotion/styled";
 
 function EnterPassword(props) {
 	const history = useHistory();
@@ -293,10 +294,25 @@ function EnterPassword(props) {
 
 	const [loadingUserDataIsWaiting, setloadingUserDataIsWaiting] =
 		useState(false);
+
+	const CssTextField = styled(TextField)({
+		"& .MuiOutlinedInput-input": {
+			"&.Mui-disabled": {
+				color: "var(--text-color)",
+				"-webkit-text-fill-color": "unset",
+			},
+			color: "var(--text-color)",
+		},
+		"& .Mui-disabled": {
+			color: "var(--text-color)",
+		},
+	});
+
 	return (
 		<div className="select-wrapper">
 			{loadingUserDataIsWaiting ? (
 				<WaitingPopup
+					hide={true}
 					title={"Connecting to blockchain"}
 					text={`Loading user data...`}
 				/>
@@ -312,10 +328,9 @@ function EnterPassword(props) {
 									marginTop: "24px",
 								}}
 							>
-								<TextField
+								<CssTextField
 									label="Decryption password"
 									error={!validPassword}
-									sx={{width: "100%"}}
 									placeholder={
 										"Your seed phrase will be decrypted with this password"
 									}
@@ -329,6 +344,20 @@ function EnterPassword(props) {
 									value={seedPhrasePassword}
 									onKeyDown={enterClick}
 									autoFocus
+									sx={{
+										width: "100%",
+										"&:focus": {
+											color: "var(--text-color) !important",
+											outlineColor: "var(--text-color) !important",
+											borderColor: "var(--text-color) !important",
+										},
+										"::placeholder": {
+											color: "var(--text-color) !important",
+										},
+										color: "var(--text-color) !important",
+										outlineColor: "var(--text-color) !important",
+										borderColor: "var(--text-color) !important",
+									}}
 								/>
 							</Box>
 							<Box
@@ -367,46 +396,36 @@ function EnterPassword(props) {
 											(decryptResult === true && "All right")}
 									</AlertTitle>
 									{(decryptResult === null &&
-										"Please, enter your password and click to button below.") ||
+										"Please, enter your password and click the button below.") ||
 										(decryptResult === false &&
 											"Oh! You're enter incorrect password! Try enter again or Clear your saved account.") ||
 										(decryptResult === true &&
 											"Yeah! Your wallet have been unlocked! Please wait, we check additional information. Be patient.")}
 								</Alert>
 							</Box>
-							<Box
-								sx={{
-									display: "flex",
-									justifyContent: "center",
-									marginTop: "24px",
-								}}
-							>
-								<Grid
-									container
-									spacing={3}
-									sx={{justifyContent: "space-between"}}
-								>
-									<Grid item>
+							<div className={"EnterPassword_buttons_container"}>
+								<div className={"EnterPassword_buttons"}>
+									<div className={"EnterPassword_full_width margint"}>
 										<button
 											style={{fontSize: "24px"}}
 											onClick={clear}
-											className="btn-error wallet-btn"
+											className="btn-error wallet-btn unlock"
 										>
 											Log out and Delete
 										</button>
-									</Grid>
+									</div>
 
-									<Grid item>
+									<div className={"EnterPassword_full_width"}>
 										<button
 											style={{fontSize: "24px"}}
 											onClick={login}
-											className="btn wallet-btn"
+											className="btn wallet-btn unlock"
 										>
 											Unlock
 										</button>
-									</Grid>
-								</Grid>
-							</Box>
+									</div>
+								</div>
+							</div>
 						</>
 					}
 				/>

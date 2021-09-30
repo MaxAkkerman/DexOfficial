@@ -105,7 +105,11 @@
 		margin: 0;
 		transition: 0s;
 	}
-
+	&-description {
+		font-size: 16px;
+		margin: 0;
+		transition: 0s;
+	}
 	&-descr {
 		font-size: 16px;
 		margin: 0;
@@ -124,7 +128,29 @@
 	transition: 0s;
 }
 
+.PoolExplorerItem_pair_reserve_box {
+	height: 64px;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-evenly;
+	display: none;
+}
+
+.PoolExplorerItem_pair_margin_left {
+	margin-left: 5px;
+}
+
 @media screen and (max-width: 1025px) {
+	.poolExplorer__fixed_width {
+		width: unset;
+	}
+	.PoolExplorerItem_pair_reserve_box {
+		display: flex;
+		flex-direction: row;
+		span {
+			margin-left: 5px;
+		}
+	}
 	.poolExplorer__pair_rate {
 		height: auto;
 	}

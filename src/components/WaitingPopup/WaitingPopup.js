@@ -17,9 +17,14 @@ function WaitingPopup(props) {
 							{props.text}
 						</p>
 					)}
-					<button className="btn popup-btn" onClick={() => props.handleClose()}>
-						Hide
-					</button>
+					{!props.hide && (
+						<button
+							className="btn popup-btn"
+							onClick={() => props.handleClose()}
+						>
+							Hide
+						</button>
+					)}
 				</div>
 			}
 		/>

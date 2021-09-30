@@ -4,6 +4,9 @@
 		padding: 16px 20px;
 		border-radius: 18px;
 		width: auto;
+		&.full-width {
+			width: 100%;
+		}
 	}
 
 	&-wrap {
@@ -54,6 +57,9 @@ html[data-theme="dark"] .wallet-key {
 			font-size: 16px;
 			padding: 13px 15px;
 			border-radius: 12px;
+			&.unlock {
+				width: 100%;
+			}
 		}
 
 		&-wrap {

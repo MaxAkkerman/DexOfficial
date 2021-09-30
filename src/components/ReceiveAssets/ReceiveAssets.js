@@ -53,7 +53,7 @@ function ReceiveAssets() {
 							<button className="arrow_back" onClick={() => handleBack()}>
 								<img src={arrowBack} alt={"arrow"} />
 							</button>
-							<div className="left_block">Receive asset</div>
+							<div className="left_block boldFont">Receive asset</div>
 						</div>
 						<BlockItem
 							leftTitle={(tokenForReceiveSetted && "Balance:") || ""}

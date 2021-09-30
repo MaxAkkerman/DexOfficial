@@ -1,8 +1,7 @@
 .orders__price_box {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	justify-content: space-between;
-	align-items: center;
 	margin-top: 8%;
 }
 
@@ -22,7 +21,8 @@
 	font-style: normal;
 	font-weight: bold;
 	font-size: 20px;
-	color: var(--search-input-text-color);
+	color: var(--text-color);
+	padding: 0 10px;
 
 	&:focus {
 		outline: none;
@@ -31,7 +31,7 @@
 
 .btn {
 	&.orders {
-		height: 59px;
+		height: 45px;
 		min-width: 179px;
 		display: flex;
 		background: rgba(53, 105, 240, 0.72);
@@ -39,6 +39,9 @@
 		border-radius: 11px;
 		justify-content: center;
 		align-items: center;
+		padding: 22px;
+		font-size: 22px;
+		width: 100%;
 	}
 }
 
