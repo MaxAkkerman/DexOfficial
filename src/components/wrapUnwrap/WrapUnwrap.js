@@ -89,15 +89,15 @@ function WrapUnwrap(props) {
 			setmainIsVisible(false);
 			let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
 			const keys = await getClientKeys(decrypted.phrase);
-			// const curPair = {rootA: "0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37"}
-			//
-			// const deployData = {
-			//     curPair,
-			//     clientAdr: clientData.address,
-			//     clientRoots: ""
-			// }
-			// const deployRes = await connectToPairStep2DeployWallets(deployData, keys)
-			// console.log("deployRes", deployRes)
+			const curPair = {rootA: "0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37"}
+
+			const deployData = {
+			    curPair,
+			    clientAdr: clientData.address,
+			    clientRoots: ""
+			}
+			const deployRes = await connectToPairStep2DeployWallets(deployData, keys)
+			console.log("deployRes", deployRes)
 			setdeployWTONisVisible(false);
 			setmainIsVisible(true);
 		}
