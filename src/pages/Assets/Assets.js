@@ -187,7 +187,7 @@ console.log("tonObj",tonObj)
                                 <div className="action_btns">
                                     <div>
 
-                                        <div className="onHover" onClick={walletIsConnected ? () => handleChangeOnSend() : null}>
+                                        <div className={walletIsConnected ? "onHover" : "onHover btn--disabled"} onClick={walletIsConnected ? () => handleChangeOnSend() : null}>
                                             <img className="arrow_icons " src={sendAssetsimg} alt={"Send"}/>
 
                                         </div>
@@ -197,16 +197,16 @@ console.log("tonObj",tonObj)
                                     </div>
                                     <div>
 
-                                        <div className="onHover" onClick={walletIsConnected ?  () => handleChangeOnReceive() : null}>
+                                        <button className={walletIsConnected ? "onHover" : "onHover btn--disabled"} onClick={walletIsConnected ?  () => handleChangeOnReceive() : null}>
                                             <img className="arrow_icons" src={receiveAssets} alt={"Receive"}/>
 
-                                        </div>
+                                        </button>
                                         <div className="action_btns_bottom_text">
                                             Receive
                                         </div>
                                     </div>
                                     <div>
-                                        <div className="onHover" onClick={() => handlePushToExchange()}>
+                                        <div className={walletIsConnected ? "onHover" : "onHover btn--disabled"} onClick={() => handlePushToExchange()}>
                                             <img className="arrow_icons" src={goToExchange} alt={"Exchange"} />
                                         </div>
                                         <div className="action_btns_bottom_text">

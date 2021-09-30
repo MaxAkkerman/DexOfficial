@@ -45,6 +45,7 @@ import { getWalletExt } from "../../extensions/extensions/checkExtensions";
 import { useHistory } from "react-router-dom";
 import { copyToClipboard, getAllPairsAndSetToStore, getAllTokensAndSetToStore } from "../../reactUtils/reactUtils";
 import styled from "@emotion/styled";
+import WaitingPopup from "../WaitingPopup/WaitingPopup";
 
 function EnterSeedPhrase(props) {
     const history = useHistory()
@@ -254,7 +255,7 @@ function EnterSeedPhrase(props) {
             let clientStatus = await checkPubKey(clientKeys.public)
             if (clientStatus.status) {
                 // dispatch(showEnterSeedPhrase(false))
-
+                setloadingUserDataIsWaitingSeed(true)
                 // setonloadingData(true)
                 const dexClientAddress = clientStatus.dexclient
                 const dexClientStatus = clientStatus.status
@@ -278,19 +279,42 @@ function EnterSeedPhrase(props) {
                 await getAllTokensAndSetToStore(dexClientAddress)
 
 
-                dispatch(showEnterSeedPhrase(false))
+                dispatch(wordOneEnterSeedPhrase(""))
+                dispatch(wordTwoEnterSeedPhrase(""))
+                dispatch(wordThreeEnterSeedPhrase(""))
+                dispatch(wordFourEnterSeedPhrase(""))
+                dispatch(wordFiveEnterSeedPhrase(""))
+                dispatch(wordSixEnterSeedPhrase(""))
+                dispatch(wordSevenEnterSeedPhrase(""))
+                dispatch(wordEightEnterSeedPhrase(""))
+                dispatch(wordNineEnterSeedPhrase(""))
+                dispatch(wordTenEnterSeedPhrase(""))
+                dispatch(wordElevenEnterSeedPhrase(""))
+                dispatch(wordTwelveEnterSeedPhrase(""))
+
+
+
 
 
                 let encrypted = await encrypt(seedPhraseString, seedPhrasePassword)
                 dispatch(setSeedPassword(seedPhrasePassword))
                 dispatch(enterSeedPhraseSaveToLocalStorage(encrypted));
-                history.push("/swap")
+
+
+
+                dispatch(setWalletIsConnected(true))
+                history.push("/wallet")
+                dispatch(showEnterSeedPhrase(false))
+                setloadingUserDataIsWaitingSeed(false)
+
+
+
             }else{
                 console.log("client",clientStatus.status)
                 setNoClientError(true)
             }
         }
-        dispatch(setWalletIsConnected(true))
+
         // setonloadingData(false)
 
     }
@@ -420,6 +444,7 @@ function EnterSeedPhrase(props) {
                 await getAllPairsAndSetToStore(dexClientAddress)
                 await getAllTokensAndSetToStore(dexClientAddress)
 
+                subscribeClient(dexClientAddress)
                 subscribeClientBalance(dexClientAddress)
                 dispatch(showEnterSeedPhrase(false))
 
@@ -435,7 +460,7 @@ function EnterSeedPhrase(props) {
         }
     }
 
-
+    const [loadingUserDataIsWaitingSeed,setloadingUserDataIsWaitingSeed] = useState(false)
     function enterClick(e) {
         if (e.code === "NumpadEnter" || e.code === "Enter") {
             login()
@@ -473,901 +498,906 @@ function EnterSeedPhrase(props) {
     });
 
 
-    return ReactDOM.createPortal(
+    return (
         <div className="select-wrapper">
-            <Snackbar open={snackbarOpened} autoHideDuration={6000} onClose={snackbarHandleClose}>
-                <Alert onClose={snackbarHandleClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
-            <MainBlock
-                title={getTitle(enterSeedPhraseSide)}
-                classHeader={"fixFontSize"}
-                classTitle={"fixFontSize"}
-                class={(enterSeedPhraseSide === "login" || enterSeedPhraseSide === "register" || enterSeedPhraseSide === "confirmReg") ? "fixheight big" : "fixheight"}
-                button={(enterSeedPhraseSide === "login" || enterSeedPhraseSide === "register" || enterSeedPhraseSide === "confirmReg") &&
-                <CloseBtn width={"16px"} height={"16px"} func={handleClose} />}
-                content={
-                    <>
-                        {enterSeedPhraseSide === "login" && <>
-                            <Grid container spacing={3} sx={{ justifyContent: "center" }}>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-one"
-                                        label="Word 1"
+            {loadingUserDataIsWaitingSeed ?
+                <WaitingPopup title={"Connecting to blockchain"} text={`Loading user data...`}/>
 
-                                        options={mnemonicWords}
-                                        value={wordOne}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordOneError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordOneError(false)
-                                            else setWordOneError(true)
-                                            dispatch(wordOneEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 100, height: 50 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordOneError}
-                                                                               label="Word 1" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-two"
-                                        label="Word 2"
-                                        options={mnemonicWords}
-                                        value={wordTwo}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordTwoError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordTwoError(false)
-                                            else setWordTwoError(true)
-                                            dispatch(wordTwoEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 100, height: 50 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordTwoError}
-                                                                               label="Word 2" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-three"
-                                        label="Word 3"
-                                        options={mnemonicWords}
-                                        value={wordThree}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordThreeError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordThreeError(false)
-                                            else setWordThreeError(true)
-                                            dispatch(wordThreeEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 100, height: 50 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordThreeError}
-                                                                               label="Word 3" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-four"
-                                        label="Word 4"
-                                        options={mnemonicWords}
-                                        value={wordFour}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordFourError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordFourError(false)
-                                            else setWordFourError(true)
-                                            dispatch(wordFourEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 100, height: 50 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordFourError}
-                                                                               label="Word 4" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-five"
-                                        label="Word 5"
-                                        options={mnemonicWords}
-                                        value={wordFive}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordFiveError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordFiveError(false)
-                                            else setWordFiveError(true)
-                                            dispatch(wordFiveEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 100, height: 50 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordFiveError}
-                                                                               label="Word 5" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-six"
-                                        label="Word 6"
-                                        options={mnemonicWords}
-                                        value={wordSix}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordSixError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordSixError(false)
-                                            else setWordSixError(true)
-                                            dispatch(wordSixEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 100, height: 50 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordSixError}
-                                                                               label="Word 6" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-seven"
-                                        label="Word 7"
-                                        options={mnemonicWords}
-                                        value={wordSeven}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordSevenError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordSevenError(false)
-                                            else setWordSevenError(true)
-                                            dispatch(wordSevenEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 100, height: 50 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordSevenError}
-                                                                               label="Word 7" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-eight"
-                                        label="Word 8"
-                                        options={mnemonicWords}
-                                        value={wordEight}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordEightError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordEightError(false)
-                                            else setWordEightError(true)
-                                            dispatch(wordEightEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 100, height: 50 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordEightError}
-                                                                               label="Word 8" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-nine"
-                                        label="Word 9"
-                                        options={mnemonicWords}
-                                        value={wordNine}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordNineError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordNineError(false)
-                                            else setWordNineError(true)
-                                            dispatch(wordNineEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 100, height: 50 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordNineError}
-                                                                               label="Word 9" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-ten"
-                                        label="Word 10"
-                                        options={mnemonicWords}
-                                        value={wordTen}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordTenError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordTenError(false)
-                                            else setWordTenError(true)
-                                            dispatch(wordTenEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 100, height: 50 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordTenError}
-                                                                               label="Word 10" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-eleven"
-                                        label="Word 11"
-                                        options={mnemonicWords}
-                                        value={wordEleven}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordElevenError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordElevenError(false)
-                                            else setWordElevenError(true)
-                                            dispatch(wordElevenEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 100, height: 50 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordElevenError}
-                                                                               label="Word 11" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-twelve"
-                                        label="Word 12"
-                                        options={mnemonicWords}
-
-                                        value={wordTwelve}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordTwelveError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordTwelveError(false)
-                                            else setWordTwelveError(true)
-                                            dispatch(wordTwelveEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 100, height: 50 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordTwelveError}
-                                                                               label="Word 12" />}
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-
-                                <Alert severity={!validSeedPhrase ? 'error' : 'success'} sx={{ width: "100%" }}>
-                                    <AlertTitle>{!validSeedPhrase ? 'Seed phrase invalid' : 'Seed phrase valid'}</AlertTitle>
-                                    {!validSeedPhrase ? 'The seed phrase is currently incorrect.' : 'It remains to enter the Encryption password to complete the wallet setup.'}
-                                </Alert>
-                            </Box>
-                            { noClientError ? <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-
-                                <Alert severity={"warning"} sx={{ width: "100%" }}>
-                                    <AlertTitle>{"Client not exists"}</AlertTitle>
-                                    {"There is no DEX client smart contract with such pubkey registered on DEX, please check your seed phrase or create new client."}
-                                </Alert>
-                            </Box> : null}
-
-                            <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-
-                                <TextField
-                                    label="Encryption password"
-                                    error={!validPassword}
-                                    sx={{ width: "100%" }}
-                                    placeholder={"Your seed phrase will be encrypted with this password"}
-                                    type="password"
-                                    onChange={passwordChange}
-                                    value={seedPhrasePassword}
-                                />
-                            </Box>
-
-                            <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-
-                                <Alert severity="info">
-                                    <AlertTitle>Hint</AlertTitle>
-                                    You can paste seed phrase into page (Ctrl + V), and the fields will be automatically
-                                    filled
-                                </Alert>
-                            </Box>
-
-                            <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-
-                                <Alert severity="warning">
-                                    <AlertTitle>Security policy</AlertTitle>
-                                    Your password is the key to decrypting the seed phrase!
-                                    Please make sure that this password is only used for this service.
-                                    DefiSpace does not store your password and seed phrase on the remote server.
-                                    The encrypted string with the seed phrase is stored in your computer's browser
-                                    storage.
-                                    DefiSpace service <strong>cannot decrypt</strong> it without knowing the password.
-                                </Alert>
-                            </Box>
-
-                            <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-                                <button style={{ fontSize: "24px" }} onClick={login} className="btn wallet-btn">Log in
-                                </button>
-                            </Box>
-                        </>}
-                        {enterSeedPhraseSide === "register" && <>
-                            <Grid container spacing={3} sx={{ justifyContent: "center" }}>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-one"
-                                        label="Word 1"
-                                        // disabled
-                                        options={mnemonicWords}
-                                        value={wordOne}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordOneError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordOneError(false)
-                                            else setWordOneError(true)
-                                            dispatch(wordOneEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        color={"var(--primary-color)"}
-                                        renderInput={(params) => <CssTextField {...params} error={wordOneError}
-                                                                               label="Word 1" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-two"
-                                        label="Word 2"
-                                        options={mnemonicWords}
-                                        // disabled
-                                        value={wordTwo}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordTwoError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordTwoError(false)
-                                            else setWordTwoError(true)
-                                            dispatch(wordTwoEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordTwoError}
-                                                                               label="Word 2" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-three"
-                                        label="Word 3"
-                                        options={mnemonicWords}
-                                        // disabled
-                                        value={wordThree}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordThreeError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordThreeError(false)
-                                            else setWordThreeError(true)
-                                            dispatch(wordThreeEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordThreeError}
-                                                                               label="Word 3" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-four"
-                                        label="Word 4"
-                                        options={mnemonicWords}
-                                        value={wordFour}
-                                        // disabled
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordFourError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordFourError(false)
-                                            else setWordFourError(true)
-                                            dispatch(wordFourEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordFourError}
-                                                                               label="Word 4" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-five"
-                                        label="Word 5"
-                                        options={mnemonicWords}
-                                        // disabled
-                                        value={wordFive}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordFiveError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordFiveError(false)
-                                            else setWordFiveError(true)
-                                            dispatch(wordFiveEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordFiveError}
-                                                                               label="Word 5" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-six"
-                                        label="Word 6"
-                                        options={mnemonicWords}
-                                        value={wordSix}
-                                        // disabled
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordSixError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordSixError(false)
-                                            else setWordSixError(true)
-                                            dispatch(wordSixEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordSixError}
-                                                                               label="Word 6" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-seven"
-                                        label="Word 7"
-                                        options={mnemonicWords}
-                                        value={wordSeven}
-                                        // disabled
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordSevenError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordSevenError(false)
-                                            else setWordSevenError(true)
-                                            dispatch(wordSevenEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordSevenError}
-                                                                               label="Word 7" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-eight"
-                                        label="Word 8"
-                                        options={mnemonicWords}
-                                        // disabled
-                                        value={wordEight}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordEightError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordEightError(false)
-                                            else setWordEightError(true)
-                                            dispatch(wordEightEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordEightError}
-                                                                               label="Word 8" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-nine"
-                                        label="Word 9"
-                                        options={mnemonicWords}
-                                        // disabled
-                                        value={wordNine}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordNineError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordNineError(false)
-                                            else setWordNineError(true)
-                                            dispatch(wordNineEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordNineError}
-                                                                               label="Word 9" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-ten"
-                                        label="Word 10"
-                                        options={mnemonicWords}
-                                        // disabled
-                                        value={wordTen}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordTenError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordTenError(false)
-                                            else setWordTenError(true)
-                                            dispatch(wordTenEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordTenError}
-                                                                               label="Word 10" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-eleven"
-                                        label="Word 11"
-                                        options={mnemonicWords}
-                                        // disabled
-                                        value={wordEleven}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordElevenError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordElevenError(false)
-                                            else setWordElevenError(true)
-                                            dispatch(wordElevenEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordElevenError}
-                                                                               label="Word 11" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-twelve"
-                                        label="Word 12"
-                                        options={mnemonicWords}
-                                        // disabled
-                                        value={wordTwelve}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordTwelveError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordTwelveError(false)
-                                            else setWordTwelveError(true)
-                                            dispatch(wordTwelveEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordTwelveError}
-                                                                               label="Word 12" />}
-                                    />
-                                </Grid>
-                            </Grid>
-
-                            <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-
-                                <Alert severity={"warning"} sx={{ width: "100%" }}>
-                                    <AlertTitle>Important information</AlertTitle>
-                                    It is very important to keep the seed phrase. It cannot be restored. The DefiSpace
-                                    service does not store the seed phrase, and will not be able to help if it is lost.
-                                    Remember this.
-                                </Alert>
-                            </Box>
-
-                            <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-                                <Grid container className={"enterSPRegBox"} spacing={2}>
+                :
+                <MainBlock
+                    title={getTitle(enterSeedPhraseSide)}
+                    classHeader={"fixFontSize"}
+                    classTitle={"fixFontSize"}
+                    class={(enterSeedPhraseSide === "login" || enterSeedPhraseSide === "register" || enterSeedPhraseSide === "confirmReg") ? "fixheight big" : "fixheight"}
+                    button={(enterSeedPhraseSide === "login" || enterSeedPhraseSide === "register" || enterSeedPhraseSide === "confirmReg") &&
+                    <CloseBtn width={"16px"} height={"16px"} func={handleClose}/>}
+                    content={
+                        <>
+                            {enterSeedPhraseSide === "login" && <>
+                                <Grid container spacing={3} sx={{justifyContent: "center"}}>
                                     <Grid item>
-                                        <button style={{ fontSize: "16px" }} onClick={genPhrase}
-                                                className="btn wallet-btn">Re-create seed phrase
-                                        </button>
+                                        <Autocomplete
+                                            id="seed-phrase-word-one"
+                                            label="Word 1"
+
+                                            options={mnemonicWords}
+                                            value={wordOne}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordOneError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordOneError(false)
+                                                else setWordOneError(true)
+                                                dispatch(wordOneEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 100, height: 50}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordOneError}
+                                                                                   label="Word 1"/>}
+                                        />
                                     </Grid>
                                     <Grid item>
-                                        <button style={{ fontSize: "16px" }} onClick={continueReg}
-                                                className="btn wallet-btn">Continue
-                                        </button>
+                                        <Autocomplete
+                                            id="seed-phrase-word-two"
+                                            label="Word 2"
+                                            options={mnemonicWords}
+                                            value={wordTwo}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordTwoError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordTwoError(false)
+                                                else setWordTwoError(true)
+                                                dispatch(wordTwoEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 100, height: 50}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordTwoError}
+                                                                                   label="Word 2"/>}
+                                        />
                                     </Grid>
                                     <Grid item>
-                                        <button style={{ fontSize: "16px" }} onClick={copySeedPhrase}
-                                                className="btn wallet-btn">Copy
-                                        </button>
+                                        <Autocomplete
+                                            id="seed-phrase-word-three"
+                                            label="Word 3"
+                                            options={mnemonicWords}
+                                            value={wordThree}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordThreeError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordThreeError(false)
+                                                else setWordThreeError(true)
+                                                dispatch(wordThreeEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 100, height: 50}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordThreeError}
+                                                                                   label="Word 3"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-four"
+                                            label="Word 4"
+                                            options={mnemonicWords}
+                                            value={wordFour}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordFourError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordFourError(false)
+                                                else setWordFourError(true)
+                                                dispatch(wordFourEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 100, height: 50}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordFourError}
+                                                                                   label="Word 4"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-five"
+                                            label="Word 5"
+                                            options={mnemonicWords}
+                                            value={wordFive}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordFiveError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordFiveError(false)
+                                                else setWordFiveError(true)
+                                                dispatch(wordFiveEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 100, height: 50}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordFiveError}
+                                                                                   label="Word 5"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-six"
+                                            label="Word 6"
+                                            options={mnemonicWords}
+                                            value={wordSix}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordSixError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordSixError(false)
+                                                else setWordSixError(true)
+                                                dispatch(wordSixEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 100, height: 50}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordSixError}
+                                                                                   label="Word 6"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-seven"
+                                            label="Word 7"
+                                            options={mnemonicWords}
+                                            value={wordSeven}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordSevenError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordSevenError(false)
+                                                else setWordSevenError(true)
+                                                dispatch(wordSevenEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 100, height: 50}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordSevenError}
+                                                                                   label="Word 7"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-eight"
+                                            label="Word 8"
+                                            options={mnemonicWords}
+                                            value={wordEight}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordEightError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordEightError(false)
+                                                else setWordEightError(true)
+                                                dispatch(wordEightEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 100, height: 50}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordEightError}
+                                                                                   label="Word 8"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-nine"
+                                            label="Word 9"
+                                            options={mnemonicWords}
+                                            value={wordNine}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordNineError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordNineError(false)
+                                                else setWordNineError(true)
+                                                dispatch(wordNineEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 100, height: 50}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordNineError}
+                                                                                   label="Word 9"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-ten"
+                                            label="Word 10"
+                                            options={mnemonicWords}
+                                            value={wordTen}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordTenError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordTenError(false)
+                                                else setWordTenError(true)
+                                                dispatch(wordTenEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 100, height: 50}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordTenError}
+                                                                                   label="Word 10"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-eleven"
+                                            label="Word 11"
+                                            options={mnemonicWords}
+                                            value={wordEleven}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordElevenError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordElevenError(false)
+                                                else setWordElevenError(true)
+                                                dispatch(wordElevenEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 100, height: 50}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordElevenError}
+                                                                                   label="Word 11"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-twelve"
+                                            label="Word 12"
+                                            options={mnemonicWords}
+
+                                            value={wordTwelve}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordTwelveError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordTwelveError(false)
+                                                else setWordTwelveError(true)
+                                                dispatch(wordTwelveEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 100, height: 50}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordTwelveError}
+                                                                                   label="Word 12"/>}
+                                        />
                                     </Grid>
                                 </Grid>
-                            </Box>
-                        </>}
-                        {enterSeedPhraseSide === "confirmReg" && <>
-                            <Grid container spacing={3} sx={{ justifyContent: "center" }}>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-one"
-                                        label="Word 1"
 
-                                        options={mnemonicWords}
-                                        value={wordOne}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordOneError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordOneError(false)
-                                            else setWordOneError(true)
-                                            dispatch(wordOneEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordOneError}
-                                                                               label="Word 1" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-two"
-                                        label="Word 2"
-                                        options={mnemonicWords}
-                                        value={wordTwo}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordTwoError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordTwoError(false)
-                                            else setWordTwoError(true)
-                                            dispatch(wordTwoEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordTwoError}
-                                                                               label="Word 2" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-three"
-                                        label="Word 3"
-                                        options={mnemonicWords}
-                                        value={wordThree}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordThreeError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordThreeError(false)
-                                            else setWordThreeError(true)
-                                            dispatch(wordThreeEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordThreeError}
-                                                                               label="Word 3" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-four"
-                                        label="Word 4"
-                                        options={mnemonicWords}
-                                        value={wordFour}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordFourError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordFourError(false)
-                                            else setWordFourError(true)
-                                            dispatch(wordFourEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordFourError}
-                                                                               label="Word 4" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-five"
-                                        label="Word 5"
-                                        options={mnemonicWords}
-                                        value={wordFive}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordFiveError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordFiveError(false)
-                                            else setWordFiveError(true)
-                                            dispatch(wordFiveEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordFiveError}
-                                                                               label="Word 5" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-six"
-                                        label="Word 6"
-                                        options={mnemonicWords}
-                                        value={wordSix}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordSixError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordSixError(false)
-                                            else setWordSixError(true)
-                                            dispatch(wordSixEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordSixError}
-                                                                               label="Word 6" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-seven"
-                                        label="Word 7"
-                                        options={mnemonicWords}
-                                        value={wordSeven}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordSevenError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordSevenError(false)
-                                            else setWordSevenError(true)
-                                            dispatch(wordSevenEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordSevenError}
-                                                                               label="Word 7" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-eight"
-                                        label="Word 8"
-                                        options={mnemonicWords}
-                                        value={wordEight}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordEightError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordEightError(false)
-                                            else setWordEightError(true)
-                                            dispatch(wordEightEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordEightError}
-                                                                               label="Word 8" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-nine"
-                                        label="Word 9"
-                                        options={mnemonicWords}
-                                        value={wordNine}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordNineError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordNineError(false)
-                                            else setWordNineError(true)
-                                            dispatch(wordNineEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordNineError}
-                                                                               label="Word 9" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-ten"
-                                        label="Word 10"
-                                        options={mnemonicWords}
-                                        value={wordTen}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordTenError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordTenError(false)
-                                            else setWordTenError(true)
-                                            dispatch(wordTenEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordTenError}
-                                                                               label="Word 10" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-eleven"
-                                        label="Word 11"
-                                        options={mnemonicWords}
-                                        value={wordEleven}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordElevenError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordElevenError(false)
-                                            else setWordElevenError(true)
-                                            dispatch(wordElevenEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordElevenError}
-                                                                               label="Word 11" />}
-                                    />
-                                </Grid>
-                                <Grid item>
-                                    <Autocomplete
-                                        id="seed-phrase-word-twelve"
-                                        label="Word 12"
-                                        options={mnemonicWords}
+                                <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
 
-                                        value={wordTwelve}
-                                        onChange={(event, newValue) => {
-                                            if (newValue === null) setWordTwelveError(true);
-                                            else if (mnemonicWords.indexOf(newValue) !== -1) setWordTwelveError(false)
-                                            else setWordTwelveError(true)
-                                            dispatch(wordTwelveEnterSeedPhrase(newValue));
-                                        }}
-                                        getOptionLabel={(option) => option}
-                                        sx={{ width: 160 }}
-                                        renderInput={(params) => <CssTextField {...params} error={wordTwelveError}
-                                                                               label="Word 12" />}
+                                    <Alert severity={!validSeedPhrase ? 'error' : 'success'} sx={{width: "100%"}}>
+                                        <AlertTitle>{!validSeedPhrase ? 'Seed phrase invalid' : 'Seed phrase valid'}</AlertTitle>
+                                        {!validSeedPhrase ? 'The seed phrase is currently incorrect.' : 'It remains to enter the Encryption password to complete the wallet setup.'}
+                                    </Alert>
+                                </Box>
+                                {noClientError ?
+                                    <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+
+                                        <Alert severity={"warning"} sx={{width: "100%"}}>
+                                            <AlertTitle>{"Client not exists"}</AlertTitle>
+                                            {"There is no DEX client smart contract with such pubkey registered on DEX, please check your seed phrase or create new client."}
+                                        </Alert>
+                                    </Box> : null}
+
+                                <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+
+                                    <TextField
+                                        label="Encryption password"
+                                        error={!validPassword}
+                                        sx={{width: "100%"}}
+                                        placeholder={"Your seed phrase will be encrypted with this password"}
+                                        type="password"
+                                        onChange={passwordChange}
+                                        value={seedPhrasePassword}
                                     />
-                                </Grid>
-                            </Grid>
-
-                            <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-
-                                <Alert severity={!validSeedPhrase ? 'error' : 'success'} sx={{ width: "100%" }}>
-                                    <AlertTitle>{!validSeedPhrase ? 'Seed phrase invalid' : 'Seed phrase valid'}</AlertTitle>
-                                    {!validSeedPhrase ? 'The seed phrase is currently incorrect.' : 'Seed phrase valid. You can create DexWallet'}
-                                </Alert>
-                            </Box>
-
-                            <div style={{ display: "flex", justifyContent: "space-around" }} className={"enterSPContent"}>
-                                {(errorAfterCheck === true || errorAfterCheck === null) &&
-                                <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-                                    <button style={{ fontSize: "24px" }} onClick={backToGen}
-                                            className="btn wallet-btn">Back
-                                    </button>
-                                </Box>}
-                                {/*{errorAfterCheck === false &&*/}
-                                <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-                                    <button style={{ fontSize: "24px" }} onClick={validateSP}
-                                            className="btn wallet-btn">Generate wallet
-                                    </button>
                                 </Box>
 
+                                <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
 
-                            </div>
-                            {/*}*/}
-                        </>}
-                        {enterSeedPhraseSide === "genClient" &&
-                        <Grid container spacing={3} sx={{ justifyContent: "center", marginLeft: "0px" }}>
-                            <Box sx={{
+                                    <Alert severity="info">
+                                        <AlertTitle>Hint</AlertTitle>
+                                        You can paste seed phrase into page (Ctrl + V), and the fields will be
+                                        automatically
+                                        filled
+                                    </Alert>
+                                </Box>
 
-                                marginTop: "24px",
-                                width: "100%",
-                                marginLeft:"20px",
-                                wordBreak: "break-word"
-                            }}>
-                                Please send 2 or more TON to this address: <strong className={"textOnHover"}
-                                                                                   onClick={() => copyToClipboard(clientPrepData[0].data.address)}>{clientPrepData[0].data.address ? clientPrepData[0].data.address : "default"}</strong>,
-                                and click "Create wallet".
+                                <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
 
-                            </Box>
+                                    <Alert severity="warning">
+                                        <AlertTitle>Security policy</AlertTitle>
+                                        Your password is the key to decrypting the seed phrase!
+                                        Please make sure that this password is only used for this service.
+                                        DefiSpace does not store your password and seed phrase on the remote server.
+                                        The encrypted string with the seed phrase is stored in your computer's browser
+                                        storage.
+                                        DefiSpace service <strong>cannot decrypt</strong> it without knowing the
+                                        password.
+                                    </Alert>
+                                </Box>
 
-                            {balanceInsError && <Box sx={{
-                                display: "flex",
-                                justifyContent: "center",
-                                marginTop: "24px",
-                                width: "100%",
-                                flexDirection: "column"
-                            }}>
+                                <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+                                    <button style={{fontSize: "24px"}} onClick={login} className="btn wallet-btn">Log in
+                                    </button>
+                                </Box>
+                            </>}
+                            {enterSeedPhraseSide === "register" && <>
+                                <Grid container spacing={3} sx={{justifyContent: "center"}}>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-one"
+                                            label="Word 1"
+                                            // disabled
+                                            options={mnemonicWords}
+                                            value={wordOne}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordOneError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordOneError(false)
+                                                else setWordOneError(true)
+                                                dispatch(wordOneEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            color={"var(--primary-color)"}
+                                            renderInput={(params) => <CssTextField {...params} error={wordOneError}
+                                                                                   label="Word 1"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-two"
+                                            label="Word 2"
+                                            options={mnemonicWords}
+                                            // disabled
+                                            value={wordTwo}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordTwoError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordTwoError(false)
+                                                else setWordTwoError(true)
+                                                dispatch(wordTwoEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordTwoError}
+                                                                                   label="Word 2"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-three"
+                                            label="Word 3"
+                                            options={mnemonicWords}
+                                            // disabled
+                                            value={wordThree}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordThreeError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordThreeError(false)
+                                                else setWordThreeError(true)
+                                                dispatch(wordThreeEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordThreeError}
+                                                                                   label="Word 3"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-four"
+                                            label="Word 4"
+                                            options={mnemonicWords}
+                                            value={wordFour}
+                                            // disabled
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordFourError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordFourError(false)
+                                                else setWordFourError(true)
+                                                dispatch(wordFourEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordFourError}
+                                                                                   label="Word 4"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-five"
+                                            label="Word 5"
+                                            options={mnemonicWords}
+                                            // disabled
+                                            value={wordFive}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordFiveError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordFiveError(false)
+                                                else setWordFiveError(true)
+                                                dispatch(wordFiveEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordFiveError}
+                                                                                   label="Word 5"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-six"
+                                            label="Word 6"
+                                            options={mnemonicWords}
+                                            value={wordSix}
+                                            // disabled
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordSixError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordSixError(false)
+                                                else setWordSixError(true)
+                                                dispatch(wordSixEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordSixError}
+                                                                                   label="Word 6"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-seven"
+                                            label="Word 7"
+                                            options={mnemonicWords}
+                                            value={wordSeven}
+                                            // disabled
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordSevenError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordSevenError(false)
+                                                else setWordSevenError(true)
+                                                dispatch(wordSevenEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordSevenError}
+                                                                                   label="Word 7"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-eight"
+                                            label="Word 8"
+                                            options={mnemonicWords}
+                                            // disabled
+                                            value={wordEight}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordEightError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordEightError(false)
+                                                else setWordEightError(true)
+                                                dispatch(wordEightEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordEightError}
+                                                                                   label="Word 8"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-nine"
+                                            label="Word 9"
+                                            options={mnemonicWords}
+                                            // disabled
+                                            value={wordNine}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordNineError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordNineError(false)
+                                                else setWordNineError(true)
+                                                dispatch(wordNineEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordNineError}
+                                                                                   label="Word 9"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-ten"
+                                            label="Word 10"
+                                            options={mnemonicWords}
+                                            // disabled
+                                            value={wordTen}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordTenError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordTenError(false)
+                                                else setWordTenError(true)
+                                                dispatch(wordTenEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordTenError}
+                                                                                   label="Word 10"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-eleven"
+                                            label="Word 11"
+                                            options={mnemonicWords}
+                                            // disabled
+                                            value={wordEleven}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordElevenError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordElevenError(false)
+                                                else setWordElevenError(true)
+                                                dispatch(wordElevenEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordElevenError}
+                                                                                   label="Word 11"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-twelve"
+                                            label="Word 12"
+                                            options={mnemonicWords}
+                                            // disabled
+                                            value={wordTwelve}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordTwelveError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordTwelveError(false)
+                                                else setWordTwelveError(true)
+                                                dispatch(wordTwelveEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordTwelveError}
+                                                                                   label="Word 12"/>}
+                                        />
+                                    </Grid>
+                                </Grid>
 
-                                TONs not received, please try again or wait one minute.
+                                <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
 
-                            </Box>
+                                    <Alert severity={"warning"} sx={{width: "100%"}}>
+                                        <AlertTitle>Important information</AlertTitle>
+                                        It is very important to keep the seed phrase. It cannot be restored. The
+                                        DefiSpace
+                                        service does not store the seed phrase, and will not be able to help if it is
+                                        lost.
+                                        Remember this.
+                                    </Alert>
+                                </Box>
+
+                                <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+                                    <Grid container className={"enterSPRegBox"} spacing={2}>
+                                        <Grid item>
+                                            <button style={{fontSize: "16px"}} onClick={genPhrase}
+                                                    className="btn wallet-btn">Re-create seed phrase
+                                            </button>
+                                        </Grid>
+                                        <Grid item>
+                                            <button style={{fontSize: "16px"}} onClick={continueReg}
+                                                    className="btn wallet-btn">Continue
+                                            </button>
+                                        </Grid>
+                                        <Grid item>
+                                            <button style={{fontSize: "16px"}} onClick={copySeedPhrase}
+                                                    className="btn wallet-btn">Copy
+                                            </button>
+                                        </Grid>
+                                    </Grid>
+                                </Box>
+                            </>}
+                            {enterSeedPhraseSide === "confirmReg" && <>
+                                <Grid container spacing={3} sx={{justifyContent: "center"}}>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-one"
+                                            label="Word 1"
+
+                                            options={mnemonicWords}
+                                            value={wordOne}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordOneError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordOneError(false)
+                                                else setWordOneError(true)
+                                                dispatch(wordOneEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordOneError}
+                                                                                   label="Word 1"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-two"
+                                            label="Word 2"
+                                            options={mnemonicWords}
+                                            value={wordTwo}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordTwoError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordTwoError(false)
+                                                else setWordTwoError(true)
+                                                dispatch(wordTwoEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordTwoError}
+                                                                                   label="Word 2"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-three"
+                                            label="Word 3"
+                                            options={mnemonicWords}
+                                            value={wordThree}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordThreeError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordThreeError(false)
+                                                else setWordThreeError(true)
+                                                dispatch(wordThreeEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordThreeError}
+                                                                                   label="Word 3"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-four"
+                                            label="Word 4"
+                                            options={mnemonicWords}
+                                            value={wordFour}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordFourError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordFourError(false)
+                                                else setWordFourError(true)
+                                                dispatch(wordFourEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordFourError}
+                                                                                   label="Word 4"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-five"
+                                            label="Word 5"
+                                            options={mnemonicWords}
+                                            value={wordFive}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordFiveError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordFiveError(false)
+                                                else setWordFiveError(true)
+                                                dispatch(wordFiveEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordFiveError}
+                                                                                   label="Word 5"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-six"
+                                            label="Word 6"
+                                            options={mnemonicWords}
+                                            value={wordSix}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordSixError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordSixError(false)
+                                                else setWordSixError(true)
+                                                dispatch(wordSixEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordSixError}
+                                                                                   label="Word 6"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-seven"
+                                            label="Word 7"
+                                            options={mnemonicWords}
+                                            value={wordSeven}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordSevenError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordSevenError(false)
+                                                else setWordSevenError(true)
+                                                dispatch(wordSevenEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordSevenError}
+                                                                                   label="Word 7"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-eight"
+                                            label="Word 8"
+                                            options={mnemonicWords}
+                                            value={wordEight}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordEightError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordEightError(false)
+                                                else setWordEightError(true)
+                                                dispatch(wordEightEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordEightError}
+                                                                                   label="Word 8"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-nine"
+                                            label="Word 9"
+                                            options={mnemonicWords}
+                                            value={wordNine}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordNineError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordNineError(false)
+                                                else setWordNineError(true)
+                                                dispatch(wordNineEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordNineError}
+                                                                                   label="Word 9"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-ten"
+                                            label="Word 10"
+                                            options={mnemonicWords}
+                                            value={wordTen}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordTenError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordTenError(false)
+                                                else setWordTenError(true)
+                                                dispatch(wordTenEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordTenError}
+                                                                                   label="Word 10"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-eleven"
+                                            label="Word 11"
+                                            options={mnemonicWords}
+                                            value={wordEleven}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordElevenError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordElevenError(false)
+                                                else setWordElevenError(true)
+                                                dispatch(wordElevenEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordElevenError}
+                                                                                   label="Word 11"/>}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Autocomplete
+                                            id="seed-phrase-word-twelve"
+                                            label="Word 12"
+                                            options={mnemonicWords}
+
+                                            value={wordTwelve}
+                                            onChange={(event, newValue) => {
+                                                if (newValue === null) setWordTwelveError(true);
+                                                else if (mnemonicWords.indexOf(newValue) !== -1) setWordTwelveError(false)
+                                                else setWordTwelveError(true)
+                                                dispatch(wordTwelveEnterSeedPhrase(newValue));
+                                            }}
+                                            getOptionLabel={(option) => option}
+                                            sx={{width: 160}}
+                                            renderInput={(params) => <CssTextField {...params} error={wordTwelveError}
+                                                                                   label="Word 12"/>}
+                                        />
+                                    </Grid>
+                                </Grid>
+
+                                <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+
+                                    <Alert severity={!validSeedPhrase ? 'error' : 'success'} sx={{width: "100%"}}>
+                                        <AlertTitle>{!validSeedPhrase ? 'Seed phrase invalid' : 'Seed phrase valid'}</AlertTitle>
+                                        {!validSeedPhrase ? 'The seed phrase is currently incorrect.' : 'Seed phrase valid. You can create DexWallet'}
+                                    </Alert>
+                                </Box>
+
+                                <div style={{display: "flex", justifyContent: "space-around"}}
+                                     className={"enterSPContent"}>
+                                    {(errorAfterCheck === true || errorAfterCheck === null) &&
+                                    <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+                                        <button style={{fontSize: "24px"}} onClick={backToGen}
+                                                className="btn wallet-btn">Back
+                                        </button>
+                                    </Box>}
+                                    {/*{errorAfterCheck === false &&*/}
+                                    <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+                                        <button style={{fontSize: "24px"}} onClick={validateSP}
+                                                className="btn wallet-btn">Generate wallet
+                                        </button>
+                                    </Box>
+
+
+                                </div>
+                                {/*}*/}
+                            </>}
+                            {enterSeedPhraseSide === "genClient" &&
+                            <Grid container spacing={3} sx={{justifyContent: "center", marginLeft: "0px"}}>
+                                <Box sx={{
+
+                                    marginTop: "24px",
+                                    width: "100%",
+                                    marginLeft: "20px",
+                                    wordBreak: "break-word"
+                                }}>
+                                    Please send 2 or more TON to this address: <strong className={"textOnHover"}
+                                                                                       onClick={() => copyToClipboard(clientPrepData[0].data.address)}>{clientPrepData[0].data.address ? clientPrepData[0].data.address : "default"}</strong>,
+                                    and click "Create wallet".
+
+                                </Box>
+
+                                {balanceInsError && <Box sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    marginTop: "24px",
+                                    width: "100%",
+                                    flexDirection: "column"
+                                }}>
+
+                                    TONs not received, please try again or wait one minute.
+
+                                </Box>
+                                }
+                                <div className={"enterSPBox"}>
+                                    <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+                                        <button style={{fontSize: "24px"}} onClick={BackFromGenClient}
+                                                className="btn wallet-btn">Back
+                                        </button>
+                                    </Box>
+
+                                    <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+                                        <button style={{fontSize: "24px"}}
+                                                onClick={() => copyToClipboard(clientPrepData[0].data.address)}
+                                                className="btn wallet-btn">Copy address
+                                        </button>
+                                    </Box>
+
+                                    <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+                                        <button style={{fontSize: "24px"}} onClick={deplo}
+                                                className="btn wallet-btn">Create wallet
+                                        </button>
+                                    </Box>
+                                </div>
+                            </Grid>
                             }
-                            <div className={"enterSPBox"}>
-                                <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-                                    <button style={{ fontSize: "24px" }} onClick={BackFromGenClient}
-                                            className="btn wallet-btn">Back
+                            {enterSeedPhraseSide === "setPassword" &&
+                            <Grid container spacing={3}
+                                  sx={{justifyContent: "center", width: "100%", margin: 0, flexDirection: "column"}}>
+                                <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+
+                                    <TextField
+                                        label="Decryption password"
+                                        error={!validPassword}
+                                        sx={{width: "100%"}}
+                                        placeholder={"Your seed phrase will be decrypted with this password"}
+                                        type="password"
+                                        inputProps={{style: {color: "var(--primary-color)"}}}
+                                        onChange={passwordChange}
+                                        inputRef={(input) => {
+                                            if (input != null) {
+                                                input.focus();
+                                            }
+                                        }}
+                                        value={seedPhrasePassword}
+                                        onKeyDown={enterClick}
+                                    />
+                                </Box>
+                                <Box sx={{display: "flex", justifyContent: "center", marginTop: "24px"}}>
+                                    <button style={{fontSize: "24px"}} onClick={goIntoApp}
+                                            className="btn wallet-btn">Set Password for your Wallet
                                     </button>
                                 </Box>
-
-                                <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-                                    <button style={{ fontSize: "24px" }}
-                                            onClick={() => copyToClipboard(clientPrepData[0].data.address)}
-                                            className="btn wallet-btn">Copy address
-                                    </button>
-                                </Box>
-
-                                <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-                                    <button style={{ fontSize: "24px" }} onClick={deplo}
-                                            className="btn wallet-btn">Create wallet
-                                    </button>
-                                </Box>
-                            </div>
-                        </Grid>
-                        }
-                        {enterSeedPhraseSide === "setPassword" &&
-                        <Grid container spacing={3}
-                              sx={{ justifyContent: "center", width: "100%", margin: 0, flexDirection: "column" }}>
-                            <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-
-                                <TextField
-                                    label="Decryption password"
-                                    error={!validPassword}
-                                    sx={{ width: "100%" }}
-                                    placeholder={"Your seed phrase will be decrypted with this password"}
-                                    type="password"
-                                    inputProps={{ style: { color: "var(--primary-color)" } }}
-                                    onChange={passwordChange}
-                                    inputRef={(input) => {
-                                        if (input != null) {
-                                            input.focus();
-                                        }
-                                    }}
-                                    value={seedPhrasePassword}
-                                    onKeyDown={enterClick}
-                                />
-                            </Box>
-                            <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
-                                <button style={{ fontSize: "24px" }} onClick={goIntoApp}
-                                        className="btn wallet-btn">Set Password for your Wallet
-                                </button>
-                            </Box>
-                        </Grid>
-                        }
-                        {
-                            enterSeedPhraseSide === "loader" &&
-                            <div>
-                                <Loader />
-                                <div style={{ textAlign: "center", marginTop: "70px" }}>{loaderInfo}</div>
-                            </div>
-                        }
-                    </>
-                }
-            />
-
-        </div>,
-        document.querySelector('body')
+                            </Grid>
+                            }
+                            {
+                                enterSeedPhraseSide === "loader" &&
+                                <div>
+                                    <Loader/>
+                                    <div style={{textAlign: "center", marginTop: "70px"}}>{loaderInfo}</div>
+                                </div>
+                            }
+                        </>
+                    }
+                />
+            }
+        </div>
+        // document.querySelector('body')
     );
 }
 

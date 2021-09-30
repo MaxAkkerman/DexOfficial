@@ -14,7 +14,7 @@ import MainBlock from '../../components/MainBlock/MainBlock';
 import ExtensionsList from '../../components/ExtensionsList/ExtensionsList';
 import './Account.scss';
 import {copyToClipboard} from "../../reactUtils/reactUtils";
-import {setSeedPassword} from "../../store/actions/enterSeedPhrase";
+import {setSeedPassword, wordOneEnterSeedPhrase} from "../../store/actions/enterSeedPhrase";
 
 function Account() {
     const history = useHistory();
@@ -33,10 +33,15 @@ function Account() {
     function disconnectHandler() {
         dispatch(setWallet({id: '', balance: 0}));
         dispatch(setWalletIsConnected(false));
-        dispatch(setCurExt({}));
-        dispatch(setTokenList([]));
-        dispatch(setLiquidityList([]));
-        dispatch(setPairsList([]))
+        // dispatch(setCurExt({}));
+        // dispatch(setTokenList([]));
+        // dispatch(setLiquidityList([]));
+        // dispatch(setPairsList([]))
+
+
+
+
+
         dispatch(setSeedPassword(""))
         // dispatch(enterSeedPhraseSaveToLocalStorage(""));
         dispatch(setClientData({
@@ -44,8 +49,12 @@ function Account() {
             dexclient: "",
             balance: 0
         }));
+
+        localStorage.removeItem("setSubscribeReceiveTokens");
+        // window.location.reload();
+
         localStorage.removeItem("esp");
-        console.log("history", history)
+
         // history.push("/account");
     }
 

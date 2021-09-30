@@ -113,10 +113,10 @@ function EnterPassword(props) {
     }
 
     async function login() {
-
+event.preventDefault()
         let esp = localStorage.getItem("esp");
 
-
+console.log("login")
         let decrypted = await decrypt(esp, seedPhrasePassword)
 
         if (decrypted.valid === false) setDecryptResult(false)
