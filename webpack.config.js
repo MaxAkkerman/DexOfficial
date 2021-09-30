@@ -63,6 +63,7 @@ module.exports = {
 			hash: true,
 			template: "./index.html",
 			filename: "index.html",
+			favicon: "./favicon.ico",
 		}),
 		new webpack.LoaderOptionsPlugin({
 			minimize: false,
