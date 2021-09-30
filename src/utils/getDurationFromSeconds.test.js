@@ -13,17 +13,17 @@ test("at least returns a number", () => {
 
 	expect(
 		typeof getDurationFromSeconds(
-			genRandomInt(0, 1e9), variants[genRandomInt(0, 6)],
+			genRandomInt(0, 1e9),
+			variants[genRandomInt(0, 6)],
 		),
-	)
-		.toBe("number");
+	).toBe("number");
 });
 
 function genRandomInt(min = 0, max = 1) {
-  if (max - min < 0 || !Number.isInteger(min) || !Number.isInteger(max))
-    throw new Error("Invalid max or min value.");
+	if (max - min < 0 || !Number.isInteger(min) || !Number.isInteger(max))
+		throw new Error("Invalid max or min value.");
 
-  const range = max - min + 1;
+	const range = max - min + 1;
 
-  return min + Math.floor(Math.random() * range);
+	return min + Math.floor(Math.random() * range);
 }

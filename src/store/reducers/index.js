@@ -11,17 +11,16 @@ import enterSeedPhrase from "./enterSeedPhrase";
 import stakingReducer from "./stake";
 import limitOrders from "./limitOrders";
 
-
 export default combineReducers({
-  appReducer,
-  walletReducer,
-  swapReducer,
-  poolReducer,
-  manageReducer,
-  clientWallets,
-  poolExplorer,
-  walletSeedReducer,
-  enterSeedPhrase,
-  stakingReducer,
-  limitOrders
+	appReducer,
+	walletReducer,
+	swapReducer,
+	poolReducer,
+	manageReducer,
+	clientWallets,
+	poolExplorer,
+	walletSeedReducer,
+	enterSeedPhrase,
+	stakingReducer,
+	limitOrders,
 });

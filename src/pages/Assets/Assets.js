@@ -11,13 +11,16 @@ import AssetsList from "../../components/AssetsList/AssetsList";
 
 import {useDispatch, useSelector} from "react-redux";
 import {showTip} from "../../store/actions/app";
-import useAssetList from "../../hooks/useAssetList";
+import useTokensList from "../../hooks/useAssetList";
 import {setTokenList} from "../../store/actions/wallet";
 import {unWrapTons, wrapTons} from "../../extensions/sdk/run";
 import {decrypt} from "../../extensions/seedPhrase";
 import useKeyPair from "../../hooks/useKeyPair";
 import client from "../../extensions/webhook/script";
 
+import fetchLimitOrders from "../../utils/fetchLimitOrders";
+
+import {setOrderList} from "../../store/actions/limitOrders";
 import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
 import TONicon from "../../images/tonCrystalDefault.svg";
 // import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
@@ -26,6 +29,7 @@ function Assets() {
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const [assets, setAssets] = useState([]);
+	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const walletIsConnected = useSelector(
 		(state) => state.appReducer.walletIsConnected,
 	);
@@ -36,6 +40,12 @@ function Assets() {
 	const liquidityList = useSelector(
 		(state) => state.walletReducer.liquidityList,
 	);
+	const clientData = useSelector((state) => state.walletReducer.clientData);
+
+	useEffect(async () => {
+		const orders = await fetchLimitOrders();
+		dispatch(setOrderList(orders));
+	}, []);
 
 	useEffect(() => {
 		setAssets(NFTassets);
@@ -78,7 +88,7 @@ function Assets() {
 	function handleClickToken(curItem) {
 		if (curItem.type !== "Native Tons") return;
 		console.log("curItem", curItem);
-		const copyAssets = JSON.parse(JSON.stringify(assetList));
+		const copyAssets = JSON.parse(JSON.stringify(tokensList));
 		copyAssets.map((item) => {
 			if ("Native Tons" === item.type) {
 				item.showWrapMenu = !item.showWrapMenu;
@@ -93,27 +103,27 @@ function Assets() {
 	const [currentTokenForWrap, setcurrentTokenForWrap] = useState({});
 	const [viewData, setViewData] = useState({});
 	async function handleWrapTons() {
-		const tonObj = assetList.filter((item) => item.type === "Native Tons");
+		const tonObj = tokensList.filter((item) => item.type === "Native Tons");
 		console.log("tonObj", tonObj);
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
 			type: "wrap",
 			confirmText: "wrap",
 			tokenSetted: true,
-			title: "Wrap Tons",
+			title: "Wrap TONs",
 		});
 		setshowWrapMenu(true);
 		// const wrapRes = await wrapTons(clientData.address,keyPair,1000000000)
 		// console.log("wrapRes",wrapRes)
 	}
 	async function handleUnWrapTons() {
-		const tonObj = assetList.filter((item) => item.symbol === "WTON");
+		const tonObj = tokensList.filter((item) => item.symbol === "WTON");
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
 			type: "unwrap",
 			confirmText: "unrap",
 			tokenSetted: true,
-			title: "Unwrap Tons",
+			title: "Unwrap TONs",
 		});
 		console.log("tonObj", tonObj);
 		setshowWrapMenu(true);
@@ -140,7 +150,7 @@ function Assets() {
 	//
 	//
 	//     }, []);
-	const {assetList} = useAssetList();
+	const {assetList: tokensList} = useTokensList();
 	return (
 		<>
 			{showWrapMenu ? (
@@ -163,7 +173,11 @@ function Assets() {
 									<div className="left_block boldFont">Your assets</div>
 									<div className={"settings_btn_container"}>
 										<button
-											className="settings_btn"
+											className={
+												walletIsConnected
+													? "settings_btn"
+													: "settings_btn btn--disabled"
+											}
 											onClick={
 												walletIsConnected ? () => addTokenWallet() : null
 											}
@@ -171,7 +185,11 @@ function Assets() {
 											<img src={nativeBtn} alt={"native"} />
 										</button>
 										<button
-											className="settings_btn"
+											className={
+												walletIsConnected
+													? "settings_btn"
+													: "settings_btn btn--disabled"
+											}
 											onClick={
 												walletIsConnected ? () => handleGoToSettings() : null
 											}
@@ -183,7 +201,9 @@ function Assets() {
 								<div className="action_btns">
 									<div>
 										<div
-											className="onHover"
+											className={
+												walletIsConnected ? "onHover" : "onHover btn--disabled"
+											}
 											onClick={
 												walletIsConnected ? () => handleChangeOnSend() : null
 											}
@@ -197,8 +217,10 @@ function Assets() {
 										<div className="action_btns_bottom_text">Send</div>
 									</div>
 									<div>
-										<div
-											className="onHover"
+										<button
+											className={
+												walletIsConnected ? "onHover" : "onHover btn--disabled"
+											}
 											onClick={
 												walletIsConnected ? () => handleChangeOnReceive() : null
 											}
@@ -208,12 +230,14 @@ function Assets() {
 												src={receiveAssets}
 												alt={"Receive"}
 											/>
-										</div>
+										</button>
 										<div className="action_btns_bottom_text">Receive</div>
 									</div>
 									<div>
 										<div
-											className="onHover"
+											className={
+												walletIsConnected ? "onHover" : "onHover btn--disabled"
+											}
 											onClick={() => handlePushToExchange()}
 										>
 											<img
@@ -229,10 +253,10 @@ function Assets() {
 								{walletIsConnected ? (
 									<>
 										{(NFTassets && NFTassets.length) ||
-										(assetList && assetList.length) ||
+										(tokensList && tokensList.length) ||
 										(orderList && orderList.length) ? (
 											<AssetsList
-												TokenAssetsArray={[...assetList, ...liquidityList]}
+												TokenAssetsArray={[...tokensList, ...liquidityList]}
 												orderAssetsArray={orderList}
 												NFTassetsArray={assets}
 												handleClickNFT={(item) => handleShowNFTData(item)}

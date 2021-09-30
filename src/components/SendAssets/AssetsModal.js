@@ -16,7 +16,6 @@ import useAssetList from "../../hooks/useAssetList";
 import CloseBtn from "../CloseBtn/CloseBtn";
 import MainBlock from "../MainBlock/MainBlock";
 import {useMediatedState} from "react-use";
-import includesTextInToken from "../../utils/includesTextInToken";
 
 function AssetsModal() {
 	const history = useHistory();
@@ -63,7 +62,6 @@ function AssetsModal() {
 	// =======
 	const {assetList} = useAssetList();
 
-	const [filter, setFilter] = useState("");
 	// >>>>>>> origin/liketurbo
 
 	// }, [clientData, tokenList])
@@ -81,7 +79,7 @@ function AssetsModal() {
 
 	function handleSetNFT(item) {
 		dispatch(setAmountForSend(""));
-
+		console.log("i am on vft");
 		dispatch(setInputNFTDisabled("disabled"));
 		dispatch(setAmountForSend(item.stakeTotal));
 		dispatch(setCurrentTokenForSend(item));
@@ -106,7 +104,14 @@ function AssetsModal() {
 	//     setShowNFTdata(!showNFTdata)
 	//
 	// }
-
+	const [filter, setFilter] = useState("");
+	function handleSearch(text) {
+		setFilter(text);
+		// const assetsArrCopy = JSON.parse(JSON.stringify(assetsArr))
+		// const arr = assetsArrCopy.filter(item=>text===item.name)
+		//
+		// setAssetsArr(arr)
+	}
 	function handleClose() {
 		dispatch(setInputNFTDisabled(null));
 		history.push("/wallet/send");
@@ -127,17 +132,16 @@ function AssetsModal() {
 							{/*        <img src={arrowBack} alt={"arrow"}/>*/}
 							{/*    </button>*/}
 							{/*</div>*/}
-							<SearchInput func={setFilter} />
+							<SearchInput func={(e) => handleSearch(e)} />
 
 							<AssetsList
 								handleClickNFT={(item) => handleSetNFT(item)}
 								handleClickToken={(item) => handleSetToken(item)}
-								TokenAssetsArray={[...assetList, ...liquidityList]
-									.sort((a, b) => b.balance - a.balance)
-									.filter((t) => includesTextInToken(t, filter))}
+								TokenAssetsArray={[...assetList, ...liquidityList]}
 								NFTassetsArray={NFTassets}
 								orderAssetsArray={null}
 								showItBeShown={false}
+								filter={filter}
 								// showNFTdata={false}
 							/>
 						</>

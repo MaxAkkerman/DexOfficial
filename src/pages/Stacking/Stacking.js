@@ -324,53 +324,46 @@ function Stacking() {
 											</div>
 											{/*</CardContent>*/}
 											<CardActions>
-												{item.id === 0 ? (
-													<div
-														style={{
-															fontSize: "14px",
-															width: "100px",
-															color: "#3569F0",
-														}}
-													>
-														Comming soon
-													</div>
-												) : (
-													<Button
-														size="small"
-														disableRipple
-														sx={{
-															"&:hover": {
-																backgroundColor:
-																	programs[curProgram].name === item.name
-																		? "rgba(53, 105, 240, 0.4)"
-																		: "rgba(0, 31, 111, 0.85)",
-																color:
-																	programs[curProgram].name === item.name
-																		? "#3569F0"
-																		: "#F4F7FF",
-																boxShadow: "none",
-															},
-															background:
+												{/*{item.id === 0*/}
+												{/*    ?*/}
+												{/*    <div style={{fontSize: "14px", width: "100px", color: "#3569F0"}}>Coming soon</div>*/}
+												{/*    :*/}
+												<Button
+													size="small"
+													disableRipple
+													sx={{
+														"&:hover": {
+															backgroundColor:
 																programs[curProgram].name === item.name
-																	? "rgba(0, 31, 111, 0.85)"
-																	: "rgba(53, 105, 240, 0.4)",
-															border: "none",
-															// height: "37px",
+																	? "rgba(53, 105, 240, 0.4)"
+																	: "rgba(0, 31, 111, 0.85)",
 															color:
 																programs[curProgram].name === item.name
-																	? "#F4F7FF"
-																	: "#3569F0",
-															borderRadius: "12px",
-															padding: "8px",
-															fontSize: "11px",
-															width: "92px",
-															height: "34px",
-														}}
-														onClick={() => calculateButton(item)}
-													>
-														Calculate
-													</Button>
-												)}
+																	? "#3569F0"
+																	: "#F4F7FF",
+															boxShadow: "none",
+														},
+														background:
+															programs[curProgram].name === item.name
+																? "rgba(0, 31, 111, 0.85)"
+																: "rgba(53, 105, 240, 0.4)",
+														border: "none",
+														// height: "37px",
+														color:
+															programs[curProgram].name === item.name
+																? "#F4F7FF"
+																: "#3569F0",
+														borderRadius: "12px",
+														padding: "8px",
+														fontSize: "11px",
+														width: "92px",
+														height: "34px",
+													}}
+													onClick={() => calculateButton(item)}
+												>
+													Calculate
+												</Button>
+												{/*}*/}
 											</CardActions>
 										</div>
 									);

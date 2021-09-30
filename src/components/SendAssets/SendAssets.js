@@ -29,6 +29,8 @@ import WaitingPopup from "../WaitingPopup/WaitingPopup";
 import {setTips} from "../../store/actions/app";
 
 import useSendAssetsSelectedToken from "../../hooks/useSendAssetsSelectedToken";
+import {getExpectedWalletAddressByOwner} from "../../extensions/webhook/script";
+import Loader from "../Loader/Loader";
 
 function SendAssets() {
 	const dispatch = useDispatch();
@@ -61,11 +63,13 @@ function SendAssets() {
 	);
 
 	let curExt = useSelector((state) => state.appReducer.curExt);
-
-	const {invalid: invalidAmount, validationMsg: validationMsgForAmount} =
+	const {isInvalid: isInvalidAmount, validationMsg: validationMsgForAmount} =
 		useSendAssetsCheckAmount();
-	const {invalid: invalidAddress, validationMsg: validationMsgForAddress} =
-		useSendAssetsCheckAddress();
+	const {
+		invalid: invalidAddress,
+		loading,
+		validationMsg: validationMsgForAddress,
+	} = useSendAssetsCheckAddress();
 	const {selectedToken} = useSendAssetsSelectedToken();
 	// const [currentAsset, setcurrentAsset] = useState([])
 	function handleSetSendPopupVisibility() {
@@ -214,16 +218,23 @@ function SendAssets() {
 				amountToSend,
 				decrypted.phrase,
 			);
+
+			const walletAddrByOwner = await getExpectedWalletAddressByOwner(
+				selectedToken.rootAddress,
+				addressToSend,
+			);
+			console.log("walletAddrByOwner222", walletAddrByOwner);
+
 			const res = await sendToken(
 				curExt,
 				selectedToken.rootAddress,
-				addressToSend,
+				walletAddrByOwner.name,
 				amountToSend,
 				decrypted.phrase,
 				selectedToken,
 			);
-			// dispatch(setShowWaitingSendAssetsPopup(false))
-			if (!res.code) {
+			dispatch(setShowWaitingSendAssetsPopup(false));
+			if (res && !res.code) {
 				dispatch(
 					setTips({
 						message: `Sended message to blockchain`,
@@ -282,6 +293,7 @@ function SendAssets() {
 							<div
 								className={cls("recipient_wrapper", {
 									amount_wrapper_error: invalidAddress,
+									amount_wrapper_success: !invalidAddress && !loading,
 								})}
 							>
 								<div className="send_text_headers">Recipient address</div>
@@ -325,9 +337,13 @@ function SendAssets() {
 								}
 								rightBottomBlock={<RightBlockBottom enableMax={<MaxBtn />} />}
 								leftBlockBottom={<InputChange />}
-								className={invalidAmount && "amount_wrapper_error"}
+								className={
+									isInvalidAmount
+										? "amount_wrapper_error"
+										: "amount_wrapper_success"
+								}
 							/>
-							{invalidAmount && (
+							{isInvalidAmount && (
 								<FormHelperText
 									style={{marginLeft: "27px", marginTop: "4px"}}
 									error
@@ -340,7 +356,9 @@ function SendAssets() {
 							<div className="btn_wrapper ">
 								<button
 									onClick={() => handleSetSendPopupVisibility()}
-									className="btn mainblock-btn"
+									className={`btn mainblock-btn ${
+										loading ? "btn--disabled" : ""
+									}`}
 								>
 									Send
 								</button>

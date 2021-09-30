@@ -71,6 +71,7 @@ function LimitOrder() {
 	);
 	const [connectAsyncIsWaiting, setconnectAsyncIsWaiting] = useState(false);
 	const [curExist, setExistsPair] = useState(false);
+	const [slippage, setSlippage] = useState("");
 	const [notDeployedWallets, setNotDeployedWallets] = useState([]);
 	const [connectPairStatusText, setconnectPairStatusText] = useState("");
 	const [incorrectBalance, setincorrectBalance] = useState(false);
@@ -255,6 +256,7 @@ function LimitOrder() {
 									type={"from"}
 									text={"From"}
 									token={fromToken}
+									value={fromValue}
 									incorrectBalance={incorrectBalance}
 								/>
 								<SwapBtn
@@ -274,6 +276,7 @@ function LimitOrder() {
 										)
 									}
 									token={toToken}
+									value={toValue}
 									incorrectBalance={false}
 								/>
 
@@ -325,6 +328,7 @@ function LimitOrder() {
 										Connect wallet
 									</button>
 								)}
+								{/*<button className="btn mainblock-btn btn--disabled" disabled>Coming soon</button>*/}
 
 								{fromToken.symbol && toToken.symbol && (
 									<p className="swap-rate">

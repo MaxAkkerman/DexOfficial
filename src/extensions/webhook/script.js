@@ -106,7 +106,7 @@ export async function getShardConnectPairQUERY(
 	let walletAddr;
 	while (!status) {
 		let response = await accClient.runLocal("getConnectorAddress", {
-			answerId: 0,
+			_answer_id: 0,
 			connectorSoArg: n,
 		});
 		// console.log("response",response)
@@ -115,7 +115,7 @@ export async function getShardConnectPairQUERY(
 		if (shardC === targetShard) {
 			console.log("sharding--------", n, shardC, targetShard);
 			let resp = await RootTknContract.runLocal("getWalletAddress", {
-				answerId: 0,
+				_answer_id: 0,
 				wallet_public_key_: 0,
 				owner_address_: connectorAddr,
 			});
@@ -349,6 +349,8 @@ export async function getAllClientWallets(clientAddress) {
 			itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
 			itemData.tokenName = getFullName(itemData.symbol);
 			itemData.type = "PureToken";
+			itemData.owner_address =
+				curWalletData.decoded.output.value0.owner_address;
 			itemData.decimals = curRootData.decoded.output.value0.decimals;
 			itemData.icon = iconGenerator(itemData.symbol);
 			itemData.rootAddress = curWalletData.decoded.output.value0.root_address;
@@ -551,7 +553,25 @@ export async function getDetailsFromTokenRoot(address) {
 		decimals: rootDetails.decoded.output.value0.decimals,
 	};
 }
+export async function getExpectedWalletAddressByOwner(rootAddress, toAddress) {
+	const rootAcc = new Account(RootTokenContract, {
+		address: rootAddress,
+		client,
+	});
 
+	let walletAddress = await rootAcc.runLocal("getWalletAddress", {
+		_answer_id: 0,
+		wallet_public_key_: 0,
+		owner_address_: toAddress,
+	});
+	console.log(
+		"walletAddress.decoded.output.value0.address",
+		walletAddress.decoded.output,
+	);
+	return {
+		name: walletAddress.decoded.output.value0,
+	};
+}
 export async function getRootFromTonWallet(address) {
 	const tokenWalletAcc = new Account(TONTokenWalletContract, {
 		address: address,
@@ -568,18 +588,22 @@ export async function getDetailsFromTONtokenWallet(address) {
 		address: address,
 		client,
 	});
-
-	let tokenWalletDetails = await tokenWalletAcc.runLocal("getDetails", {
-		_answer_id: 0,
-	});
-	console.log(
-		"atokenWalletDetails.decoded.output.value0.root_addressddress",
-		tokenWalletDetails,
-	);
-	if (!tokenWalletDetails.decoded.output.value0.root_address) {
-		return undefined;
+	try {
+		let tokenWalletDetails = await tokenWalletAcc.runLocal("getDetails", {
+			_answer_id: 0,
+		});
+		console.log(
+			"atokenWalletDetails.decoded.output.value0.root_addressddress",
+			tokenWalletDetails,
+		);
+		if (!tokenWalletDetails.decoded.output.value0.root_address) {
+			return undefined;
+		}
+		return tokenWalletDetails.decoded.output.value0.root_address;
+	} catch (e) {
+		console.log("eee", e);
+		return e;
 	}
-	return tokenWalletDetails.decoded.output.value0.root_address;
 }
 
 // // const transListReceiveTokens = useSelector(state => state.walletReducer.transListReceiveTokens);
@@ -820,7 +844,9 @@ export async function subscribeClient(address) {
 							name: decoded.name,
 							token_root: decoded.value.tokenRoot || "default",
 							updated_balance: decoded.value.updated_balance || "default",
-							amount: decoded.value.tokens || "default",
+							amount:
+								+decoded.value.tokens / getDecimals(rootData.decimals) ||
+								"default",
 							dst: decoded.value.to || "default",
 							created_at: params.result.created_at || "default",
 							tonLiveID: params.result.id || "default",
@@ -831,9 +857,9 @@ export async function subscribeClient(address) {
 						console.log("send callbackData", callbackData);
 						store.dispatch(
 							setTips({
-								message: `You send ${(
-									Number(callbackData.amount) / 1000000000
-								).toFixed(4)} ${callbackData.token_name}`,
+								message: `You send ${callbackData.amount.toFixed(4)} ${
+									callbackData.token_name
+								}`,
 								type: "info",
 								...callbackData,
 							}),
@@ -888,8 +914,12 @@ export async function subscribeClient(address) {
 						const rootABdetails = await getDetailsFromTokenRoot(rootABaddress);
 
 						const provideData = {
-							returnA: Number(decoded.value.returnA) / 1000000000,
-							returnB: Number(decoded.value.returnB) / 1000000000,
+							returnA:
+								Number(decoded.value.returnA) /
+								getDecimals(rootAdetails.decimals),
+							returnB:
+								Number(decoded.value.returnB) /
+								getDecimals(rootBdetails.decimals),
 							burnAB: Number(decoded.value.burnAB) / 1000000000,
 							walletA: decoded.value.walletA,
 							tokenAsymbol: hex2a(rootAdetails.symbol),
@@ -907,7 +937,7 @@ export async function subscribeClient(address) {
 									provideData.tokenAname || "def"
 								} and ${provideData.returnB.toFixed(4)} ${
 									provideData.tokenBname || "def"
-								} payed ${provideData.burnAB.toFixed(4)} ${
+								} payed ${provideData.burnAB.toFixed(6)} ${
 									provideData.tokenABname || "def"
 								}`,
 								type: "info",
@@ -938,14 +968,38 @@ export async function subscribeClient(address) {
 						const rootBdetails = await getDetailsFromTokenRoot(rootBaddress);
 						const rootABdetails = await getDetailsFromTokenRoot(rootABaddress);
 
+						//
+						// // console.log("hereii", curWalletData)
+						//                 itemData.walletAddress = item[1];
+						//                 itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
+						//                 itemData.tokenName = getFullName(itemData.symbol)
+						//                 itemData.type = "PureToken"
+						//                 itemData.owner_address = curWalletData.decoded.output.value0.owner_address
+						//                 itemData.decimals = curRootData.decoded.output.value0.decimals
+						//                 itemData.icon = iconGenerator(itemData.symbol)
+						//                 itemData.rootAddress = curWalletData.decoded.output.value0.root_address;
+						//                 itemData.balance = +curWalletData.decoded.output.value0.balance / getDecimals(curRootData.decoded.output.value0.decimals);
+
 						const provideData = {
-							amountA: Number(decoded.value.amountA) / 1000000000,
-							amountB: Number(decoded.value.amountB) / 1000000000,
+							amountA:
+								Number(decoded.value.amountA) /
+								getDecimals(rootAdetails.decimals),
+							amountB:
+								Number(decoded.value.amountB) /
+								getDecimals(rootBdetails.decimals),
 							amountAB: Number(decoded.value.mintAB) / 1000000000,
-							provideA: Number(decoded.value.provideA) / 1000000000,
-							provideB: Number(decoded.value.provideB) / 1000000000,
-							unusedReturnA: Number(decoded.value.unusedReturnA) / 1000000000,
-							unusedReturnB: Number(decoded.value.unusedReturnB) / 1000000000,
+							provideA:
+								Number(decoded.value.provideA) /
+								getDecimals(rootAdetails.decimals),
+							provideB:
+								Number(decoded.value.provideB) /
+								getDecimals(rootBdetails.decimals),
+							unusedReturnA:
+								Number(decoded.value.unusedReturnA) /
+								getDecimals(rootAdetails.decimals),
+							unusedReturnB:
+								Number(decoded.value.unusedReturnB) /
+								getDecimals(rootBdetails.decimals),
 							walletA: decoded.value.walletA,
 							tokenAsymbol: hex2a(rootAdetails.symbol),
 							tokenAname: hex2a(rootAdetails.name),
@@ -962,7 +1016,7 @@ export async function subscribeClient(address) {
 									provideData.tokenAname || "def"
 								} and ${provideData.amountB.toFixed(4)} ${
 									provideData.tokenBname || "def"
-								} for ${provideData.amountAB.toFixed(4)} ${
+								} for ${provideData.amountAB.toFixed(6)} ${
 									provideData.tokenABname || "def"
 								}`,
 								type: "info",
@@ -1029,7 +1083,8 @@ export async function subscribeClient(address) {
 							token_wallet: decoded.value.token_wallet || "default",
 							token_root: decoded.value.token_root || "default",
 							updated_balance: decoded.value.updated_balance || "default",
-							amount: decoded.value.amount || "default",
+							amount:
+								decoded.value.amount / getDecimals(rootD.decimals) || "default",
 							created_at: params.result.created_at || "default",
 							tonLiveID: params.result.id || "default",
 							token_name: hex2a(rootD.name) || "default",
@@ -1085,9 +1140,9 @@ export async function subscribeClient(address) {
 
 							store.dispatch(
 								setTips({
-									message: `Someone send y ${
-										Number(decoded.value.amount) / 1000000000
-									} ${hex2a(rootD.name)}`,
+									message: `Someone send y ${checkedDuple.amount} ${hex2a(
+										rootD.name,
+									)}`,
 									type: "info",
 									...checkedDuple,
 								}),
@@ -1098,7 +1153,7 @@ export async function subscribeClient(address) {
 							store.dispatch(
 								setTips({
 									message: `This one was your change ${
-										Number(decoded.value.amount) / 1000000000
+										checkedDuple.amount
 									} ${hex2a(rootD.name)}`,
 									type: "info",
 									...checkedDuple,
@@ -1145,9 +1200,9 @@ export async function subscribeClient(address) {
 
 							store.dispatch(
 								setTips({
-									message: `You receive ${(
-										Number(decoded.value.amount) / 1000000000
-									).toFixed(4)} ${hex2a(rootD.name)}`,
+									message: `You receive ${checkedDuple.amount.toFixed(
+										4,
+									)} ${hex2a(rootD.name)}`,
 									type: "info",
 									...checkedDuple,
 								}),
@@ -1323,7 +1378,7 @@ export async function subscribe(address) {
 							src: params.result.src,
 							dst: params.result.dst,
 							created_at: params.result.created_at,
-							amount: getFixedNums(d.decimals, Number(decoded.value.tokens)),
+							amount: Number(decoded.value.tokens) / getDecimals(d.decimals),
 							token_name: hex2a(d.name),
 							token_symbol: hex2a(d.symbol),
 						};

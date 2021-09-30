@@ -16,7 +16,7 @@ export default function useSendAssetsSelectedToken() {
 
 	function selectToken() {
 		const inListToken = assetList.find(
-			(token) => token.tokenName === currentTokenForSend.tokenName,
+			(token) => token.symbol === currentTokenForSend.symbol,
 		);
 
 		return inListToken || currentTokenForSend;
