@@ -2,6 +2,7 @@ import MainBlock from "../MainBlock/MainBlock";
 import React from "react";
 import {useSelector} from "react-redux";
 import "./DeployAssetConfirmPopup.scss";
+import {copyToClipboard} from "../../reactUtils/reactUtils";
 
 function DeployAssetConfirmPopup(props) {
 	console.log("assssss", props);
@@ -44,11 +45,11 @@ function DeployAssetConfirmPopup(props) {
 												alt={"assetIcon"}
 											/>
 										</span>
-										<span className="confirm-value">
+										<span className="confirm-value deployAsset">
 											{props.currentAsset.symbol}
 										</span>
 									</div>
-									<span className="confirm-value">
+									<span className="confirm-value deployAsset">
 										{props.currentAsset.tokenName}
 									</span>
 								</div>
@@ -57,19 +58,22 @@ function DeployAssetConfirmPopup(props) {
 							<div style={{width: "100%", marginTop: "20px"}}>
 								<div className="send_text_headers">Token Root Address</div>
 
-								<div
-									className="send_inputs"
-									style={{marginTop: "5px", wordBreak: "break-word"}}
-								>
-									{props.currentAsset.rootAddress}
+								<div className="DeployAssetConfirmPopup__data">
+									<span
+										className={"textOnHover"}
+										onClick={() =>
+											copyToClipboard(props.currentAsset.rootAddress)
+										}
+									>
+										{" "}
+										{props.currentAsset.rootAddress}
+									</span>
 								</div>
 								<div></div>
 							</div>
 							<div style={{width: "100%", marginTop: "20px"}}>
 								<div className="send_text_headers">Deploy Fee</div>
-								<div className="send_inputs" style={{marginTop: "5px"}}>
-									~ 4 TONs
-								</div>
+								<div className="DeployAssetConfirmPopup__data">~ 4 TONs</div>
 								<div></div>
 							</div>
 

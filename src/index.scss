@@ -276,6 +276,9 @@ input[type="number"] {
 		padding-right: 16px;
 		display: flex;
 		align-items: center;
+		&.deployAsset {
+			font-size: 30px;
+		}
 	}
 
 	&-icon {
