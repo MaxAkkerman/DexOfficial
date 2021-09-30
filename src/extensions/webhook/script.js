@@ -1184,7 +1184,7 @@ export async function subscribe(address) {
                     src: params.result.src,
                     dst: params.result.dst,
                     created_at: params.result.created_at,
-                    amount: getFixedNums(d.decimals,Number(decoded.value.tokens)),
+                    amount: Number(decoded.value.tokens)/getDecimals(d.decimals),
                     token_name: hex2a(d.name),
                     token_symbol: hex2a(d.symbol)
                 }

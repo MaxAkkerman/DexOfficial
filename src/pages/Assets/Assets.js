@@ -172,10 +172,10 @@ console.log("tonObj",tonObj)
                                     </div>
                                     <div className={"settings_btn_container"}>
 
-                                        <button className="settings_btn" onClick={walletIsConnected ? () => addTokenWallet() : null}>
+                                        <button className={walletIsConnected ? "settings_btn" : "settings_btn btn--disabled"} onClick={walletIsConnected ? () => addTokenWallet() : null}>
                                             <img src={nativeBtn} alt={"native"}/>
                                         </button>
-                                        <button className="settings_btn" onClick={walletIsConnected ?  () => handleGoToSettings() : null}>
+                                        <button className={walletIsConnected ? "settings_btn" : "settings_btn btn--disabled"} onClick={walletIsConnected ?  () => handleGoToSettings() : null}>
                                             <img src={settingsBtn} alt={"settings"} />
                                         </button>
 
