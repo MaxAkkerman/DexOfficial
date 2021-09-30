@@ -23,6 +23,7 @@ export default function useAssetList() {
 		if (isTONwalletExist.length === 0) {
 			const TONdata = {
 				walletAddress: clientData.address,
+				owner_address: clientData.address,
 				symbol: "TON Crystal",
 				tokenName: "TON Crystal",
 				type: "Native Tons",
