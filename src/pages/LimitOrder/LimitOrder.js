@@ -74,7 +74,7 @@ function LimitOrder() {
 	const [notDeployedWallets, setNotDeployedWallets] = useState([]);
 	const [connectPairStatusText, setconnectPairStatusText] = useState("");
 	const [incorrectBalance, setincorrectBalance] = useState(false);
-	const {isInvalid} = useLimitOrderValidation();
+	const {invalid} = useLimitOrderValidation();
 
 	useEffect(() => {
 		if (!pairsList.length || !pairId) {
@@ -100,7 +100,7 @@ function LimitOrder() {
 	}, [toToken, tokenList, pairId]);
 
 	function handleConfirm() {
-		if (isInvalid) return;
+		if (invalid) return;
 
 		dispatch(showOrdersConfirmPopup());
 	}
@@ -197,7 +197,7 @@ function LimitOrder() {
 			return (
 				<button
 					className={
-						isInvalid ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"
+						invalid ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"
 					}
 					onClick={() => handleConfirm()}
 				>
@@ -212,7 +212,7 @@ function LimitOrder() {
 			return (
 				<button
 					className={
-						isInvalid ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"
+						invalid ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"
 					}
 					onClick={() => handleConnectPair()}
 				>
@@ -223,7 +223,7 @@ function LimitOrder() {
 		return (
 			<button
 				className={
-					isInvalid ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"
+					invalid ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"
 				}
 				onClick={() => handleConfirm()}
 			>

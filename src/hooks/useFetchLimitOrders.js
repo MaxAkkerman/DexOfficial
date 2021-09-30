@@ -13,15 +13,11 @@ export default function useFetchLimitOrders() {
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 
 	const orderList = useSelector((state) => state.limitOrders.orderList);
-	const isLoading = useSelector(
-		(state) => state.limitOrders.isOrderListLoading,
-	);
-	const isFetched = useSelector(
-		(state) => state.limitOrders.isOrderListFetched,
-	);
+	const loading = useSelector((state) => state.limitOrders.orderListLoading);
+	const fetched = useSelector((state) => state.limitOrders.orderListFetched);
 
 	useEffect(async () => {
-		if (!clientData.address || isFetched) return;
+		if (!clientData.address || fetched) return;
 
 		dispatch(setOrderListLoading(true));
 
@@ -36,8 +32,8 @@ export default function useFetchLimitOrders() {
 	}, [clientData]);
 
 	return {
-		isLoading,
-		isFetched,
+		loading,
+		fetched,
 		orderList,
 	};
 }

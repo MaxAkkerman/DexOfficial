@@ -51,8 +51,8 @@ const initialState = {
 	ordersConfirmPopupVisible: false,
 	revertValue: 0,
 	orderList: [],
-	isOrderListLoading: false,
-	isOrderListFetched: false,
+	orderListLoading: false,
+	orderListFetched: false,
 };
 
 const limitOrders = (state = initialState, {type, payload}) => {
@@ -130,12 +130,12 @@ const limitOrders = (state = initialState, {type, payload}) => {
 		case SET_ORDER_LIST_LOADING:
 			return {
 				...state,
-				isOrderListLoading: payload,
+				orderListLoading: payload,
 			};
 		case SET_ORDER_LIST_FETCHED:
 			return {
 				...state,
-				isOrderListFetched: payload,
+				orderListFetched: payload,
 			};
 		default:
 			return state;
