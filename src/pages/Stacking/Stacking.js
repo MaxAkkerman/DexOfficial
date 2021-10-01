@@ -341,7 +341,7 @@ function Stacking() {
 												<Typography
 													variant="h5"
 													className={"Staking__text apy"}
-													sx={{fontWeight: "bold"}}
+													sx={{fontWeight: "bold", wordBreak: "all"}}
 													color="var(--primary-color)"
 												>
 													~{item.apy}%
