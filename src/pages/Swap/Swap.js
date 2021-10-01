@@ -138,6 +138,8 @@ function Swap() {
 	}, [toToken, tokenList, pairId]);
 
 	function handleConfirm() {
+		if (!fromValue && !toValue) return;
+
 		if (fromValue > fromToken.balance) {
 			setincorrectBalance(true);
 			setTimeout(() => setincorrectBalance(false), 10000);
@@ -429,10 +431,7 @@ function Swap() {
 									incorrectBalance={incorrectBalance}
 								/>
 								{errors.fromTokenAmount && (
-									<FormHelperText
-										error
-										sx={{color: "var(--text-color)", textAlign: "center"}}
-									>
+									<FormHelperText error sx={{color: "var(--text-color)"}}>
 										{NOT_ENOUGH}
 									</FormHelperText>
 								)}
@@ -467,6 +466,11 @@ function Swap() {
 										Connect wallet
 									</button>
 								)}
+								{!fromValue && !toValue && (
+									<FormHelperText sx={{textAlign: "center"}}>
+										{NOT_TOUCHED}
+									</FormHelperText>
+								)}
 								<SlippagePopper
 									slippageState={slippageState}
 									popperState={popperState}
@@ -483,10 +487,7 @@ function Swap() {
 								)}
 							</div>
 							{errors.commission && (
-								<FormHelperText
-									error
-									sx={{color: "var(--text-color)", textAlign: "center"}}
-								>
+								<FormHelperText error sx={{color: "var(--text-color)"}}>
 									{errors.commission}
 								</FormHelperText>
 							)}
