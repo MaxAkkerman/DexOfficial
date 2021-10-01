@@ -229,8 +229,6 @@ function WrapUnwrap(props) {
 		setWrapConfirmIsVisible(false);
 	}
 
-	console.log("@liketurbo", props.currentTokenForWrap);
-
 	return (
 		<div className="container">
 			{((!wrapConfirmIsVisible && !deployWTONisVisible) || mainIsVisible) && (
