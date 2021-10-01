@@ -22,11 +22,17 @@ import {
 import {hideStackingConfirmPopup} from "../../store/actions/wallet";
 import StackingConfirmPopup from "../../components/StackingConfirmPopup/StackingConfirmPopup";
 import {calculateRate} from "../../reactUtils/reactUtils";
-import useCheckAmount from "../../hooks/useCheckAmount";
 import TON from "../../images/tonCrystalDefault.svg";
 import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
 import stakingReducer from "../../store/reducers/stake";
 import {useHistory} from "react-router-dom";
+import {useFormik} from "formik";
+import useAssetList from "../../hooks/useAssetList";
+import {
+	NOT_ENOUGH as NOT_ENOUGH_MSG,
+	NOT_ENOUGH_CAUSE_COMMISSION as NOT_ENOUGH_CAUSE_COMMISSION_MSG,
+} from "../../constants/validationMessages";
+import {STACKING as STACKING_COMMISSION} from "../../constants/commissions";
 
 function Stacking() {
 	const dispatch = useDispatch();
@@ -134,6 +140,34 @@ function Stacking() {
 
 	const [curProgram, setProgram] = React.useState(1);
 
+	const {assetList} = useAssetList();
+
+	const {
+		values,
+		setFieldValue,
+		errors,
+		isValid: valid,
+	} = useFormik({
+		initialValues: {
+			stake: 0,
+			profit: 105.7,
+			APY: 10.57,
+		},
+		async validate({stake}) {
+			const errors = {};
+
+			const tonAsset = assetList.find((t) => t.symbol === "TON Crystal");
+			if (!tonAsset) return;
+
+			if (tonAsset.balance < stake) errors.stake = NOT_ENOUGH_MSG;
+
+			if (tonAsset.balance - STACKING_COMMISSION < stake)
+				errors.commission = `${NOT_ENOUGH_CAUSE_COMMISSION_MSG}\nCommission is ${STACKING_COMMISSION} TON`;
+
+			return errors;
+		},
+	});
+
 	function onPeriodChange(event) {
 		let curPeriod = Number(event.target.value);
 		console.log("curPeriod", curPeriod);
@@ -146,31 +180,23 @@ function Stacking() {
 
 		console.log("curMark", curMark);
 
-		setAPY(curMark[0].rate);
+		setFieldValue("APY", curMark[0].rate);
 		reCalc(curMark[0].rate, curMark[0].value);
 	}
 
-	const [stake, setStake] = React.useState(1000);
-	const [profit, setProfit] = React.useState(105.7);
-	const [APY, setAPY] = React.useState(10.57);
-	const {
-		invalid: error,
-		validate,
-		validationMsg: errorMsg,
-	} = useCheckAmount(stake);
 	function reCalc(percent, period) {
-		const totalProfit = calculateRate(stake, percent, period);
+		const totalProfit = calculateRate(values.stake, percent, period);
 
-		const profit = totalProfit - stake;
+		const profit = totalProfit - values.stake;
 
-		setProfit(profit);
+		setFieldValue("profit", profit);
 	}
 
 	function calculateButton(item) {
 		console.log("itemmm", item);
 		setProgram(item.id);
 		setPeriod(item.period);
-		setAPY(item.apy);
+		setFieldValue("APY", item.apy);
 		reCalc(item.apy, item.period);
 		// let percent = item.apy || 0
 		// let profit = stake * (percent * 0.01)
@@ -182,19 +208,17 @@ function Stacking() {
 
 		if (newStake < 1) newStake = 0;
 
-		const totalProfit = calculateRate(newStake, APY, period);
+		const totalProfit = calculateRate(newStake, values.APY, period);
 
 		const profit = totalProfit - newStake;
 		console.log("totalProfit", totalProfit, "newStake", newStake);
-		setProfit(profit);
-		setStake(newStake);
-
-		validate(Number(event.target.value));
+		setFieldValue("profit", profit);
+		setFieldValue("stake", newStake);
 	}
 
 	const [showConfirmPopup, setStackingConfirmPopup] = useState(false);
 	function handlestake(show) {
-		if (clientData.balance + 3 < Number(stake)) return;
+		if (!valid) return;
 
 		let periodInSeconds = 0;
 		if (period === 0) {
@@ -203,11 +227,11 @@ function Stacking() {
 			periodInSeconds = Number(period) * 30 * 60 * 60 * 24;
 		}
 
-		const stakeInNanotons = Number(stake) * 1000000000;
+		const stakeInNanotons = Number(values.stake) * 1000000000;
 
 		dispatch(setStackingPeriod(periodInSeconds));
 		dispatch(setStackingAmount(stakeInNanotons));
-		dispatch(setAPYforStaking(APY));
+		dispatch(setAPYforStaking(values.APY));
 
 		console.log(
 			"periodInSeconds",
@@ -215,7 +239,7 @@ function Stacking() {
 			"stakeInNanotons",
 			stakeInNanotons,
 			"APY",
-			APY,
+			values.APY,
 		);
 		setStackingConfirmPopup(show);
 	}
@@ -227,33 +251,34 @@ function Stacking() {
 		console.log("drop");
 		dispatch(setStackingPeriod(12 * 30 * 60 * 60 * 24));
 		dispatch(setStackingAmount(1000000000000));
-		setAPY(10.57);
-		setProfit(105.7);
-		setStake(1000);
+		setFieldValue("APY", 10.57);
+		setFieldValue("profit", 105.7);
+		setFieldValue("stake", 0);
 		setPeriod(12);
 		setStackingConfirmPopup(false);
 	}
 	function handleClose() {
 		dispatch(setShowStakingWaitingPopup(false));
 	}
+
 	return (
 		<div className="container">
 			{showConfirmPopup && (
 				<StackingConfirmPopup
-					stake={stake}
+					stake={values.stake}
 					period={period}
 					// program={programs[curProgram]}
 					programName={programs[curProgram].name}
-					profit={profit}
+					profit={values.profit}
 					handleClose={() => handleCloseStackingConfirm()}
-					APY={APY}
+					APY={values.APY}
 					hideConfirmPopup={() => dispatch(hideStackingConfirmPopup())}
 					handleDrop={() => handleDrop()}
 				/>
 			)}
 			{showWaitingStakingPopup && (
 				<WaitingPopup
-					text={`Stacking ${stake} TONS`}
+					text={`Stacking ${values.stake} TONS`}
 					handleClose={() => handleClose()}
 				/>
 			)}
@@ -270,11 +295,11 @@ function Stacking() {
 								onClick={() =>
 									console.log(
 										"profit",
-										profit,
+										values.profit,
 										"stake",
-										stake,
+										values.stake,
 										"APY",
-										APY,
+										values.APY,
 										"priod",
 										period,
 									)
@@ -416,7 +441,7 @@ function Stacking() {
 												</div>
 												<TextField
 													sx={{borderRadius: "12px"}}
-													value={stake}
+													value={values.stake}
 													inputProps={{
 														style: {
 															color: "var(--primary-color)",
@@ -426,10 +451,8 @@ function Stacking() {
 													id="stacking-amount"
 													size="small"
 													variant="outlined"
-													error={walletIsConnected ? error : null}
-													helperText={
-														walletIsConnected ? error && errorMsg : null
-													}
+													error={errors.stake ? errors.stake : null}
+													helperText={walletIsConnected ? errors.stake : null}
 													disabled={walletIsConnected ? null : "disabled"}
 
 													// placeholder="1000"
@@ -457,7 +480,8 @@ function Stacking() {
 															src={TON}
 															alt={"Ton Crystal"}
 														/>{" "}
-														{Number(stake + profit).toFixed(1) || 0}
+														{Number(values.stake + values.profit).toFixed(1) ||
+															0}
 													</Typography>
 												</Stack>
 											</Stack>
@@ -484,7 +508,7 @@ function Stacking() {
 														src={TON}
 														alt={"Ton Crystal"}
 													/>{" "}
-													{Number(profit).toFixed(1) || 0}
+													{Number(values.profit).toFixed(1) || 0}
 												</Typography>
 											</Stack>
 											<Stack
@@ -503,7 +527,7 @@ function Stacking() {
 															color: "var(--primary-color)",
 														}}
 													>
-														{APY || 0}%
+														{values.APY || 0}%
 													</Typography>
 												</Stack>
 											</Stack>
@@ -517,7 +541,7 @@ function Stacking() {
 											style={{borderRadius: "16px", height: "59px"}}
 											className={"btn mainblock-btn btn--disabled"}
 										>
-											{/*className={error ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"}>*/}
+											{/*className={errors.stake ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"}>*/}
 											Coming soon
 										</button>
 									) : (
