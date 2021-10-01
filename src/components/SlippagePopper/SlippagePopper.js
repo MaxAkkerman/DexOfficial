@@ -23,7 +23,7 @@ export default function SlippagePopper({slippageState, popperState}) {
 					<Stack spacing={1}>
 						<Typography>Slippage tolerance:</Typography>
 						<PercentageTextField
-							placeholder="0.10%"
+							placeholder="2%"
 							value={slippage}
 							onChange={handleSetSlippage}
 							sx={{maxWidth: "165px", maxHeight: "45px"}}

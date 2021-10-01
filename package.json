@@ -68,7 +68,7 @@
 		"lint-staged": "^11.1.2",
 		"mini-css-extract-plugin": "^1.5.0",
 		"node-sass": "^5.0.0",
-		"prettier": "^2.4.1",
+		"prettier": "2.4.1",
 		"react-refresh": "^0.10.0",
 		"sass": "^1.32.11",
 		"sass-loader": "^11.0.1",

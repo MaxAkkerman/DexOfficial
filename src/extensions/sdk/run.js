@@ -978,11 +978,11 @@ export async function sendNFT(curExt, addrto, nftLockStakeAddress, phrase) {
 //     return sendTransactionStacking
 // }
 const rootAddrNFT =
-	"0:a93c63523b5b954a933f9eed2af92a6b28067154a002f6fab2633a14465aef48";
+	"0:84fcbfeaa219e2f8fa919f13923a3ae01c6308f469e9de7eb08998a66e38de17";
+
+// const rootAddrNFT = "0:a93c63523b5b954a933f9eed2af92a6b28067154a002f6fab2633a14465aef48"
 const depoolAddress =
-	"0:268864dfa2abb35976d8ab2ccd5f359f02143bb36f2f9cdcf770f2ec1a3e2c76";
-const period = 10800;
-const lockStake = 40_000_000_000;
+	"0:aaaaaaa9f87e476ec16a0b03b4dc4d4801466d6d85a44100e0790d58fd51d33d";
 
 export async function stakeToDePool(
 	curExt,

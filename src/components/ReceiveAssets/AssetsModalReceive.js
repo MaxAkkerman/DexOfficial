@@ -10,15 +10,16 @@ import {
 import SearchInput from "../SearchInput/SearchInput";
 import useAssetList from "../../hooks/useAssetList";
 import includesTextInToken from "../../utils/includesTextInToken";
-
+import salary from "../../images/salary.svg";
 const pureNFT = [
 	{
 		walletAddress:
 			"0:e0b0495751895edc29c5e453f122f25fffebd2bf21c0a0c3d8e98a8ae7b87e3a",
 		balance: 0,
 		stakeTotal: 0,
-		icon: "http://localhost:3005/c409d72cd528242f9218027787fafa1b.svg",
+		icon: salary,
 		symbol: "DP",
+		owner_address: "default",
 	},
 ];
 
@@ -51,6 +52,7 @@ function AssetsModalReceive() {
 		const nftDef = JSON.parse(JSON.stringify(pureNFT));
 
 		nftDef[0].walletAddress = clientData.address;
+		nftDef[0].owner_address = clientData.address;
 		console.log("nftDef", nftDef);
 		setDefNFT(nftDef);
 		// dispatch(setReceiveToken(nftDef))

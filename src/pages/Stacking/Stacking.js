@@ -124,15 +124,39 @@ function Stacking() {
 		(state) => state.stakingReducer.showWaitingStakingPopup,
 	);
 
-	const [period, setPeriod] = React.useState(12);
+	const [period, setPeriod] = React.useState(1 / 30);
 
 	const programs = [
-		{name: "On demand", period: 1 / 30, apy: 6, id: 0, info: "Daily"},
-		{name: "Medium term", period: 12, apy: 10.57, id: 1, info: "12 months"},
-		{name: "Long term", period: 48, apy: 26, id: 2, info: "48 months"},
+		{
+			name: "On demand",
+			period: 1 / 30,
+			apy: 6,
+			id: 0,
+			info: "Daily",
+			disabledBtn: false,
+			status: "Calculate",
+		},
+		{
+			name: "Medium term",
+			period: 12,
+			apy: 10.57,
+			id: 1,
+			info: "12 months",
+			disabledBtn: true,
+			status: "Coming soon",
+		},
+		{
+			name: "Long term",
+			period: 48,
+			apy: 26,
+			id: 2,
+			info: "48 months",
+			disabledBtn: true,
+			status: "Coming soon",
+		},
 	];
 
-	const [curProgram, setProgram] = React.useState(1);
+	const [curProgram, setProgram] = React.useState(0);
 
 	function onPeriodChange(event) {
 		let curPeriod = Number(event.target.value);
@@ -151,8 +175,8 @@ function Stacking() {
 	}
 
 	const [stake, setStake] = React.useState(1000);
-	const [profit, setProfit] = React.useState(105.7);
-	const [APY, setAPY] = React.useState(10.57);
+	const [profit, setProfit] = React.useState(0.1619);
+	const [APY, setAPY] = React.useState(6);
 	const {
 		invalid: error,
 		validate,
@@ -197,7 +221,7 @@ function Stacking() {
 		if (clientData.balance + 3 < Number(stake)) return;
 
 		let periodInSeconds = 0;
-		if (period === 0) {
+		if (period === 1 / 30) {
 			periodInSeconds = 86400;
 		} else {
 			periodInSeconds = Number(period) * 30 * 60 * 60 * 24;
@@ -330,6 +354,7 @@ function Stacking() {
 												{/*    :*/}
 												<Button
 													size="small"
+													disabled={item.disabledBtn}
 													disableRipple
 													sx={{
 														"&:hover": {
@@ -356,12 +381,12 @@ function Stacking() {
 														borderRadius: "12px",
 														padding: "8px",
 														fontSize: "11px",
-														width: "92px",
+														width: "95px",
 														height: "34px",
 													}}
 													onClick={() => calculateButton(item)}
 												>
-													Calculate
+													{item.status}
 												</Button>
 												{/*}*/}
 											</CardActions>
@@ -398,6 +423,7 @@ function Stacking() {
 														},
 													},
 												}}
+												disabled
 												getAriaValueText={valuetext}
 												onChange={onPeriodChange}
 												min={6}
@@ -444,7 +470,9 @@ function Stacking() {
 											<Grid item>
 												<Stack spacing={1} sx={{alignItems: "flex-end"}}>
 													<div className="Stacking__calculator_deposit_term_text end">
-														In {period} months you will have
+														In{" "}
+														{period === 1 / 30 ? "1 day" : `${period} months`}{" "}
+														you will have
 													</div>
 													<Stack spacing={1} direction={"row"}>
 														<Typography
@@ -460,7 +488,7 @@ function Stacking() {
 																src={TON}
 																alt={"Ton Crystal"}
 															/>{" "}
-															{Number(stake + profit).toFixed(1) || 0}
+															{Number(stake + profit).toFixed(4) || 0}
 														</Typography>
 													</Stack>
 												</Stack>
@@ -490,7 +518,7 @@ function Stacking() {
 															src={TON}
 															alt={"Ton Crystal"}
 														/>{" "}
-														{Number(profit).toFixed(1) || 0}
+														{Number(profit).toFixed(4) || 0}
 													</Typography>
 												</Stack>
 											</Grid>
@@ -517,14 +545,17 @@ function Stacking() {
 									</Stack>
 									{walletIsConnected ? (
 										<button
-											disabled
-											// onClick={() => handlestake(true)}
-											// disabled={error}
+											// disabled
+											onClick={() => handlestake(true)}
+											disabled={error}
 											style={{borderRadius: "16px", height: "59px"}}
-											className={"btn mainblock-btn btn--disabled"}
-										>
-											{/*className={error ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"}>*/}
-											Coming soon
+											// className={"btn mainblock-btn btn--disabled"}
+
+											className=
+											{error || period !== 1 / 30
+												? "btn mainblock-btn btn--disabled"
+												: "btn mainblock-btn"}
+											> {period === 1 / 30 ? "Stake" : "Coming soon"}
 										</button>
 									) : (
 										<button
