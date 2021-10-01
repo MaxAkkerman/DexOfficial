@@ -78,7 +78,7 @@ function Popup(props) {
 								</button>
 								<a
 									target="_blank"
-									href={`https://net.ton.live/messages/messageDetails?id=${props.link}`}
+									href={`https://ton.live/messages/messageDetails?id=${props.link}`}
 									className="popup-link"
 								>
 									View on ton.live

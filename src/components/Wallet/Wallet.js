@@ -3,6 +3,7 @@ import {useHistory} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {connectWallet} from "../../store/actions/app";
 import "./Wallet.scss";
+import {iconGenerator} from "../../iconGenerator";
 
 function Wallet() {
 	const history = useHistory();
@@ -41,7 +42,7 @@ function Wallet() {
 					{updatedWallet === null
 						? clientData.balance.toFixed(4)
 						: updatedWallet.toFixed(4)}{" "}
-					TON
+					<img width={15} src={iconGenerator("STACKING")} />
 				</span>
 				<span className="wallet-key">
 					{clientData.address.slice(0, 5)}...{clientData.address.slice(-4)}

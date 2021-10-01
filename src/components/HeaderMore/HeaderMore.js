@@ -28,7 +28,7 @@ function HeaderMore() {
 			</svg>
 			{isVisible ? (
 				<div className="more-dropdown">
-					<Link to="https://docs.defispace.com" className="more-link">
+					<a href={"https://docs.defispace.com"} className="more-link">
 						<svg
 							width="17"
 							height="16"
@@ -43,12 +43,10 @@ function HeaderMore() {
 								fill="#BBBBBB"
 							/>
 						</svg>
-						<span onClick={() => href("docs")} className="more-link-text">
-							Docs
-						</span>
-					</Link>
-					<Link
-						to="https://github.com/radianceteam/dex2"
+						<span className="more-link-text">Docs</span>
+					</a>
+					<a
+						href={"https://github.com/radianceteam/dex3"}
 						target="_blank"
 						className="more-link"
 					>
@@ -64,11 +62,9 @@ function HeaderMore() {
 								fill="#BBBBBB"
 							/>
 						</svg>
-						<span onClick={() => href("Github")} className="more-link-text">
-							GitHub
-						</span>
-					</Link>
-					<p style={{color: "grey"}}>v.0.1.19</p>
+						<span className="more-link-text">GitHub</span>
+					</a>
+					<div className={"more__ver"}>v.0.1.19</div>
 				</div>
 			) : null}
 		</button>

@@ -28,32 +28,7 @@ import {
 	setOrdersPairId,
 	setOrdersToToken,
 } from "../../store/actions/limitOrders";
-
-function getFullName(name) {
-	if (name === "TON") {
-		return "TON Crystal";
-	} else if (name === "WTON") {
-		return "TON Crystal";
-	} else if (name === "fBTC") {
-		return "fBitcoin";
-	} else if (name === "WETH") {
-		return "Ethereum";
-	} else if (name === "fETH") {
-		return "fEthereum";
-	} else if (name === "WBTC") {
-		return "Bitcoin";
-	} else if (name === "DS-WTON/USDT") {
-		return "Pool tokens of TON/USDT pair";
-	} else if (name === "DS-WTON/WETH") {
-		return "Pool tokens of TON/ETH pair";
-	} else if (name === "DS-WTON/WBTC") {
-		return "Pool tokens of TON/BTC pair";
-	} else if (name === "USDT") {
-		return "Tether";
-	} else {
-		return name;
-	}
-}
+import {getFullName} from "../../extensions/webhook/script";
 
 function SelectItem(props) {
 	const dispatch = useDispatch();

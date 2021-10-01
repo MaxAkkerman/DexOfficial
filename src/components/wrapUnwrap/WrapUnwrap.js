@@ -80,7 +80,7 @@ function WrapUnwrap(props) {
 		if (clientData.balance < 4) {
 			dispatch(
 				setTips({
-					message: `You need at least 4 TONs on balance to deploy WTON wallet`,
+					message: `You need at least 4 TON Crystal on balance to deploy WTON wallet`,
 					type: "error",
 				}),
 			);
@@ -89,15 +89,18 @@ function WrapUnwrap(props) {
 			setmainIsVisible(false);
 			let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
 			const keys = await getClientKeys(decrypted.phrase);
-			const curPair = {rootA: "0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37"}
+			const curPair = {
+				rootA:
+					"0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37",
+			};
 
 			const deployData = {
-			    curPair,
-			    clientAdr: clientData.address,
-			    clientRoots: ""
-			}
-			const deployRes = await connectToPairStep2DeployWallets(deployData, keys)
-			console.log("deployRes", deployRes)
+				curPair,
+				clientAdr: clientData.address,
+				clientRoots: "",
+			};
+			const deployRes = await connectToPairStep2DeployWallets(deployData, keys);
+			console.log("deployRes", deployRes);
 			setdeployWTONisVisible(false);
 			setmainIsVisible(true);
 		}
@@ -196,7 +199,7 @@ function WrapUnwrap(props) {
 								>
 									<img src={arrowBack} alt={"arrow"} />
 								</button>
-								<div className="left_block">{props.title}</div>
+								<div className="left_block boldFont">{props.title}</div>
 							</div>
 
 							<BlockItem

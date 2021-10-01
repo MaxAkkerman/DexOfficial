@@ -103,9 +103,10 @@ function AssetsListForDeploy() {
 								<SearchInput func={() => console.log("func")} />
 								{assetsFromGraphQL.length ? (
 									<AssetsList
-										assetWrap="heightfixWrap"
+										assetWrap="heightfixWrap assetsList_off_padding"
 										TokenAssetsArray={assetsFromGraphQL}
 										NFTassetsArray={null}
+										isAssetsInspector={true}
 										handleClickNFT={() => console.log("token item")}
 										// showNFTdata={showNFTdata}
 										handleClickToken={(item) => handleSetAssetForDeploy(item)}
