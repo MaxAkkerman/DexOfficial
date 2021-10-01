@@ -90,7 +90,7 @@ function WrapUnwrap(props) {
 		if (clientData.balance < 4) {
 			dispatch(
 				setTips({
-					message: `You need at least 4 TONs on balance to deploy WTON wallet`,
+					message: `You need at least 4 TON Crystal on balance to deploy WTON wallet`,
 					type: "error",
 				}),
 			);
@@ -251,7 +251,7 @@ function WrapUnwrap(props) {
 								>
 									<img src={arrowBack} alt={"arrow"} />
 								</button>
-								<div className="left_block">{props.title}</div>
+								<div className="left_block boldFont">{props.title}</div>
 							</div>
 
 							<BlockItem
