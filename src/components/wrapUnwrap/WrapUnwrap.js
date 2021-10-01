@@ -42,9 +42,6 @@ import {WRAP_UNWRAP as WRAP_UNWRAP_COMMISSION} from "../../constants/commissions
 function WrapUnwrap(props) {
 	const dispatch = useDispatch();
 	const history = useHistory();
-	const amountToSend = useSelector(
-		(state) => state.walletSeedReducer.amountToSend,
-	);
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 
@@ -158,7 +155,7 @@ function WrapUnwrap(props) {
 	async function handleConfirm() {
 		if (!valid) return;
 
-		if (!amountToSend) {
+		if (!values.amount) {
 			dispatch(
 				setTips({
 					message: `Please set amount for ${props.confirmText}`,
@@ -167,7 +164,7 @@ function WrapUnwrap(props) {
 			);
 		} else if (
 			props.currentTokenForWrap.type === "Native Tons" &&
-			amountToSend > props.currentTokenForWrap.balance - 1.2
+			values.amount > props.currentTokenForWrap.balance - 1.2
 		) {
 			dispatch(
 				setTips({
@@ -177,7 +174,7 @@ function WrapUnwrap(props) {
 			);
 		} else if (
 			props.currentTokenForWrap.type === "PureToken" &&
-			amountToSend > props.currentTokenForWrap.balance
+			values.amount > props.currentTokenForWrap.balance
 		) {
 			dispatch(
 				setTips({
@@ -190,9 +187,9 @@ function WrapUnwrap(props) {
 			setmainIsVisible(false);
 			let res;
 			if (props.transactionType === "wrap") {
-				res = await wrapTons(clientData.address, keyPair, amountToSend);
+				res = await wrapTons(clientData.address, keyPair, values.amount);
 			} else {
-				res = await unWrapTons(clientData.address, keyPair, amountToSend);
+				res = await unWrapTons(clientData.address, keyPair, values.amount);
 			}
 
 			if (!res.code) {
@@ -234,107 +231,110 @@ function WrapUnwrap(props) {
 	return (
 		<div className="container">
 			{((!wrapConfirmIsVisible && !deployWTONisVisible) || mainIsVisible) && (
-				<MainBlock
-					style={{
-						borderColor: errors.commission
-							? "var(--error)"
-							: "var(--mainblock-border-color)",
-					}}
-					smallTitle={false}
-					content={
-						<div>
-							<div className="head_wrapper">
-								{/*//TODO*/}
-								<button
-									className="arrow_back"
-									onClick={() => handleBack(false)}
-								>
-									<img src={arrowBack} alt={"arrow"} />
-								</button>
-								<div className="left_block boldFont">{props.title}</div>
-							</div>
+				<div style={{display: "contents"}}>
+					<MainBlock
+						style={{
+							borderColor: errors.commission
+								? "var(--error)"
+								: "var(--mainblock-border-color)",
+						}}
+						smallTitle={false}
+						content={
+							<div>
+								<div className="head_wrapper">
+									{/*//TODO*/}
+									<button
+										className="arrow_back"
+										onClick={() => handleBack(false)}
+									>
+										<img src={arrowBack} alt={"arrow"} />
+									</button>
+									<div className="left_block boldFont">{props.title}</div>
+								</div>
 
-							<BlockItem
-								leftTitle={"Amount"}
-								style={{
-									borderColor: errors.amount
-										? "var(--error)"
-										: "var(--input-border-color)",
-								}}
-								// currentToken={currentToken}
-								rightTopBlock={
-									<ShowBalance
-										classWrapper={"send_balance center"}
-										balance={props.currentTokenForWrap.balance}
-										label={true}
-										showBal={props.tokenSetted}
-									/>
-								}
-								rightBottomBlock={
-									<div className="send_set_token_wrap column">
-										{/*<MaxBtn/>*/}
-										<div style={{width: "52px"}} />
-										<SetTokenBlock
-											handleTouchTokenModal={null}
-											// img={TON}
-											disableArrow={true}
-											currentToken={props.currentTokenForWrap}
+								<BlockItem
+									leftTitle={"Amount"}
+									style={{
+										borderColor: errors.amount
+											? "var(--error)"
+											: "var(--input-border-color)",
+									}}
+									// currentToken={currentToken}
+									rightTopBlock={
+										<ShowBalance
+											classWrapper={"send_balance center"}
+											balance={props.currentTokenForWrap.balance}
+											label={true}
+											showBal={props.tokenSetted}
 										/>
-									</div>
-								}
-								leftBlockBottom={
-									<InputChangeLocal
-										name="amount"
-										value={values.amount}
-										onChange={handleChange}
-										onBlur={handleBlur}
-									/>
-								}
-								// className={isInvalidAmount && "amount_wrapper_error"}
-							/>
-							{errors.amount && (
-								<FormHelperText error>{errors.amount}</FormHelperText>
-							)}
-							{/*{isInvalidAmount &&*/}
-							{/*<FormHelperText style={{marginLeft: "27px", marginTop: "4px"}} error id="component-error-text">{validationMsgForAmount}</FormHelperText>}*/}
+									}
+									rightBottomBlock={
+										<div className="send_set_token_wrap column">
+											{/*<MaxBtn/>*/}
+											<div style={{width: "52px"}} />
+											<SetTokenBlock
+												handleTouchTokenModal={null}
+												// img={TON}
+												disableArrow={true}
+												currentToken={props.currentTokenForWrap}
+											/>
+										</div>
+									}
+									leftBlockBottom={
+										<InputChangeLocal
+											name="amount"
+											value={values.amount}
+											onChange={handleChange}
+											onBlur={handleBlur}
+										/>
+									}
+									// className={isInvalidAmount && "amount_wrapper_error"}
+								/>
+								{errors.amount && (
+									<FormHelperText error>{errors.amount}</FormHelperText>
+								)}
+								{/*{isInvalidAmount &&*/}
+								{/*<FormHelperText style={{marginLeft: "27px", marginTop: "4px"}} error id="component-error-text">{validationMsgForAmount}</FormHelperText>}*/}
 
-							<div className="btn_wrapper ">
-								{!noWtonWallet ? (
-									<button
-										onClick={() => handleConfirm()}
-										className={cls(
-											"btn mainblock-btn",
-											(!dirty || !valid) && "btn--disabled",
-										)}
-									>
-										Confirm {props.confirmText}
-									</button>
-								) : (
-									<button
-										onClick={() => handleDeployWtonWallet()}
-										className="btn mainblock-btn"
-									>
-										Deploy WTON wallet
-									</button>
+								<div className="btn_wrapper ">
+									{!noWtonWallet ? (
+										<button
+											onClick={() => handleConfirm()}
+											className={cls(
+												"btn mainblock-btn",
+												(!dirty || !valid) && "btn--disabled",
+											)}
+										>
+											Confirm {props.confirmText}
+										</button>
+									) : (
+										<button
+											onClick={() => handleDeployWtonWallet()}
+											className="btn mainblock-btn"
+										>
+											Deploy WTON wallet
+										</button>
+									)}
+								</div>
+								{!dirty && (
+									<FormHelperText sx={{textAlign: "center"}}>
+										{NOT_TOUCHED_MSG}
+									</FormHelperText>
 								)}
 							</div>
-							{!dirty && (
-								<FormHelperText sx={{textAlign: "center"}}>
-									{NOT_TOUCHED_MSG}
-								</FormHelperText>
-							)}
-						</div>
-					}
-				/>
+						}
+					/>
+					{errors.commission && (
+						<FormHelperText error sx={{textAlign: "center"}}>
+							{errors.commission}
+						</FormHelperText>
+					)}
+				</div>
 			)}
-			{errors.commission && (
-				<FormHelperText error sx={{textAlign: "center"}}>
-					{errors.commission}
-				</FormHelperText>
-			)}
+
 			{wrapConfirmIsVisible && (
 				<WaitingPopup
-					text={`${props.title} ${amountToSend}`}
+					text={`${props.title} ${values.amount}`}
 					handleClose={() => handleClose()}
 				/>
 			)}
