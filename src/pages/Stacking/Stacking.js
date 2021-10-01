@@ -409,74 +409,41 @@ function Stacking() {
 									</div>
 
 									<Stack spacing={2}>
-										<Stack
-											spacing={2}
-											direction={"row"}
-											sx={{justifyContent: "space-between"}}
-										>
-											<Grid item>
-												<Stack spacing={1}>
-													<div className="Stacking__calculator_deposit_term_text">
-														Enter amount to stake
-													</div>
-													<TextField
-														sx={{borderRadius: "12px"}}
-														value={stake}
-														inputProps={{
-															style: {
-																color: "var(--primary-color)",
-															},
-														}}
-														onChange={onStakeChange}
-														id="stacking-amount"
-														size="small"
-														variant="outlined"
-														error={walletIsConnected ? error : null}
-														helperText={
-															walletIsConnected ? error && errorMsg : null
-														}
-														disabled={walletIsConnected ? null : "disabled"}
+										<div className={"Stacking__calculator_div_container"}>
+											<Stack spacing={1}>
+												<div className="Stacking__calculator_deposit_term_text">
+													Enter amount to stake
+												</div>
+												<TextField
+													sx={{borderRadius: "12px"}}
+													value={stake}
+													inputProps={{
+														style: {
+															color: "var(--primary-color)",
+														},
+													}}
+													onChange={onStakeChange}
+													id="stacking-amount"
+													size="small"
+													variant="outlined"
+													error={walletIsConnected ? error : null}
+													helperText={
+														walletIsConnected ? error && errorMsg : null
+													}
+													disabled={walletIsConnected ? null : "disabled"}
 
-														// placeholder="1000"
-													/>
-												</Stack>
-											</Grid>
-											<Grid item>
-												<Stack spacing={1} sx={{alignItems: "flex-end"}}>
-													<div className="Stacking__calculator_deposit_term_text end">
-														In {period} months you will have
-													</div>
-													<Stack spacing={1} direction={"row"}>
-														<Typography
-															sx={{
-																fontWeight: "700",
-																fontSize: "24px",
-																lineHeight: "unset",
-																color: "var(--primary-color)",
-															}}
-														>
-															<img
-																style={{marginRight: "5px"}}
-																src={TON}
-																alt={"Ton Crystal"}
-															/>{" "}
-															{Number(stake + profit).toFixed(1) || 0}
-														</Typography>
-													</Stack>
-												</Stack>
-											</Grid>
-										</Stack>
+													// placeholder="1000"
+												/>
+											</Stack>
 
-										<Stack
-											spacing={2}
-											direction={"row"}
-											sx={{justifyContent: "space-between"}}
-										>
-											<Grid item>
-												<Stack spacing={1}>
-													<div className="Stacking__calculator_deposit_term_text">
-														Your profit
-													</div>
+											<Stack
+												spacing={1}
+												className={"Stacking__calculator_item end"}
+											>
+												<div className="Stacking__calculator_deposit_term_text end">
+													In {period} months you will have
+												</div>
+												<Stack spacing={1} direction={"row"}>
 													<Typography
 														sx={{
 															fontWeight: "700",
@@ -490,30 +457,57 @@ function Stacking() {
 															src={TON}
 															alt={"Ton Crystal"}
 														/>{" "}
-														{Number(profit).toFixed(1) || 0}
+														{Number(stake + profit).toFixed(1) || 0}
 													</Typography>
 												</Stack>
-											</Grid>
-											<Grid item>
-												<Stack spacing={1} sx={{alignItems: "flex-end"}}>
-													<div className="Stacking__calculator_deposit_term_text end">
-														Annual Percentage Yield (APY)
-													</div>
-													<Stack spacing={1} direction={"row"}>
-														<Typography
-															sx={{
-																fontWeight: "700",
-																fontSize: "24px",
-																lineHeight: "unset",
-																color: "var(--primary-color)",
-															}}
-														>
-															{APY || 0}%
-														</Typography>
-													</Stack>
+											</Stack>
+										</div>
+
+										<div className={"Stacking__calculator_div_container"}>
+											<Stack
+												spacing={1}
+												className={"Stacking__calculator_item end"}
+											>
+												<div className="Stacking__calculator_deposit_term_text">
+													Your profit
+												</div>
+												<Typography
+													sx={{
+														fontWeight: "700",
+														fontSize: "24px",
+														lineHeight: "unset",
+														color: "var(--primary-color)",
+													}}
+												>
+													<img
+														style={{marginRight: "5px"}}
+														src={TON}
+														alt={"Ton Crystal"}
+													/>{" "}
+													{Number(profit).toFixed(1) || 0}
+												</Typography>
+											</Stack>
+											<Stack
+												spacing={1}
+												className={"Stacking__calculator_item end"}
+											>
+												<div className="Stacking__calculator_deposit_term_text end">
+													Annual Percentage Yield (APY)
+												</div>
+												<Stack spacing={1} direction={"row"}>
+													<Typography
+														sx={{
+															fontWeight: "700",
+															fontSize: "24px",
+															lineHeight: "unset",
+															color: "var(--primary-color)",
+														}}
+													>
+														{APY || 0}%
+													</Typography>
 												</Stack>
-											</Grid>
-										</Stack>
+											</Stack>
+										</div>
 									</Stack>
 									{walletIsConnected ? (
 										<button

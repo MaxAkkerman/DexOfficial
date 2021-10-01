@@ -81,6 +81,7 @@
 
 	&.end {
 		text-align: end;
+		margin-top: 16px;
 	}
 }
 
@@ -190,7 +191,29 @@
 	margin-left: 17px;
 }
 
+.Stacking__calculator_div_container {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row;
+}
+
+.Stacking__calculator_item {
+	&.end {
+		align-items: flex-end;
+	}
+}
+
 @media screen and (max-width: 1025px) {
+	.Stacking__calculator_item {
+		&.end {
+			align-items: center;
+		}
+	}
+
+	.Stacking__calculator_div_container {
+		flex-direction: column;
+	}
+
 	.Stacking__calculate_button {
 		width: 0;
 	}
