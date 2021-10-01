@@ -2,7 +2,7 @@
     DEX contracts
 */
 import {DEXRootContract} from "../contracts/DEXRoot.js";
-import {DEXClientContract} from "../contracts/DEXClient.js";
+import {DEXClientContract} from "../contracts/DEXClientMainNet.js";
 import {GContract} from "../contracts/GContract.js";
 import {TONTokenWalletContract} from "../contracts/TONTokenWallet.js";
 import {RootTokenContract} from "../contracts/RootTokenContract.js";
@@ -34,7 +34,7 @@ const {TonClient} = require("@tonclient/core");
 const {Account} = require("@tonclient/appkit");
 TonClient.useBinaryLibrary(libWeb);
 
-const DappServer = "main.ton.dev";
+const DappServer = "net.ton.dev";
 const client = new TonClient({network: {endpoints: [DappServer]}});
 export default client;
 
@@ -1711,7 +1711,7 @@ export async function agregateQueryNFTassets(addrClient) {
 	let k = 0;
 	for (const item of nftTokenItemAddress) {
 		const dataNFT = await getDataInfo(item.id, addrClient);
-
+//todo add type
 		if (dataNFT) {
 			k++;
 			dataNFT["type"] = "DePoolStake";

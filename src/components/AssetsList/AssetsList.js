@@ -112,7 +112,7 @@ function AssetsList(props) {
 									<button
 										className="settings_btn"
 										style={{
-											width: "100px",
+											width: "110px",
 											height: "63px",
 											color: "white",
 											fontSize: "20px",
@@ -124,7 +124,7 @@ function AssetsList(props) {
 									<button
 										className="settings_btn"
 										style={{
-											width: "100px",
+											width: "110px",
 											height: "63px",
 											color: "white",
 											fontSize: "20px",
@@ -144,11 +144,11 @@ function AssetsList(props) {
 				props.NFTassetsArray.map((item) => (
 					<div
 						className="assets_item_wrapper"
-						onClick={() => props.handleClickNFT(item)}
+
 						key={item._safeLockStake}
 					>
 						<div className="NFT_item">
-							<div className="NFT_item_header">
+							<div className="NFT_item_header" onClick={() => props.handleClickNFT(item)}>
 								<div style={{display: "flex", alignItems: "flex-start"}}>
 									<div className="assetList_item_icon">
 										<img
@@ -165,12 +165,19 @@ function AssetsList(props) {
 								<div>{Number(item.stakeTotal / 1e9).toFixed(4)}</div>
 							</div>
 							{item.showNftData && (
-								<div className="NFT_additional_data">
+								<div className="NFT_additional_data" style={{flexDirection:"column"}}>
+									<div>
 									<div
 										className="NFT_additional_block"
-										style={{marginLeft: "50px"}}
+										style={{marginLeft: "70px", fontSize:"16px",flexShrink:"0"}}
 									>
-										<div>
+										<div style={{width:"80%"}}>
+											<div className="swap-confirm-wrap">
+												<p className="mainblock-footer-value">
+													{item.type}
+												</p>
+												<p className="mainblock-footer-subtitle">Type</p>
+											</div>
 											<div className="swap-confirm-wrap">
 												<p className="mainblock-footer-value">
 													{item.details.apyLockStake / 100}%
@@ -182,11 +189,17 @@ function AssetsList(props) {
 													{getDurationFromSeconds(
 														item.details.periodLockStake,
 														"days",
-													)}{" "}
+													).toFixed()}{" "}
 													days
 												</p>
 												<p className="mainblock-footer-subtitle">Period</p>
 											</div>
+
+
+										</div>
+										<div style={{width:"100%"}}>
+
+
 											<div className="swap-confirm-wrap">
 												<p className="mainblock-footer-value">
 													{getFormattedDate(
@@ -195,21 +208,44 @@ function AssetsList(props) {
 												</p>
 												<p className="mainblock-footer-subtitle">Start time</p>
 											</div>
+
 											<div className="swap-confirm-wrap">
 												<p className="mainblock-footer-value">
 													{getFormattedDate(
 														Number(item.details.timeStartLockStake) +
-															Number(item.details.periodLockStake),
+														Number(item.details.periodLockStake),
 													)}
 												</p>
 												<p className="mainblock-footer-subtitle">End Time</p>
 											</div>
+
+
+											<div className="swap-confirm-wrap">
+												<p
+													className="mainblock-footer-value"
+													style={{width: "215px"}}
+												>
+													{
+														<CalculateTimeLeft
+															date={
+																new Date(
+																	(Number(item.details.timeStartLockStake) +
+																		Number(item.details.periodLockStake)) *
+																	1000,
+																)
+															}
+														/>
+													}
+												</p>
+												<p className="mainblock-footer-subtitle">Estimate</p>
+											</div>
+
 										</div>
-										<div>
+										<div style={{width:"100%"}}>
 											<div className="swap-confirm-wrap">
 												<p className="mainblock-footer-value fixFlex">
 													<img
-														style={{marginRight: "5px"}}
+														style={{marginRight: "5px",width:"20px"}}
 														src={TON}
 														alt={"Ton Crystal"}
 													/>{" "}
@@ -220,7 +256,7 @@ function AssetsList(props) {
 											<div className="swap-confirm-wrap">
 												<p className="mainblock-footer-value fixFlex">
 													<img
-														style={{marginRight: "5px"}}
+														style={{marginRight: "5px",width:"20px"}}
 														src={TON}
 														alt={"Ton Crystal"}
 													/>{" "}
@@ -239,7 +275,7 @@ function AssetsList(props) {
 											<div className="swap-confirm-wrap">
 												<p className="mainblock-footer-value fixFlex">
 													<img
-														style={{marginRight: "5px"}}
+														style={{marginRight: "5px",width:"20px"}}
 														src={TON}
 														alt={"Ton Crystal"}
 													/>{" "}
@@ -255,28 +291,32 @@ function AssetsList(props) {
 													Total income
 												</p>
 											</div>
-											<div className="swap-confirm-wrap">
-												<p
-													className="mainblock-footer-value"
-													style={{width: "200px"}}
-												>
-													{
-														<CalculateTimeLeft
-															date={
-																new Date(
-																	(Number(item.details.timeStartLockStake) +
-																		Number(item.details.periodLockStake)) *
-																		1000,
-																)
-															}
-														/>
-													}
-												</p>
-												<p className="mainblock-footer-subtitle">Estimate</p>
-											</div>
+
 										</div>
 									</div>
+									</div>
+									<div style={{
+										width: "100%",
+										// marginLeft:"20px",
+										display:"flex",
+										justifyContent:"end"
+									}}>
+									<button
+										className="settings_btn"
+										style={{
+											width: "110px",
+											height: "63px",
+											color: "white",
+											fontSize: "20px",
+											marginTop:"20px"
+										}}
+										onClick={props.handleWithdraw ? ()=>props.handleWithdraw(item) : null}
+									>
+										Withdraw
+									</button>
+									</div>
 								</div>
+
 							)}
 						</div>
 					</div>

@@ -1,9 +1,9 @@
 {
 	"networks": {
 		"2": {
-			"dexroot2": "0:eaaaffaa24457d6088fca0732cf00172cd854e9ca26d42434ded9ada297dfa62",
+			"dexroot": "0:eaaaffaa24457d6088fca0732cf00172cd854e9ca26d42434ded9ada297dfa62",
 			"dexrootMainPerevious": "0:628277ac76b44180de19bc5399c820e0e6d4d411370e80f174904e8ea5040362",
-			"dexroot": "0:5d0f5a8cb443e00934d1bb632acadc036a6c41b59308e3a36d809449a5e777d9",
+			"dexrootMainNEt": "0:5d0f5a8cb443e00934d1bb632acadc036a6c41b59308e3a36d809449a5e777d9",
 
 			"vaultAddr": "0:d0936a9fc29b5175487208b1d07ab8042ce7ddbc2de7e271c4087ca833b865cc",
 			"vaultWTONAddr": "0:9ded00aed222ece1b9ce7b4de60b2e1e705dd5b685e25a537a012a988193647d",

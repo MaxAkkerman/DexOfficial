@@ -1,7 +1,7 @@
 import {Account} from "@tonclient/appkit";
 import {DEXRootContract} from "../contracts/DEXRoot.js";
 import {DataContract} from "../contracts/Data.js";
-import {DEXClientContract} from "../contracts/DEXClient.js";
+import {DEXClientContract} from "../contracts/DEXClientMainNet.js";
 import {WrappedTONVaultContract} from "../contracts/WrappedTONVault.js";
 import client, {
 	checkPubKey,
@@ -977,12 +977,16 @@ export async function sendNFT(curExt, addrto, nftLockStakeAddress, phrase) {
 //     console.log("sendTransactionStacking", sendTransactionStacking);
 //     return sendTransactionStacking
 // }
-const rootAddrNFT =
-	"0:84fcbfeaa219e2f8fa919f13923a3ae01c6308f469e9de7eb08998a66e38de17";
 
-// const rootAddrNFT = "0:a93c63523b5b954a933f9eed2af92a6b28067154a002f6fab2633a14465aef48"
-const depoolAddress =
-	"0:aaaaaaa9f87e476ec16a0b03b4dc4d4801466d6d85a44100e0790d58fd51d33d";
+//mainnet
+// const rootAddrNFT = "0:84fcbfeaa219e2f8fa919f13923a3ae01c6308f469e9de7eb08998a66e38de17";
+// const depoolAddress = "0:aaaaaaa9f87e476ec16a0b03b4dc4d4801466d6d85a44100e0790d58fd51d33d";
+
+
+
+// testnet
+const rootAddrNFT = "0:c0f1550614238e8e8408e4287ddf06895c83207be7f3ab282dd819467735dd04"
+const depoolAddress = '0:127ae93241278304fff6b7e5b7b182fd382b6e95b200551061a7354e032e50bf';
 
 export async function stakeToDePool(
 	curExt,
@@ -1023,6 +1027,11 @@ export async function stakeToDePool(
 			input: {
 				_donor: getClientAddressFromRoot.dexclient,
 				_depoolAddress: depoolAddress,
+				//mainnet
+				// _depoolFee: 500000000,
+				// _depoolMinStake: 50000000000,
+
+				// testnet
 				_depoolFee: 500000000,
 				_depoolMinStake: 10000000000,
 				_amountLockStake: lockStake,
