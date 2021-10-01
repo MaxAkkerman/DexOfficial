@@ -227,7 +227,7 @@ function WrapUnwrap(props) {
 	}
 
 	return (
-		<div className="container">
+		<div className="container" style={{flexDirection: "column"}}>
 			{((!wrapConfirmIsVisible && !deployWTONisVisible) || mainIsVisible) && (
 				<div style={{display: "contents"}}>
 					<MainBlock
