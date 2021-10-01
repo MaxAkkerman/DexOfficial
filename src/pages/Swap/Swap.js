@@ -400,7 +400,7 @@ function Swap() {
 					}}
 					smallTitle={false}
 					content={
-						<div>
+						<div style={{display: "contents"}}>
 							<div className="head_wrapper" style={{marginBottom: "40px"}}>
 								<div
 									className="left_block"
@@ -482,6 +482,14 @@ function Swap() {
 									</p>
 								)}
 							</div>
+							{errors.commission && (
+								<FormHelperText
+									error
+									sx={{color: "var(--text-color)", textAlign: "center"}}
+								>
+									{errors.commission}
+								</FormHelperText>
+							)}
 						</div>
 					}
 					footer={
@@ -523,14 +531,7 @@ function Swap() {
 					}
 				/>
 			)}
-			{errors.commission && (
-				<FormHelperText
-					error
-					sx={{color: "var(--text-color)", textAlign: "center"}}
-				>
-					{errors.commission}
-				</FormHelperText>
-			)}
+
 			{swapConfirmPopupIsVisible && (
 				<SwapConfirmPopup
 					hideConfirmPopup={setSwapConfirmPopupIsVisible.bind(this, false)}
