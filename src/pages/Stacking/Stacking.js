@@ -473,6 +473,7 @@ function Stacking() {
 															fontSize: "24px",
 															lineHeight: "unset",
 															color: "var(--primary-color)",
+															wordBreak: "break-all",
 														}}
 													>
 														<img
@@ -501,6 +502,7 @@ function Stacking() {
 														fontSize: "24px",
 														lineHeight: "unset",
 														color: "var(--primary-color)",
+														wordBreak: "break-all",
 													}}
 												>
 													<img
