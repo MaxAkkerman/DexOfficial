@@ -1,16 +1,22 @@
-import React from "react";
 import cls from "classnames";
 
-function BlockItem(props) {
+function BlockItem({
+	className,
+	leftTitle,
+	leftBlockBottom,
+	rightTopBlock,
+	rightBottomBlock,
+	...rest
+}) {
 	return (
-		<div className={cls("amount_wrapper", props.className)}>
+		<div className={cls("amount_wrapper", className)} {...rest}>
 			<div className="amount_left_block">
-				<div className="send_text_headers">{props.leftTitle}</div>
-				{props.leftBlockBottom}
+				<div className="send_text_headers">{leftTitle}</div>
+				{leftBlockBottom}
 			</div>
 			<div className="amount_right_block">
-				{props.rightTopBlock}
-				{props.rightBottomBlock}
+				{rightTopBlock}
+				{rightBottomBlock}
 			</div>
 		</div>
 	);

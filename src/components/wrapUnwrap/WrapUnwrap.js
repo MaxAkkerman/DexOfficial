@@ -9,7 +9,7 @@ import {
 	setAmountForSend,
 	setShowWaitingSendAssetsPopup,
 } from "../../store/actions/walletSeed";
-import InputChange from "../AmountBlock/InputChange";
+import InputChangeLocal from "../AmountBlock/InputChangeLocal";
 import BlockItem from "../AmountBlock/AmountBlock";
 import MaxBtn from "../AmountBlock/MAXbtn";
 import ShowBalance from "../AmountBlock/ShowBalance";
@@ -28,6 +28,16 @@ import useKeyPair from "../../hooks/useKeyPair";
 import {setTokenList} from "../../store/actions/wallet";
 import {decrypt} from "../../extensions/seedPhrase";
 import {getClientKeys} from "../../extensions/webhook/script";
+import {useFormik} from "formik";
+import cls from "classnames";
+import {FormHelperText} from "@mui/material";
+import {
+	NOT_ENOUGH as NOT_ENOUGH_MSG,
+	NOT_ENOUGH_CAUSE_COMMISSION as NOT_ENOUGH_CAUSE_COMMISSION_MSG,
+	NOT_TOUCHED as NOT_TOUCHED_MSG,
+} from "../../constants/validationMessages";
+import useAssetList from "../../hooks/useAssetList";
+import {WRAP_UNWRAP as WRAP_UNWRAP_COMMISSION} from "../../constants/commissions";
 
 function WrapUnwrap(props) {
 	const dispatch = useDispatch();
@@ -89,15 +99,18 @@ function WrapUnwrap(props) {
 			setmainIsVisible(false);
 			let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
 			const keys = await getClientKeys(decrypted.phrase);
-			const curPair = {rootA: "0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37"}
+			const curPair = {
+				rootA:
+					"0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37",
+			};
 
 			const deployData = {
-			    curPair,
-			    clientAdr: clientData.address,
-			    clientRoots: ""
-			}
-			const deployRes = await connectToPairStep2DeployWallets(deployData, keys)
-			console.log("deployRes", deployRes)
+				curPair,
+				clientAdr: clientData.address,
+				clientRoots: "",
+			};
+			const deployRes = await connectToPairStep2DeployWallets(deployData, keys);
+			console.log("deployRes", deployRes);
 			setdeployWTONisVisible(false);
 			setmainIsVisible(true);
 		}
@@ -109,7 +122,42 @@ function WrapUnwrap(props) {
 	}
 	const {keyPair} = useKeyPair();
 
+	const {assetList} = useAssetList();
+
+	const {
+		values,
+		handleChange,
+		handleBlur,
+		dirty,
+		errors,
+		isValid: valid,
+	} = useFormik({
+		initialValues: {
+			amount: "",
+		},
+		validate({amount}) {
+			const errors = {};
+
+			if (amount > props.currentTokenForWrap.balance)
+				errors.amount = NOT_ENOUGH_MSG;
+
+			const tonAsset = assetList.find((t) => t.symbol === "TON Crystal");
+
+			if (tonAsset && tonAsset.symbol === props.currentTokenForWrap.symbol) {
+				if (tonAsset.balance - amount - WRAP_UNWRAP_COMMISSION <= 0)
+					errors.commission = `${NOT_ENOUGH_CAUSE_COMMISSION_MSG} (Commission = ${WRAP_UNWRAP_COMMISSION} TON)`;
+			} else if (tonAsset) {
+				if (tonAsset.balance - WRAP_UNWRAP_COMMISSION <= 0)
+					errors.commission = `${NOT_ENOUGH_CAUSE_COMMISSION_MSG} (Commission = ${WRAP_UNWRAP_COMMISSION} TON)`;
+			}
+
+			return errors;
+		},
+	});
+
 	async function handleConfirm() {
+		if (!valid) return;
+
 		if (!amountToSend) {
 			dispatch(
 				setTips({
@@ -181,10 +229,17 @@ function WrapUnwrap(props) {
 		setWrapConfirmIsVisible(false);
 	}
 
+	console.log("@liketurbo", props.currentTokenForWrap);
+
 	return (
 		<div className="container">
 			{((!wrapConfirmIsVisible && !deployWTONisVisible) || mainIsVisible) && (
 				<MainBlock
+					style={{
+						borderColor: errors.commission
+							? "var(--error)"
+							: "var(--mainblock-border-color)",
+					}}
 					smallTitle={false}
 					content={
 						<div>
@@ -201,6 +256,11 @@ function WrapUnwrap(props) {
 
 							<BlockItem
 								leftTitle={"Amount"}
+								style={{
+									borderColor: errors.amount
+										? "var(--error)"
+										: "var(--input-border-color)",
+								}}
 								// currentToken={currentToken}
 								rightTopBlock={
 									<ShowBalance
@@ -222,9 +282,19 @@ function WrapUnwrap(props) {
 										/>
 									</div>
 								}
-								leftBlockBottom={<InputChange />}
+								leftBlockBottom={
+									<InputChangeLocal
+										name="amount"
+										value={values.amount}
+										onChange={handleChange}
+										onBlur={handleBlur}
+									/>
+								}
 								// className={isInvalidAmount && "amount_wrapper_error"}
 							/>
+							{errors.amount && (
+								<FormHelperText error>{errors.amount}</FormHelperText>
+							)}
 							{/*{isInvalidAmount &&*/}
 							{/*<FormHelperText style={{marginLeft: "27px", marginTop: "4px"}} error id="component-error-text">{validationMsgForAmount}</FormHelperText>}*/}
 
@@ -232,7 +302,10 @@ function WrapUnwrap(props) {
 								{!noWtonWallet ? (
 									<button
 										onClick={() => handleConfirm()}
-										className="btn mainblock-btn"
+										className={cls(
+											"btn mainblock-btn",
+											(!dirty || !valid) && "btn--disabled",
+										)}
 									>
 										Confirm {props.confirmText}
 									</button>
@@ -245,9 +318,19 @@ function WrapUnwrap(props) {
 									</button>
 								)}
 							</div>
+							{!dirty && (
+								<FormHelperText sx={{textAlign: "center"}}>
+									{NOT_TOUCHED_MSG}
+								</FormHelperText>
+							)}
 						</div>
 					}
 				/>
+			)}
+			{errors.commission && (
+				<FormHelperText error sx={{textAlign: "center"}}>
+					{errors.commission}
+				</FormHelperText>
 			)}
 			{wrapConfirmIsVisible && (
 				<WaitingPopup
