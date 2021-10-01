@@ -153,7 +153,7 @@ function WrapUnwrap(props) {
 	});
 
 	async function handleConfirm() {
-		if (!valid) return;
+		if (!valid || !dirty) return;
 
 		if (!values.amount) {
 			dispatch(

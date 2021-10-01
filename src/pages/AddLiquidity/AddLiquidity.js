@@ -192,6 +192,8 @@ function AddLiquidity() {
 	const [incorrectBalanceToValue, setincorrectBalanceToValue] = useState(false);
 
 	function handleConfirm() {
+		if (!fromValue && !toValue) return;
+
 		if (fromValue > fromToken.balance) {
 			console.log("return", fromValue, "____", fromToken.balance);
 			setincorrectBalance(true);
@@ -335,10 +337,7 @@ function AddLiquidity() {
 										incorrectBalance={incorrectBalance}
 									/>
 									{errors.fromTokenAmount && (
-										<FormHelperText
-											error
-											sx={{color: "var(--text-color)", textAlign: "center"}}
-										>
+										<FormHelperText error sx={{color: "var(--text-color)"}}>
 											{NOT_ENOUGH}
 										</FormHelperText>
 									)}
@@ -373,10 +372,7 @@ function AddLiquidity() {
 										incorrectBalanceToValue={incorrectBalanceToValue}
 									/>
 									{errors.toTokenAmount && (
-										<FormHelperText
-											error
-											sx={{color: "var(--text-color)", textAlign: "center"}}
-										>
+										<FormHelperText error sx={{color: "var(--text-color)"}}>
 											{NOT_ENOUGH}
 										</FormHelperText>
 									)}
@@ -526,6 +522,11 @@ function AddLiquidity() {
 										>
 											Connect wallet
 										</button>
+									)}
+									{!fromValue && !toValue && (
+										<FormHelperText sx={{textAlign: "center"}}>
+											{NOT_TOUCHED}
+										</FormHelperText>
 									)}
 								</div>
 							}
