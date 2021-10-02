@@ -31,6 +31,11 @@ import {setTips} from "../../store/actions/app";
 import useSendAssetsSelectedToken from "../../hooks/useSendAssetsSelectedToken";
 import {getExpectedWalletAddressByOwner} from "../../extensions/webhook/script";
 import Loader from "../Loader/Loader";
+import {
+	NOT_ENOUGH_CAUSE_COMMISSION,
+	NOT_TOUCHED,
+} from "../../constants/validationMessages";
+import {SEND_TOKEN} from "../../constants/commissions";
 
 function SendAssets() {
 	const dispatch = useDispatch();
@@ -63,16 +68,23 @@ function SendAssets() {
 	);
 
 	let curExt = useSelector((state) => state.appReducer.curExt);
-	const {isInvalid: isInvalidAmount, validationMsg: validationMsgForAmount} =
+	const {invalid: isInvalidAmount, validationMsg: validationMsgForAmount} =
 		useSendAssetsCheckAmount();
 	const {
-		isInvalid: isInvalidAddress,
-		isLoading: isLoading,
+		invalid: isInvalidAddress,
+		loading: isLoading,
 		validationMsg: validationMsgForAddress,
 	} = useSendAssetsCheckAddress();
 	const {selectedToken} = useSendAssetsSelectedToken();
 	// const [currentAsset, setcurrentAsset] = useState([])
 	function handleSetSendPopupVisibility() {
+		if (
+			isInvalidAddress ||
+			isInvalidAmount ||
+			(!addressToSend && !amountToSend)
+		)
+			return;
+
 		//todo handle errors set block border red case error
 		if (!tokenSetted) {
 			console.log("please set token for send");
@@ -274,9 +286,15 @@ function SendAssets() {
 	}
 
 	return (
-		<div className="container">
+		<div className="container" style={{flexDirection: "column"}}>
 			{!showWaitingSendAssetPopup && (
 				<MainBlock
+					style={{
+						borderColor:
+							validationMsgForAmount === NOT_ENOUGH_CAUSE_COMMISSION
+								? "var(--error)"
+								: "var(--mainblock-border-color)",
+					}}
 					smallTitle={false}
 					content={
 						<div>
@@ -292,8 +310,9 @@ function SendAssets() {
 							</div>
 							<div
 								className={cls("recipient_wrapper", {
-									amount_wrapper_error: isInvalidAddress,
-									amount_wrapper_success: !isInvalidAddress && !isLoading,
+									amount_wrapper_error: isInvalidAddress && addressToSend,
+									amount_wrapper_success:
+										!isInvalidAddress && !isLoading && addressToSend,
 								})}
 							>
 								<div className="send_text_headers">Recipient address</div>
@@ -315,7 +334,7 @@ function SendAssets() {
 									<div></div>
 								</div>
 							</div>
-							{isInvalidAddress && (
+							{isInvalidAddress && addressToSend && (
 								<FormHelperText
 									style={{marginLeft: "27px", marginTop: "4px"}}
 									error
@@ -338,32 +357,49 @@ function SendAssets() {
 								}
 								rightBottomBlock={<RightBlockBottom enableMax={<MaxBtn />} />}
 								leftBlockBottom={<InputChange />}
-								className={
-									isInvalidAmount
-										? "amount_wrapper_error"
-										: "amount_wrapper_success"
-								}
+								className={cls({
+									amount_wrapper_error:
+										isInvalidAmount &&
+										validationMsgForAmount !== NOT_ENOUGH_CAUSE_COMMISSION,
+									amount_wrapper_success:
+										tokenSetted &&
+										amountToSend &&
+										!(
+											isInvalidAmount &&
+											validationMsgForAmount !== NOT_ENOUGH_CAUSE_COMMISSION
+										),
+								})}
 							/>
-							{isInvalidAmount && (
-								<FormHelperText
-									style={{marginLeft: "27px", marginTop: "4px"}}
-									error
-									id="component-error-text"
-								>
-									{validationMsgForAmount}
-								</FormHelperText>
-							)}
+							{isInvalidAmount &&
+								validationMsgForAmount !== NOT_ENOUGH_CAUSE_COMMISSION && (
+									<FormHelperText
+										style={{marginLeft: "27px", marginTop: "4px"}}
+										error
+										id="component-error-text"
+									>
+										{validationMsgForAmount}
+									</FormHelperText>
+								)}
 
 							<div className="btn_wrapper ">
 								<button
 									onClick={() => handleSetSendPopupVisibility()}
-									className={`btn mainblock-btn ${
-										isLoading ? "btn--disabled" : ""
-									}`}
+									className={cls("btn mainblock-btn", {
+										"btn--disabled":
+											isLoading ||
+											(!addressToSend && !amountToSend) ||
+											isInvalidAmount ||
+											isInvalidAddress,
+									})}
 								>
 									Send
 								</button>
 							</div>
+							{!addressToSend && !amountToSend && (
+								<FormHelperText sx={{textAlign: "center"}}>
+									{NOT_TOUCHED}
+								</FormHelperText>
+							)}
 						</div>
 					}
 				/>
@@ -384,6 +420,12 @@ function SendAssets() {
 					text={`Sending ${amountToSend} ${selectedToken.symbol}`}
 					handleClose={() => handleClose()}
 				/>
+			)}
+
+			{validationMsgForAmount === NOT_ENOUGH_CAUSE_COMMISSION && (
+				<FormHelperText
+					error
+				>{`${NOT_ENOUGH_CAUSE_COMMISSION} (Commission = ${SEND_TOKEN} TON)`}</FormHelperText>
 			)}
 		</div>
 	);

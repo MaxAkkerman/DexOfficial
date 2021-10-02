@@ -29,7 +29,7 @@ export default function useAssetList() {
 				type: "Native Tons",
 				icon: TONicon,
 				rootAddress: "none",
-				showWrapMenu: false,
+				showWrapMenu: true,
 				balance: updatedWallet === null ? clientData.balance : updatedWallet,
 			};
 

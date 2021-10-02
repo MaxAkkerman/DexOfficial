@@ -5,6 +5,8 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import PercentageTextField from "../../components/PercentageTextField/PercentageTextField";
 import classNames from "./SlippagePopper.module.scss";
+import cls from "classnames";
+import "./SlippagePopper.scss";
 
 export default function SlippagePopper({slippageState, popperState}) {
 	const {slippage, setSlippage} = slippageState;
@@ -17,23 +19,33 @@ export default function SlippagePopper({slippageState, popperState}) {
 	}
 
 	return (
-		<Popper id={id} open={open} anchorEl={anchorEl} placement="bottom-start">
+		<Popper
+			id={id}
+			open={open}
+			anchorEl={anchorEl}
+			placement="bottom-start"
+			style={{zIndex: 1}}
+		>
 			<Paper variant="outlined" classes={{root: classNames.container}}>
-				<Stack spacing={2} direction={"row"} sx={{alignItems: "center"}}>
-					<Stack spacing={1}>
-						<Typography>Slippage tolerance:</Typography>
+				<div className={"SlippagePopper_container"}>
+					<div className={"SlippagePopper_slippage_container"}>
+						<div
+							className={cls("SlippagePopper_slippage_text", classNames.title)}
+						>
+							Slippage tolerance:
+						</div>
 						<PercentageTextField
 							placeholder="0.10%"
 							value={slippage}
 							onChange={handleSetSlippage}
 							sx={{maxWidth: "165px", maxHeight: "45px"}}
 						/>
-					</Stack>
-					<Box sx={{maxWidth: "256px"}}>
+					</div>
+					<Box sx={{maxWidth: "236px"}} className={classNames.paragraph}>
 						Your transaction will revert if the price changes unfavorably by
 						more than this percentage
 					</Box>
-				</Stack>
+				</div>
 			</Paper>
 		</Popper>
 	);

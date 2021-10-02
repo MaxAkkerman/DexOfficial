@@ -33,28 +33,28 @@ function AssetsList(props) {
 					onClick={() => props.handleClickToken(item)}
 					key={i}
 				>
-					<div style={{width: "100%"}}>
-						<div
-							style={{
-								width: "100%",
-								display: "flex",
-								justifyContent: "space-between",
-							}}
-						>
-							<div style={{display: "flex"}}>
-								<div>
-									<img
-										className="arrow_icons2"
-										src={item.icon}
-										alt={"send assetsList"}
-									/>
-								</div>
-								<div style={{marginLeft: "15px"}}>
-									<div style={{fontWeight: "bold"}}>{item.symbol}</div>
-									<div style={{fontSize: "14px"}}>{item.tokenName}</div>
+					<div className={"assetsList__container"}>
+						<div className={"assetsList__item"}>
+							<div className={"assetList__item_meta"}>
+								<img
+									className="arrow_icons2"
+									src={item.icon}
+									alt={"send assetsList"}
+								/>
+								<div className="assetsList__meta_container">
+									<div className={"assetsList__symbol"}>{item.symbol}</div>
+									<div className={"assetList__token_name"}>
+										{item.tokenName}
+									</div>
 								</div>
 							</div>
-							<div>
+							<div
+								className={
+									props.isAssetsInspector
+										? "assetList__token_balance wordBreak"
+										: "assetList__token_balance"
+								}
+							>
 								{item.balance === 0
 									? "0.0000"
 									: item.balance < 0.0001
@@ -64,10 +64,7 @@ function AssetsList(props) {
 						</div>
 						{item.showWrapMenu && props.showItBeShown && (
 							<div className="NFT_additional_data">
-								<div
-									className="NFT_additional_block"
-									style={{justifyContent: "end"}}
-								>
+								<div className="NFT_additional_block end">
 									{/*    <div>*/}
 									{/*        <div className="swap-confirm-wrap">*/}
 									{/*            /!*<p className="mainblock-footer-value">{item.details.apyLockStake / 100}%</p>*!/*/}
@@ -110,25 +107,13 @@ function AssetsList(props) {
 
 									{/*<div className={"settings_btn_container"}>*/}
 									<button
-										className="settings_btn"
-										style={{
-											width: "100px",
-											height: "63px",
-											color: "white",
-											fontSize: "20px",
-										}}
+										className="settings_btn wrapUnwrap"
 										onClick={props.wrapTons ? () => props.wrapTons() : null}
 									>
 										Wrap
 									</button>
 									<button
-										className="settings_btn"
-										style={{
-											width: "100px",
-											height: "63px",
-											color: "white",
-											fontSize: "20px",
-										}}
+										className="settings_btn wrapUnwrap"
 										onClick={props.unWrapTons ? () => props.unWrapTons() : null}
 									>
 										Unwrap
