@@ -10,7 +10,7 @@ import {
 import {useSelector} from "react-redux";
 import cls from "classnames";
 
-import SvgWTon from "../../images/tokens/tonNew.svg";
+import SvgWTon from "../../images/tokens/TON.svg";
 import SvgWEth from "../../images/tokens/wETH.svg";
 import SvgUsdt from "../../images/tokens/wUSDT.svg";
 import SvgWBtc from "../../images/tokens/wBTC.svg";
