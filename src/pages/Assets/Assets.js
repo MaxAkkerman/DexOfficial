@@ -156,7 +156,7 @@ function Assets() {
 	}
 
 	const [showWithdrawMenu,setshowWithdrawMenu] = useState(false)
-	const [urNFTForWithdraw,setCurNFTForWithdraw] = useState(false)
+	const [curNFTForWithdraw,setCurNFTForWithdraw] = useState(false)
 	function handleWithdraw(item){
 		setshowWithdrawMenu(true)
 		setshowWrapMenu(false);
@@ -179,9 +179,9 @@ function Assets() {
 			}
 			{!showWrapMenu && showWithdrawMenu &&
 			<WithDraw
-				currentTokenForWrap={currentTokenForWrap}
+				curNFTForWithdraw={curNFTForWithdraw}
 				confirmText={viewData.confirmText}
-				tokenSetted={viewData.tokenSetted}
+				// tokenSetted={viewData.tokenSetted}
 				title={viewData.title}
 				handleShow={()=>setshowWithdrawMenu(false)}
 				transactionType={viewData.type}

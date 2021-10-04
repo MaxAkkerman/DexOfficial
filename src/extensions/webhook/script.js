@@ -21,11 +21,7 @@ import salary from "../../images/salary.svg";
 import {libWeb} from "@tonclient/lib-web";
 import {store} from "../../index";
 import {setTips} from "../../store/actions/app";
-import {
-	setAcceptedPairTokens,
-	setSubscribeReceiveTokens,
-	setUpdatedBalance,
-} from "../../store/actions/wallet";
+import {setUpdatedBalance,} from "../../store/actions/wallet";
 import TON from "../../images/tokens/TON.svg";
 import {getDecimals, getFixedNums} from "../../reactUtils/reactUtils";
 
@@ -39,7 +35,7 @@ const client = new TonClient({network: {endpoints: [DappServer]}});
 export default client;
 
 const Radiance = require("../Radiance.json");
-
+const rootAddrNFT = Radiance.networks["2"].rootAddrNFT
 function hex2a(hex) {
 	let str = "";
 	for (let i = 0; i < hex.length; i += 2) {
@@ -53,8 +49,25 @@ function getShardThis(string) {
 	return string[2];
 }
 
-let GiverAd =
-	"0:ed069a52b79f0bc21d13da9762a591e957ade1890d4a1c355e0010a8cb291ae4";
+
+
+
+export async function getAccType(addr) {
+	try {
+		return await client.utils.convert_address({
+			address: addr,
+			output_format: {
+				type: "Hex",
+			},
+		})
+	} catch(e) {
+
+		return e;
+	}
+
+}
+
+let GiverAd ="0:ed069a52b79f0bc21d13da9762a591e957ade1890d4a1c355e0010a8cb291ae4";
 
 export async function transferFromGiver(addr, count) {
 	const gSigner = signerKeys({
@@ -1675,8 +1688,7 @@ export async function queryByCode(code) {
 		console.error(error);
 	}
 }
-const rootAddrNFT =
-	"0:a93c63523b5b954a933f9eed2af92a6b28067154a002f6fab2633a14465aef48";
+
 
 export async function getCodeHashFromNFTRoot() {
 	const acc = new Account(NftRootContract, {
@@ -1697,9 +1709,6 @@ export async function getCodeHashFromNFTRoot() {
 		return e;
 	}
 }
-
-let testAddressOfOwner =
-	"0:b6ad8175fd6870e93fe44908c01831269065f8890ad119c5917bad088e192c43";
 
 export async function agregateQueryNFTassets(addrClient) {
 	const codeHash = await getCodeHashFromNFTRoot();

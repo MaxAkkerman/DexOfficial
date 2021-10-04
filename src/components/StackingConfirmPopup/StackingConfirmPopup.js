@@ -188,7 +188,7 @@ function StackingConfirmPopup(props) {
 								<div className="swap-confirm-wrap">
 									<p className="mainblock-footer-value">
 										{props.period === 1 / 30
-											? "1 day"
+											? "On demand"
 											: `${props.period} months`}
 									</p>
 									<p className="mainblock-footer-subtitle">Program duration</p>

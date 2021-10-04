@@ -322,12 +322,12 @@ function AssetsList(props) {
 					</div>
 				))}
 
-			{props.orderAssetsArray &&
-				props.orderAssetsArray.length >= 1 &&
-				pairList.length >= 1 &&
-				props.orderAssetsArray.map((orderAsset, idx) => (
-					<AssetsListOrderItem key={idx} orderAsset={orderAsset} />
-				))}
+			{/*{props.orderAssetsArray &&*/}
+			{/*	props.orderAssetsArray.length >= 1 &&*/}
+			{/*	pairList.length >= 1 &&*/}
+			{/*	props.orderAssetsArray.map((orderAsset, idx) => (*/}
+			{/*		<AssetsListOrderItem key={idx} orderAsset={orderAsset} />*/}
+			{/*	))}*/}
 		</div>
 	);
 }
