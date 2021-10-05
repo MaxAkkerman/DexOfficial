@@ -362,12 +362,13 @@ function LimitOrder() {
 					}
 				/>
 			)}
-			{ordersConfirmPopupIsVisible && (
-				<OrdersConfirmPopup hideConfirmPopup={hideOrdersConfirmPopup} />
-			)}
+			{ordersConfirmPopupIsVisible && <OrdersConfirmPopup />}
 			{ordersAsyncIsWaiting && (
 				<WaitingPopup
-					text={`Creating limit order of ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`}
+					text={`Sending message to create limit order with ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`}
+					handleClose={() => {
+						dispatch(setOrdersAsyncIsWaiting(false));
+					}}
 				/>
 			)}
 		</div>

@@ -28,6 +28,7 @@ import {
 	SET_ORDERS_ASYNC_IS_WAITING,
 	SET_ORDER_LIST_FETCHED,
 	SET_ORDER_LIST_LOADING,
+	ADD_TO_ORDER_LIST,
 } from "../actions/types";
 
 const initialState = {
@@ -126,6 +127,11 @@ const limitOrders = (state = initialState, {type, payload}) => {
 			return {
 				...state,
 				orderList: payload,
+			};
+		case ADD_TO_ORDER_LIST:
+			return {
+				...state,
+				orderList: [...state.orderList, payload],
 			};
 		case SET_ORDER_LIST_LOADING:
 			return {

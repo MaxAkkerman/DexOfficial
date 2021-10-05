@@ -15,6 +15,7 @@ import {
 	SET_ORDERS_ASYNC_IS_WAITING,
 	SET_ORDER_LIST_LOADING,
 	SET_ORDER_LIST_FETCHED,
+	ADD_TO_ORDER_LIST,
 } from "./types";
 
 export function setOrdersFromInputValue(payload) {
@@ -73,6 +74,10 @@ export function setOrdersAsyncIsWaiting(payload) {
 
 export function setOrderList(payload) {
 	return {type: SET_ORDER_LIST, payload};
+}
+
+export function addToOrderList(payload) {
+	return {type: ADD_TO_ORDER_LIST, payload};
 }
 
 export function setOrderListLoading(payload) {
