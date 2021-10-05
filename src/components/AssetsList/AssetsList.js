@@ -1,4 +1,3 @@
-import React, {useEffect, useState} from "react";
 import "./AssetsList.scss";
 import TON from "../../images/tonCrystalDefault.svg";
 import {
@@ -7,17 +6,10 @@ import {
 } from "../../reactUtils/getDurationFromSeconds";
 import {calculateRate} from "../../reactUtils/reactUtils";
 
-import nativeBtn from "../../images/nativeadd.svg";
-import settingsBtn from "../../images/Vector.svg";
-import calculateTimeLeft from "../../hooks/useTimer";
 import CalculateTimeLeft from "../../hooks/useTimer";
 import AssetsListOrderItem from "../AssetsListOrderItem/AssetsListOrderItem";
-import {Divider} from "@mui/material";
-import {useSelector} from "react-redux";
 
 function AssetsList(props) {
-	const pairList = useSelector((state) => state.walletReducer.pairsList);
-
 	return (
 		<div
 			className={
@@ -268,11 +260,22 @@ function AssetsList(props) {
 				))}
 
 			{props.orderAssetsArray &&
+				props.pairList &&
 				props.orderAssetsArray.length >= 1 &&
-				pairList.length >= 1 &&
-				props.orderAssetsArray.map((orderAsset, idx) => (
-					<AssetsListOrderItem key={idx} orderAsset={orderAsset} />
-				))}
+				props.pairList.length >= 1 &&
+				props.orderAssetsArray
+					.map((asset) => ({
+						asset,
+						pair: props.pairList.find((p) => p.pairAddress === asset.addrPair),
+					}))
+					.filter(({pair}) => pair)
+					.sort(
+						(a, b) =>
+							Number(a.asset.last_trans_lt) - Number(b.asset.last_trans_lt),
+					)
+					.map(({asset, pair}) => (
+						<AssetsListOrderItem key={asset.id} asset={asset} pair={pair} />
+					))}
 		</div>
 	);
 }

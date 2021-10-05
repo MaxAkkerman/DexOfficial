@@ -1,7 +1,12 @@
 import {useSnackbar} from "notistack";
 import {useEffect, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {INVALID_PAIR_DIRECTION} from "../constants/runtimeErrorMessages";
+import {LIMIT_ORDER_AMOUNT as LIMIT_ORDER_AMOUNT_DENOMINATOR} from "../constants/denominators";
+import {INVALID_PAIR_DIRECTION as INVALID_PAIR_DIRECTION_ERROR} from "../constants/runtimeErrorMessages";
+import {
+	A_B_DIRECTION as A_B_DIRECTION_VARIABLE,
+	B_A_DIRECTION as B_A_DIRECTION_VARIABLE,
+} from "../constants/runtimeVariables";
 import {DEXClientContract} from "../extensions/contracts/DEXClient";
 import client, {decode} from "../extensions/webhook/script";
 import {addToOrderList} from "../store/actions/limitOrders";
@@ -34,7 +39,7 @@ export default async function useSubLimitOrders() {
 				filter: {
 					dst: {eq: clientData.address},
 				},
-				result: "boc",
+				result: "boc id created_lt",
 			},
 			async (params) => {
 				const decoded = await decode.message(
@@ -74,27 +79,38 @@ export default async function useSubLimitOrders() {
 						message: `Creating limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol}`,
 					});
 				} else if (decoded.name === "limitOrderCallback") {
-					const {addrPair, amount, price, directionPair} = decoded.value;
+					let {addrPair, amount, price, directionPair} = decoded.value;
 
 					const pair = pairsList.find((p) => p.pairAddress === addrPair);
 
 					let fromSymbol = null;
 					let toSymbol = null;
 
-					if (directionPair === "4") {
+					if (directionPair === A_B_DIRECTION_VARIABLE) {
 						fromSymbol = pair.symbolA;
 						toSymbol = pair.symbolB;
-					} else if (directionPair === "5") {
+					} else if (directionPair === B_A_DIRECTION_VARIABLE) {
 						fromSymbol = pair.symbolB;
 						toSymbol = pair.symbolA;
 					} else {
-						throw new Error(INVALID_PAIR_DIRECTION);
+						throw new Error(INVALID_PAIR_DIRECTION_ERROR);
 					}
 
-					dispatch(addToOrderList(decoded.value));
+					amount = Number(amount) / LIMIT_ORDER_AMOUNT_DENOMINATOR;
+					price = Number(price);
 
-					const fromValue = Number(amount) / 1e9;
-					const toValue = fromValue * Number(price);
+					dispatch(
+						addToOrderList({
+							...decoded.value,
+							id: params.result.id,
+							last_trans_lt: Number(params.result.last_trans_lt),
+							price,
+							amount,
+						}),
+					);
+
+					const fromValue = amount;
+					const toValue = fromValue * price;
 
 					enqueueSnackbar({
 						type: "success",

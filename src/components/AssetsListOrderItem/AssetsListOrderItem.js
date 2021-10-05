@@ -7,7 +7,6 @@ import {
 	SvgIcon,
 	Tooltip,
 } from "@mui/material";
-import {useSelector} from "react-redux";
 import cls from "classnames";
 
 import SvgWTon from "../../images/tokens/TON.svg";
@@ -18,6 +17,7 @@ import SvgCross from "!@svgr/webpack!../../images/icons/crossNew.svg";
 import SvgCopy from "!@svgr/webpack!../../images/icons/copyNew.svg";
 
 import classes from "./AssetsListOrderItem.module.scss";
+import {B_A_DIRECTION} from "../../constants/runtimeVariables";
 
 const SYMBOL_ICON_MAP = {
 	WTON: SvgWTon,
@@ -26,15 +26,12 @@ const SYMBOL_ICON_MAP = {
 	WBTC: SvgWBtc,
 };
 
-export default function AssetsListOrderItem({orderAsset}) {
-	const {addrPair, amount, price, directionPair} = orderAsset;
-
-	const pairList = useSelector((state) => state.walletReducer.pairsList);
-	const pair = pairList.find((pairItem) => pairItem.pairAddress === addrPair);
+export default function AssetsListOrderItem({asset, pair}) {
+	const {amount, price, directionPair} = asset;
 
 	let {symbolA, symbolB} = pair;
 
-	if (directionPair === "5") [symbolA, symbolB] = [symbolB, symbolA];
+	if (directionPair === B_A_DIRECTION) [symbolA, symbolB] = [symbolB, symbolA];
 
 	const iconA = SYMBOL_ICON_MAP[symbolA];
 	const iconB = SYMBOL_ICON_MAP[symbolB];
@@ -69,7 +66,7 @@ export default function AssetsListOrderItem({orderAsset}) {
 					</Typography>
 				</Stack>
 				<Typography component="span" className={classes.amount}>
-					{amount / 1e9} {symbolA}
+					{amount} {symbolA}
 				</Typography>
 			</Stack>
 			<Collapse in={open}>
@@ -102,7 +99,7 @@ export default function AssetsListOrderItem({orderAsset}) {
 						</Typography>
 					</Stack>
 					<Typography component="span" className={classes.amount}>
-						{(amount * price) / 1e9} {symbolB}
+						{amount * price} {symbolB}
 					</Typography>
 				</Stack>
 			</Collapse>

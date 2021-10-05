@@ -13,23 +13,17 @@ import {useDispatch, useSelector} from "react-redux";
 import {showTip} from "../../store/actions/app";
 import useTokensList from "../../hooks/useAssetList";
 import {setTokenList} from "../../store/actions/wallet";
-import {unWrapTons, wrapTons} from "../../extensions/sdk/run";
-import {decrypt} from "../../extensions/seedPhrase";
-import useKeyPair from "../../hooks/useKeyPair";
-import client from "../../extensions/webhook/script";
 
 import fetchLimitOrders from "../../utils/fetchLimitOrders";
 
 import {setOrderList} from "../../store/actions/limitOrders";
 import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
-import TONicon from "../../images/tonCrystalDefault.svg";
 // import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 
 function Assets() {
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const [assets, setAssets] = useState([]);
-	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const walletIsConnected = useSelector(
 		(state) => state.appReducer.walletIsConnected,
 	);
@@ -40,7 +34,7 @@ function Assets() {
 	const liquidityList = useSelector(
 		(state) => state.walletReducer.liquidityList,
 	);
-	const clientData = useSelector((state) => state.walletReducer.clientData);
+	const pairList = useSelector((state) => state.walletReducer.pairsList);
 
 	useEffect(async () => {
 		const orders = await fetchLimitOrders();
@@ -96,7 +90,6 @@ function Assets() {
 		});
 		dispatch(setTokenList(copyAssets));
 	}
-	const {keyPair} = useKeyPair();
 
 	const [showWrapMenu, setshowWrapMenu] = useState(false);
 
@@ -258,6 +251,7 @@ function Assets() {
 											<AssetsList
 												TokenAssetsArray={[...tokensList, ...liquidityList]}
 												orderAssetsArray={orderList}
+												pairList={pairList}
 												NFTassetsArray={assets}
 												handleClickNFT={(item) => handleShowNFTData(item)}
 												// showNFTdata={showNFTdata}
