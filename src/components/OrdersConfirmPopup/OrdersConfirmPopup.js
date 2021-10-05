@@ -10,6 +10,7 @@ import {
 	hideOrdersConfirmPopup,
 	setOrdersAsyncIsWaiting,
 } from "../../store/actions/limitOrders";
+import {useSnackbar} from "notistack";
 
 function OrdersConfirmPopup() {
 	const dispatch = useDispatch();
@@ -24,13 +25,14 @@ function OrdersConfirmPopup() {
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 
 	const {keyPair} = useKeyPair();
+	const {enqueueSnackbar} = useSnackbar();
 
 	async function handleConfirm() {
 		dispatch(hideOrdersConfirmPopup());
 
 		dispatch(setOrdersAsyncIsWaiting(true));
 
-		await makeLimitOrder(
+		const {makeLimitOrderStatus} = await makeLimitOrder(
 			{
 				price: rate,
 				qty: fromValue,
@@ -42,6 +44,17 @@ function OrdersConfirmPopup() {
 				clientAddr: clientData.address,
 			},
 		);
+
+		if (makeLimitOrderStatus)
+			enqueueSnackbar({
+				type: "info",
+				message: `Creating limit order with ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol} ⏳`,
+			});
+		else
+			enqueueSnackbar({
+				type: "error",
+				message: `Failed creation of limit order with ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`,
+			});
 
 		dispatch(setOrdersAsyncIsWaiting(false));
 	}
@@ -128,8 +141,8 @@ function OrdersConfirmPopup() {
 											y2="-16.8695"
 											gradientUnits="userSpaceOnUse"
 										>
-											<stop stop-color="white" />
-											<stop offset="1" stop-color="white" stopOpacity="0" />
+											<stop stopColor="white" />
+											<stop offset="1" stopColor="white" stopOpacity="0" />
 										</linearGradient>
 									</defs>
 								</svg>

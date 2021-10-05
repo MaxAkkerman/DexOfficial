@@ -1,17 +1,4 @@
 import {
-	SET_SWAP_FROM_INPUT_VALUE_CHANGE,
-	SET_SWAP_FROM_INPUT_VALUE,
-	SET_SWAP_TO_INPUT_VALUE,
-	SET_SWAP_FROM_TOKEN,
-	SET_SWAP_TO_TOKEN,
-	SET_SWAP_PAIR_ID,
-	SHOW_SWAP_FROM_SELECT,
-	HIDE_SWAP_FROM_SELECT,
-	SHOW_SWAP_TO_SELECT,
-	HIDE_SWAP_TO_SELECT,
-	SET_SWAP_ASYNC_IS_WAITING,
-	SET_SWAP_RATE,
-	SET_SLIPPAGE,
 	SET_ORDERS_FROM_INPUT_VALUE,
 	SET_ORDERS_TO_INPUT_VALUE,
 	SET_ORDERS_FROM_TOKEN,
@@ -29,6 +16,7 @@ import {
 	SET_ORDER_LIST_FETCHED,
 	SET_ORDER_LIST_LOADING,
 	ADD_TO_ORDER_LIST,
+	REMOVE_FROM_ORDER_LIST,
 } from "../actions/types";
 
 const initialState = {
@@ -132,6 +120,11 @@ const limitOrders = (state = initialState, {type, payload}) => {
 			return {
 				...state,
 				orderList: [...state.orderList, payload],
+			};
+		case REMOVE_FROM_ORDER_LIST:
+			return {
+				...state,
+				orderList: state.orderList.filter((o) => o.id !== payload),
 			};
 		case SET_ORDER_LIST_LOADING:
 			return {

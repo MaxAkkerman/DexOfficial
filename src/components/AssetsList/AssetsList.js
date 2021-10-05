@@ -264,17 +264,13 @@ function AssetsList(props) {
 				props.orderAssetsArray.length >= 1 &&
 				props.pairList.length >= 1 &&
 				props.orderAssetsArray
-					.map((asset) => ({
-						asset,
-						pair: props.pairList.find((p) => p.pairAddress === asset.addrPair),
+					.map((order) => ({
+						order,
+						pair: props.pairList.find((p) => p.pairAddress === order.addrPair),
 					}))
 					.filter(({pair}) => pair)
-					.sort(
-						(a, b) =>
-							Number(a.asset.last_trans_lt) - Number(b.asset.last_trans_lt),
-					)
-					.map(({asset, pair}) => (
-						<AssetsListOrderItem key={asset.id} asset={asset} pair={pair} />
+					.map(({order, pair}) => (
+						<AssetsListOrderItem key={order.id} order={order} pair={pair} />
 					))}
 		</div>
 	);

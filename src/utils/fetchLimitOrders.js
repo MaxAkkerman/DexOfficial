@@ -27,13 +27,13 @@ export default async function fetchLimitOrders() {
 			filter: {
 				code_hash: {eq: hash},
 			},
-			result: "id last_trans_lt",
+			result: "id",
 		})
 	).result;
 
 	const orders = [];
 
-	for (const {id, last_trans_lt} of data) {
+	for (const {id} of data) {
 		const orderAcc = new Account(LimitOrderContract, {
 			address: id,
 			client,
@@ -44,7 +44,6 @@ export default async function fetchLimitOrders() {
 		orders.push({
 			...res.decoded.output,
 			id,
-			last_trans_lt: Number(last_trans_lt),
 			price: Number(res.decoded.output.price),
 			amount: Number(res.decoded.output.amount) / LIMIT_ORDER_AMOUNT,
 		});

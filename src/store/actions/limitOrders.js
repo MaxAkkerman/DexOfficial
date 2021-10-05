@@ -16,6 +16,7 @@ import {
 	SET_ORDER_LIST_LOADING,
 	SET_ORDER_LIST_FETCHED,
 	ADD_TO_ORDER_LIST,
+	REMOVE_FROM_ORDER_LIST,
 } from "./types";
 
 export function setOrdersFromInputValue(payload) {
@@ -78,6 +79,10 @@ export function setOrderList(payload) {
 
 export function addToOrderList(payload) {
 	return {type: ADD_TO_ORDER_LIST, payload};
+}
+
+export function removeFromOrderList(payload) {
+	return {type: REMOVE_FROM_ORDER_LIST, payload};
 }
 
 export function setOrderListLoading(payload) {

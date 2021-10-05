@@ -18,6 +18,10 @@ import SvgCopy from "!@svgr/webpack!../../images/icons/copyNew.svg";
 
 import classes from "./AssetsListOrderItem.module.scss";
 import {B_A_DIRECTION} from "../../constants/runtimeVariables";
+import cancelLimitOrder from "../../utils/cancelLimitOrder";
+import useKeyPair from "../../hooks/useKeyPair";
+import {useSelector} from "react-redux";
+import {useSnackbar} from "notistack";
 
 const SYMBOL_ICON_MAP = {
 	WTON: SvgWTon,
@@ -26,9 +30,8 @@ const SYMBOL_ICON_MAP = {
 	WBTC: SvgWBtc,
 };
 
-export default function AssetsListOrderItem({asset, pair}) {
-	const {amount, price, directionPair} = asset;
-
+export default function AssetsListOrderItem({order, pair}) {
+	const {amount, price, directionPair, id} = order;
 	let {symbolA, symbolB} = pair;
 
 	if (directionPair === B_A_DIRECTION) [symbolA, symbolB] = [symbolB, symbolA];
@@ -37,6 +40,7 @@ export default function AssetsListOrderItem({asset, pair}) {
 	const iconB = SYMBOL_ICON_MAP[symbolB];
 
 	const [open, setOpen] = useState(false);
+	const [disabled, setDisabled] = useState(false);
 
 	const CrossIcon = (props) => (
 		<SvgIcon component={SvgCross} viewBox="0 0 12 12" {...props} />
@@ -46,8 +50,44 @@ export default function AssetsListOrderItem({asset, pair}) {
 		<SvgIcon component={SvgCopy} viewBox="0 0 14 14" {...props} />
 	);
 
+	const {keyPair} = useKeyPair();
+	const clientData = useSelector((state) => state.walletReducer.clientData);
+	const {enqueueSnackbar} = useSnackbar();
+
+	async function handleOrderCancel(e) {
+		e.stopPropagation();
+
+		setDisabled(true);
+
+		const {cancelOrderStatus} = await cancelLimitOrder(id, {
+			clientAddress: clientData.address,
+			clientKeyPair: keyPair,
+		});
+
+		if (cancelOrderStatus) {
+			enqueueSnackbar({
+				type: "info",
+				message: `Canceling limit order with ${amount} ${symbolA} for ${
+					amount * price
+				} ${symbolB} ⏳`,
+			});
+		} else {
+			enqueueSnackbar({
+				type: "error",
+				message: `Failed to cancel limit order with ${amount} ${symbolA} for ${
+					amount * price
+				} ${symbolB}`,
+			});
+
+			setDisabled(false);
+		}
+	}
+
 	return (
-		<Box className={classes.wrapper} onClick={() => setOpen(!open)}>
+		<Box
+			className={cls(classes.wrapper, disabled && classes.disabled)}
+			onClick={() => setOpen(!open)}
+		>
 			<Stack direction="row" className={classes.container}>
 				<Box>
 					<img
@@ -75,8 +115,11 @@ export default function AssetsListOrderItem({asset, pair}) {
 					className={cls(classes.container, classes.container_second)}
 				>
 					<Stack direction="flow" alignItems="flex-start">
-						<Tooltip title="Delete order">
-							<button className={cls(classes.btn, classes.btn_first)}>
+						<Tooltip title="Cancel order">
+							<button
+								className={cls(classes.btn, classes.btn_first)}
+								onClick={handleOrderCancel}
+							>
 								<CrossIcon
 									className={cls(classes.icon_close, classes.icon_white)}
 								/>
