@@ -1,6 +1,7 @@
 import {useSnackbar} from "notistack";
 import {useEffect, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
+
 import {LIMIT_ORDER_AMOUNT as LIMIT_ORDER_AMOUNT_DENOMINATOR} from "../constants/denominators";
 import {
 	INVALID_ORDER_DIRECTION as INVALID_ORDER_DIRECTION_ERROR,
