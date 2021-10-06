@@ -1,12 +1,15 @@
 {
 	"parser": "@babel/eslint-parser",
 	"extends": ["eslint:recommended", "plugin:react/recommended"],
+	"plugins": ["simple-import-sort"],
 	"env": {
 		"browser": true,
 		"node": true
 	},
 	"rules": {
 		"react/prop-types": "off",
-		"react/react-in-jsx-scope": "off"
+		"react/react-in-jsx-scope": "off",
+		"simple-import-sort/imports": "error",
+		"simple-import-sort/exports": "error"
 	}
 }
