@@ -7,6 +7,7 @@ import MainBlock from "../MainBlock/MainBlock";
 import {setTransactionsList} from "../../store/actions/wallet";
 import {decrypt} from "../../extensions/seedPhrase";
 import {setTips} from "../../store/actions/app";
+import useKeyPair from "../../hooks/useKeyPair";
 
 function PoolConfirmPopup(props) {
 	const dispatch = useDispatch();
@@ -15,6 +16,7 @@ function PoolConfirmPopup(props) {
 
 	const fromToken = useSelector((state) => state.poolReducer.fromToken);
 	const toToken = useSelector((state) => state.poolReducer.toToken);
+	const clientData = useSelector((state) => state.walletReducer.clientData);
 
 	const fromValue = useSelector((state) => state.poolReducer.fromInputValue);
 	const toValue = useSelector((state) => state.poolReducer.toInputValue);
@@ -23,18 +25,19 @@ function PoolConfirmPopup(props) {
 	const transactionsList = useSelector(
 		(state) => state.walletReducer.transactionsList,
 	);
+	const {keyPair} = useKeyPair();
 
 	const pairId = useSelector((state) => state.poolReducer.pairId);
 
-	const encryptedSeedPhrase = useSelector(
-		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
-	);
-	const seedPhrasePassword = useSelector(
-		(state) => state.enterSeedPhrase.seedPhrasePassword,
-	);
+	// const encryptedSeedPhrase = useSelector(
+	// 	(state) => state.enterSeedPhrase.encryptedSeedPhrase,
+	// );
+	// const seedPhrasePassword = useSelector(
+	// 	(state) => state.enterSeedPhrase.seedPhrasePassword,
+	// );
 
 	async function handleSuply() {
-		let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
+		// let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
 		dispatch(setPoolAsyncIsWaiting(true));
 		props.hideConfirmPopup();
 
@@ -47,11 +50,11 @@ function PoolConfirmPopup(props) {
 		);
 
 		let poolStatus = await processLiquidity(
-			curExt,
+			clientData.address,
 			pairId,
 			fromValue,
 			toValue,
-			decrypted.phrase,
+			keyPair,
 			fromtokenData[0],
 			toTokenData[0],
 		);

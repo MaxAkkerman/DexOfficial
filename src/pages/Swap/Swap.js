@@ -29,6 +29,7 @@ import {decrypt} from "../../extensions/seedPhrase";
 import settingsBtn from "../../images/Vector.svg";
 import SlippagePopper from "../../components/SlippagePopper/SlippagePopper";
 import useSlippagePopper from "../../hooks/useSlippagePopper";
+import useKeyPair from "../../hooks/useKeyPair";
 
 function Swap() {
 	const history = useHistory();
@@ -140,7 +141,7 @@ function Swap() {
 			);
 		}
 	}
-
+	const {keyPair} = useKeyPair();
 	const [balanceError, setNotEnoughtBalanceError] = useState(false);
 	async function handleConnectPair() {
 		if (clientData.balance < 12) {
@@ -153,13 +154,13 @@ function Swap() {
 			return;
 		}
 
-		let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
-		const keys = await getClientKeys(decrypted.phrase);
+		// let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
+		// const keys = await getClientKeys(decrypted.phrase);
 
 		setconnectAsyncIsWaiting(true);
 		setconnectPairStatusText("getting data from pair.");
 
-		let connectRes = await connectToPair(pairId, keys);
+		let connectRes = await connectToPair(pairId, keyPair);
 
 		if (
 			!connectRes ||
@@ -198,7 +199,7 @@ function Swap() {
 				);
 				let connectToRootsStatus = await connectToPairStep2DeployWallets(
 					getClientForConnectStatus,
-					keys,
+					keyPair,
 				);
 				console.log("connectToRootsStatus", connectToRootsStatus);
 				if (connectToRootsStatus.code) {

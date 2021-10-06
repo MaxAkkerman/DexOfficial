@@ -9,7 +9,7 @@ import {RootTokenContract} from "../contracts/RootTokenContract.js";
 import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
 import {DEXPairContract} from "../contracts/DEXPair.js";
 import {DEXConnectorContract} from "../contracts/DEXConnector.js";
-import {abiContract, signerKeys} from "@tonclient/core";
+import {abiContract, signerKeys, signerNone} from "@tonclient/core";
 import {iconGenerator} from "../../iconGenerator";
 /*
     NFT contracts
@@ -23,36 +23,200 @@ import {store} from "../../index";
 import {setTips} from "../../store/actions/app";
 import {setUpdatedBalance,} from "../../store/actions/wallet";
 import TON from "../../images/tokens/TON.svg";
-import {getDecimals, getFixedNums} from "../../reactUtils/reactUtils";
+import {getDecimals, getFixedNums, toBytes, toHex} from "../../reactUtils/reactUtils";
 
 const {ResponseType} = require("@tonclient/core/dist/bin");
 const {TonClient} = require("@tonclient/core");
 const {Account} = require("@tonclient/appkit");
 TonClient.useBinaryLibrary(libWeb);
 
-const DappServer = "net.ton.dev";
+const Radiance = require("../Radiance.json");
+const dexroot = Radiance.networks["2"].dexroot
+const rootAddrNFT = Radiance.networks["2"].rootAddrNFT
+const BroxusRootCodeHash = Radiance.networks["2"].BroxusRootCodeHash
+
+const DappServer = Radiance.networks["2"].DappServer
+
 const client = new TonClient({network: {endpoints: [DappServer]}});
 export default client;
 
-const Radiance = require("../Radiance.json");
-const rootAddrNFT = Radiance.networks["2"].rootAddrNFT
-function hex2a(hex) {
-	let str = "";
-	for (let i = 0; i < hex.length; i += 2) {
-		let v = parseInt(hex.substr(i, 2), 16);
-		if (v) str += String.fromCharCode(v);
-	}
-	return str;
-}
+
+
+import {hex2a} from "../../reactUtils/reactUtils"
 
 function getShardThis(string) {
 	return string[2];
 }
 
+export async function getWalletAddress(clientPubkey,pairAddress,rootAddress) {
+	const rootAcc = new Account(DEXRootContract, {
+		address: dexroot,
+		signer: signerNone(),
+		client,
+	});
+	const RTacc = new Account(RootTokenContract, {address: rootAddress,client,});
+	let pubk = "0x" + clientPubkey
+
+	let connectorSoArg0;
+	let status = false;
+	let n = 0;
+	let res;
+
+	let targetShard = getShardThis(dexroot);
+	while (!status) {
+		res = await rootAcc.runLocal("getConnectorAddress", {
+			_answer_id: 0,
+			connectorPubKey: pubk,
+			connectorSoArg: n,
+			connectorCommander: pairAddress
+		});
+		let connectorAddr = res.decoded.output.value0;
+		let shardC = getShardThis(connectorAddr);
+		if (shardC === targetShard) {
+			console.log("connectorSoArg:", n);
+			console.log("getConnectorAddress:", connectorAddr);
+			res = await RTacc.runLocal("getWalletAddress", {
+				_answer_id: 0,
+				wallet_public_key_: 0,
+				owner_address_: connectorAddr
+			});
+			let walletAddr = res.decoded.output.value0;
+			let shardW = getShardThis(walletAddr);
+			if (shardW === targetShard) {
+				console.log("Bingo!");
+				connectorSoArg0 = n;
+				console.log("getWalletAddress:", walletAddr);
+				console.log("connectorSoArg0:", n);
+				status = true;
+			} else {
+				console.log("n",n);
+			}
+		} else {
+			console.log("n",n);
+		}
+		n++;
+	}
+	return connectorSoArg0
+}
+
+
+export async function getRootTokenAddress(clientPubkey,rootName,decimals) {
+	const rootAcc = new Account(DEXRootContract, {
+		address: dexroot,
+		client,
+	});
+	let rootABsouint;
+	let rootABaddress;
+	let status = false;
+	let targetShard = getShardThis(dexroot);
+	let n = 0;
+	let res;
+	let pubk = "0x" + clientPubkey
+
+	console.log("pubk",pubk,"n",n,"rootName",rootName,"decimals",decimals)
+	try {
+		while (!status) {
+			res = await rootAcc.runLocal("getRootTokenAddress", {
+				_answer_id: 0,
+				rootPubKey: pubk,
+				rootSoArg: n,
+				rootName: toHex(rootName),
+				rootSymbol: toHex(rootName),
+				rootDecimals: decimals
+			});
+			console.log("targetShard", targetShard, n)
+			rootABaddress = res.decoded.output.value0;
+			rootABsouint = n;
+			let shard = getShardThis(rootABaddress);
+			if (shard === targetShard) {
+				console.log("Bingo!");
+				console.log("rootAB SoArg:", rootABsouint);
+				console.log("rootAB Address:", rootABaddress);
+				status = true;
+			} else {
+				console.log(n);
+			}
+			n++;
+
+		}
+		return {rootABsouint: rootABsouint, rootABaddress: rootABaddress}
+	}catch(e){
+console.log("e",e)
+		return e
+	}
+}
+
+export async function getPairAddress(clientPubkey,clientAddr,rootAddrA,rootAddrB,rootABaddress){
+	const rootAcc = new Account(DEXRootContract, {
+		address: dexroot,
+		signer: signerNone(),
+		client,
+	});
+	let pubk = "0x" + clientPubkey
+
+	let targetShard = getShardThis(dexroot);
+	let pairAddress;
+	let pairSoArg;
+	let status = false;
+	let n = 0;
+	let res;
+	while (!status) {
+		res = await rootAcc.runLocal("getPairAddress", {_answer_id:0,pairPubKey:pubk,pairSoArg:n,pairCreator:clientAddr,pairRootA:rootAddrA,pairRootB:rootAddrB,pairRootAB:rootABaddress});
+		pairAddress = res.decoded.output.value0;
+		let shard = getShardThis(pairAddress);
+		if (shard === targetShard) {
+			console.log("Bingo!");
+			console.log("pair SoArg:", n);
+			pairSoArg = n;
+			console.log("pairAddress Address:", pairAddress);
+			status = true;
+		} else {console.log(n);}
+		n++;
+	}
+	return {pairAddress:pairAddress,pairSoArg:pairSoArg}
+
+}
 
 
 
-export async function getAccType(addr) {
+export async function queryRoots(minBalance) {
+	try {
+		return (
+			await client.net.query_collection({
+				collection: "accounts",
+				filter: {
+					code_hash: {
+						eq: BroxusRootCodeHash,
+					},
+					balance:{
+						gt: minBalance
+					},
+				},
+				order_by:{
+					path:"balance",
+					direction:"DESC"
+				},
+				result: "id balance",
+			})
+		).result;
+	} catch (error) {
+		console.error(error);
+	}
+}
+export async function getAccType2(addr) {
+	try {
+		const curWalletContract = new Account(TONTokenWalletContract, {
+			address: addr,
+			client,
+		});
+
+		return await curWalletContract.getAccount()
+	} catch (e) {
+		console.log("catch E", e);
+		return e;
+	}
+}
+export async function getAccTypeHex(addr) {
 	try {
 		return await client.utils.convert_address({
 			address: addr,
@@ -593,6 +757,28 @@ export async function getRootFromTonWallet(address) {
 
 	let tokenWalletDetails = await tokenWalletAcc.runLocal("root_address", {});
 	return tokenWalletDetails.decoded.output.value0.root_address;
+}
+
+export async function getDetailsFromTONtokenWallet2(address) {
+	console.log("address", address);
+	const tokenWalletAcc = new Account(TONTokenWalletContract, {
+		address: address,
+		client,
+	});
+	try {
+		let tokenWalletDetails = await tokenWalletAcc.runLocal("getDetails", {
+			_answer_id: 0,
+		});
+		console.log(
+			"atokenWalletDetails.decoded.output.value0.root_addressddress",
+			tokenWalletDetails,
+		);
+
+		return tokenWalletDetails.decoded.output;
+	} catch (e) {
+		console.log("eee", e);
+		return e;
+	}
 }
 
 export async function getDetailsFromTONtokenWallet(address) {
@@ -1632,18 +1818,56 @@ export async function mintTokens(walletAddress, clientAddress) {
  */
 const RootCodeHash =
 	"5020feaf723931a07921b97696fba4212ce3c60d70ca18a8b7ede24a33313aae";
-const BroxusRootCodeHash =
-	"3bae4a28a3491aa348ad9b4f21ca642828fcecb0a4945246c5ba7ad4f7f87d04";
+
 let RootCodeHashmyCode =
 	"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";
 
-export async function getAssetsForDeploy() {
-	// const code = (await client.boc.get_code_from_tvc({tvc: RootTokenContract.tvc})).code;
 
-	// const hashCode = (await client.boc.get_boc_hash({boc: RootCodeHash})).hash;
-	//
-	// console.log(`Root token code hash: ${hashCode}`)
-	const rootAddresses = await queryByCode(BroxusRootCodeHash);
+
+export async function getAssetsForDeploy() {
+	// const rootAddresses = [];
+	// let minBalance = 0
+	// const arrPart = await queryRoots(minBalance.toString())
+	// const arrPart2 = await queryRoots(arrPart[49].balance.toString())
+	// const arrPart3 = await queryRoots(arrPart2[49].balance.toString())
+	// const arrPart4 = await queryRoots(arrPart3[49].balance.toString())
+	// const arrPart5 = await queryRoots(arrPart4[49].balance.toString())
+	// const arrPart6 = await queryRoots(arrPart5[49].balance.toString())
+	// rootAddresses.push(...arrPart,...arrPart2,...arrPart3,...arrPart4,...arrPart5,...arrPart6)
+
+
+	// let rootAddresses = [
+	// 	{id: "0:b129553a53652983183374f5beb4652268641325726eccbb81feb5e98be0eef6"},
+	// 	{id: "0:dccb2920d677e2587c79cb9b479d28d8ddd2bbfe0202dc7dc537b5406d32569a"},
+	// 	{id: "0:2397e4d02332dd23108974e6103d56864ae0571db86cb195f542159ea5754344"},
+	// 	{id: "0:e887fbbf4ba3f0c06b7a9ca6d2bf097a6a85affedd1610c5c0a8d159bfd7d049"},
+	// 	{id: "0:6f45817be9283ae9828181dd454ea73a3330d9e2ba4610a6623dbbcdf6552995"},
+	// 	{id: "0:7d58a33a03bfdb2aac393b15a2c9767ea194006c53278fd63046a946f437b81b"},
+	// ]
+
+/*
+	DONT DELETE
+		// wton 0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37
+		// uni 0:471c9d737254a0044695c7e50ec5b8f6f94eadd49511b298d4a331b95106652b
+		// weth 0:45f682b7e783283caef3f268e10073cf08842bce20041d5224c38d87df9f2e90
+		// dai 0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef
+		// usdt 0:751b6e22687891bdc1706c8d91bf77281237f7453d27dc3106c640ec165a2abf
+		// usdc 0:1ad0575f0f98f87a07ec505c39839cb9766c70a11dadbfc171f59b2818759819
+		// wbtc 0:6e76bccb41be2210dc9d7a4d0f3cbf0d5da592d0cb6b87662d5510f5b5efe497
+*/
+
+	const rootAddresses = [
+		{id:"0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37"},
+		{id:"0:471c9d737254a0044695c7e50ec5b8f6f94eadd49511b298d4a331b95106652b"},
+		{id:"0:45f682b7e783283caef3f268e10073cf08842bce20041d5224c38d87df9f2e90"},
+		{id:"0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef"},
+		{id:"0:751b6e22687891bdc1706c8d91bf77281237f7453d27dc3106c640ec165a2abf"},
+		{id:"0:1ad0575f0f98f87a07ec505c39839cb9766c70a11dadbfc171f59b2818759819"},
+		{id:"0:6e76bccb41be2210dc9d7a4d0f3cbf0d5da592d0cb6b87662d5510f5b5efe497"},
+
+	]
+
+	console.log("rootAddresses",rootAddresses)
 	const rootDataArray = [];
 
 	console.log(
@@ -1654,6 +1878,7 @@ export async function getAssetsForDeploy() {
 				"0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37",
 		),
 	);
+
 	rootAddresses.map(async (item) => {
 		const curRootData = await getDetailsFromTokenRoot(item.id);
 		curRootData.tokenName = hex2a(curRootData.name);

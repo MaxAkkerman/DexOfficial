@@ -36,6 +36,7 @@ import OrdersConfirmPopup from "../../components/OrdersConfirmPopup/OrdersConfir
 import {iconGenerator} from "../../iconGenerator";
 import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
 import useLimitOrderValidation from "../../hooks/useLimitOrderValidation";
+import useKeyPair from "../../hooks/useKeyPair";
 
 function LimitOrder() {
 	const history = useHistory();
@@ -114,15 +115,16 @@ function LimitOrder() {
 			);
 		}
 	}
+	const {keyPair} = useKeyPair();
 
 	async function handleConnectPair() {
-		let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
-		const keys = await getClientKeys(decrypted.phrase);
+		// let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
+		// const keys = await getClientKeys(decrypted.phrase);
 
 		setconnectAsyncIsWaiting(true);
 		setconnectPairStatusText("getting data from pair.");
 
-		let connectRes = await connectToPair(pairId, keys);
+		let connectRes = await connectToPair(pairId, keyPair);
 
 		if (
 			!connectRes ||
@@ -149,7 +151,7 @@ function LimitOrder() {
 				);
 				let connectToRootsStatus = await connectToPairStep2DeployWallets(
 					getClientForConnectStatus,
-					keys,
+					keyPair,
 				);
 				console.log("connectToRootsStatus", connectToRootsStatus);
 				if (connectToRootsStatus.code) {

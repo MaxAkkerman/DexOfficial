@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import MainBlock from "../../components/MainBlock/MainBlock";
 import AssetsList from "../../components/AssetsList/AssetsList";
 import {useSelector} from "react-redux";
-import {getClientKeys} from "../../extensions/webhook/script";
+import {getClientKeys, queryRoots} from "../../extensions/webhook/script";
 import DeployAssetConfirmPopup from "../DeployAssetConfirmPopup/DeployAssetConfirmPopup";
 import {connectToPairStep2DeployWallets} from "../../extensions/sdk/run";
 import {decrypt} from "../../extensions/seedPhrase";
@@ -12,6 +12,9 @@ import WaitingPopup from "../WaitingPopup/WaitingPopup";
 import includesTextInToken from "../../utils/includesTextInToken";
 import arrowBack from "../../images/arrowBack.png";
 import {useHistory} from "react-router-dom";
+import nativeBtn from "../../images/nativeadd.svg";
+import useKeyPair from "../../hooks/useKeyPair";
+import DeployCustomTokenPopup from "../DeployCustomTokenPopup/DeployCustomTokenPopup";
 
 function AssetsListForDeploy() {
 	const history = useHistory();
@@ -44,14 +47,26 @@ function AssetsListForDeploy() {
 		showConfirmAssetDeployPopup(false);
 	}
 	const [deployWalletIsWaiting, setdeployWalletIsWaiting] = useState(false);
+	const {keyPair} = useKeyPair();
+
+	const [customRootAddr, setcustomRootAddr] = useState("")
+
+	const [showDeployCustomWalletPopup, setshowDeployCustomWalletPopup] = useState(false)
+
+
+	function handleSetCustomAddrPopup() {
+		setshowDeployCustomWalletPopup(true)
+	}
+
+
+
 
 	async function handleDeployAsset() {
 		console.log("curAssetForDeploy", curAssetForDeploy);
 		if (clientData.balance < 4) return;
 		showConfirmAssetDeployPopup(false);
 		setdeployWalletIsWaiting(true);
-		let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
-		const keys = await getClientKeys(decrypted.phrase);
+
 		const curPair = {rootA: curAssetForDeploy.rootAddress};
 
 		const deployData = {
@@ -59,7 +74,7 @@ function AssetsListForDeploy() {
 			clientAdr: clientData.address,
 			clientRoots: "",
 		};
-		const deployRes = await connectToPairStep2DeployWallets(deployData, keys);
+		const deployRes = await connectToPairStep2DeployWallets(deployData, keyPair);
 		console.log("deployRes", deployRes);
 		setdeployWalletIsWaiting(true);
 		showConfirmAssetDeployPopup(false);
@@ -70,8 +85,20 @@ function AssetsListForDeploy() {
 	function handleBack() {
 		history.push("/wallet");
 	}
+
+
+
+
+
 	return (
 		<>
+
+			{showDeployCustomWalletPopup &&
+			<DeployCustomTokenPopup
+				handleShow={()=>setshowDeployCustomWalletPopup(false)}
+			/>
+
+			}
 			{showAssetDepPopup && (
 				<DeployAssetConfirmPopup
 					handleDeployAsset={() => handleDeployAsset()}
@@ -86,7 +113,7 @@ function AssetsListForDeploy() {
 						handleClose={() => handleClose()}
 					/>
 				)}
-				{!deployWalletIsWaiting ? (
+				{!deployWalletIsWaiting && !showDeployCustomWalletPopup ? (
 					<MainBlock
 						class={"heightfixmainBlock"}
 						smallTitle={false}
@@ -98,6 +125,12 @@ function AssetsListForDeploy() {
 										<img src={arrowBack} alt={"arrow"} />
 									</button>
 									<div className="left_block boldFont">Assets Inspector</div>
+									<button
+										className={"settings_btn"}
+										onClick={() => handleSetCustomAddrPopup()}
+									>
+										<img src={nativeBtn} alt={"native"}/>
+									</button>
 								</div>
 
 								<SearchInput func={() => console.log("func")} />

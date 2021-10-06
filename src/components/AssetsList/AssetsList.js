@@ -17,7 +17,7 @@ import {useSelector} from "react-redux";
 
 function AssetsList(props) {
 	const pairList = useSelector((state) => state.walletReducer.pairsList);
-
+console.log("assets list",props)
 	return (
 		<div
 			className={

@@ -2,7 +2,6 @@ import {Account} from "@tonclient/appkit";
 import {DEXRootContract} from "../contracts/DEXRoot.js";
 import {DataContract} from "../contracts/Data.js";
 import {DEXClientContract} from "../contracts/DEXClientMainNet.js";
-import {LockStakeSafeContract} from "../contracts/LockStakeSafe.js";
 import {WrappedTONVaultContract} from "../contracts/WrappedTONVault.js";
 import client, {
     checkPubKey,
@@ -15,14 +14,15 @@ import client, {
     getsoUINT,
     pairs,
 } from "../webhook/script";
-import {signerKeys, signerNone} from "@tonclient/core";
+import {signerKeys} from "@tonclient/core";
 import {NftRootContract} from "../contracts/NftRoot";
 import {DEXConnectorContract} from "../contracts/DEXConnector";
-import {getDecimals} from "../../reactUtils/reactUtils";
+import {getDecimals, toHex} from "../../reactUtils/reactUtils";
+import {RootTokenContract} from "../contracts/RootTokenContract";
 // TonClient.useBinaryLibrary(libWeb);
 
 const Radiance = require("../Radiance.json");
-    const depoolAddress = Radiance.networks["2"].depoolAddress
+const depoolAddress = Radiance.networks["2"].depoolAddress
 const rootAddrNFT = Radiance.networks["2"].rootAddrNFT
 
 function UserException(message) {
@@ -32,6 +32,82 @@ function UserException(message) {
 
 function getShard(string) {
     return string[2];
+}
+
+const rootDecimals = 9;
+const grammsForPair = 1500000000;
+const grammsForRoot = 1600000000;
+const grammsForConnector = 1100000000;
+const grammsForWallet = 3200000000;
+const grammsTotal = 15000000000;
+
+export async function deployEmptyWallet(clientAddr,clientKeys,rootAddress,ownerAddress){
+    const clientAcc = new Account(DEXClientContract, {
+        address: clientAddr,
+        signer: signerKeys(clientKeys),
+        client,
+    });
+    try {
+        const {body} = await client.abi.encode_message_body({
+            abi: {type: "Contract", value: RootTokenContract.abi},
+            signer: {type: "None"},
+            is_internal: true,
+            call_set: {
+                function_name: "deployEmptyWallet",
+                input: {
+                    deploy_grams:200000000,
+                    wallet_public_key_:0,
+                    owner_address_:ownerAddress,
+                    gas_back_address:clientAddr
+                },
+            },
+        });
+        return await clientAcc.run("sendTransaction", {
+            dest: rootAddress,
+            value: 1500000000,
+            bounce: true,
+            flags: 3,
+            payload: body,
+        })
+    } catch (e) {
+        console.log(e)
+        return e
+    }
+
+
+}
+
+
+
+
+
+export async function createNewPair(
+    clientAddr, clientKeys, rootName, root0, root1, pairSoArg, connectorSoArg0, connectorSoArg1, rootSoArg) {
+
+
+    const clientAcc = new Account(DEXClientContract, {
+        address: clientAddr,
+        signer: signerKeys(clientKeys),
+        client,
+    });
+    const RootCreators = await clientAcc.run("createNewPair", {
+        root0: root0,
+        root1: root1,
+        pairSoArg: pairSoArg,
+        connectorSoArg0: connectorSoArg0,
+        connectorSoArg1: connectorSoArg1,
+        rootSoArg: rootSoArg,
+        rootName: toHex(rootName),
+        rootSymbol: toHex(rootName),
+        rootDecimals: rootDecimals,
+        grammsForPair: grammsForPair,
+        grammsForRoot: grammsForRoot,
+        grammsForConnector: grammsForConnector,
+        grammsForWallet: grammsForWallet,
+        grammsTotal: grammsTotal
+    });
+    return RootCreators.decoded.output;
+
 }
 
 
@@ -60,7 +136,7 @@ export async function withdrawAll(dataAddr, clientAddr, clientKeys) {
             flags: 3,
             payload: body,
         });
-return res
+        return res
     } catch (e) {
         console.log(e)
         return e
@@ -71,7 +147,7 @@ return res
 
 export async function withdrawPart(dataAddr, clientAddr, clientKeys, amount) {
 
-    const fixedAmount = Number(amount)*1000000000
+    const fixedAmount = Number(amount) * 1000000000
 
     const clientAcc = new Account(DEXClientContract, {
         address: clientAddr,
@@ -672,57 +748,56 @@ export async function returnLiquidity(curExt, pairAddr, tokens, keys) {
  * Function to process liquid
  * @author   max_akkerman
  * @param qtyB
- * @param phrase
- * @param curExt
  * @param pairAddr
  * @param qtyA
  * @param qtyB
- * @param phrase
- * @param curExt
  * @param pairAddr
  * @param qtyA
  * @param qtyB
- * @param phrase
- * @param curExt
  * @param pairAddr
  * @param qtyA
  * @param qtyB
- * @param phrase
- * @param curExt
+ * @param clientAddress
  * @param pairAddr
  * @param qtyA
  * @param qtyB
- * @param phrase
+ * @param keys
  * @param toTokenData
  * @param fromtokenData
  */
 
 export async function processLiquidity(
-    curExt,
+    clientAddress,
     pairAddr,
     qtyA,
     qtyB,
-    phrase,
+    keys,
     fromtokenData,
     toTokenData,
 ) {
-    const {pubkey} = curExt._extLib;
+    // const {pubkey} = curExt._extLib;
 
     let qtyAnum = Number(qtyA);
     let qtyBnum = Number(qtyB);
 
     const qtyAfixed = Math.round(qtyAnum * getDecimals(fromtokenData.decimals));
     const qtyBfixed = Math.round(qtyBnum * getDecimals(toTokenData.decimals));
+console.log("processLiquidity data",clientAddress,
+        pairAddr,
+        qtyA,
+        qtyB,
+        keys,
+        fromtokenData,
+        toTokenData,)
+    // let getClientAddressFromRoot = await checkPubKey(pubkey);
 
-    let getClientAddressFromRoot = await checkPubKey(pubkey);
+    // const keys = await getClientKeys(phrase);
 
-    const keys = await getClientKeys(phrase);
-
-    if (getClientAddressFromRoot.status === false) {
-        return getClientAddressFromRoot;
-    }
+    // if (getClientAddressFromRoot.status === false) {
+    //     return getClientAddressFromRoot;
+    // }
     const acc = new Account(DEXClientContract, {
-        address: getClientAddressFromRoot.dexclient,
+        address: clientAddress,
         client,
         signer: signerKeys(keys),
     });
@@ -909,24 +984,25 @@ export async function connectToPairStep2DeployWallets(connectionData, keys) {
     WALLET
 */
 export async function sendToken(
+    clientAddress,
     curExt,
     tokenRootAddress,
     addressTo,
     tokensAmount,
-    phrase,
+    keys,
     selectedToken,
 ) {
     const gramsForSend = 1000000000;
-    const {pubkey, contract, callMethod} = curExt._extLib;
-    let getClientAddressFromRoot = await checkPubKey(pubkey);
-
-    const keys = await getClientKeys(phrase);
-
-    if (getClientAddressFromRoot.status === false) {
-        return getClientAddressFromRoot;
-    }
+    // const {pubkey, contract, callMethod} = curExt._extLib;
+    // let getClientAddressFromRoot = await checkPubKey(pubkey);
+    //
+    // const keys = await getClientKeys(phrase);
+    //
+    // if (getClientAddressFromRoot.status === false) {
+    //     return getClientAddressFromRoot;
+    // }
     const acc = new Account(DEXClientContract, {
-        address: getClientAddressFromRoot.dexclient,
+        address: clientAddress,
         client,
         signer: signerKeys(keys),
     });

@@ -15,7 +15,7 @@ import ShowBalance from "../AmountBlock/ShowBalance";
 import SendConfirmPopup from "../SendConfirmPopup/SendConfirmPopup";
 import {withdrawAll, withdrawPart} from "../../extensions/sdk/run";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
-import {getAccType} from "../../extensions/webhook/script";
+import {getAccType, getAccTypeHex} from "../../extensions/webhook/script";
 import SetTokenBlock from "../AmountBlock/SetTokenBlock";
 import useKeyPair from "../../hooks/useKeyPair";
 
@@ -53,7 +53,7 @@ function WithDraw(props) {
 
     useEffect(async()=>{
         if(addrForWithdraw === null)return
-        const res = await getAccType(addrForWithdraw)
+        const res = await getAccTypeHex(addrForWithdraw)
         if(res.code){
             setAddressValidation({
                 isInvalid:true,

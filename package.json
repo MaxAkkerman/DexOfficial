@@ -23,6 +23,7 @@
 		"@tonclient/core": "^1.20.1",
 		"@tonclient/lib-node": "^1.16.0",
 		"@tonclient/lib-web": "^1.20.1",
+		"ascii-hex": "^1.0.1",
 		"bignumber.js": "^9.0.1",
 		"classnames": "^2.3.1",
 		"core-js": "^3.12.1",

@@ -16,7 +16,7 @@ import {setTokenList} from "../../store/actions/wallet";
 import {unWrapTons, wrapTons} from "../../extensions/sdk/run";
 import {decrypt} from "../../extensions/seedPhrase";
 import useKeyPair from "../../hooks/useKeyPair";
-import client from "../../extensions/webhook/script";
+import client, {queryRoots} from "../../extensions/webhook/script";
 
 import fetchLimitOrders from "../../utils/fetchLimitOrders";
 
@@ -189,7 +189,7 @@ function Assets() {
 			}
 
 			{!showWrapMenu && !showWithdrawMenu &&
-			<div className="container" onClick={() => dispatch(showTip())}>
+			<div className="container">
 				<MainBlock
 					smallTitle={false}
 					// title={'Assets'}
