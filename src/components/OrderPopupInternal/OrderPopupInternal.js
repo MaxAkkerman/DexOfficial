@@ -1,4 +1,4 @@
-import "./OrderInternalPopup.scss";
+import "./OrderPopupInternal.scss";
 
 import cls from "classnames";
 import {useSnackbar} from "notistack";
@@ -11,9 +11,9 @@ import miniSwap from "../../images/icons/mini-swap.png";
 import getTruncatedNum from "../../utils/getTruncatedNum";
 import IconCross from "../IconCross/IconCross";
 import MainBlock from "../MainBlock/MainBlock";
-import classes from "./OrderInternalPopup.module.scss";
+import classes from "./OrderPopupInternal.module.scss";
 
-export default function OrderInternalPopup({
+export default function OrderPopupInternal({
 	title,
 	order,
 	contractFn,

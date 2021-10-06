@@ -6,7 +6,7 @@ import {B_A_DIRECTION} from "../../constants/runtimeVariables";
 import {iconGenerator} from "../../iconGenerator";
 import IconCross from "../IconCross/IconCross";
 import IconEdit from "../IconEdit/IconEdit";
-import OrderCancelPopup from "../OrderCancelPopup/OrderCancelPopup";
+import OrderPopupCancel from "../OrderPopupCancel/OrderPopupCancel";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
 import classes from "./AssetsListOrderItem.module.scss";
 
@@ -17,7 +17,7 @@ export default function AssetsListOrderItem({order, pair}) {
 	if (directionPair === B_A_DIRECTION) [symbolA, symbolB] = [symbolB, symbolA];
 
 	const [fold, setFold] = useState(false);
-	const [popup, setPopup] = useState(false);
+	const [cancelPopup, setPopup] = useState(false);
 	const [waitPopup, setWaitPopup] = useState(false);
 
 	async function handleCancel(e) {
@@ -92,8 +92,8 @@ export default function AssetsListOrderItem({order, pair}) {
 					</Stack>
 				</Collapse>
 			</Box>
-			{popup && (
-				<OrderCancelPopup
+			{cancelPopup && (
+				<OrderPopupCancel
 					order={{
 						id,
 						fromSymbol: symbolA,

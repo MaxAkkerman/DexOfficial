@@ -5,7 +5,7 @@ import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
 
-import OrderDeployPopup from "../../components/OrderDeployPopup/OrderDeployPopup";
+import OrderPopupDeploy from "../../components/OrderPopupDeploy/OrderPopupDeploy";
 import OrdersInput from "../../components/OrdersInput/OrdersInput";
 import SwapBtn from "../../components/SwapBtn/SwapBtn";
 import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
@@ -344,7 +344,7 @@ function LimitOrder() {
 				/>
 			)}
 			{popup && (
-				<OrderDeployPopup
+				<OrderPopupDeploy
 					order={{
 						fromSymbol: fromToken.symbol,
 						toSymbol: toToken.symbol,

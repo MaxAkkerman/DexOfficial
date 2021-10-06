@@ -1,7 +1,7 @@
 import cancelLimitOrder from "../../utils/cancelLimitOrder";
-import OrderInternalPopup from "../OrderInternalPopup/OrderInternalPopup";
+import OrderPopupInternal from "../OrderPopupInternal/OrderPopupInternal";
 
-export default function OrderCancelPopup({
+export default function OrderPopupCancel({
 	order,
 	popupStateFn,
 	waitPopupStateFn,
@@ -9,7 +9,7 @@ export default function OrderCancelPopup({
 	const {id, fromSymbol, toSymbol, fromValue, toValue} = order;
 
 	return (
-		<OrderInternalPopup
+		<OrderPopupInternal
 			title="Confirm Limit Order cancel"
 			order={order}
 			contractFn={async ({clientAddress, clientKeyPair}) => {

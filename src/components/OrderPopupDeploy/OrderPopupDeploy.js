@@ -1,7 +1,7 @@
 import makeLimitOrder from "../../utils/makeLimitOrder";
-import OrderInternalPopup from "../OrderInternalPopup/OrderInternalPopup";
+import OrderPopupInternal from "../OrderPopupInternal/OrderPopupInternal";
 
-export default function OrderDeployPopup({
+export default function OrderPopupDeploy({
 	order,
 	pairId,
 	popupStateFn,
@@ -10,7 +10,7 @@ export default function OrderDeployPopup({
 	const {fromSymbol, toSymbol, fromValue, toValue, price} = order;
 
 	return (
-		<OrderInternalPopup
+		<OrderPopupInternal
 			title="Confirm Limit Order creation"
 			order={order}
 			contractFn={async ({clientAddress, clientKeyPair}) => {
