@@ -463,22 +463,22 @@ export async function checkwalletExists(clientAddress, pairAddress) {
 /**
  * Function to get client wallets
  * @author   max_akkerman
- * @return   [{walletAddress:string,symbol:string,balance:number}]
+ * @return   string
  * @param name
  */
-function getFullName(name) {
+export function getFullName(name) {
 	if (name === "TON") {
 		return "TON Crystal";
 	} else if (name === "WTON") {
-		return "TON Crystal";
+		return "Wrapped TON Crystal";
 	} else if (name === "fBTC") {
 		return "fBitcoin";
 	} else if (name === "WETH") {
-		return "Ethereum";
+		return "Wrapped Ethereum";
 	} else if (name === "fETH") {
 		return "fEthereum";
 	} else if (name === "WBTC") {
-		return "Bitcoin";
+		return "Wrapped Bitcoin";
 	} else if (name === "DS-WTON/USDT") {
 		return "Pool tokens of TON/USDT pair";
 	} else if (name === "DS-WTON/WETH") {

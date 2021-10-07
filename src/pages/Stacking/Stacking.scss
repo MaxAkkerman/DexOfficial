@@ -3,8 +3,8 @@
 }
 
 .Staking__text {
-	font-size: 19px !important;
-	//font-size: 1.5rem !important;
+	font-size: 19px;
+
 	&.program {
 		min-width: 45%;
 		max-width: 45%;
@@ -19,6 +19,10 @@
 		min-width: 14%;
 		max-width: 14%;
 		text-align: end;
+	}
+
+	@media screen and (max-width: 400px) {
+		font-size: 15px;
 	}
 }
 
@@ -81,6 +85,7 @@
 
 	&.end {
 		text-align: end;
+		margin-top: 16px;
 	}
 }
 
@@ -190,7 +195,29 @@
 	margin-left: 17px;
 }
 
+.Stacking__calculator_div_container {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row;
+}
+
+.Stacking__calculator_item {
+	&.end {
+		align-items: flex-end;
+	}
+}
+
 @media screen and (max-width: 1025px) {
+	.Stacking__calculator_item {
+		&.end {
+			align-items: center;
+		}
+	}
+
+	.Stacking__calculator_div_container {
+		flex-direction: column;
+	}
+
 	.Stacking__calculate_button {
 		width: 0;
 	}

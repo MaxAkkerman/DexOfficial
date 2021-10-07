@@ -255,7 +255,14 @@ function Input(props) {
 	}, [props.token.balance]);
 	return (
 		<>
-			<div className="input">
+			<div
+				className="input"
+				style={{
+					borderColor: props.borderError
+						? "var(--error)"
+						: "var(--input-border-color)",
+				}}
+			>
 				<div className="input-wrapper">
 					<span className="input-title">{props.text}</span>
 					<span

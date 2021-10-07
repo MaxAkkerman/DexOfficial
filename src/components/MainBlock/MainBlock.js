@@ -1,14 +1,24 @@
-import React from "react";
 import "./MainBlock.scss";
 
-function MainBlock(props) {
+function MainBlock({
+	smallTitle,
+	normalTitle,
+	class: className,
+	title,
+	button,
+	classHeader,
+	classTitle,
+	content,
+	footer,
+	...rest
+}) {
 	function classGenerator() {
 		let str = "mainblock-title";
 
-		if (props.smallTitle) {
+		if (smallTitle) {
 			str += " mainblock-title--small";
 		}
-		if (props.normalTitle) {
+		if (normalTitle) {
 			str += " mainblock-title--normal";
 		}
 
@@ -16,29 +26,30 @@ function MainBlock(props) {
 	}
 
 	return (
-		<div className={props.class ? props.class + " mainblock" : "mainblock"}>
-			{(props.title || props.button) && (
+		<div
+			className={className ? className + " mainblock" : "mainblock"}
+			{...rest}
+		>
+			{(title || button) && (
 				<div
 					className={
-						props.classHeader
-							? props.classHeader + " mainblock-header"
-							: "mainblock-header"
+						classHeader ? classHeader + " mainblock-header" : "mainblock-header"
 					}
 				>
 					<h2
 						className={
-							props.classTitle
-								? `${props.classTitle} ` + classGenerator()
+							classTitle
+								? `${classTitle} ` + classGenerator()
 								: classGenerator()
 						}
 					>
-						{props.title}
+						{title}
 					</h2>
-					{props.button && props.button}
+					{button && button}
 				</div>
 			)}
-			{props.content}
-			{props.footer && props.footer}
+			{content}
+			{footer && footer}
 		</div>
 	);
 }

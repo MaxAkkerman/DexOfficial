@@ -49,6 +49,12 @@
 	background: #3569f0;
 	transform: scale(0.7);
 	//height:inherit;
+	&.wrapUnwrap {
+		width: 110px;
+		height: 63px;
+		color: white;
+		font-size: 20px;
+	}
 }
 
 .settings_btn_container {
@@ -103,6 +109,9 @@
 	display: flex;
 	justify-content: space-around;
 	margin-left: 20px;
+	&.end {
+		justify-content: end;
+	}
 }
 
 .assetsList__nft_data_block {
@@ -115,6 +124,43 @@
 
 .assetList__nft_data {
 	color: #53e514;
+}
+
+.assetsList__meta_container {
+	margin-left: 15px;
+}
+
+.assetsList__symbol {
+	font-weight: bold;
+	color: var(--text-color);
+}
+
+.assetList__token_name {
+	font-size: 14px;
+}
+
+.assetsList__container {
+	width: 100%;
+}
+
+.assetsList__item {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.assetList__item_meta {
+	display: flex;
+	align-items: center;
+}
+
+.assetList__token_balance {
+	color: var(--text-color);
+	font-weight: bold;
+	&.wordBreak {
+		word-break: break-all;
+	}
 }
 
 @media screen and (max-width: 1025px) {

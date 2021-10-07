@@ -145,7 +145,7 @@ function Account() {
 									{isCopied && <span>Address copied</span>}
 								</button>
 								<a
-									href={`https://net.ton.live/accounts/accountDetails?id=${clientData.address}`}
+									href={`https://ton.live/accounts/accountDetails?id=${clientData.address}`}
 									target="_blank"
 									className="account-link"
 								>
@@ -180,6 +180,7 @@ function Account() {
 											<svg
 												width="20"
 												height="20"
+												style={{minWidth: "20px", maxWidth: "20px"}}
 												viewBox="0 0 20 20"
 												fill="none"
 												xmlns="http://www.w3.org/2000/svg"

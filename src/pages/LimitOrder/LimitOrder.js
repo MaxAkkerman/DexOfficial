@@ -331,7 +331,7 @@ function LimitOrder() {
 										disabled
 										onClick={() => history.push("/account")}
 									>
-										Set to market (Coming soon)
+										Set to market
 									</button>
 								</div>
 

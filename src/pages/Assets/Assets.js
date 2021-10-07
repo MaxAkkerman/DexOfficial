@@ -133,7 +133,7 @@ function Assets() {
 			type: "wrap",
 			confirmText: "wrap",
 			tokenSetted: true,
-			title: "Wrap TONs",
+			title: "TON Crystal → WTON",
 		});
 		setshowWrapMenu(true);
 		// const wrapRes = await wrapTons(clientData.address,keyPair,1000000000)
@@ -144,9 +144,9 @@ function Assets() {
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
 			type: "unwrap",
-			confirmText: "unrap",
+			confirmText: "unwrap",
 			tokenSetted: true,
-			title: "Unwrap TONs",
+			title: "WTON → TON Crystal",
 		});
 		console.log("tonObj", tonObj);
 		setshowWrapMenu(true);

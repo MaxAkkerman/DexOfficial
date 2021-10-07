@@ -30,6 +30,19 @@ import settingsBtn from "../../images/Vector.svg";
 import SlippagePopper from "../../components/SlippagePopper/SlippagePopper";
 import useSlippagePopper from "../../hooks/useSlippagePopper";
 import useKeyPair from "../../hooks/useKeyPair";
+import {
+	NOT_ENOUGH,
+	NOT_ENOUGH as NOT_ENOUGH_MSG,
+	NOT_ENOUGH_CAUSE_COMMISSION as NOT_ENOUGH_CAUSE_COMMISSION_MSG,
+	NOT_TOUCHED,
+} from "../../constants/validationMessages";
+import {
+	PROVIDE_LIQUIDITY_COMMISSION,
+	SWAP_COMMISSION,
+} from "../../constants/commissions";
+import useAssetList from "../../hooks/useAssetList";
+import {FormHelperText} from "@mui/material";
+
 
 function Swap() {
 	const history = useHistory();
@@ -127,6 +140,8 @@ function Swap() {
 	}, [toToken, tokenList, pairId]);
 
 	function handleConfirm() {
+		if (!fromValue && !toValue) return;
+
 		if (fromValue > fromToken.balance) {
 			setincorrectBalance(true);
 			setTimeout(() => setincorrectBalance(false), 10000);
@@ -267,7 +282,11 @@ function Swap() {
 			return (
 				<button
 					className={
-						fromToken.symbol && toToken.symbol && fromValue && toValue
+						fromToken.symbol &&
+						toToken.symbol &&
+						fromValue &&
+						toValue &&
+						!isError
 							? "btn mainblock-btn"
 							: "btn mainblock-btn btn--disabled"
 					}
@@ -312,6 +331,54 @@ function Swap() {
 		dispatch(setSwapAsyncIsWaiting(false));
 	}
 
+	const {assetList} = useAssetList();
+
+	const [errors, setErrors] = React.useState({});
+	const [isError, setIsError] = React.useState(true);
+
+	useEffect(() => {
+		if (Object.keys(errors).length === 0) setIsError(false);
+		else setIsError(true);
+	}, [errors]);
+
+	function checkDecimals(value) {
+		return value.toFixed(4);
+	}
+
+	function validate(fromValue, toValue, fromToken, toToken) {
+		console.log(fromToken, toToken);
+		if (
+			fromToken.symbol &&
+			toToken.symbol &&
+			fromToken.balance &&
+			toToken.balance
+		) {
+			const localErrors = {};
+
+			const fromTokenBalance = Number(fromToken.balance);
+
+			if (fromValue > checkDecimals(fromTokenBalance))
+				localErrors.fromTokenAmount = NOT_ENOUGH_MSG;
+
+			if (toValue === 0 || fromValue === 0)
+				localErrors.emptyFields = NOT_TOUCHED;
+
+			const tonAsset = assetList.find((t) => t.symbol === "TON Crystal");
+			if (tonAsset && tonAsset.balance) {
+				const nativeTONBalance = tonAsset.balance;
+
+				if (nativeTONBalance < SWAP_COMMISSION)
+					localErrors.commission = `${NOT_ENOUGH_CAUSE_COMMISSION_MSG} (Commission = ${SWAP_COMMISSION} TON Crystal)`;
+				console.log(localErrors);
+				setErrors(localErrors);
+			}
+		}
+	}
+
+	useEffect(() => {
+		if (fromToken && toToken) validate(fromValue, toValue, fromToken, toToken);
+	}, [fromValue, toValue, fromToken, toToken]);
+
 	return (
 		<div
 			className="container"
@@ -330,9 +397,14 @@ function Swap() {
 		>
 			{!swapAsyncIsWaiting && !connectAsyncIsWaiting && (
 				<MainBlock
+					style={{
+						borderColor: errors.commission
+							? "var(--error)"
+							: "var(--mainblock-border-color)",
+					}}
 					smallTitle={false}
 					content={
-						<div>
+						<div style={{display: "contents"}}>
 							<div className="head_wrapper" style={{marginBottom: "40px"}}>
 								<div
 									className="left_block"
@@ -357,8 +429,14 @@ function Swap() {
 									text={"From"}
 									token={fromToken}
 									value={fromValue}
+									borderError={errors.fromTokenAmount}
 									incorrectBalance={incorrectBalance}
 								/>
+								{errors.fromTokenAmount && (
+									<FormHelperText error sx={{color: "var(--text-color)"}}>
+										{NOT_ENOUGH}
+									</FormHelperText>
+								)}
 								{/*<>   {incorrectBalance && <div>error</div>}</>*/}
 								<SwapBtn
 									fromToken={fromToken}
@@ -380,7 +458,6 @@ function Swap() {
 									value={toValue}
 									incorrectBalance={false}
 								/>
-
 								{walletIsConnected ? (
 									getCurBtn()
 								) : (
@@ -390,6 +467,11 @@ function Swap() {
 									>
 										Connect wallet
 									</button>
+								)}
+								{!fromValue && !toValue && (
+									<FormHelperText sx={{textAlign: "center"}}>
+										{NOT_TOUCHED}
+									</FormHelperText>
 								)}
 								<SlippagePopper
 									slippageState={slippageState}
@@ -406,6 +488,11 @@ function Swap() {
 									</p>
 								)}
 							</div>
+							{errors.commission && (
+								<FormHelperText error sx={{color: "var(--text-color)"}}>
+									{errors.commission}
+								</FormHelperText>
+							)}
 						</div>
 					}
 					footer={
