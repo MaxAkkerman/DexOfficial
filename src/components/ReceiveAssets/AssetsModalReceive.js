@@ -11,7 +11,6 @@ import SearchInput from "../SearchInput/SearchInput";
 import useAssetList from "../../hooks/useAssetList";
 import includesTextInToken from "../../utils/includesTextInToken";
 import salary from "../../images/salary.svg";
-
 const pureNFT = [
 	{
 		walletAddress:

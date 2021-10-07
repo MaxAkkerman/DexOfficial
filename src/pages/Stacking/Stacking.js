@@ -130,15 +130,39 @@ function Stacking() {
 		(state) => state.stakingReducer.showWaitingStakingPopup,
 	);
 
-	const [period, setPeriod] = React.useState(12);
+	const [period, setPeriod] = React.useState(1 / 30);
 
 	const programs = [
-		{name: "On demand", period: 1 / 30, apy: 6, id: 0, info: "Daily"},
-		{name: "Medium term", period: 12, apy: 10.57, id: 1, info: "12 months"},
-		{name: "Long term", period: 48, apy: 26, id: 2, info: "48 months"},
+		{
+			name: "On demand",
+			period: 1 / 30,
+			apy: 6,
+			id: 0,
+			info: "Daily",
+			disabledBtn: false,
+			status: "Calculate",
+		},
+		{
+			name: "Medium term",
+			period: 12,
+			apy: 10.57,
+			id: 1,
+			info: "12 months",
+			disabledBtn: true,
+			status: "Coming soon",
+		},
+		{
+			name: "Long term",
+			period: 48,
+			apy: 26,
+			id: 2,
+			info: "48 months",
+			disabledBtn: true,
+			status: "Coming soon",
+		},
 	];
 
-	const [curProgram, setProgram] = React.useState(1);
+	const [curProgram, setProgram] = React.useState(0);
 
 	const {assetList} = useAssetList();
 
@@ -149,9 +173,9 @@ function Stacking() {
 		isValid: valid,
 	} = useFormik({
 		initialValues: {
-			stake: 0,
-			profit: 105.7,
-			APY: 10.57,
+			stake: 1000,
+			profit: 0.1619,
+			APY: 6,
 		},
 		async validate({stake}) {
 			const errors = {};
@@ -183,6 +207,16 @@ function Stacking() {
 		setFieldValue("APY", curMark[0].rate);
 		reCalc(curMark[0].rate, curMark[0].value);
 	}
+
+
+	// const [stake, setStake] = React.useState(1000);
+	// const [profit, setProfit] = React.useState(0.1619);
+	// const [APY, setAPY] = React.useState(6);
+	// const {
+	// 	invalid: error,
+	// 	validate,
+	// 	validationMsg: errorMsg,
+	// } = useCheckAmount(stake);
 
 	function reCalc(percent, period) {
 		const totalProfit = calculateRate(values.stake, percent, period);
@@ -221,7 +255,7 @@ function Stacking() {
 		if (!valid) return;
 
 		let periodInSeconds = 0;
-		if (period === 0) {
+		if (period === 1 / 30) {
 			periodInSeconds = 86400;
 		} else {
 			periodInSeconds = Number(period) * 30 * 60 * 60 * 24;
@@ -355,6 +389,7 @@ function Stacking() {
 												{/*    :*/}
 												<Button
 													size="small"
+													disabled={item.disabledBtn}
 													disableRipple
 													sx={{
 														"&:hover": {
@@ -381,12 +416,12 @@ function Stacking() {
 														borderRadius: "12px",
 														padding: "8px",
 														fontSize: "11px",
-														width: "92px",
+														width: "95px",
 														height: "34px",
 													}}
 													onClick={() => calculateButton(item)}
 												>
-													Calculate
+													{item.status}
 												</Button>
 												{/*}*/}
 											</CardActions>
@@ -423,6 +458,7 @@ function Stacking() {
 														},
 													},
 												}}
+												disabled
 												getAriaValueText={valuetext}
 												onChange={onPeriodChange}
 												min={6}
@@ -434,59 +470,126 @@ function Stacking() {
 									</div>
 
 									<Stack spacing={2}>
-										<div className={"Stacking__calculator_div_container"}>
-											<Stack spacing={1}>
-												<div className="Stacking__calculator_deposit_term_text">
-													Enter amount to stake
-												</div>
-												<TextField
-													sx={{borderRadius: "12px"}}
-													value={values.stake}
-													inputProps={{
-														style: {
-															color: "var(--primary-color)",
-														},
-													}}
-													onChange={onStakeChange}
-													id="stacking-amount"
-													size="small"
-													variant="outlined"
-													error={errors.stake ? errors.stake : null}
-													helperText={walletIsConnected ? errors.stake : null}
-													disabled={walletIsConnected ? null : "disabled"}
 
-													// placeholder="1000"
-												/>
-											</Stack>
-
-											<Stack
-												spacing={1}
-												className={"Stacking__calculator_item end"}
-											>
-												<div className="Stacking__calculator_deposit_term_text end">
-													In {period} months you will have
-												</div>
-												<Stack spacing={1} direction={"row"}>
-													<Typography
-														sx={{
-															fontWeight: "700",
-															fontSize: "24px",
-															lineHeight: "unset",
-															color: "var(--primary-color)",
-															wordBreak: "break-all",
+										<Stack
+											spacing={2}
+											direction={"row"}
+											sx={{justifyContent: "space-between"}}
+										>
+											<Grid item>
+												<Stack spacing={1}>
+													<div className="Stacking__calculator_deposit_term_text">
+														Enter amount to stake
+													</div>
+													<TextField
+														sx={{borderRadius: "12px"}}
+														value={values.stake}
+														inputProps={{
+															style: {
+																color: "var(--primary-color)",
+															},
 														}}
-													>
-														<img
-															style={{marginRight: "5px"}}
-															src={TON}
-															alt={"Ton Crystal"}
-														/>{" "}
-														{Number(values.stake + values.profit).toFixed(1) ||
-															0}
-													</Typography>
+														onChange={onStakeChange}
+														id="stacking-amount"
+														size="small"
+														variant="outlined"
+														error={errors.stake ? errors.stake : null}
+														helperText={
+															walletIsConnected ? errors.stake : null
+														}
+														disabled={walletIsConnected ? null : "disabled"}
+
+														// placeholder="1000"
+													/>
 												</Stack>
+											</Grid>
+											<Grid item>
+												<Stack spacing={1} sx={{alignItems: "flex-end"}}>
+													<div className="Stacking__calculator_deposit_term_text end">
+														In{" "}
+														{period === 1 / 30 ? "1 day" : `${period} months`}{" "}
+														you will have
+													</div>
+													<Stack spacing={1} direction={"row"}>
+														<Typography
+															sx={{
+																fontWeight: "700",
+																fontSize: "24px",
+																lineHeight: "unset",
+																color: "var(--primary-color)",
+															}}
+														>
+															<img
+																style={{marginRight: "5px"}}
+																src={TON}
+																alt={"Ton Crystal"}
+															/>{" "}
+															{Number(values.stake + values.profit).toFixed(4) ||
+															0}
+														</Typography>
+													</Stack>
+												</Stack>
+											</Grid>
+										</Stack>
+
+										{/*<div className={"Stacking__calculator_div_container"}>*/}
+										{/*	<Stack spacing={1}>*/}
+										{/*		<div className="Stacking__calculator_deposit_term_text">*/}
+										{/*			Enter amount to stake*/}
+										{/*		</div>*/}
+										{/*		<TextField*/}
+										{/*			sx={{borderRadius: "12px"}}*/}
+										{/*			value={values.stake}*/}
+										{/*			inputProps={{*/}
+										{/*				style: {*/}
+										{/*					color: "var(--primary-color)",*/}
+										{/*				},*/}
+										{/*			}}*/}
+										{/*			onChange={onStakeChange}*/}
+										{/*			id="stacking-amount"*/}
+										{/*			size="small"*/}
+										{/*			variant="outlined"*/}
+										{/*			error={errors.stake ? errors.stake : null}*/}
+										{/*			helperText={walletIsConnected ? errors.stake : null}*/}
+										{/*			disabled={walletIsConnected ? null : "disabled"}*/}
+
+
+													{/*// placeholder="1000"*/}
+												{/*/>*/}
 											</Stack>
-										</div>
+
+											{/*<Stack*/}
+											{/*	spacing={1}*/}
+											{/*	className={"Stacking__calculator_item end"}*/}
+											{/*>*/}
+											{/*	<div className="Stacking__calculator_deposit_term_text end">*/}
+											{/*		In {period} months you will have*/}
+											{/*	</div>*/}
+											{/*	<Stack spacing={1} direction={"row"}>*/}
+											{/*		<Typography*/}
+											{/*			sx={{*/}
+											{/*				fontWeight: "700",*/}
+											{/*				fontSize: "24px",*/}
+											{/*				lineHeight: "unset",*/}
+											{/*				color: "var(--primary-color)",*/}
+											{/*				wordBreak: "break-all",*/}
+											{/*			}}*/}
+											{/*		>*/}
+											{/*			<img*/}
+											{/*				style={{marginRight: "5px"}}*/}
+											{/*				src={TON}*/}
+											{/*				alt={"Ton Crystal"}*/}
+											{/*			/>{" "}*/}
+
+											{/*			{Number(profit).toFixed(4) || 0}*/}
+
+											{/*			/!*{Number(values.stake + values.profit).toFixed(1) ||*!/*/}
+											{/*			/!*	0}*!/*/}
+
+											{/*		</Typography>*/}
+											{/*	</Stack>*/}
+											{/*</Stack>*/}
+										{/*</div>*/}
 
 										<div className={"Stacking__calculator_div_container"}>
 											<Stack
@@ -535,16 +638,21 @@ function Stacking() {
 											</Stack>
 										</div>
 									</Stack>
+								<Stack style={{width:"100%"}}>
 									{walletIsConnected ? (
 										<button
-											disabled
-											// onClick={() => handlestake(true)}
-											// disabled={error}
+											// disabled
+											onClick={() => handlestake(true)}
+											disabled={errors.commission || errors.stake}
 											style={{borderRadius: "16px", height: "59px"}}
-											className={"btn mainblock-btn btn--disabled"}
-										>
-											{/*className={errors.stake ? "btn mainblock-btn btn--disabled" : "btn mainblock-btn"}>*/}
-											Coming soon
+											// className={"btn mainblock-btn btn--disabled"}
+
+											className="btn mainblock-btn"
+											// {error || period !== 1 / 30
+											// 	? "btn mainblock-btn btn--disabled"
+											// 	: "btn mainblock-btn"
+											// 	}
+											> {period === 1 / 30 ? "Stake" : "Coming soon"}
 										</button>
 									) : (
 										<button

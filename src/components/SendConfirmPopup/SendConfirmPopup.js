@@ -8,11 +8,11 @@ function SendConfirmPopup(props) {
 
 	function getTitle(tp) {
 		if (tp === "PureToken") {
-			return "Tokens";
+			return "Send Tokens";
 		} else if (tp === "Native Tons") {
-			return "TONs";
+			return "Send TONs";
 		} else {
-			return "DP";
+			return "Send DP";
 		}
 	}
 
@@ -20,7 +20,7 @@ function SendConfirmPopup(props) {
 	return (
 		<div className="popup-wrapper">
 			<MainBlock
-				title={`Send ${getTitle(props.currentAsset.type)}`}
+				title={props.title ? props.title : getTitle(props.currentAsset.type)}
 				button={
 					<svg
 						onClick={() => props.hideConfirmPopup()}
@@ -76,14 +76,14 @@ function SendConfirmPopup(props) {
 						</div>
 
 						<p className="confirm-text">
-							You are going to send some assets{" "}
+							{props.msgText ? props.msgText : "You are going to send some assets"}
 							{/*Output is estimated. You will receive at least <span>{toValue < 0.0001 ? parseFloat(getAmountOut(fromValue).toFixed(8)) : parseFloat(getAmountOut(fromValue).toFixed(4))} {fromToken.symbol}</span> or the transaction will revert*/}
 						</p>
 						<button
 							className="btn popup-btn"
 							onClick={() => props.handleSend()}
 						>
-							Confirm Send
+							{props.btnText ? props.btnText : "Confirm Send"}
 						</button>
 					</>
 				}

@@ -2,6 +2,7 @@ import arrowBottomBl from "../../images/arrowBottomBl.svg";
 import React from "react";
 
 function SetTokenBlock(props) {
+console.log("pro",props)
 	return (
 		<div
 			onClick={

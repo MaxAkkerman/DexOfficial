@@ -35,7 +35,7 @@ export default function SlippagePopper({slippageState, popperState}) {
 							Slippage tolerance:
 						</div>
 						<PercentageTextField
-							placeholder="0.10%"
+							placeholder="2%"
 							value={slippage}
 							onChange={handleSetSlippage}
 							sx={{maxWidth: "165px", maxHeight: "45px"}}
