@@ -2,25 +2,25 @@ import "./OrderPopupUpdate.scss";
 
 import cls from "classnames";
 import {useSnackbar} from "notistack";
-import React from "react";
+import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 
 import useKeyPair from "../../hooks/useKeyPair";
 import {iconGenerator} from "../../iconGenerator";
 import miniSwap from "../../images/icons/mini-swap.png";
 import {
-	closeOrderCancelPopup,
+	closeOrderUpdatePopup,
 	closeOrderWaitPopup,
 	openOrderWaitPopup,
 } from "../../store/actions/limitOrders";
 import getTruncatedNum from "../../utils/getTruncatedNum";
-import makeLimitOrder from "../../utils/makeLimitOrder";
+import updateLimitOrderPrice from "../../utils/updateLimitOrderPrice";
 import IconCross from "../IconCross/IconCross";
 import MainBlock from "../MainBlock/MainBlock";
 import classes from "./OrderPopupUpdate.module.scss";
 
 export default function OrderPopupUpdate({order, close}) {
-	const {fromSymbol, toSymbol, fromValue, toValue, price, pairId} = order;
+	const {fromSymbol, toSymbol, fromValue, toValue, price, id} = order;
 
 	const dispatch = useDispatch();
 
@@ -29,38 +29,38 @@ export default function OrderPopupUpdate({order, close}) {
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 	const {keyPair} = useKeyPair();
 
+	const [newPrice, setNewPrice] = useState(order.price);
+
 	const {enqueueSnackbar} = useSnackbar();
 
 	async function handleConfirm() {
-		dispatch(closeOrderCancelPopup());
+		dispatch(closeOrderUpdatePopup());
 		dispatch(
 			openOrderWaitPopup({
-				text: `Sending message to update limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol}`,
+				text: `Sending message to update price of limit order ${fromSymbol} - ${toSymbol}`,
 			}),
 		);
 
-		const {makeLimitOrderStatus} = await makeLimitOrder(
+		const {changePriceStatus} = await updateLimitOrderPrice(
 			{
-				price,
-				qty: fromValue,
-				tokenSymbol: fromSymbol,
-				pairAddr: pairId,
+				id,
+				newPrice,
 			},
 			{
 				clientKeyPair: keyPair,
-				clientAddr: clientData.clientAddress,
+				clientAddress: clientData.address,
 			},
 		);
 
-		if (makeLimitOrderStatus)
+		if (changePriceStatus)
 			enqueueSnackbar({
 				type: "info",
-				message: `Creating limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol} ⏳`,
+				message: `Updating price of limit order ${fromSymbol} - ${toSymbol} ⏳`,
 			});
 		else
 			enqueueSnackbar({
 				type: "error",
-				message: `Failed creation of limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol}`,
+				message: `Failed price update of limit order ${fromSymbol} - ${toSymbol}`,
 			});
 
 		dispatch(closeOrderWaitPopup());
@@ -151,10 +151,25 @@ export default function OrderPopupUpdate({order, close}) {
 									src={iconGenerator(toSymbol)}
 									alt={toSymbol}
 								/>
-								{toValue < 0.0001
-									? parseFloat(toValue.toFixed(8))
-									: parseFloat(toValue.toFixed(4))}
+								{getTruncatedNum(toValue)}
 							</span>
+						</div>
+
+						<div
+							className="recipient_wrapper"
+							style={{height: 100, padding: 15, marginTop: 25}}
+						>
+							<div className="send_text_headers">New price</div>
+							<div className="send_inputs">
+								<input
+									onChange={(e) => setNewPrice(e.target.value)}
+									value={newPrice}
+									className="recipient_input"
+									placeholder="0"
+									style={{marginTop: 0}}
+									type="number"
+								/>
+							</div>
 						</div>
 						<button className="btn popup-btn" onClick={handleConfirm}>
 							Update Order

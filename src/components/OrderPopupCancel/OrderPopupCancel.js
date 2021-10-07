@@ -47,12 +47,12 @@ export default function OrderPopupCancel({order, close}) {
 		if (cancelOrderStatus)
 			enqueueSnackbar({
 				type: "info",
-				message: `Canceling limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol} ⏳`,
+				message: `Canceling limit order ${fromSymbol} - ${toSymbol} ⏳`,
 			});
 		else
 			enqueueSnackbar({
 				type: "error",
-				message: `Failed to cancel limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol}`,
+				message: `Failed to cancel limit order ${fromSymbol} - ${toSymbol}`,
 			});
 
 		dispatch(closeOrderWaitPopup());

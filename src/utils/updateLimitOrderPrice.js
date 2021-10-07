@@ -5,7 +5,7 @@ import {DEXClientContract} from "../extensions/contracts/DEXClient";
 import client from "../extensions/webhook/script";
 
 export default async function updateLimitOrderPrice(
-	{limitOrderId, newPrice},
+	{id, newPrice},
 	{clientAddress, clientKeyPair},
 ) {
 	const clientAcc = new Account(DEXClientContract, {
@@ -15,7 +15,7 @@ export default async function updateLimitOrderPrice(
 	});
 
 	const response = await clientAcc.run("changeLimitOrderPrice", {
-		limitOrder: limitOrderId,
+		limitOrder: id,
 		newPrice,
 	});
 

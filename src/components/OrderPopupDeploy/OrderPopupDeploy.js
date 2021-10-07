@@ -55,12 +55,12 @@ export default function OrderPopupDeploy({order, close}) {
 		if (makeLimitOrderStatus)
 			enqueueSnackbar({
 				type: "info",
-				message: `Creating limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol} ⏳`,
+				message: `Creating limit order ${fromSymbol} - ${toSymbol} ⏳`,
 			});
 		else
 			enqueueSnackbar({
 				type: "error",
-				message: `Failed creation of limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol}`,
+				message: `Failed creation of limit order ${fromSymbol} - ${toSymbol}`,
 			});
 
 		dispatch(closeOrderWaitPopup());

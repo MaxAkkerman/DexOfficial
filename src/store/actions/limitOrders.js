@@ -22,6 +22,7 @@ import {
 	SET_ORDERS_TO_TOKEN,
 	SHOW_ORDERS_FROM_SELECT,
 	SHOW_ORDERS_TO_SELECT,
+	UPDATE_PRICE_ORDER_LIST,
 } from "./types";
 
 export function setOrdersFromInputValue(payload) {
@@ -76,6 +77,10 @@ export function addToOrderList(payload) {
 
 export function removeFromOrderList(payload) {
 	return {type: REMOVE_FROM_ORDER_LIST, payload};
+}
+
+export function updatePriceFromOrderList(payload) {
+	return {type: UPDATE_PRICE_ORDER_LIST, payload};
 }
 
 export function setOrderListLoading(payload) {

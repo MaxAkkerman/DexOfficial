@@ -22,6 +22,7 @@ import {
 	SET_ORDERS_TO_TOKEN,
 	SHOW_ORDERS_FROM_SELECT,
 	SHOW_ORDERS_TO_SELECT,
+	UPDATE_PRICE_ORDER_LIST,
 } from "../actions/types";
 
 const initialState = {
@@ -121,6 +122,13 @@ const limitOrders = (state = initialState, {type, payload}) => {
 			return {
 				...state,
 				orderList: state.orderList.filter((o) => o.id !== payload),
+			};
+		case UPDATE_PRICE_ORDER_LIST:
+			return {
+				...state,
+				orderList: state.orderList.map((o) =>
+					o.id === payload.id ? {...o, price: payload.newPrice} : o,
+				),
 			};
 		case SET_ORDER_LIST_LOADING:
 			return {
