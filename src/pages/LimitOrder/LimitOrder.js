@@ -20,7 +20,7 @@ import {
 	openOrderDeployPopup,
 	setOrdersRate,
 } from "../../store/actions/limitOrders";
-import getTruncatedNum from "../../utils/getTruncatedNum";
+import truncateNum from "../../utils/truncateNum";
 import MainBlock from "./../../components/MainBlock/MainBlock";
 
 function LimitOrder() {
@@ -343,7 +343,7 @@ function LimitOrder() {
 									<p className="swap-rate">
 										Price{" "}
 										<span>
-											{getTruncatedNum(rate)} {toToken.symbol}
+											{truncateNum(rate)} {toToken.symbol}
 										</span>{" "}
 										per <span>1 {fromToken.symbol}</span>
 									</p>

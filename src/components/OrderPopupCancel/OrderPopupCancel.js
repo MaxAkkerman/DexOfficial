@@ -14,7 +14,7 @@ import {
 	openOrderWaitPopup,
 } from "../../store/actions/limitOrders";
 import cancelLimitOrder from "../../utils/cancelLimitOrder";
-import getTruncatedNum from "../../utils/getTruncatedNum";
+import truncateNum from "../../utils/truncateNum";
 import IconCross from "../IconCross/IconCross";
 import MainBlock from "../MainBlock/MainBlock";
 import classes from "./OrderPopupCancel.module.scss";
@@ -143,7 +143,7 @@ export default function OrderPopupCancel({order, close}) {
 									src={iconGenerator(toSymbol)}
 									alt={toSymbol}
 								/>
-								{getTruncatedNum(toValue)}
+								{truncateNum(toValue)}
 							</span>
 						</div>
 						<button
@@ -160,14 +160,14 @@ export default function OrderPopupCancel({order, close}) {
 							{/*<div>*/}
 							<div className="swap-confirm-wrap">
 								<p className="mainblock-footer-value">
-									<img src={miniSwap} alt="" /> {getTruncatedNum(price)}{" "}
+									<img src={miniSwap} alt="" /> {truncateNum(price)}{" "}
 									{fromSymbol}/{toSymbol}
 								</p>
 								<p className="mainblock-footer-subtitle">Price</p>
 							</div>
 							<div className="swap-confirm-wrap">
 								<p className="mainblock-footer-value">
-									{getTruncatedNum((fromValue * 0.3) / 100)} {fromSymbol}
+									{truncateNum((fromValue * 0.3) / 100)} {fromSymbol}
 								</p>
 								<p className="mainblock-footer-subtitle">Fee</p>
 							</div>

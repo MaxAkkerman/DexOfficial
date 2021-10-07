@@ -5,7 +5,7 @@
  * @param {number} [digits=4]
  * @returns {number}
  */
-export default function getTruncatedNum(num, digits = 4) {
+export default function truncateNum(num, digits = 4) {
 	if (Number.isInteger(num)) return num;
 
 	let truncatedNum = getFixedDown(num, digits);

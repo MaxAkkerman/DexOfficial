@@ -3,8 +3,8 @@ import "./AssetsList.scss";
 import CalculateTimeLeft from "../../hooks/useTimer";
 import TON from "../../images/tonCrystalDefault.svg";
 import {
+	formatDate,
 	getDurationFromSeconds,
-	getFormattedDate,
 } from "../../reactUtils/getDurationFromSeconds";
 import {calculateRate} from "../../reactUtils/reactUtils";
 import AssetsListOrderItem from "../AssetsListOrderItem/AssetsListOrderItem";
@@ -67,7 +67,7 @@ function AssetsList(props) {
 									{/*            <p className="mainblock-footer-subtitle">Period</p>*/}
 									{/*        </div>*/}
 									{/*        <div className="swap-confirm-wrap">*/}
-									{/*            /!*<p className="mainblock-footer-value">{getFormattedDate(Number(item.details.timeStartLockStake))}</p>*!/*/}
+									{/*            /!*<p className="mainblock-footer-value">{formatDate(Number(item.details.timeStartLockStake))}</p>*!/*/}
 									{/*            <p className="mainblock-footer-subtitle">Start time</p>*/}
 									{/*        </div>*/}
 
@@ -166,15 +166,13 @@ function AssetsList(props) {
 											</div>
 											<div className="swap-confirm-wrap">
 												<p className="mainblock-footer-value">
-													{getFormattedDate(
-														Number(item.details.timeStartLockStake),
-													)}
+													{formatDate(Number(item.details.timeStartLockStake))}
 												</p>
 												<p className="mainblock-footer-subtitle">Start time</p>
 											</div>
 											<div className="swap-confirm-wrap">
 												<p className="mainblock-footer-value">
-													{getFormattedDate(
+													{formatDate(
 														Number(item.details.timeStartLockStake) +
 															Number(item.details.periodLockStake),
 													)}
