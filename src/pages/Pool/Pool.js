@@ -23,7 +23,7 @@ function Pool() {
 				class={"pool"}
 				title={"Your liquidity"}
 				button={
-					<Link to="/create-pair" className="btn liquidity-btn" style={{fontSize:"18px",borderRadius:"12px"}}>
+					<Link to="/create-pair" className="btn liquidity-btn" style={{fontSize:"20px",borderRadius:"12px"}}>
 						Create Pair
 					</Link>
 				}

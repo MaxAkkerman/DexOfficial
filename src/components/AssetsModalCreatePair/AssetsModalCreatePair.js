@@ -34,7 +34,8 @@ function AssetsModalCreatePair(props) {
 		<>
 			<div className="select-wrapper">
 				<MainBlock
-					title={"Select a token"}
+					title={"Select asset"}
+					class={"fixPositionCreatePairModal"}
 					button={<CloseBtn func={() => handleClose()} />}
 					content={
 						<>

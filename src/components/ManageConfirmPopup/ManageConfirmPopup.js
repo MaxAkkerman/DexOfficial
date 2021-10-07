@@ -10,6 +10,7 @@ import {
 	setPoolToToken,
 } from "../../store/actions/pool";
 import ReturnLiquidConfirmPopup from "../ReturnLiquidConfirmPopup/ReturnLiquidConfirmPopup";
+import {getDecimals} from "../../reactUtils/reactUtils";
 
 function ManageConfirmPopup(props) {
 	const history = useHistory();
@@ -42,8 +43,14 @@ function ManageConfirmPopup(props) {
 	useEffect(() => {
 		if (!curPair[0]) return;
 		let curP = curPair;
-		let pooledTokensA = (curP[0].reserveA / 1000000000) * poolShare;
-		let pooledTokensB = (curP[0].reservetB / 1000000000) * poolShare;
+		console.log("curP",curP,"fromToken",fromToken,"toToken",toToken,"poolshare",poolShare)
+
+		// const tokeA = tokenList.filter(item=>item.symbol === curP[0].symbolA)
+		const tokeB = tokenList.filter(item=>item.symbol === curP[0].symbolB)
+
+		// console.log("tokeA",tokeA,tokeB)
+		let pooledTokensA = ((curP[0].reserveA / 1000000000) * poolShare)/100;
+		let pooledTokensB = ((curP[0].reservetB / 1000000000) * poolShare)/100;
 		setpooledTokensA(pooledTokensA);
 		setpooledTokensB(pooledTokensB);
 	}, [poolShare]);
@@ -148,7 +155,7 @@ function ManageConfirmPopup(props) {
 							<div>
 								<div className="swap-confirm-wrap">
 									<p className="mainblock-footer-value">
-										{(pooledTokensA / 100).toFixed(4)}
+										{pooledTokensA.toFixed(4)}
 									</p>
 									<p className="mainblock-footer-subtitle">
 										Your pooled {fromToken.symbol}
@@ -156,7 +163,7 @@ function ManageConfirmPopup(props) {
 								</div>
 								<div className="swap-confirm-wrap">
 									<p className="mainblock-footer-value">
-										{(pooledTokensB / 100).toFixed(4)}
+										{pooledTokensB.toFixed(4)}
 									</p>
 									<p className="mainblock-footer-subtitle">
 										Your pooled {toToken.symbol}

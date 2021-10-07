@@ -4,7 +4,7 @@ import cls from "classnames";
 function BlockItem(props) {
 	return (
 		<div className={cls("amount_wrapper", props.className)}>
-			<div className="amount_left_block">
+			<div className={props.amount_left_block ? props.amount_left_block : "amount_left_block"}>
 				<div className="send_text_headers">{props.leftTitle}</div>
 				{props.leftBlockBottom}
 			</div>

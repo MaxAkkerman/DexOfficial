@@ -798,8 +798,9 @@ console.log("processLiquidity data",clientAddress,
     // }
     const acc = new Account(DEXClientContract, {
         address: clientAddress,
-        client,
         signer: signerKeys(keys),
+        client,
+
     });
 
     console.log(

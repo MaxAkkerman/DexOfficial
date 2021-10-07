@@ -15,7 +15,7 @@ import AssetsModalCreatePair from "../../components/AssetsModalCreatePair/Assets
 import SetTokenBlock from "../../components/AmountBlock/SetTokenBlock";
 import SelectTokenMenu from "../../components/AmountBlock/SelectTokenMenu";
 import CreatePairConfirmPopup from "../../components/CreatePairConfirmPopup/CreatePairConfirmPopup";
-import {getRootSymbol} from "../../reactUtils/reactUtils";
+import {getFraction, getRootSymbol} from "../../reactUtils/reactUtils";
 import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
 import {
     connectToPair,
@@ -25,6 +25,7 @@ import {
 } from "../../extensions/sdk/run";
 import useKeyPair from "../../hooks/useKeyPair";
 import {getPairAddress, getRootTokenAddress, getWalletAddress} from "../../extensions/webhook/script";
+import {setTips} from "../../store/actions/app";
 
 function CreatePair() {
     const history = useHistory();
@@ -203,7 +204,16 @@ function CreatePair() {
 
 
     function handleConfirm() {
-
+        if(isInvalidAmountA || isInvalidAmountB || (tokenAamount === 0) || (tokenBamount === 0)) return
+        if(clientData.balance < 25){
+            dispatch(
+                setTips({
+                    message: `Insufficient balance, you need at least 25 Tons to create pair`,
+                    type: "error",
+                }),
+            );
+            return
+        }
 
         setcreatePairConfirmPopupIsVisible(true)
     }
@@ -309,6 +319,8 @@ function CreatePair() {
     }
 
     async function handleCreateNewPair() {
+
+
         setcreatePairConfirmPopupIsVisible(false)
         setcreatePairAsyncIsWaiting(true)
         console.log("create new pair")
@@ -322,6 +334,8 @@ function CreatePair() {
         const souintConnectorTokenA = await getWalletAddress(keyPair.public, pairAddress, tokenA.rootAddress)
         const souintConnectorTokenB = await getWalletAddress(keyPair.public, pairAddress, tokenB.rootAddress)
         console.log("rootABsouint",rootABsouint,"rootABaddress",rootABaddress,"pairAddress",pairAddress,"pairSoArg",pairSoArg)
+
+        //check 20 tons minimun
         const res = await createNewPair(
             clientData.address,
             keyPair,
@@ -350,22 +364,25 @@ function CreatePair() {
             );
             console.log("connectToRootsStatus",connectToRootsStatus)
 
+            setTimeout(async ()=>{
+                let poolStatus = await processLiquidity(
+                    clientData.address,
+                    pairAddress,
+                    tokenAamount,
+                    tokenBamount,
+                    keyPair,
+                    tokenA,
+                    tokenB,
+                );
+                console.log("poolStatus",poolStatus)
+            },35000)
+
+
         },15000)
 
         console.log("after connect pair")
 
-        setTimeout(async ()=>{
-            let poolStatus = await processLiquidity(
-                clientData.address,
-                pairId,
-                tokenAamount,
-                tokenBamount,
-                keyPair,
-                tokenA,
-                tokenB,
-            );
-            console.log("poolStatus",poolStatus)
-        },10000)
+
         setcreatePairAsyncIsWaiting(false)
 
 
@@ -385,7 +402,28 @@ function CreatePair() {
         setcreatePairConfirmPopupIsVisible(false)
         setcreatePairAsyncIsWaiting(false)
     }
+    async function rule(){
+        await setTimeout(()=>console.log(1),5000)
+        setTimeout(()=>console.log(2),5000)
+        // const num = 1.204
+        // const check = getFraction(num)
+        // console.log("check",check)
+        // let tokenAamount = 1
+        // let tokenBamount = 0.0001
+        //
+        // let poolStatus = await processLiquidity(
+        //     clientData.address,
+        //     "0:5b0332fa7e6da60a7d545dc8c1a4b479347af8f7c63a8fd6bd3d6317d11e6112",
+        //     tokenAamount,
+        //     tokenBamount,
+        //     keyPair,
+        //     tokenA,
+        //     tokenB,
+        // );
+        // console.log("poolStatus",poolStatus)
 
+
+    }
     return (
         <div className="container" onClick={()=>console.log("tokenA,tokenB", tokenAamount,
             tokenBamount)}>
@@ -411,9 +449,10 @@ function CreatePair() {
                     }
                     content={
                         <div>
-
+<button onClick={()=>rule()}>CLICK me</button>
                             <BlockItem
                                 leftTitle={"Amount"}
+                                amount_left_block={"amount_left_blockFixedWidth"}
                                 // currentToken={currentToken}
                                 rightTopBlock={
 
@@ -445,7 +484,7 @@ function CreatePair() {
                                                 </div>
                                             </>
                                         ) : (
-                                            <div className="send_select_wrap">
+                                            <div className="send_select_wrap ">
                                                 <SelectTokenMenu
                                                     handleTouchTokenModal2={() => handleshowAssetsList("typeA")}
                                                 />
@@ -499,6 +538,7 @@ function CreatePair() {
                             </svg>
                             <BlockItem
                                 leftTitle={"Amount"}
+                                amount_left_block={"amount_left_blockFixedWidth"}
                                 // currentToken={currentToken}
                                 rightTopBlock={
 

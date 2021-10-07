@@ -6,6 +6,7 @@ function SelectTokenMenu(props) {
 		<div
 			onClick={() => props.handleTouchTokenModal2()}
 			className="send_select_btn"
+
 		>
 			<div className="send_set_token">Select asset</div>
 			<div className="send_arrow_bottom_wrapper nofilter">

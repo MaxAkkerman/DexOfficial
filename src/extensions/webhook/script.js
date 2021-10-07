@@ -23,7 +23,7 @@ import {store} from "../../index";
 import {setTips} from "../../store/actions/app";
 import {setUpdatedBalance,} from "../../store/actions/wallet";
 import TON from "../../images/tokens/TON.svg";
-import {getDecimals, getFixedNums, toBytes, toHex} from "../../reactUtils/reactUtils";
+import {getDecimals, getFixedNums, toHex} from "../../reactUtils/reactUtils";
 
 const {ResponseType} = require("@tonclient/core/dist/bin");
 const {TonClient} = require("@tonclient/core");
@@ -620,11 +620,9 @@ export async function getAllPairsWoithoutProvider() {
 		const balanceA = Number(bal.decoded.output.balanceReserve[item[1].root0]);
 		const balanceB = Number(bal.decoded.output.balanceReserve[item[1].root1]);
 
-		const fixedA =
-			decimalsRootA === 9 ? balanceA : getFixedNums(decimalsRootA, balanceA);
-		const fixedB =
-			decimalsRootB === 9 ? balanceB : getFixedNums(decimalsRootB, balanceB);
-		console.log("fixedA", fixedA, "fixedB", fixedB);
+		const fixedA =  getFixedNums(decimalsRootA, balanceA);
+		const fixedB =  getFixedNums(decimalsRootB, balanceB);
+		// console.log("fixedA", fixedA, "fixedB", fixedB);
 		let itemData = {};
 		itemData.pairAddress = item[0];
 

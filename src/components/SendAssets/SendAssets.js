@@ -262,14 +262,15 @@ function SendAssets() {
 		dispatch(setShowWaitingSendAssetsPopup(false));
 	}
 	async function get(){
-		const walletAddrByOwner = await getExpectedWalletAddressByOwner(
-			"0:751b6e22687891bdc1706c8d91bf77281237f7453d27dc3106c640ec165a2abf",
-			"0:d771d527e4a49dad13af1a6eff628ddd3eb2512ad9f3481eeb82fb431bd9bfb7",
-		);
-		console.log("walletAddrByOwner",walletAddrByOwner)
-		const det = await getDetailsFromTONtokenWallet2(walletAddrByOwner.name)
-		// 0:59ef9f31c63a783d3e62a9038293dfc6166cecf13197bab1e107de89c324d33c
-		console.log("det",det)
+
+		// const walletAddrByOwner = await getExpectedWalletAddressByOwner(
+		// 	"0:751b6e22687891bdc1706c8d91bf77281237f7453d27dc3106c640ec165a2abf",
+		// 	"0:d771d527e4a49dad13af1a6eff628ddd3eb2512ad9f3481eeb82fb431bd9bfb7",
+		// );
+		// console.log("walletAddrByOwner",walletAddrByOwner)
+		// const det = await getDetailsFromTONtokenWallet2(walletAddrByOwner.name)
+		// // 0:59ef9f31c63a783d3e62a9038293dfc6166cecf13197bab1e107de89c324d33c
+		// console.log("det",det)
 
 
 		// const accType = await getAccType2("0:6b7da6d98817281c83aa5a863372d3efd89b96b6c087275b2b8193d1779e62ee")

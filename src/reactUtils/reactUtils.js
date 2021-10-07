@@ -95,11 +95,23 @@ export function getDecimals(decimals) {
 	return Number(x);
 }
 export function getFixedNums(dec, amount) {
-	let x = 1;
-	for (let i = 0; i < 9 - dec; i++) {
-		x *= 10;
+	if(dec === 9){
+		return amount
+	}else if(dec < 9){
+		let x = 1;
+		for (let i = 0; i < 9 - dec; i++) {
+			x *= 10;
+		}
+		return amount * x;
+	}else if(dec > 9){
+		let x = 1;
+		for (let i = 0; i < dec - 9; i++) {
+			x *= 10;
+		}
+		return amount / x;
 	}
-	return amount * x;
+
+
 }
 export function hex2a(hex) {
 	let str = "";
@@ -127,4 +139,20 @@ export function toHex(input) {
 	let output = '';
 	for (let i = 0; i < input.length; i ++){output += hex(input[i]).toString(16)}
 	return String(output);
+}
+export function getFraction(num){
+	let numStr = num.toString()
+	let shouldBeFact = numStr.match(/0.0/)
+
+	console.log(shouldBeFact)
+	if(!shouldBeFact) return num
+console.log("numStr",numStr)
+		let regNumsSub = numStr.match(/[^0]{4}/)
+
+		let regNumsZeros = numStr.match(/^.*0/)
+
+		console.log("regNumsSub", regNumsSub, "regNumsZeros", regNumsZeros)
+
+		return Number(regNumsZeros[0].concat(regNumsSub[0]))
+
 }

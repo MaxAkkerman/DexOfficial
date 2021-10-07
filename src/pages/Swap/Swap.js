@@ -410,7 +410,7 @@ function Swap() {
 					}
 					footer={
 						<div className="mainblock-footer">
-							<div className="mainblock-footer-wrap">
+							<div className="mainblock-footer-wrap" style={{justifyContent: "space-around"}}>
 								<div className="swap-confirm-wrap">
 									<p className="mainblock-footer-value">
 										{parseFloat(
@@ -425,12 +425,12 @@ function Swap() {
 										Minimum <br /> received
 									</p>
 								</div>
-								<div className="swap-confirm-wrap">
-									<p className="mainblock-footer-value">2.00%</p>
-									<p className="mainblock-footer-subtitle">
-										Price <br /> Impact
-									</p>
-								</div>
+								{/*<div className="swap-confirm-wrap">*/}
+								{/*	<p className="mainblock-footer-value">2.00%</p>*/}
+								{/*	<p className="mainblock-footer-subtitle">*/}
+								{/*		Price <br /> Impact*/}
+								{/*	</p>*/}
+								{/*</div>*/}
 								<div className="swap-confirm-wrap">
 									<p className="mainblock-footer-value">
 										{fromValue && fromValue !== 0
