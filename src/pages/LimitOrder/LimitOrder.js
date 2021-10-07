@@ -5,10 +5,8 @@ import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
 
-import OrderPopupDeploy from "../../components/OrderPopupDeploy/OrderPopupDeploy";
 import OrdersInput from "../../components/OrdersInput/OrdersInput";
 import SwapBtn from "../../components/SwapBtn/SwapBtn";
-import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
 import {
 	connectToPair,
 	connectToPairStep2DeployWallets,
@@ -18,7 +16,11 @@ import {decrypt} from "../../extensions/seedPhrase";
 import {getClientKeys} from "../../extensions/webhook/script";
 import {iconGenerator} from "../../iconGenerator";
 import {showPopup} from "../../store/actions/app";
-import {setOrdersRate} from "../../store/actions/limitOrders";
+import {
+	openOrderDeployPopup,
+	setOrdersRate,
+} from "../../store/actions/limitOrders";
+import getTruncatedNum from "../../utils/getTruncatedNum";
 import MainBlock from "./../../components/MainBlock/MainBlock";
 
 function LimitOrder() {
@@ -79,9 +81,6 @@ function LimitOrder() {
 		}
 	}, [toToken, tokenList, pairId]);
 
-	const [popup, setPopup] = useState(false);
-	const [waitPopup, setWaitPopup] = useState(false);
-
 	function handleConfirm() {
 		if (fromValue > fromToken.balance) {
 			setincorrectBalance(true);
@@ -90,7 +89,19 @@ function LimitOrder() {
 		}
 		if (fromToken.symbol && toToken.symbol && fromValue) {
 			console.log("3453453495834058dgjfjgfdjg");
-			setPopup(true);
+
+			dispatch(
+				openOrderDeployPopup({
+					order: {
+						fromSymbol: fromToken.symbol,
+						toSymbol: toToken.symbol,
+						fromValue,
+						toValue,
+						price: rate,
+						pairId,
+					},
+				}),
+			);
 		} else {
 			dispatch(
 				showPopup({type: "error", message: "Fields should not be empty"}),
@@ -332,8 +343,7 @@ function LimitOrder() {
 									<p className="swap-rate">
 										Price{" "}
 										<span>
-											{parseFloat(rate).toFixed(rate > 0.0001 ? 4 : 6)}{" "}
-											{toToken.symbol}
+											{getTruncatedNum(rate)} {toToken.symbol}
 										</span>{" "}
 										per <span>1 {fromToken.symbol}</span>
 									</p>
@@ -341,26 +351,6 @@ function LimitOrder() {
 							</div>
 						</div>
 					}
-				/>
-			)}
-			{popup && (
-				<OrderPopupDeploy
-					order={{
-						fromSymbol: fromToken.symbol,
-						toSymbol: toToken.symbol,
-						fromValue,
-						toValue,
-						price: rate,
-					}}
-					pairId={pairId}
-					popupStateFn={setPopup}
-					waitPopupStateFn={setWaitPopup}
-				/>
-			)}
-			{waitPopup && (
-				<WaitingPopup
-					text={`Sending message to create limit order with ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`}
-					handleClose={() => setWaitPopup(false)}
 				/>
 			)}
 		</div>

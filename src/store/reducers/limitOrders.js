@@ -1,22 +1,27 @@
 import {
-	SET_ORDERS_FROM_INPUT_VALUE,
-	SET_ORDERS_TO_INPUT_VALUE,
-	SET_ORDERS_FROM_TOKEN,
-	SET_ORDERS_TO_TOKEN,
-	SET_ORDERS_RATE,
-	SET_ORDERS_PAIR_ID,
-	SHOW_ORDERS_FROM_SELECT,
+	ADD_TO_ORDER_LIST,
+	CLOSE_ORDER_CANCEL_POPUP,
+	CLOSE_ORDER_DEPLOY_POPUP,
+	CLOSE_ORDER_UPDATE_POPUP,
+	CLOSE_ORDER_WAIT_POPUP,
 	HIDE_ORDERS_FROM_SELECT,
-	SHOW_ORDERS_TO_SELECT,
 	HIDE_ORDERS_TO_SELECT,
-	SHOW_ORDERS_CONFIRM_POPUP,
-	HIDE_ORDERS_CONFIRM_POPUP,
+	OPEN_ORDER_CANCEL_POPUP,
+	OPEN_ORDER_DEPLOY_POPUP,
+	OPEN_ORDER_UPDATE_POPUP,
+	OPEN_ORDER_WAIT_POPUP,
+	REMOVE_FROM_ORDER_LIST,
 	SET_ORDER_LIST,
-	SET_ORDERS_ASYNC_IS_WAITING,
 	SET_ORDER_LIST_FETCHED,
 	SET_ORDER_LIST_LOADING,
-	ADD_TO_ORDER_LIST,
-	REMOVE_FROM_ORDER_LIST,
+	SET_ORDERS_FROM_INPUT_VALUE,
+	SET_ORDERS_FROM_TOKEN,
+	SET_ORDERS_PAIR_ID,
+	SET_ORDERS_RATE,
+	SET_ORDERS_TO_INPUT_VALUE,
+	SET_ORDERS_TO_TOKEN,
+	SHOW_ORDERS_FROM_SELECT,
+	SHOW_ORDERS_TO_SELECT,
 } from "../actions/types";
 
 const initialState = {
@@ -36,9 +41,15 @@ const initialState = {
 	pairId: "",
 	ordersFromSelectIsVisible: false,
 	ordersToSelectIsVisible: false,
-	ordersAsyncIsWaiting: false,
-	ordersConfirmPopupVisible: false,
 	revertValue: 0,
+	orderPopupCancelVisible: false,
+	orderPopupCancelPayload: null,
+	orderPopupDeployVisible: false,
+	orderPopupDeployPayload: null,
+	orderPopupUpdateVisible: false,
+	orderPopupUpdatePayload: null,
+	orderPopupWaitVisible: false,
+	orderPopupWaitPayload: null,
 	orderList: [],
 	orderListLoading: false,
 	orderListFetched: false,
@@ -96,21 +107,6 @@ const limitOrders = (state = initialState, {type, payload}) => {
 				...state,
 				ordersToSelectIsVisible: false,
 			};
-		case SHOW_ORDERS_CONFIRM_POPUP:
-			return {
-				...state,
-				ordersConfirmPopupVisible: true,
-			};
-		case HIDE_ORDERS_CONFIRM_POPUP:
-			return {
-				...state,
-				ordersConfirmPopupVisible: false,
-			};
-		case SET_ORDERS_ASYNC_IS_WAITING:
-			return {
-				...state,
-				ordersAsyncIsWaiting: payload,
-			};
 		case SET_ORDER_LIST:
 			return {
 				...state,
@@ -135,6 +131,54 @@ const limitOrders = (state = initialState, {type, payload}) => {
 			return {
 				...state,
 				orderListFetched: payload,
+			};
+		case OPEN_ORDER_CANCEL_POPUP:
+			return {
+				...state,
+				orderPopupCancelVisible: true,
+				orderPopupCancelPayload: payload,
+			};
+		case CLOSE_ORDER_CANCEL_POPUP:
+			return {
+				...state,
+				orderPopupCancelVisible: false,
+				orderPopupCancelPayload: null,
+			};
+		case OPEN_ORDER_DEPLOY_POPUP:
+			return {
+				...state,
+				orderPopupDeployVisible: true,
+				orderPopupDeployPayload: payload,
+			};
+		case CLOSE_ORDER_DEPLOY_POPUP:
+			return {
+				...state,
+				orderPopupDeployVisible: false,
+				orderPopupDeployPayload: null,
+			};
+		case OPEN_ORDER_UPDATE_POPUP:
+			return {
+				...state,
+				orderPopupUpdateVisible: true,
+				orderPopupUpdatePayload: payload,
+			};
+		case CLOSE_ORDER_UPDATE_POPUP:
+			return {
+				...state,
+				orderPopupUpdateVisible: false,
+				orderPopupUpdatePayload: null,
+			};
+		case OPEN_ORDER_WAIT_POPUP:
+			return {
+				...state,
+				orderPopupWaitVisible: true,
+				orderPopupWaitPayload: payload,
+			};
+		case CLOSE_ORDER_WAIT_POPUP:
+			return {
+				...state,
+				orderPopupWaitVisible: false,
+				orderPopupWaitPayload: null,
 			};
 		default:
 			return state;

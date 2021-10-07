@@ -1,16 +1,17 @@
+import "./index.scss";
+
+import {StyledEngineProvider} from "@mui/material/styles";
+import {SnackbarProvider} from "notistack";
 import React from "react";
 import ReactDOM from "react-dom";
+import {Provider} from "react-redux";
+import {BrowserRouter} from "react-router-dom";
 import {createStore} from "redux";
 import {composeWithDevTools} from "redux-devtools-extension";
-import rootReducer from "./store/reducers";
-import {BrowserRouter} from "react-router-dom";
-import {Provider} from "react-redux";
-import {SnackbarProvider} from "notistack";
-import {StyledEngineProvider} from "@mui/material/styles";
 
-import Alert from "./components/Alert/Alert";
-import "./index.scss";
 import App from "./App";
+import Alert from "./components/Alert/Alert";
+import rootReducer from "./store/reducers";
 
 export const store = createStore(rootReducer, composeWithDevTools());
 

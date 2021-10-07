@@ -1,29 +1,63 @@
 import {Box, Collapse, Stack, Tooltip, Typography} from "@mui/material";
 import cls from "classnames";
 import {useState} from "react";
+import {useDispatch} from "react-redux";
 
 import {B_A_DIRECTION} from "../../constants/runtimeVariables";
 import {iconGenerator} from "../../iconGenerator";
+import {
+	openOrderCancelPopup,
+	openOrderUpdatePopup,
+} from "../../store/actions/limitOrders";
 import IconCross from "../IconCross/IconCross";
 import IconEdit from "../IconEdit/IconEdit";
-import OrderPopupCancel from "../OrderPopupCancel/OrderPopupCancel";
-import WaitingPopup from "../WaitingPopup/WaitingPopup";
 import classes from "./AssetsListOrderItem.module.scss";
 
-export default function AssetsListOrderItem({order, pair}) {
-	const {amount, price, directionPair, id} = order;
+function AssetsListOrderItem({order, pair}) {
+	const {amount, price, directionPair, id, addrPair} = order;
+
 	let {symbolA, symbolB} = pair;
 
 	if (directionPair === B_A_DIRECTION) [symbolA, symbolB] = [symbolB, symbolA];
 
+	const dispatch = useDispatch();
+
 	const [fold, setFold] = useState(false);
-	const [cancelPopup, setPopup] = useState(false);
-	const [waitPopup, setWaitPopup] = useState(false);
 
 	async function handleCancel(e) {
 		e.stopPropagation();
 
-		setPopup(true);
+		dispatch(
+			openOrderCancelPopup({
+				order: {
+					fromSymbol: symbolA,
+					toSymbol: symbolB,
+					fromValue: amount,
+					toValue: amount * price,
+					price,
+					id,
+					pairId: addrPair,
+				},
+			}),
+		);
+	}
+
+	async function handleUpdate(e) {
+		e.stopPropagation();
+
+		dispatch(
+			openOrderUpdatePopup({
+				order: {
+					fromSymbol: symbolA,
+					toSymbol: symbolB,
+					fromValue: amount,
+					toValue: amount * price,
+					price,
+					id,
+					pairId: addrPair,
+				},
+			}),
+		);
 	}
 
 	return (
@@ -71,7 +105,7 @@ export default function AssetsListOrderItem({order, pair}) {
 								</button>
 							</Tooltip>
 							<Tooltip title="Update order">
-								<button className={classes.btn} color="primary">
+								<button className={classes.btn} onClick={handleUpdate}>
 									<IconEdit
 										className={cls(classes.icon_copy, classes.icon_white)}
 									/>
@@ -92,28 +126,8 @@ export default function AssetsListOrderItem({order, pair}) {
 					</Stack>
 				</Collapse>
 			</Box>
-			{cancelPopup && (
-				<OrderPopupCancel
-					order={{
-						id,
-						fromSymbol: symbolA,
-						toSymbol: symbolB,
-						fromValue: amount,
-						toValue: amount * price,
-						price,
-					}}
-					popupStateFn={setPopup}
-					waitPopupStateFn={setWaitPopup}
-				/>
-			)}
-			{waitPopup && (
-				<WaitingPopup
-					text={`Sending message to cancel limit order with ${amount} ${symbolA} for ${
-						amount * price
-					} ${symbolB}`}
-					handleClose={() => setWaitPopup(false)}
-				/>
-			)}
 		</>
 	);
 }
+
+export default AssetsListOrderItem;

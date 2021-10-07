@@ -1,29 +1,28 @@
-import "./OrderPopupInternal.scss";
+import "./OrderPopupUpdate.scss";
 
 import cls from "classnames";
 import {useSnackbar} from "notistack";
 import React from "react";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 
 import useKeyPair from "../../hooks/useKeyPair";
 import {iconGenerator} from "../../iconGenerator";
 import miniSwap from "../../images/icons/mini-swap.png";
+import {
+	closeOrderCancelPopup,
+	closeOrderWaitPopup,
+	openOrderWaitPopup,
+} from "../../store/actions/limitOrders";
 import getTruncatedNum from "../../utils/getTruncatedNum";
+import makeLimitOrder from "../../utils/makeLimitOrder";
 import IconCross from "../IconCross/IconCross";
 import MainBlock from "../MainBlock/MainBlock";
-import classes from "./OrderPopupInternal.module.scss";
+import classes from "./OrderPopupUpdate.module.scss";
 
-export default function OrderPopupInternal({
-	title,
-	order,
-	contractFn,
-	contractSuccessText,
-	contractFailText,
-	buttonProps = {},
-	popupStateFn,
-	waitPopupStateFn,
-}) {
-	const {fromSymbol, toSymbol, fromValue, toValue, price} = order;
+export default function OrderPopupUpdate({order, close}) {
+	const {fromSymbol, toSymbol, fromValue, toValue, price, pairId} = order;
+
+	const dispatch = useDispatch();
 
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
 
@@ -33,46 +32,52 @@ export default function OrderPopupInternal({
 	const {enqueueSnackbar} = useSnackbar();
 
 	async function handleConfirm() {
-		popupStateFn(false);
-		waitPopupStateFn(true);
+		dispatch(closeOrderCancelPopup());
+		dispatch(
+			openOrderWaitPopup({
+				text: `Sending message to update limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol}`,
+			}),
+		);
 
-		const status = await contractFn({
-			clientAddress: clientData.address,
-			clientKeyPair: keyPair,
-		});
+		const {makeLimitOrderStatus} = await makeLimitOrder(
+			{
+				price,
+				qty: fromValue,
+				tokenSymbol: fromSymbol,
+				pairAddr: pairId,
+			},
+			{
+				clientKeyPair: keyPair,
+				clientAddr: clientData.clientAddress,
+			},
+		);
 
-		if (status)
+		if (makeLimitOrderStatus)
 			enqueueSnackbar({
 				type: "info",
-				message: contractSuccessText,
+				message: `Creating limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol} ⏳`,
 			});
 		else
 			enqueueSnackbar({
 				type: "error",
-				message: contractFailText,
+				message: `Failed creation of limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol}`,
 			});
 
-		waitPopupStateFn(false);
-	}
-
-	function handleClose() {
-		popupStateFn(false);
+		dispatch(closeOrderWaitPopup());
 	}
 
 	return (
 		<div className="popup-wrapper">
 			<MainBlock
 				button={
-					<>
-						<button onClick={handleClose} className={classes.btn}>
-							<IconCross
-								fill="none"
-								className={cls("close", classes.btn__icon)}
-							/>
-						</button>
-					</>
+					<button onClick={close} className={classes.btn}>
+						<IconCross
+							fill="none"
+							className={cls("close", classes.btn__icon)}
+						/>
+					</button>
 				}
-				title={title}
+				title="Update Limit Order"
 				content={
 					<>
 						<div className="confirm-block swap-confirm-block">
@@ -151,11 +156,9 @@ export default function OrderPopupInternal({
 									: parseFloat(toValue.toFixed(4))}
 							</span>
 						</div>
-						<button
-							{...buttonProps}
-							className={cls("btn popup-btn", buttonProps.className)}
-							onClick={handleConfirm}
-						/>
+						<button className="btn popup-btn" onClick={handleConfirm}>
+							Update Order
+						</button>
 					</>
 				}
 				footer={

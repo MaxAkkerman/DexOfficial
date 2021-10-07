@@ -1,20 +1,25 @@
 import {
 	ADD_TO_ORDER_LIST,
-	HIDE_ORDERS_CONFIRM_POPUP,
+	CLOSE_ORDER_CANCEL_POPUP,
+	CLOSE_ORDER_DEPLOY_POPUP,
+	CLOSE_ORDER_UPDATE_POPUP,
+	CLOSE_ORDER_WAIT_POPUP,
 	HIDE_ORDERS_FROM_SELECT,
 	HIDE_ORDERS_TO_SELECT,
+	OPEN_ORDER_CANCEL_POPUP,
+	OPEN_ORDER_DEPLOY_POPUP,
+	OPEN_ORDER_UPDATE_POPUP,
+	OPEN_ORDER_WAIT_POPUP,
 	REMOVE_FROM_ORDER_LIST,
 	SET_ORDER_LIST,
 	SET_ORDER_LIST_FETCHED,
 	SET_ORDER_LIST_LOADING,
-	SET_ORDERS_ASYNC_IS_WAITING,
 	SET_ORDERS_FROM_INPUT_VALUE,
 	SET_ORDERS_FROM_TOKEN,
 	SET_ORDERS_PAIR_ID,
 	SET_ORDERS_RATE,
 	SET_ORDERS_TO_INPUT_VALUE,
 	SET_ORDERS_TO_TOKEN,
-	SHOW_ORDERS_CONFIRM_POPUP,
 	SHOW_ORDERS_FROM_SELECT,
 	SHOW_ORDERS_TO_SELECT,
 } from "./types";
@@ -61,18 +66,6 @@ export function hideOrdersToSelect() {
 	return {type: HIDE_ORDERS_TO_SELECT};
 }
 
-export function showOrdersConfirmPopup() {
-	return {type: SHOW_ORDERS_CONFIRM_POPUP};
-}
-
-export function hideOrdersConfirmPopup() {
-	return {type: HIDE_ORDERS_CONFIRM_POPUP};
-}
-
-export function setOrdersAsyncIsWaiting(payload) {
-	return {type: SET_ORDERS_ASYNC_IS_WAITING, payload};
-}
-
 export function setOrderList(payload) {
 	return {type: SET_ORDER_LIST, payload};
 }
@@ -91,4 +84,36 @@ export function setOrderListLoading(payload) {
 
 export function setOrderListFetched(payload) {
 	return {type: SET_ORDER_LIST_FETCHED, payload};
+}
+
+export function openOrderCancelPopup(payload) {
+	return {type: OPEN_ORDER_CANCEL_POPUP, payload};
+}
+
+export function closeOrderCancelPopup() {
+	return {type: CLOSE_ORDER_CANCEL_POPUP};
+}
+
+export function openOrderDeployPopup(payload) {
+	return {type: OPEN_ORDER_DEPLOY_POPUP, payload};
+}
+
+export function closeOrderDeployPopup() {
+	return {type: CLOSE_ORDER_DEPLOY_POPUP};
+}
+
+export function openOrderUpdatePopup(payload) {
+	return {type: OPEN_ORDER_UPDATE_POPUP, payload};
+}
+
+export function closeOrderUpdatePopup() {
+	return {type: CLOSE_ORDER_UPDATE_POPUP};
+}
+
+export function openOrderWaitPopup(payload) {
+	return {type: OPEN_ORDER_WAIT_POPUP, payload};
+}
+
+export function closeOrderWaitPopup() {
+	return {type: CLOSE_ORDER_WAIT_POPUP};
 }

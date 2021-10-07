@@ -1,12 +1,12 @@
 import "./AssetsList.scss";
+
+import CalculateTimeLeft from "../../hooks/useTimer";
 import TON from "../../images/tonCrystalDefault.svg";
 import {
 	getDurationFromSeconds,
 	getFormattedDate,
 } from "../../reactUtils/getDurationFromSeconds";
 import {calculateRate} from "../../reactUtils/reactUtils";
-
-import CalculateTimeLeft from "../../hooks/useTimer";
 import AssetsListOrderItem from "../AssetsListOrderItem/AssetsListOrderItem";
 
 function AssetsList(props) {
