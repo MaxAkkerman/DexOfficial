@@ -4,15 +4,16 @@ import {useDispatch, useSelector} from "react-redux";
 
 import {LIMIT_ORDER_AMOUNT as LIMIT_ORDER_AMOUNT_DENOMINATOR} from "../constants/denominators";
 import {
-	INVALID_ORDER_DIRECTION as INVALID_ORDER_DIRECTION_ERROR,
-	INVALID_ORDER_STATUS as INVALID_ORDER_STATUS_ERROR,
+	INVALID_ORDER_DIRECTION,
+	INVALID_ORDER_STATUS,
 } from "../constants/runtimeErrorMessages";
 import {
-	A_B_DIRECTION as A_B_DIRECTION_VARIABLE,
-	B_A_DIRECTION as B_A_DIRECTION_VARIABLE,
-	STATUS_CANCEL_ORDER as STATUS_CANCEL_ORDER_VARIABLE,
-	STATUS_DEPLOY_ORDER as STATUS_DEPLOY_ORDER_VARIABLE,
-	STATUS_UPDATE_PRICE_ORDER as STATUS_UPDATE_PRICE_ORDER_VARIABLE,
+	A_B_DIRECTION,
+	B_A_DIRECTION,
+	STATUS_ORDER_CANCEL,
+	STATUS_ORDER_CHANGE_OWNER,
+	STATUS_ORDER_DEPLOY,
+	STATUS_ORDER_UPDATE_PRICE,
 } from "../constants/runtimeVariables";
 import {DEXClientContract} from "../extensions/contracts/DEXClient";
 import client, {decode} from "../extensions/webhook/script";
@@ -73,20 +74,20 @@ export default async function useSubLimitOrders() {
 				let fromSymbol = null;
 				let toSymbol = null;
 
-				if (directionPair === A_B_DIRECTION_VARIABLE) {
+				if (directionPair === A_B_DIRECTION) {
 					fromSymbol = pair.symbolA;
 					toSymbol = pair.symbolB;
-				} else if (directionPair === B_A_DIRECTION_VARIABLE) {
+				} else if (directionPair === B_A_DIRECTION) {
 					fromSymbol = pair.symbolB;
 					toSymbol = pair.symbolA;
 				} else {
-					throw new Error(INVALID_ORDER_DIRECTION_ERROR);
+					throw new Error(INVALID_ORDER_DIRECTION);
 				}
 
 				amount = Number(amount) / LIMIT_ORDER_AMOUNT_DENOMINATOR;
 				price = Number(price);
 
-				if (status === STATUS_DEPLOY_ORDER_VARIABLE)
+				if (status === STATUS_ORDER_DEPLOY) {
 					dispatch(
 						addToOrderList({
 							...decoded.value,
@@ -95,30 +96,33 @@ export default async function useSubLimitOrders() {
 							amount,
 						}),
 					);
-				else if (status === STATUS_CANCEL_ORDER_VARIABLE)
-					dispatch(removeFromOrderList(params.result.src));
-				else if (status === STATUS_UPDATE_PRICE_ORDER_VARIABLE)
-					dispatch(
-						updatePriceFromOrderList({id: params.result.src, newPrice: price}),
-					);
-				else throw new Error(INVALID_ORDER_STATUS_ERROR);
-
-				if (status === STATUS_DEPLOY_ORDER_VARIABLE)
 					enqueueSnackbar({
 						type: "success",
 						message: `Created limit order ${fromSymbol} - ${toSymbol}`,
 					});
-				else if (status === STATUS_CANCEL_ORDER_VARIABLE)
+				} else if (status === STATUS_ORDER_CANCEL) {
+					dispatch(removeFromOrderList(params.result.src));
 					enqueueSnackbar({
 						type: "success",
 						message: `Canceled limit order ${fromSymbol} - ${toSymbol}`,
 					});
-				else if (status === STATUS_UPDATE_PRICE_ORDER_VARIABLE)
+				} else if (status === STATUS_ORDER_UPDATE_PRICE) {
+					dispatch(
+						updatePriceFromOrderList({id: params.result.src, newPrice: price}),
+					);
 					enqueueSnackbar({
 						type: "success",
 						message: `Updated price of limit order ${fromSymbol} - ${toSymbol}`,
 					});
-				else throw new Error(INVALID_ORDER_STATUS_ERROR);
+				} else if (status === STATUS_ORDER_CHANGE_OWNER) {
+					dispatch(removeFromOrderList(params.result.src));
+					enqueueSnackbar({
+						type: "success",
+						message: `Updated owner of limit order ${fromSymbol} - ${toSymbol}`,
+					});
+				} else {
+					throw new Error(INVALID_ORDER_STATUS);
+				}
 			},
 		);
 

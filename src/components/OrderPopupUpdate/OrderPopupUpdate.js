@@ -1,10 +1,17 @@
 import "./OrderPopupUpdate.scss";
 
+import {FormHelperText} from "@mui/material";
 import cls from "classnames";
+import {useFormik} from "formik";
 import {useSnackbar} from "notistack";
-import React, {useState} from "react";
+import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 
+import {
+	ADDRESS_INCORRECT_LENGTH,
+	NOT_POSITIVE,
+	NOT_TOUCHED,
+} from "../../constants/validationMessages";
 import useKeyPair from "../../hooks/useKeyPair";
 import {iconGenerator} from "../../iconGenerator";
 import miniSwap from "../../images/icons/mini-swap.png";
@@ -13,6 +20,7 @@ import {
 	closeOrderWaitPopup,
 	openOrderWaitPopup,
 } from "../../store/actions/limitOrders";
+import transferLimitOrder from "../../utils/transferLimitOrder";
 import truncateNum from "../../utils/truncateNum";
 import updateLimitOrderPrice from "../../utils/updateLimitOrderPrice";
 import IconCross from "../IconCross/IconCross";
@@ -29,38 +37,84 @@ export default function OrderPopupUpdate({order, close}) {
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 	const {keyPair} = useKeyPair();
 
-	const [newPrice, setNewPrice] = useState(order.price);
+	const {
+		values,
+		handleChange,
+		handleBlur,
+		isValid: valid,
+		dirty,
+		errors,
+	} = useFormik({
+		initialValues: {
+			newPrice: price,
+			newAddress: clientData.address,
+		},
+		validate({newAddress, newPrice}) {
+			const errors = {};
+
+			if (newPrice <= 0) errors.newPrice = NOT_POSITIVE;
+			else if (newAddress.length !== 66)
+				errors.newAddress = ADDRESS_INCORRECT_LENGTH;
+
+			return errors;
+		},
+	});
 
 	const {enqueueSnackbar} = useSnackbar();
 
 	async function handleConfirm() {
+		if (!valid || !dirty) return;
+
 		dispatch(closeOrderUpdatePopup());
 		dispatch(
 			openOrderWaitPopup({
-				text: `Sending message to update price of limit order ${fromSymbol} - ${toSymbol}`,
+				text: `Sending message to update limit order ${fromSymbol} - ${toSymbol}`,
 			}),
 		);
 
-		const {changePriceStatus} = await updateLimitOrderPrice(
-			{
-				id,
-				newPrice,
-			},
-			{
-				clientKeyPair: keyPair,
-				clientAddress: clientData.address,
-			},
-		);
+		const status = [];
 
-		if (changePriceStatus)
+		if (values.newPrice !== price) {
+			const {changePriceStatus} = await updateLimitOrderPrice(
+				{
+					id,
+					newPrice: values.price,
+				},
+				{
+					clientKeyPair: keyPair,
+					clientAddress: clientData.address,
+				},
+			);
+
+			status.push(changePriceStatus);
+		}
+
+		if (values.newAddress !== clientData.address) {
+			const {transferLimitOrderStatus} = await transferLimitOrder(
+				{
+					id,
+					fromSymbol,
+					toSymbol,
+					newOwnerAddress: values.newAddress,
+				},
+				{
+					clientKeyPair: keyPair,
+					clientAddress: clientData.address,
+				},
+			);
+
+			status.push(transferLimitOrderStatus);
+		}
+
+		if (status.every((s) => s))
 			enqueueSnackbar({
 				type: "info",
-				message: `Updating price of limit order ${fromSymbol} - ${toSymbol} ⏳`,
+				message: `Updating limit order ${fromSymbol} - ${toSymbol} ⏳`,
 			});
 		else
 			enqueueSnackbar({
 				type: "error",
-				message: `Failed price update of limit order ${fromSymbol} - ${toSymbol}`,
+				message: `Failed to update limit order ${fromSymbol} - ${toSymbol}`,
 			});
 
 		dispatch(closeOrderWaitPopup());
@@ -154,16 +208,20 @@ export default function OrderPopupUpdate({order, close}) {
 								{truncateNum(toValue)}
 							</span>
 						</div>
-
 						<div
-							className="recipient_wrapper"
+							className={cls(
+								"recipient_wrapper",
+								errors.newPrice && "amount_wrapper_error",
+							)}
 							style={{height: 100, padding: 15, marginTop: 25}}
 						>
 							<div className="send_text_headers">New price</div>
 							<div className="send_inputs">
 								<input
-									onChange={(e) => setNewPrice(e.target.value)}
-									value={newPrice}
+									onChange={handleChange}
+									onBlur={handleBlur}
+									value={values.newPrice}
+									name="newPrice"
 									className="recipient_input"
 									placeholder="0"
 									style={{marginTop: 0}}
@@ -171,9 +229,42 @@ export default function OrderPopupUpdate({order, close}) {
 								/>
 							</div>
 						</div>
-						<button className="btn popup-btn" onClick={handleConfirm}>
+						{errors.newPrice && (
+							<FormHelperText error>{errors.newPrice}</FormHelperText>
+						)}
+						<div
+							className={cls(
+								"recipient_wrapper",
+								errors.newAddress && "amount_wrapper_error",
+							)}
+							style={{height: 100, padding: 15, marginTop: 25}}
+						>
+							<div className="send_text_headers">New owner</div>
+							<div className="send_inputs">
+								<input
+									onChange={handleChange}
+									onBlur={handleBlur}
+									value={values.newAddress}
+									name="newAddress"
+									className="recipient_input"
+									placeholder="0:..."
+									style={{marginTop: 0}}
+								/>
+							</div>
+						</div>
+						{errors.newAddress && (
+							<FormHelperText error>{errors.newAddress}</FormHelperText>
+						)}
+						<button
+							className={cls(
+								"btn popup-btn",
+								(!dirty || !valid) && "btn--disabled",
+							)}
+							onClick={handleConfirm}
+						>
 							Update Order
 						</button>
+						{!dirty && <FormHelperText>{NOT_TOUCHED}</FormHelperText>}
 					</>
 				}
 				footer={
