@@ -1,11 +1,12 @@
 import {Account} from "@tonclient/appkit";
 import {signerKeys} from "@tonclient/core";
-import {LimitOrderRootContract} from "../extensions/contracts/LimitOrderRoot";
-import {LimitOrderContract} from "../extensions/contracts/LimitOrder";
-import client from "../extensions/webhook/script";
-import {LIMIT_ORDER_AMOUNT} from "../constants/denominators";
 
-export default async function fetchLimitOrders() {
+import {LIMIT_ORDER_AMOUNT} from "../constants/denominators";
+import {LimitOrderContract} from "../extensions/contracts/LimitOrder";
+import {LimitOrderRootContract} from "../extensions/contracts/LimitOrderRoot";
+import client from "../extensions/webhook/script";
+
+export default async function fetchLimitOrders({clientAddress}) {
 	const rootAcc = new Account(LimitOrderRootContract, {
 		address: process.env.LIMIT_ROOT_ADDRESS,
 		signer: signerKeys({
@@ -41,12 +42,13 @@ export default async function fetchLimitOrders() {
 
 		const res = await orderAcc.runLocal("getInfo", {});
 
-		orders.push({
-			...res.decoded.output,
-			id,
-			price: Number(res.decoded.output.price),
-			amount: Number(res.decoded.output.amount) / LIMIT_ORDER_AMOUNT,
-		});
+		if (clientAddress === res.decoded.output.addrOwner)
+			orders.push({
+				...res.decoded.output,
+				id,
+				price: Number(res.decoded.output.price),
+				amount: Number(res.decoded.output.amount) / LIMIT_ORDER_AMOUNT,
+			});
 	}
 	console.log("orders", orders);
 	return orders;

@@ -1,23 +1,20 @@
-import React, {useState, useEffect} from "react";
-import {useHistory} from "react-router-dom";
-import MainBlock from "../../components/MainBlock/MainBlock";
 import "./Assets.scss";
-import sendAssetsimg from "../../images/sendAssets.svg";
-import receiveAssets from "../../images/receiveAssets.svg";
-import goToExchange from "../../images/goToExchange.svg";
-import settingsBtn from "../../images/Vector.svg";
-import nativeBtn from "../../images/nativeadd.svg";
-import AssetsList from "../../components/AssetsList/AssetsList";
 
+import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {showTip} from "../../store/actions/app";
-import useTokensList from "../../hooks/useAssetList";
-import {setTokenList} from "../../store/actions/wallet";
+import {useHistory} from "react-router-dom";
 
-import fetchLimitOrders from "../../utils/fetchLimitOrders";
-
-import {setOrderList} from "../../store/actions/limitOrders";
+import AssetsList from "../../components/AssetsList/AssetsList";
+import MainBlock from "../../components/MainBlock/MainBlock";
 import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
+import useTokensList from "../../hooks/useAssetList";
+import goToExchange from "../../images/goToExchange.svg";
+import nativeBtn from "../../images/nativeadd.svg";
+import receiveAssets from "../../images/receiveAssets.svg";
+import sendAssetsimg from "../../images/sendAssets.svg";
+import settingsBtn from "../../images/Vector.svg";
+import {showTip} from "../../store/actions/app";
+import {setTokenList} from "../../store/actions/wallet";
 // import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 
 function Assets() {
@@ -35,11 +32,6 @@ function Assets() {
 		(state) => state.walletReducer.liquidityList,
 	);
 	const pairList = useSelector((state) => state.walletReducer.pairsList);
-
-	useEffect(async () => {
-		const orders = await fetchLimitOrders();
-		dispatch(setOrderList(orders));
-	}, []);
 
 	useEffect(() => {
 		setAssets(NFTassets);
