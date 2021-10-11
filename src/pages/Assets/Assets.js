@@ -32,6 +32,8 @@ function Assets() {
 		(state) => state.walletReducer.liquidityList,
 	);
 
+	const pairList = useSelector((state) => state.walletReducer.pairsList);
+
 	useEffect(() => {
 		// const pureNFT = [
 		// 	{
@@ -265,6 +267,7 @@ function Assets() {
 											<AssetsList
 												TokenAssetsArray={[...tokensList, ...liquidityList]}
 												orderAssetsArray={orderList}
+												pairList={pairList}
 												NFTassetsArray={assets}
 												handleClickNFT={(item) => handleShowNFTData(item)}
 												// showNFTdata={showNFTdata}

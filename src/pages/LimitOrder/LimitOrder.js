@@ -187,7 +187,12 @@ function LimitOrder() {
 	}
 
 	function getCurBtn() {
-		if (curExist && fromToken.symbol && toToken.symbol) {
+		if (
+			curExist &&
+			fromToken.symbol &&
+			toToken.symbol &&
+			!notDeployedWallets.length
+		) {
 			return (
 				<button
 					className={
