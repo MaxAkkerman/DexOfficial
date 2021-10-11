@@ -41,7 +41,7 @@ function LiquidityItem({symbol, balance}) {
 		symbols.map(item=> {
 
 			console.log("itemm",item)
-			if(item === "DS-WTON"){
+			if(item.includes("DS-")){
 
 				curSymbolPair.push(item.replaceAll("DS-", ""))
 			}else{
