@@ -15,7 +15,7 @@ import {
 	STATUS_ORDER_DEPLOY,
 	STATUS_ORDER_UPDATE_PRICE,
 } from "../constants/runtimeVariables";
-import {DEXClientContract} from "../extensions/contracts/DEXClient";
+import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
 import client, {decode} from "../extensions/webhook/script";
 import {
 	addToOrderList,

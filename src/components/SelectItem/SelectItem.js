@@ -37,7 +37,7 @@ function SelectItem(props) {
 	const walletIsConnected = useSelector(
 		(state) => state.appReducer.walletIsConnected,
 	);
-
+	console.log("assets list",props)
 	const swapFromToken = useSelector((state) => state.swapReducer.fromToken);
 	const swapToToken = useSelector((state) => state.swapReducer.toToken);
 	const poolFromToken = useSelector((state) => state.poolReducer.fromToken);

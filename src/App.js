@@ -28,6 +28,7 @@ import useSubLimitOrders from "./hooks/useSubLimitOrders";
 import Account from "./pages/Account/Account";
 import AddLiquidity from "./pages/AddLiquidity/AddLiquidity";
 import Assets from "./pages/Assets/Assets";
+import CreatePair from "./pages/CreatePair/CreatePair";
 import LimitOrder from "./pages/LimitOrder/LimitOrder";
 import Manage from "./pages/Manage/Manage";
 import Pool from "./pages/Pool/Pool";
@@ -347,7 +348,7 @@ function App() {
 	useEffect(async () => {
 		// setLoadingRoots(true)
 		const addrArray = await getAssetsForDeploy();
-		console.log("addrArray", addrArray);
+		// console.log("addrArray", addrArray);
 		dispatch(setAssetsFromGraphQL(addrArray));
 		// setLoadingRoots(true)
 	}, []);
@@ -370,7 +371,7 @@ function App() {
 				<Route exact path="/swap" component={Swap} />
 				<Route exact path="/manage" component={Manage} />
 				<Route exact path="/add-liquidity" component={AddLiquidity} />
-
+				<Route exact path="/create-pair" component={CreatePair} />
 				<Route exact path="/staking" component={Stacking} />
 				<Route exact path="/wallet" component={Assets} />
 				<Route exact path="/orders" component={LimitOrder} />

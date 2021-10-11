@@ -6,6 +6,7 @@ import {useHistory} from "react-router-dom";
 
 import AssetsList from "../../components/AssetsList/AssetsList";
 import MainBlock from "../../components/MainBlock/MainBlock";
+import WithDraw from "../../components/WithDraw/WithDraw";
 import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
 import useTokensList from "../../hooks/useAssetList";
 import goToExchange from "../../images/goToExchange.svg";
@@ -13,7 +14,6 @@ import nativeBtn from "../../images/nativeadd.svg";
 import receiveAssets from "../../images/receiveAssets.svg";
 import sendAssetsimg from "../../images/sendAssets.svg";
 import settingsBtn from "../../images/Vector.svg";
-import {showTip} from "../../store/actions/app";
 import {setTokenList} from "../../store/actions/wallet";
 // import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 
@@ -31,9 +31,29 @@ function Assets() {
 	const liquidityList = useSelector(
 		(state) => state.walletReducer.liquidityList,
 	);
-	const pairList = useSelector((state) => state.walletReducer.pairsList);
 
 	useEffect(() => {
+		// const pureNFT = [
+		// 	{
+		// 		walletAddress:
+		// 			"0:e0b0495751895edc29c5e453f122f25fffebd2bf21c0a0c3d8e98a8ae7b87e3a",
+		// 		type:"Ordinary",
+		// 		balance: 0,
+		// 		stakeTotal: 10000000000,
+		// 		icon: salary,
+		// 		symbol: "DP",
+		// 		owner_address: "default",
+		// 		details:{
+		// 			periodLockStake:10000000,
+		// 			apyLockStake:0,
+		// 			timeStartLockStake:10,
+		// 		}
+		//
+		//
+		//
+		// 	},
+		// ];
+		// setAssets(pureNFT);
 		setAssets(NFTassets);
 	}, [NFTassets]);
 
@@ -116,39 +136,41 @@ function Assets() {
 		// const unWrapTonsRes = await unWrapTons(clientData.address,keyPair,1000000000)
 		// console.log("unWrapTonsRes",unWrapTonsRes)
 	}
-	// const [TONdataWallet,setTONdatawalet] = useState({})
-	//     useEffect(() => {
-	//         const TONdata = {
-	//             walletAddress: clientData.address,
-	//             symbol: "TON Crystal",
-	//             tokenName: "TON Crystal",
-	//             type: "Native Tons",
-	//             icon: TONicon,
-	//             rootAddress: "none",
-	//             showWrapMenu: false,
-	//             balance: clientData.balance
-	//         };
-	//         // const withNative = JSON.parse(JSON.stringify(tokenList));
-	//
-	//         setTONdatawalet(TONdata)
-	//
-	//
-	//
-	//     }, []);
+
+	const [showWithdrawMenu, setshowWithdrawMenu] = useState(false);
+	const [curNFTForWithdraw, setCurNFTForWithdraw] = useState(false);
+	function handleWithdraw(item) {
+		setshowWithdrawMenu(true);
+		setshowWrapMenu(false);
+		setCurNFTForWithdraw(item);
+		console.log("item", item);
+	}
+
 	const {assetList: tokensList} = useTokensList();
 	return (
 		<>
-			{showWrapMenu ? (
+			{showWrapMenu && !showWithdrawMenu && (
 				<WrapUnwrap
 					currentTokenForWrap={currentTokenForWrap}
 					confirmText={viewData.confirmText}
 					tokenSetted={viewData.tokenSetted}
 					title={viewData.title}
-					handleShow={() => setshowWrapMenu()}
+					handleShow={() => setshowWrapMenu(false)}
 					transactionType={viewData.type}
 				/>
-			) : (
-				<div className="container" onClick={() => dispatch(showTip())}>
+			)}
+			{!showWrapMenu && showWithdrawMenu && (
+				<WithDraw
+					curNFTForWithdraw={curNFTForWithdraw}
+					confirmText={viewData.confirmText}
+					// tokenSetted={viewData.tokenSetted}
+					title={viewData.title}
+					handleShow={() => setshowWithdrawMenu(false)}
+					transactionType={viewData.type}
+				/>
+			)}
+			{!showWrapMenu && !showWithdrawMenu && (
+				<div className="container">
 					<MainBlock
 						smallTitle={false}
 						// title={'Assets'}
@@ -243,7 +265,6 @@ function Assets() {
 											<AssetsList
 												TokenAssetsArray={[...tokensList, ...liquidityList]}
 												orderAssetsArray={orderList}
-												pairList={pairList}
 												NFTassetsArray={assets}
 												handleClickNFT={(item) => handleShowNFTData(item)}
 												// showNFTdata={showNFTdata}
@@ -251,6 +272,7 @@ function Assets() {
 												handleClickToken={(item) => handleClickToken(item)}
 												wrapTons={() => handleWrapTons()}
 												unWrapTons={() => handleUnWrapTons()}
+												handleWithdraw={(item) => handleWithdraw(item)}
 											/>
 										) : (
 											<div className="assets_loader_wrapper">

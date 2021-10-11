@@ -12,8 +12,7 @@ import {
 	connectToPairStep2DeployWallets,
 	getClientForConnect,
 } from "../../extensions/sdk/run";
-import {decrypt} from "../../extensions/seedPhrase";
-import {getClientKeys} from "../../extensions/webhook/script";
+import useKeyPair from "../../hooks/useKeyPair";
 import {iconGenerator} from "../../iconGenerator";
 import {showPopup} from "../../store/actions/app";
 import {
@@ -45,13 +44,8 @@ function LimitOrder() {
 		(state) => state.limitOrders.ordersAsyncIsWaiting,
 	);
 
-	const encryptedSeedPhrase = useSelector(
-		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
-	);
 	const clientData = useSelector((state) => state.walletReducer.clientData);
-	const seedPhrasePassword = useSelector(
-		(state) => state.enterSeedPhrase.seedPhrasePassword,
-	);
+
 	const [connectAsyncIsWaiting, setconnectAsyncIsWaiting] = useState(false);
 	const [curExist, setExistsPair] = useState(false);
 	const [notDeployedWallets, setNotDeployedWallets] = useState([]);
@@ -108,15 +102,16 @@ function LimitOrder() {
 			);
 		}
 	}
+	const {keyPair} = useKeyPair();
 
 	async function handleConnectPair() {
-		let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
-		const keys = await getClientKeys(decrypted.phrase);
+		// let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
+		// const keys = await getClientKeys(decrypted.phrase);
 
 		setconnectAsyncIsWaiting(true);
 		setconnectPairStatusText("getting data from pair.");
 
-		let connectRes = await connectToPair(pairId, keys);
+		let connectRes = await connectToPair(pairId, keyPair);
 
 		if (
 			!connectRes ||
@@ -143,7 +138,7 @@ function LimitOrder() {
 				);
 				let connectToRootsStatus = await connectToPairStep2DeployWallets(
 					getClientForConnectStatus,
-					keys,
+					keyPair,
 				);
 				console.log("connectToRootsStatus", connectToRootsStatus);
 				if (connectToRootsStatus.code) {

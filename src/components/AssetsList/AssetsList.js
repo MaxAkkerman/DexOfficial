@@ -119,13 +119,12 @@ function AssetsList(props) {
 			))}
 			{props.NFTassetsArray &&
 				props.NFTassetsArray.map((item) => (
-					<div
-						className="assets_item_wrapper"
-						onClick={() => props.handleClickNFT(item)}
-						key={item._safeLockStake}
-					>
+					<div className="assets_item_wrapper" key={item._safeLockStake}>
 						<div className="NFT_item">
-							<div className="NFT_item_header">
+							<div
+								className="NFT_item_header"
+								onClick={() => props.handleClickNFT(item)}
+							>
 								<div style={{display: "flex", alignItems: "flex-start"}}>
 									<div className="assetList_item_icon">
 										<img
@@ -142,114 +141,169 @@ function AssetsList(props) {
 								<div>{Number(item.stakeTotal / 1e9).toFixed(4)}</div>
 							</div>
 							{item.showNftData && (
-								<div className="NFT_additional_data">
+								<div
+									className="NFT_additional_data"
+									style={{flexDirection: "column"}}
+								>
+									<div>
+										<div
+											className="NFT_additional_block"
+											style={{
+												marginLeft: "70px",
+												fontSize: "16px",
+												flexShrink: "0",
+											}}
+										>
+											<div style={{width: "80%"}}>
+												<div className="swap-confirm-wrap">
+													<p className="mainblock-footer-value">{item.type}</p>
+													<p className="mainblock-footer-subtitle">Type</p>
+												</div>
+												<div className="swap-confirm-wrap">
+													<p className="mainblock-footer-value">
+														{item.details.apyLockStake / 100}%
+													</p>
+													<p className="mainblock-footer-subtitle">APY</p>
+												</div>
+												<div className="swap-confirm-wrap">
+													<p className="mainblock-footer-value">
+														{getDurationFromSeconds(
+															item.details.periodLockStake,
+															"days",
+														).toFixed()}{" "}
+														days
+													</p>
+													<p className="mainblock-footer-subtitle">Period</p>
+												</div>
+											</div>
+											<div style={{width: "100%"}}>
+												<div className="swap-confirm-wrap">
+													<p className="mainblock-footer-value">
+														{formatDate(
+															Number(item.details.timeStartLockStake),
+														)}
+													</p>
+													<p className="mainblock-footer-subtitle">
+														Start time
+													</p>
+												</div>
+
+												<div className="swap-confirm-wrap">
+													<p className="mainblock-footer-value">
+														{formatDate(
+															Number(item.details.timeStartLockStake) +
+																Number(item.details.periodLockStake),
+														)}
+													</p>
+													<p className="mainblock-footer-subtitle">End Time</p>
+												</div>
+
+												<div className="swap-confirm-wrap">
+													<p
+														className="mainblock-footer-value"
+														style={{width: "215px"}}
+													>
+														{
+															<CalculateTimeLeft
+																date={
+																	new Date(
+																		(Number(item.details.timeStartLockStake) +
+																			Number(item.details.periodLockStake)) *
+																			1000,
+																	)
+																}
+															/>
+														}
+													</p>
+													<p className="mainblock-footer-subtitle">Estimate</p>
+												</div>
+											</div>
+											<div style={{width: "100%"}}>
+												<div className="swap-confirm-wrap">
+													<p className="mainblock-footer-value fixFlex">
+														<img
+															style={{marginRight: "5px", width: "20px"}}
+															src={TON}
+															alt={"Ton Crystal"}
+														/>{" "}
+														{Number(item.stakeTotal) / 1000000000}
+													</p>
+													<p className="mainblock-footer-subtitle">Stake</p>
+												</div>
+												<div className="swap-confirm-wrap">
+													<p className="mainblock-footer-value fixFlex">
+														<img
+															style={{marginRight: "5px", width: "20px"}}
+															src={TON}
+															alt={"Ton Crystal"}
+														/>{" "}
+														{(
+															(calculateRate(
+																item.stakeTotal,
+																item.details.apyLockStake / 100,
+																item.details.periodLockStake /
+																	30 /
+																	60 /
+																	60 /
+																	24,
+															) -
+																Number(item.stakeTotal)) /
+															1000000000
+														).toFixed(4)}
+													</p>
+													<p className="mainblock-footer-subtitle">Profit</p>
+												</div>
+												<div className="swap-confirm-wrap">
+													<p className="mainblock-footer-value fixFlex">
+														<img
+															style={{marginRight: "5px", width: "20px"}}
+															src={TON}
+															alt={"Ton Crystal"}
+														/>{" "}
+														{(
+															calculateRate(
+																item.stakeTotal,
+																item.details.apyLockStake / 100,
+																item.details.periodLockStake /
+																	30 /
+																	60 /
+																	60 /
+																	24,
+															) / 1000000000
+														).toFixed(4)}
+													</p>
+													<p className="mainblock-footer-subtitle">
+														Total income
+													</p>
+												</div>
+											</div>
+										</div>
+									</div>
 									<div
-										className="NFT_additional_block"
-										style={{marginLeft: "50px"}}
+										style={{
+											width: "100%",
+											// marginLeft:"20px",
+											display: "flex",
+											justifyContent: "end",
+										}}
 									>
-										<div>
-											<div className="swap-confirm-wrap">
-												<p className="mainblock-footer-value">
-													{item.details.apyLockStake / 100}%
-												</p>
-												<p className="mainblock-footer-subtitle">APY</p>
-											</div>
-											<div className="swap-confirm-wrap">
-												<p className="mainblock-footer-value">
-													{getDurationFromSeconds(
-														item.details.periodLockStake,
-														"days",
-													)}{" "}
-													days
-												</p>
-												<p className="mainblock-footer-subtitle">Period</p>
-											</div>
-											<div className="swap-confirm-wrap">
-												<p className="mainblock-footer-value">
-													{formatDate(Number(item.details.timeStartLockStake))}
-												</p>
-												<p className="mainblock-footer-subtitle">Start time</p>
-											</div>
-											<div className="swap-confirm-wrap">
-												<p className="mainblock-footer-value">
-													{formatDate(
-														Number(item.details.timeStartLockStake) +
-															Number(item.details.periodLockStake),
-													)}
-												</p>
-												<p className="mainblock-footer-subtitle">End Time</p>
-											</div>
-										</div>
-										<div>
-											<div className="swap-confirm-wrap">
-												<p className="mainblock-footer-value fixFlex">
-													<img
-														style={{marginRight: "5px"}}
-														src={TON}
-														alt={"Ton Crystal"}
-													/>{" "}
-													{Number(item.stakeTotal) / 1000000000}
-												</p>
-												<p className="mainblock-footer-subtitle">Stake</p>
-											</div>
-											<div className="swap-confirm-wrap">
-												<p className="mainblock-footer-value fixFlex">
-													<img
-														style={{marginRight: "5px"}}
-														src={TON}
-														alt={"Ton Crystal"}
-													/>{" "}
-													{(
-														(calculateRate(
-															item.stakeTotal,
-															item.details.apyLockStake / 100,
-															item.details.periodLockStake / 30 / 60 / 60 / 24,
-														) -
-															Number(item.stakeTotal)) /
-														1000000000
-													).toFixed(4)}
-												</p>
-												<p className="mainblock-footer-subtitle">Profit</p>
-											</div>
-											<div className="swap-confirm-wrap">
-												<p className="mainblock-footer-value fixFlex">
-													<img
-														style={{marginRight: "5px"}}
-														src={TON}
-														alt={"Ton Crystal"}
-													/>{" "}
-													{(
-														calculateRate(
-															item.stakeTotal,
-															item.details.apyLockStake / 100,
-															item.details.periodLockStake / 30 / 60 / 60 / 24,
-														) / 1000000000
-													).toFixed(4)}
-												</p>
-												<p className="mainblock-footer-subtitle">
-													Total income
-												</p>
-											</div>
-											<div className="swap-confirm-wrap">
-												<p
-													className="mainblock-footer-value"
-													style={{width: "200px"}}
-												>
-													{
-														<CalculateTimeLeft
-															date={
-																new Date(
-																	(Number(item.details.timeStartLockStake) +
-																		Number(item.details.periodLockStake)) *
-																		1000,
-																)
-															}
-														/>
-													}
-												</p>
-												<p className="mainblock-footer-subtitle">Estimate</p>
-											</div>
-										</div>
+										<button
+											className="settings_btn"
+											style={{
+												width: "110px",
+												height: "63px",
+												color: "white",
+												fontSize: "20px",
+												marginTop: "20px",
+											}}
+											onClick={
+												props.handleWithdraw
+													? () => props.handleWithdraw(item)
+													: null
+											}
+										>
+											Withdraw
+										</button>
 									</div>
 								</div>
 							)}

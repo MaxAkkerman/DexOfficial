@@ -1,3 +1,10 @@
+.fixPositionCreatePairModal{
+	margin-top:200px;
+	height:fit-content;
+
+}
+
+
 .head_wrapper {
 	display: flex;
 	justify-content: space-between;
@@ -43,7 +50,7 @@
 	transform: scale(0.7);
 	//height:inherit;
 	&.wrapUnwrap {
-		width: 50%;
+		width: 110px;
 		height: 63px;
 		color: white;
 		font-size: 20px;
