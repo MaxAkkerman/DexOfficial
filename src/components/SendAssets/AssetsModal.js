@@ -26,51 +26,8 @@ function AssetsModal() {
 		(state) => state.walletReducer.liquidityList,
 	);
 
-	// <<<<<<< HEAD
-	//     const [tokensWithNativeTons, settokensWithNativeTons] = useState([])
-	//     useEffect(() => {
-	//         const TONdata = {
-	//             walletAddress: clientData.address,
-	//             symbol: "TON Crystal",
-	//             tokenName: "TON Crystal",
-	//             type: "TON Crystal",
-	//             icon: TONicon,
-	//             rootAddress: "none",
-	//             balance: clientData.balance,
-	//         }
-	//         const withNative = JSON.parse(JSON.stringify(tokenList))
-	//         withNative.push(TONdata)
-	//         settokensWithNativeTons(withNative)
-	//
-	//
-	//     }, [])
-	//     useEffect(() => {
-	//         console.log("i was here")
-	//         const TONdata = {
-	//             walletAddress: clientData.address,
-	//             symbol: "TON Crystal",
-	//             tokenName: "TON Crystal",
-	//             type: "TON Crystal",
-	//             icon: TONicon,
-	//             rootAddress: "none",
-	//             balance: clientData.balance,
-	//         }
-	//         const withNative = JSON.parse(JSON.stringify(tokenList))
-	//         withNative.push(TONdata)
-	//         settokensWithNativeTons(withNative)
-	//
-	// =======
 	const {assetList} = useAssetList();
 
-	// >>>>>>> origin/liketurbo
-
-	// }, [clientData, tokenList])
-	// const [assetsArr,setAssetsArr] = useState([])
-	// useEffect(()=>{
-	//     const arr = [...tokenList, ...liquidityList,...NFTassets]
-	//     setAssetsArr(arr)
-	//
-	// },[])
 	function handleClear() {
 		dispatch(setInputNFTDisabled(null));
 		// dispatch(setAmountForSend(0))

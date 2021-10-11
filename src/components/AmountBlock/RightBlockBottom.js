@@ -39,7 +39,7 @@ function RightBlockBottom(props) {
 							props.enableMax
 						)}
 						<SetTokenBlock
-							handleTouchTokenModal={() => handleTouchTokenModal()}
+							handleTouchTokenModal={props.showAssetsList ? props.showAssetsList() : () => handleTouchTokenModal()}
 							// img={TON}
 							currentToken={currentTokenForSend}
 						/>
@@ -48,7 +48,7 @@ function RightBlockBottom(props) {
 			) : (
 				<div className="send_select_wrap">
 					<SelectTokenMenu
-						handleTouchTokenModal2={() => handleTouchTokenModal2()}
+						handleTouchTokenModal2={props.showAssetsList ? props.showAssetsList() : () => handleTouchTokenModal2()}
 					/>
 				</div>
 			)}

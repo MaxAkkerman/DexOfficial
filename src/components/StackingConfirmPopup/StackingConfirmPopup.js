@@ -37,11 +37,14 @@ function StackingConfirmPopup(props) {
 		props.handleClose();
 		dispatch(setShowStakingWaitingPopup(true));
 		let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
+
+		const periodThis = periodForStacking === 86400 ? 0 : periodForStacking;
+
 		const stakeRes = await stakeToDePool(
 			curExt,
 			decrypted.phrase,
 			amountForStacking,
-			periodForStacking,
+			periodThis,
 			apyForLockStake,
 		);
 		props.handleDrop();
@@ -158,11 +161,15 @@ function StackingConfirmPopup(props) {
 							<span className="confirm-value" style={{fontSize: "24px"}}>
 								{props.period === 12 || props.period === 48
 									? props.programName
-									: `${props.period} months`}
+									: `${
+											props.period === 1 / 30
+												? "1 day"
+												: `${props.period} months`
+									  }`}
 							</span>
 						</div>
 						<div style={{marginLeft: "14px"}}>
-							Processing fee <strong>3 TONs</strong>, change will revert.
+							Processing fee <strong>4 TONs</strong>, change will revert.
 							<br />
 							<br />
 							After staking into this deposit program you will receive a TrueNFT
@@ -180,7 +187,9 @@ function StackingConfirmPopup(props) {
 							<div>
 								<div className="swap-confirm-wrap">
 									<p className="mainblock-footer-value">
-										{props.period} months
+										{props.period === 1 / 30
+											? "On demand"
+											: `${props.period} months`}
 									</p>
 									<p className="mainblock-footer-subtitle">Program duration</p>
 								</div>

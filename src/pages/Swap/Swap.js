@@ -29,6 +29,7 @@ import {decrypt} from "../../extensions/seedPhrase";
 import settingsBtn from "../../images/Vector.svg";
 import SlippagePopper from "../../components/SlippagePopper/SlippagePopper";
 import useSlippagePopper from "../../hooks/useSlippagePopper";
+import useKeyPair from "../../hooks/useKeyPair";
 import {
 	NOT_ENOUGH,
 	NOT_ENOUGH as NOT_ENOUGH_MSG,
@@ -41,6 +42,7 @@ import {
 } from "../../constants/commissions";
 import useAssetList from "../../hooks/useAssetList";
 import {FormHelperText} from "@mui/material";
+
 
 function Swap() {
 	const history = useHistory();
@@ -154,7 +156,7 @@ function Swap() {
 			);
 		}
 	}
-
+	const {keyPair} = useKeyPair();
 	const [balanceError, setNotEnoughtBalanceError] = useState(false);
 	async function handleConnectPair() {
 		if (clientData.balance < 12) {
@@ -167,13 +169,13 @@ function Swap() {
 			return;
 		}
 
-		let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
-		const keys = await getClientKeys(decrypted.phrase);
+		// let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
+		// const keys = await getClientKeys(decrypted.phrase);
 
 		setconnectAsyncIsWaiting(true);
 		setconnectPairStatusText("getting data from pair.");
 
-		let connectRes = await connectToPair(pairId, keys);
+		let connectRes = await connectToPair(pairId, keyPair);
 
 		if (
 			!connectRes ||
@@ -212,7 +214,7 @@ function Swap() {
 				);
 				let connectToRootsStatus = await connectToPairStep2DeployWallets(
 					getClientForConnectStatus,
-					keys,
+					keyPair,
 				);
 				console.log("connectToRootsStatus", connectToRootsStatus);
 				if (connectToRootsStatus.code) {
@@ -495,7 +497,7 @@ function Swap() {
 					}
 					footer={
 						<div className="mainblock-footer">
-							<div className="mainblock-footer-wrap">
+							<div className="mainblock-footer-wrap" style={{justifyContent: "space-around"}}>
 								<div className="swap-confirm-wrap">
 									<p className="mainblock-footer-value">
 										{parseFloat(
@@ -510,12 +512,12 @@ function Swap() {
 										Minimum <br /> received
 									</p>
 								</div>
-								<div className="swap-confirm-wrap">
-									<p className="mainblock-footer-value">2.00%</p>
-									<p className="mainblock-footer-subtitle">
-										Price <br /> Impact
-									</p>
-								</div>
+								{/*<div className="swap-confirm-wrap">*/}
+								{/*	<p className="mainblock-footer-value">2.00%</p>*/}
+								{/*	<p className="mainblock-footer-subtitle">*/}
+								{/*		Price <br /> Impact*/}
+								{/*	</p>*/}
+								{/*</div>*/}
 								<div className="swap-confirm-wrap">
 									<p className="mainblock-footer-value">
 										{fromValue && fromValue !== 0

@@ -25,7 +25,7 @@ import {
 	getAllClientWallets,
 	getAllPairsWoithoutProvider,
 	getAssetsForDeploy,
-	getClientBalance,
+	getClientBalance, queryRoots,
 	subscribe,
 } from "./extensions/webhook/script";
 import {
@@ -88,6 +88,7 @@ import {
 import LimitOrder from "./pages/LimitOrder/LimitOrder";
 import useFetchLimitOrders from "./hooks/useFetchLimitOrders";
 import useSubLimitOrders from "./hooks/useSubLimitOrders";
+import CreatePair from "./pages/CreatePair/CreatePair";
 
 function App() {
 	const {enqueueSnackbar} = useSnackbar();
@@ -402,7 +403,7 @@ function App() {
 	useEffect(async () => {
 		// setLoadingRoots(true)
 		const addrArray = await getAssetsForDeploy();
-		console.log("addrArray", addrArray);
+		// console.log("addrArray", addrArray);
 		dispatch(setAssetsFromGraphQL(addrArray));
 		// setLoadingRoots(true)
 	}, []);
@@ -425,7 +426,7 @@ function App() {
 				<Route exact path="/swap" component={Swap} />
 				<Route exact path="/manage" component={Manage} />
 				<Route exact path="/add-liquidity" component={AddLiquidity} />
-
+				<Route exact path="/create-pair" component={CreatePair} />
 				<Route exact path="/staking" component={Stacking} />
 				<Route exact path="/wallet" component={Assets} />
 				<Route exact path="/orders" component={LimitOrder} />

@@ -1,7 +1,7 @@
 import {useSnackbar} from "notistack";
 import {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {DEXClientContract} from "../extensions/contracts/DEXClient";
+import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
 import client, {decode} from "../extensions/webhook/script";
 import {setOrderList} from "../store/actions/limitOrders";
 

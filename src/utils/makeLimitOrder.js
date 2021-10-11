@@ -1,6 +1,6 @@
 import {Account} from "@tonclient/appkit";
 import {signerKeys} from "@tonclient/core";
-import {DEXClientContract} from "../extensions/contracts/DEXClient";
+import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
 import client from "../extensions/webhook/script";
 
 const TOKEN_ROUTER_MAP = {
