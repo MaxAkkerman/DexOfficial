@@ -78,7 +78,7 @@ export default function OrderPopupUpdate({order, close}) {
 			const {changePriceStatus} = await updateLimitOrderPrice(
 				{
 					id,
-					newPrice: values.price,
+					newPrice: values.newPrice,
 				},
 				{
 					clientKeyPair: keyPair,

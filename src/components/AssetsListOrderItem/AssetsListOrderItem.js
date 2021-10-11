@@ -14,7 +14,7 @@ import IconEdit from "../IconEdit/IconEdit";
 import classes from "./AssetsListOrderItem.module.scss";
 
 function AssetsListOrderItem({order, pair}) {
-	const {amount, price, directionPair, id, addrPair} = order;
+	const {amount, price, directionPair, id} = order;
 
 	let {symbolA, symbolB} = pair;
 
@@ -36,7 +36,6 @@ function AssetsListOrderItem({order, pair}) {
 					toValue: amount * price,
 					price,
 					id,
-					pairId: addrPair,
 				},
 			}),
 		);
@@ -54,7 +53,6 @@ function AssetsListOrderItem({order, pair}) {
 					toValue: amount * price,
 					price,
 					id,
-					pairId: addrPair,
 				},
 			}),
 		);
