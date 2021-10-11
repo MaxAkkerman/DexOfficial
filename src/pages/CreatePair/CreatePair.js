@@ -449,7 +449,6 @@ function CreatePair() {
                     }
                     content={
                         <div>
-<button onClick={()=>rule()}>CLICK me</button>
                             <BlockItem
                                 leftTitle={"Amount"}
                                 amount_left_block={"amount_left_blockFixedWidth"}
