@@ -31,7 +31,7 @@
 		"freeton": "^0.6.0",
 		"fs": "0.0.1-security",
 		"hex2ascii": "0.0.3",
-		"notistack": "^1.0.6-next.3",
+		"notistack": "^2.0.2",
 		"pidcrypt": "^0.0.32",
 		"qrcode.react": "^1.0.1",
 		"react": "^17.0.2",
