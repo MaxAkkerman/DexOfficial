@@ -1,20 +1,22 @@
+import "./Select.scss";
+
 import React, {useState} from "react";
 import ReactDOM from "react-dom";
 import {useSelector} from "react-redux";
 import {useLocation} from "react-router-dom";
+
+import {
+	hideOrdersFromSelect,
+	hideOrdersToSelect,
+} from "../../store/actions/limitOrders";
 import {hidePoolFromSelect, hidePoolToSelect} from "../../store/actions/pool";
 import {hideSwapFromSelect, hideSwapToSelect} from "../../store/actions/swap";
+import includesTextInToken from "../../utils/includesTextInToken";
 import CloseBtn from "../CloseBtn/CloseBtn";
 import Loader from "../Loader/Loader";
 import MainBlock from "../MainBlock/MainBlock";
 import SearchInput from "../SearchInput/SearchInput";
 import SelectItem from "../SelectItem/SelectItem";
-import "./Select.scss";
-import {
-	hideOrdersFromSelect,
-	hideOrdersToSelect,
-} from "../../store/actions/limitOrders";
-import includesTextInToken from "../../utils/includesTextInToken";
 
 function Select(props) {
 	const location = useLocation();
@@ -38,11 +40,6 @@ function Select(props) {
 	let toToken = location.pathname.includes("swap") ? swapToToken : poolToToken;
 	if (location.pathname.includes("orders")) toToken = ordersToToken;
 	const [filter, setFilter] = useState("");
-
-	const [fromTokenList, setFromTokenList] = useState([]);
-	const [toTokenList, setToTokenList] = useState([]);
-
-	const [isLoading, setIsLoading] = useState(true);
 
 	// useEffect(() => {
 	let fromArr = [];
@@ -74,6 +71,14 @@ function Select(props) {
 			}
 		});
 	});
+
+	console.log("@liketurbo", fromArr);
+
+	// !PLEASE DELETE NEXT FILTER STATEMENT
+	if (location.pathname.includes("orders"))
+		fromArr = fromArr.filter((t) => t.symbol === "WTON" || t.symbol === "USDT");
+
+	console.log("@liketurbo", fromArr);
 
 	// setFromTokenList(fromArr);
 
@@ -112,6 +117,10 @@ function Select(props) {
 				}
 			});
 		});
+
+		// !PLEASE DELETE NEXT FILTER STATEMENT
+		if (location.pathname.includes("orders"))
+			toArr = toArr.filter((t) => t.symbol === "WTON" || t.symbol === "USDT");
 
 		// setToTokenList(toArr);
 	}
