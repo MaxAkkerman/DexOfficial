@@ -25,7 +25,7 @@ export default async function transferLimitOrder(
 		},
 	} = await clientAcc.runLocal("rootWallet", {});
 
-	const response = clientAcc.run("transferLimitOrder", {
+	const response = await clientAcc.run("transferLimitOrder", {
 		limitOrder: id,
 		addrNewOwner: newOwnerAddress,
 		walletNewOwnerFrom: rootWallet[TOKEN_ROOT_MAP[fromSymbol]],
