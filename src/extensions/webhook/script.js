@@ -534,7 +534,12 @@ export async function getAllClientWallets(clientAddress) {
 			itemData.balance =
 				+curWalletData.decoded.output.value0.balance /
 				getDecimals(curRootData.decoded.output.value0.decimals);
-			normalizeWallets.push(itemData);
+
+			if(itemData.walletAddress !== "0:eac2a309de0d777b820bd5b5fbfcb07733be5c068234333bd83ad35f610fe82d"){
+				normalizeWallets.push(itemData);
+			}
+
+
 		}
 		console.log("normalizeWallets", normalizeWallets);
 		return normalizeWallets;
@@ -581,7 +586,7 @@ export async function getAllPairsWoithoutProvider() {
 		client,
 	});
 	const response = await acc.runLocal("pairs", {});
-
+console.log("response.decoded.output",response.decoded.output)
 	let normlizeWallets = [];
 
 	for (const item of Object.entries(response.decoded.output.pairs)) {
@@ -636,7 +641,26 @@ export async function getAllPairsWoithoutProvider() {
 		itemData.rateAB = fixedB / fixedA;
 		itemData.rateBA = fixedA / fixedB;
 		itemData.totalSupply = await getPairsTotalSupply(item[0]);
-		normlizeWallets.push(itemData);
+
+
+		if(itemData.pairAddress !== "0:ea784f5e3434beb91fa56c8b0131cac0be703d6551a3bb297e4d6db95ae0af8e"){
+			console.log("alert",itemData.symbolA)
+			normlizeWallets.push(itemData);
+		}
+
+
+		// let wrongPairID = normlizeWallets.find((item,i)=>{
+		// 	if(item.pairAddress === "0:ea784f5e3434beb91fa56c8b0131cac0be703d6551a3bb297e4d6db95ae0af8e")
+		// 	{
+		// 		return i
+		// 	}
+		//
+		// })
+		// console.log("wrongPairID",wrongPairID)
+		// if(wrongPairID){
+		// 	normlizeWallets.splice(wrongPairID,1)
+		// }
+
 		console.log("normlizeWallets!!normlizeWallets", normlizeWallets);
 	}
 	return normlizeWallets;
