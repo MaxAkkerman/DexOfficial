@@ -1,5 +1,6 @@
 import {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
+
 import {
 	setOrderList,
 	setOrderListFetched,
@@ -21,15 +22,12 @@ export default function useFetchLimitOrders() {
 
 		dispatch(setOrderListLoading(true));
 
-		const allOrders = await fetchLimitOrders();
-		const myOrders = allOrders.filter(
-			(order) => order.addrOwner === clientData.address,
-		);
+		const orders = await fetchLimitOrders({clientAddress: clientData.address});
 
-		dispatch(setOrderList(myOrders));
+		dispatch(setOrderList(orders));
 		dispatch(setOrderListLoading(false));
 		dispatch(setOrderListFetched(true));
-	}, [clientData]);
+	}, [clientData, fetched]);
 
 	return {
 		loading,

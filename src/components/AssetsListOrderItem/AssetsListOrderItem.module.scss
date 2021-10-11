@@ -1,5 +1,5 @@
 @mixin for-phone-only {
-	@media (max-width: 350px) {
+	@media (max-width: 400px) {
 		@content;
 	}
 }
@@ -53,7 +53,7 @@
 }
 
 .header {
-	color: var(--primary-color);
+	color: var(--text-color);
 	font-size: 20px;
 	font-weight: 600;
 	line-height: normal;
@@ -71,9 +71,9 @@
 }
 
 .amount {
-	color: var(--primary-color);
+	color: var(--text-color);
 	font-size: 20px;
-	font-weight: 400;
+	font-weight: bold;
 	margin-left: auto;
 	word-break: break-all;
 
@@ -91,6 +91,7 @@
 	align-items: center;
 	padding: 0;
 	border-radius: 5px;
+	cursor: pointer;
 
 	&_first {
 		margin-right: 14px;

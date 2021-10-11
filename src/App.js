@@ -1,118 +1,70 @@
+import {useSnackbar} from "notistack";
 import React, {useEffect, useState} from "react";
-import {useSelector, useDispatch} from "react-redux";
-import {
-	Switch,
-	Route,
-	Redirect,
-	useLocation,
-	useHistory,
-} from "react-router-dom";
-import {changeTheme, hideTip, showPopup} from "./store/actions/app";
-import {
-	setAssetsFromGraphQL,
-	setLiquidityList,
-	setPairsList,
-	setSubscribeReceiveTokens,
-	setTokenList,
-	setTransactionsList,
-	setWallet,
-} from "./store/actions/wallet";
+import {useDispatch, useSelector} from "react-redux";
+import {Redirect, Route, Switch, useLocation} from "react-router-dom";
+import {useMount} from "react-use";
+
+import AssetsListForDeploy from "./components/AssetsListForDeploy/AssetsListForDeploy";
+import EnterPassword from "./components/EnterPassword/EnterPassword";
+import Header from "./components/Header/Header";
+import NativeLogin from "./components/NativeLogin/NativeLogin";
+import PoolExplorer from "./components/PoolExplorer/PoolExplorer";
+import Popup from "./components/Popup/Popup";
+import PopupManager from "./components/PopupManager/PopupManager";
+import AssetsModalReceive from "./components/ReceiveAssets/AssetsModalReceive";
+import ReceiveAssets from "./components/ReceiveAssets/ReceiveAssets";
+import RevealSeedPhrase from "./components/RevealSeedPhrase/RevealSeedPhrase";
+import AssetsModal from "./components/SendAssets/AssetsModal";
+import SendAssets from "./components/SendAssets/SendAssets";
+import KeysBlock from "./components/WalletSettings/KeysBlock";
+import WalletSettings from "./components/WalletSettings/WalletSettings";
 import {
 	agregateQueryNFTassets,
-	checkClientPairExists,
-	checkPubKey,
-	checkwalletExists,
-	getAllClientWallets,
 	getAllPairsWoithoutProvider,
 	getAssetsForDeploy,
-	getClientBalance, queryRoots,
-	subscribe,
 } from "./extensions/webhook/script";
-import {
-	setSwapAsyncIsWaiting,
-	setSwapFromInputValue,
-	setSwapFromInputValueChange,
-	setSwapFromToken,
-	setSwapToInputValue,
-	setSwapToToken,
-} from "./store/actions/swap";
-import {
-	setPoolAsyncIsWaiting,
-	setPoolFromInputValue,
-	setPoolFromToken,
-	setPoolToInputValue,
-	setPoolToToken,
-} from "./store/actions/pool";
-import {
-	setManageAsyncIsWaiting,
-	setManageBalance,
-	setManageFromToken,
-	setManagePairId,
-	setManageRateAB,
-	setManageRateBA,
-	setManageToToken,
-} from "./store/actions/manage";
+import useFetchLimitOrders from "./hooks/useFetchLimitOrders";
+import useSubLimitOrders from "./hooks/useSubLimitOrders";
 import Account from "./pages/Account/Account";
-import Swap from "./pages/Swap/Swap";
-import Pool from "./pages/Pool/Pool";
-import Popup from "./components/Popup/Popup";
-import Header from "./components/Header/Header";
-import Manage from "./pages/Manage/Manage";
 import AddLiquidity from "./pages/AddLiquidity/AddLiquidity";
-import PoolExplorer from "./components/PoolExplorer/PoolExplorer";
-import NativeLogin from "./components/NativeLogin/NativeLogin";
 import Assets from "./pages/Assets/Assets";
-import SendAssets from "./components/SendAssets/SendAssets";
-import ReceiveAssets from "./components/ReceiveAssets/ReceiveAssets";
-import AssetsModal from "./components/SendAssets/AssetsModal";
-import AssetsModalReceive from "./components/ReceiveAssets/AssetsModalReceive";
-import {useMount} from "react-use";
+import CreatePair from "./pages/CreatePair/CreatePair";
+import LimitOrder from "./pages/LimitOrder/LimitOrder";
+import Manage from "./pages/Manage/Manage";
+import Pool from "./pages/Pool/Pool";
+import Stacking from "./pages/Stacking/Stacking";
+import Swap from "./pages/Swap/Swap";
+import {
+	getAllPairsAndSetToStore,
+	getAllTokensAndSetToStore,
+} from "./reactUtils/reactUtils";
+import {changeTheme, hideTip, showPopup} from "./store/actions/app";
 import {
 	enterSeedPhraseEmptyStorage,
 	setEncryptedSeedPhrase,
 	showEnterSeedPhraseUnlock,
 } from "./store/actions/enterSeedPhrase";
-import EnterPassword from "./components/EnterPassword/EnterPassword";
-import WalletSettings from "./components/WalletSettings/WalletSettings";
-import KeysBlock from "./components/WalletSettings/KeysBlock";
-import Stacking from "./pages/Stacking/Stacking";
-import RevealSeedPhrase from "./components/RevealSeedPhrase/RevealSeedPhrase";
-import {setNFTassets} from "./store/actions/walletSeed";
-
-import AssetsListForDeploy from "./components/AssetsListForDeploy/AssetsListForDeploy";
-import {useSnackbar} from "notistack";
 import {
-	getAllPairsAndSetToStore,
-	getAllTokensAndSetToStore,
-} from "./reactUtils/reactUtils";
-import LimitOrder from "./pages/LimitOrder/LimitOrder";
-import useFetchLimitOrders from "./hooks/useFetchLimitOrders";
-import useSubLimitOrders from "./hooks/useSubLimitOrders";
-import CreatePair from "./pages/CreatePair/CreatePair";
+	setAssetsFromGraphQL,
+	setPairsList,
+	setSubscribeReceiveTokens,
+} from "./store/actions/wallet";
+import {setNFTassets} from "./store/actions/walletSeed";
 
 function App() {
 	const {enqueueSnackbar} = useSnackbar();
 	const dispatch = useDispatch();
 	const location = useLocation();
-	const history = useHistory();
 	const popup = useSelector((state) => state.appReducer.popup);
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
-	const pubKey = useSelector((state) => state.walletReducer.pubKey);
 	const walletIsConnected = useSelector(
 		(state) => state.appReducer.walletIsConnected,
 	);
 	const swapAsyncIsWaiting = useSelector(
 		(state) => state.swapReducer.swapAsyncIsWaiting,
 	);
-	const transactionsList = useSelector(
-		(state) => state.walletReducer.transactionsList,
-	);
 	const poolAsyncIsWaiting = useSelector(
 		(state) => state.poolReducer.poolAsyncIsWaiting,
-	);
-	const tokenList = useSelector((state) => state.walletReducer.tokenList);
-	const liquidityList = useSelector(
-		(state) => state.walletReducer.liquidityList,
 	);
 	const revealSeedPhraseIsVisible = useSelector(
 		(state) => state.enterSeedPhrase.revealSeedPhraseIsVisible,
@@ -122,10 +74,6 @@ function App() {
 	const manageAsyncIsWaiting = useSelector(
 		(state) => state.manageReducer.manageAsyncIsWaiting,
 	);
-	const subscribeData = useSelector(
-		(state) => state.walletReducer.subscribeData,
-	);
-	const curExt = useSelector((state) => state.appReducer.curExt);
 
 	const chrome = localStorage.getItem("chrome");
 	if (chrome === null) showChromePopup();
@@ -362,10 +310,7 @@ function App() {
 
 		const newTransList = JSON.parse(JSON.stringify(transListReceiveTokens));
 		console.log("newTransList", newTransList);
-		if (
-			tips.name === "deployLockStakeSafeCallback" ||
-			"transferOwnershipCallback"
-		) {
+		if (tips.name === "deployLockStakeSafeCallback") {
 			const NFTassets = await agregateQueryNFTassets(clientData.address);
 			dispatch(setNFTassets(NFTassets));
 		}
@@ -470,6 +415,7 @@ function App() {
 					</>
 				) : null}
 			</Switch>
+			<PopupManager />
 			{popup.isVisible ? (
 				<Popup type={popup.type} message={popup.message} link={popup.link} />
 			) : null}
