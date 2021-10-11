@@ -1,6 +1,7 @@
 import {Account} from "@tonclient/appkit";
 import {signerKeys} from "@tonclient/core";
 
+import {LIMIT_ORDER_AMOUNT} from "../constants/denominators";
 import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
 import client from "../extensions/webhook/script";
 
@@ -39,14 +40,14 @@ export default async function makeLimitOrder(
 			response = await clientAcc.run("makeLimitOrderA", {
 				routerWalletA: TOKEN_ROUTER_MAP[tokenSymbol],
 				pairAddr,
-				qtyA: Number(qty) * 1000000000,
+				qtyA: Number(qty) * LIMIT_ORDER_AMOUNT,
 				priceA: price,
 			});
 		else
 			response = await clientAcc.run("makeLimitOrderB", {
 				routerWalletB: TOKEN_ROUTER_MAP[tokenSymbol],
 				pairAddr,
-				qtyB: Number(qty) * 1000000000,
+				qtyB: Number(qty) * LIMIT_ORDER_AMOUNT,
 				priceB: price,
 			});
 

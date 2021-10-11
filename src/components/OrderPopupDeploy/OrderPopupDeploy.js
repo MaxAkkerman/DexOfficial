@@ -35,7 +35,7 @@ export default function OrderPopupDeploy({order, close}) {
 		dispatch(closeOrderDeployPopup());
 		dispatch(
 			openOrderWaitPopup({
-				text: `Sending message to create limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol}`,
+				text: `Sending message to create limit order ${fromSymbol} - ${toSymbol}`,
 			}),
 		);
 

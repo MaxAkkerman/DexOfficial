@@ -35,7 +35,7 @@ export default function OrderPopupCancel({order, close}) {
 		dispatch(closeOrderCancelPopup());
 		dispatch(
 			openOrderWaitPopup({
-				text: `Sending message to cancel limit order with ${fromValue} ${fromSymbol} for ${toValue} ${toSymbol}`,
+				text: `Sending message to cancel limit order ${fromSymbol} - ${toSymbol}`,
 			}),
 		);
 
