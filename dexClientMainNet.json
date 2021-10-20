@@ -1,0 +1,14 @@
+[
+  {
+    "address": "0:511148fd464c31bab7b8588f06aa2314ca2d6c8d9cfbbca12b345a7ba728d1e4",
+    "keys": {
+      "type": "Keys",
+      "keys": {
+        "public": "44ec480f73ce69914012e3dce6e48df67f9f90c95bc0e94c01ad7d8dd0a34789",
+        "secret": "27c1eeacc75e156c180c97f289574cf8518118f1e8e84b8b8de75b6ef6161880"
+      }
+    },
+    "clientSoArg": 3,
+    "seed": "vibrant stumble glove one garage minimum position delay letter tragic filter always"
+  }
+]

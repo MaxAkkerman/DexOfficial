@@ -59,7 +59,13 @@
 		display: inline-block;
 		margin-left: 40px;
 	}
+	&-deploy{
+		font-family: "Gilroy", sans-serif;
+		color: var(--accent);
+		font-weight: 700;
+		margin-left: 11%;
 
+	}
 	&-disconnect {
 		font-family: "Gilroy", sans-serif;
 		color: #ff4d4d;

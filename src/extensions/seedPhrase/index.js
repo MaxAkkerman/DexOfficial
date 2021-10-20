@@ -19,6 +19,7 @@ export async function encrypt(seedPhrase, pin) {
 export async function decrypt(enc, pin) {
 	const aes = new pidCrypt.AES.CBC();
 	const decrypted = aes.decryptText(enc, pin);
+	console.log("decrypted",decrypted)
 	const mnemonicValid = await client.crypto.mnemonic_verify({
 		phrase: decrypted,
 	});

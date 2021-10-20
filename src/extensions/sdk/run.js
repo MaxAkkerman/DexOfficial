@@ -397,7 +397,6 @@ async function logEvents(params, response_type) {
 export async function prepareClientDataForDeploy(phrase) {
     const clientKeys = await getClientKeys(phrase);
     let clientPubkey = clientKeys.public;
-    console.log("phrasephrase", phrase);
     const clientSet = await onSharding(clientPubkey);
     console.log("clientSet", clientSet);
 

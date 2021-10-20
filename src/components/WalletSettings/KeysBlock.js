@@ -7,7 +7,7 @@ import {useSelector} from "react-redux";
 import MainBlock from "../MainBlock/MainBlock";
 import {decrypt} from "../../extensions/seedPhrase";
 import {getClientKeys} from "../../extensions/webhook/script";
-import {copyToClipboard} from "../../reactUtils/reactUtils";
+import {copyToClipboard, handleCutAddress} from "../../reactUtils/reactUtils";
 
 function KeysBlock() {
 	const encryptedSeedPhrase = useSelector(
@@ -25,12 +25,7 @@ function KeysBlock() {
 		setKeys(keys);
 	}, []);
 
-	function handleCutAddress(address) {
-		//todo add validation
-		let spliced = address.slice(0, 7);
-		let splicedpart2 = address.slice(59);
-		return spliced + "..." + splicedpart2;
-	}
+
 
 	const history = useHistory();
 
