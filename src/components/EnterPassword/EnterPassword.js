@@ -31,7 +31,7 @@ import {
     setSubscribeReceiveTokens, setTransactionsList,
 } from "../../store/actions/wallet";
 import {getWalletExt} from "../../extensions/extensions/checkExtensions";
-import {setCurExt, setWalletIsConnected} from "../../store/actions/app";
+import {setCurExt, setTips, setWalletIsConnected} from "../../store/actions/app";
 import {
     getAllPairsAndSetToStore,
     getAllTokensAndSetToStore, InitializeClient,
@@ -199,7 +199,15 @@ function EnterPassword(props) {
         const clientKeys = await getClientKeys(decrypted.phrase);
 
 
-        if (decrypted.valid === false) setDecryptResult(false);
+        if (decrypted.valid === false) {
+            setDecryptResult(false);
+            dispatch(
+                setTips({
+                    message: `Something goes wrong - invalid password`,
+                    type: "error",
+                }),
+            );
+        }
         if (decrypted.valid === true) {
             setloadingUserDataIsWaiting(true);
             setDecryptResult(true);

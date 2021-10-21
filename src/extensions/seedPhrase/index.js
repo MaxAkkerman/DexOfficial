@@ -5,6 +5,20 @@ import {setWallet} from "../../store/actions/wallet";
 
 require("pidcrypt/aes_cbc");
 
+
+export async function encryptPure(seedPhrase, pin) {
+	console.log("seedPhrase",seedPhrase,"pin",pin)
+	const aes = new pidCrypt.AES.CBC();
+	return aes.encryptText(seedPhrase, pin);
+
+}
+
+export async function decryptPure(enc, pin) {
+	const aes = new pidCrypt.AES.CBC();
+	return aes.decryptText(enc, pin);
+
+}
+
 export async function encrypt(seedPhrase, pin) {
 	const aes = new pidCrypt.AES.CBC();
 	const mnemonicValid = await client.crypto.mnemonic_verify({

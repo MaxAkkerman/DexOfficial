@@ -41,7 +41,7 @@ const grammsForConnector = 1100000000;
 const grammsForWallet = 3200000000;
 const grammsTotal = 15000000000;
 
-export async function deployEmptyWallet(clientAddr,clientKeys,rootAddress,ownerAddress){
+export async function deployEmptyWallet(clientAddr, clientKeys, rootAddress, ownerAddress) {
     const clientAcc = new Account(DEXClientContract, {
         address: clientAddr,
         signer: signerKeys(clientKeys),
@@ -55,10 +55,10 @@ export async function deployEmptyWallet(clientAddr,clientKeys,rootAddress,ownerA
             call_set: {
                 function_name: "deployEmptyWallet",
                 input: {
-                    deploy_grams:200000000,
-                    wallet_public_key_:0,
-                    owner_address_:ownerAddress,
-                    gas_back_address:clientAddr
+                    deploy_grams: 200000000,
+                    wallet_public_key_: 0,
+                    owner_address_: ownerAddress,
+                    gas_back_address: clientAddr
                 },
             },
         });
@@ -76,9 +76,6 @@ export async function deployEmptyWallet(clientAddr,clientKeys,rootAddress,ownerA
 
 
 }
-
-
-
 
 
 export async function createNewPair(
@@ -399,16 +396,18 @@ export async function prepareClientDataForDeploy(phrase) {
     let clientPubkey = clientKeys.public;
     const clientSet = await onSharding(clientPubkey);
     console.log("clientSet", clientSet);
+    return {
+        address: clientSet.data.address,
+        clientSoArg: clientSet.data.clientSoArg,
+        ...clientKeys
+    }
 
-    return [clientSet, clientKeys];
 }
 
-export async function deployClient(clientSet, clientKeys) {
+export async function deployClient(clientSet) {
     console.log(
         "clientSet.data.clientSoArg",
         clientSet,
-        "clientKeys",
-        clientKeys,
     );
     const connectorCode = await getRootConnectorCode();
     console.log("connectorCode", connectorCode.codeDEXconnector);
@@ -417,45 +416,37 @@ export async function deployClient(clientSet, clientKeys) {
         "connectorCode.codeDEXconnector",
         connectorCode.codeDEXconnector === DEXConnectorContract.code,
     );
+    try {
+        const clientAcc = new Account(DEXClientContract, {
+            initData: {
+                rootDEX: Radiance.networks["2"].dexroot,
+                soUINT: clientSet.clientSoArg,
+                // codeDEXConnector: DEXConnectorContract.code,
+                codeDEXConnector: DEXConnectorContract.code,
+                // codeDEXConnector: ConnectorCode
+            },
+            signer: signerKeys({public: clientSet.public, secret: clientSet.secret}),
+            client,
+        });
+        const address = await clientAcc.getAddress();
 
-    const clientAcc = new Account(DEXClientContract, {
-        initData: {
-            rootDEX: Radiance.networks["2"].dexroot,
-            soUINT: clientSet.data.clientSoArg,
-            // codeDEXConnector: DEXConnectorContract.code,
-            codeDEXConnector: DEXConnectorContract.code,
-            // codeDEXConnector: ConnectorCode
-        },
-        signer: signerKeys(clientKeys),
-        client,
-    });
-    const address = await clientAcc.getAddress();
+        let checkAddress = clientSet.address === address;
+        console.log(
+            checkAddress,
+            "checkAddress:address",
+            clientSet.address,
+            "address",
+            address,
+        );
 
-    let checkAddress = clientSet.data.address === address;
-    console.log(
-        checkAddress,
-        "checkAddress:address",
-        clientSet.data.address,
-        "address",
-        address,
-    );
-
-    return await clientAcc.deploy({
-        initFunctionName: "constructor",
-        initInput: {ownerAddr: zeroAddress},
-    });
-
-    // const deployMessage = await client.abi.encode_message(await clientAcc.getParamsOfDeployMessage({
-    //     initFunctionName:"constructor",
-    //     initInput:{
-    //         ownerAddr:zeroAddress,
-    //     },
-    // }));
-    // let shard_block_id = (await client.processing.send_message({
-    //         message: deployMessage.message,
-    //         send_events: true,
-    //     }, logEvents,
-    // )).shard_block_id;
+        return await clientAcc.deploy({
+            initFunctionName: "constructor",
+            initInput: {ownerAddr: zeroAddress},
+        });
+    } catch (e) {
+        console.log(e)
+        return e
+    }
 }
 
 /**
@@ -781,7 +772,7 @@ export async function processLiquidity(
 
     const qtyAfixed = Math.round(qtyAnum * getDecimals(fromtokenData.decimals));
     const qtyBfixed = Math.round(qtyBnum * getDecimals(toTokenData.decimals));
-console.log("processLiquidity data",clientAddress,
+    console.log("processLiquidity data", clientAddress,
         pairAddr,
         qtyA,
         qtyB,

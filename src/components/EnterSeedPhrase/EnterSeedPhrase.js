@@ -17,7 +17,7 @@ import {
     prepareClientDataForDeploy,
 } from "../../extensions/sdk/run";
 
-import {encrypt} from "../../extensions/seedPhrase";
+import {encrypt, encryptPure} from "../../extensions/seedPhrase";
 
 import {
     enterSeedPhraseSaveToLocalStorage, hideEnterSeedPhraseUnlock,
@@ -63,6 +63,7 @@ import {
 } from "../../reactUtils/reactUtils";
 import styled from "@emotion/styled";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
+import PasswordEnterPopup from "../PasswordEnterPopup/PasswordEnterPopup";
 
 function EnterSeedPhrase(props) {
     const history = useHistory();
@@ -369,8 +370,8 @@ function EnterSeedPhrase(props) {
         let clientDataLS = JSON.parse(localStorage.getItem("clientData"));
         let clientDataPreDeployLS = JSON.parse(localStorage.getItem("clientDataPreDeploy"));
 
-        if (clientDataLS && !clientDataLS.status && clientDataPreDeployLS && clientDataPreDeployLS[0].data.address) {
-            const dexClientAddress = clientDataPreDeployLS[0].data.address
+        if (clientDataLS && !clientDataLS.status && clientDataPreDeployLS && clientDataPreDeployLS.address) {
+            const dexClientAddress = clientDataPreDeployLS.address
             const dexClientBalance = await getClientBalance(dexClientAddress);
             console.log("i am here")
             dispatch(
@@ -533,6 +534,8 @@ async function validateSP() {
             dispatch(setNewSide("loader"));
 
             const clientPrepData = await prepareClientDataForDeploy(savedSP);
+
+            console.log("clientPrepData",clientPrepData)
             setclientPrepData(clientPrepData);
 
             setSeedPhraseString(sp);
@@ -564,13 +567,12 @@ const [balanceInsError, setShowInsurricentBalanceError] = useState(false);
 async function deplo() {
     // todo check acc type
 
-    const accBalance = await getClientBalance(clientPrepData[0].data.address);
+    const accBalance = await getClientBalance(clientPrepData.address);
     if (accBalance > 0.5) {
         setLoaderInfo("Creating wallet... Please wait");
         dispatch(setNewSide("loader"));
         const deployRes = await deployClient(
-            clientPrepData[0],
-            clientPrepData[1],
+            clientPrepData
         );
         setWalletDeployed(true)
         if (deployRes) {
@@ -593,7 +595,7 @@ async function handleSetEncription(){
 async function goIntoApp() {
 
     if (!walletDeployed) {
-        const dexClientAddress = clientPrepData[0].data.address
+        const dexClientAddress = clientPrepData.address
         const dexClientBalance = await getClientBalance(dexClientAddress);
         console.log("i am here")
         const data = {
@@ -611,7 +613,11 @@ async function goIntoApp() {
 // 	);
         dispatch(setTransactionsList([]));
         await handleSetEncription()
-        localStorage.setItem("clientDataPreDeploy", JSON.stringify(clientPrepData));
+        const encClData = await encryptPure(clientPrepData.secret,seedPhrasePassword)
+        const encrData = JSON.parse(JSON.stringify(clientPrepData))
+        encrData.secret = encClData
+console.log("encClData",encClData)
+        localStorage.setItem("clientDataPreDeploy", JSON.stringify(encrData));
         setSeedPhrasePassword(null)
 
 //
@@ -1082,7 +1088,7 @@ return (
                                         error={!validPassword}
                                         sx={{width: "100%"}}
                                         placeholder={
-                                            "Your seed phrase will be encrypted with this password"
+                                            "Your password"
                                         }
                                         type="password"
                                         onChange={passwordChange}
@@ -1875,11 +1881,11 @@ return (
                                     <strong
                                         className={"textOnHover"}
                                         onClick={() =>
-                                            copyToClipboard(clientPrepData[0].data.address)
+                                            copyToClipboard(clientPrepData.address)
                                         }
                                     >
-                                        {clientPrepData[0].data.address
-                                            ? handleCutAddress(clientPrepData[0].data.address)
+                                        {clientPrepData.address
+                                            ? handleCutAddress(clientPrepData.address)
                                             : "default"}
                                     </strong>
                                     , and click "Create wallet".<br/><br/>
@@ -1943,7 +1949,7 @@ return (
                                         <button
                                             style={{fontSize: "15px"}}
                                             onClick={() =>
-                                                copyToClipboard(clientPrepData[0].data.address)
+                                                copyToClipboard(clientPrepData.address)
                                             }
                                             className="btn wallet-btn"
                                         >
@@ -1969,60 +1975,17 @@ return (
                                 </div>
                             </Grid>
                         )}
-                        {enterSeedPhraseSide === "setPassword" && (
-                            <Grid
-                                container
-                                spacing={3}
-                                sx={{
-                                    justifyContent: "center",
-                                    width: "100%",
-                                    margin: 0,
-                                    flexDirection: "column",
-                                }}
-                            >
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        marginTop: "24px",
-                                    }}
-                                >
-                                    <TextField
-                                        label="Decryption password"
-                                        error={!validPassword}
-                                        sx={{width: "100%"}}
-                                        placeholder={
-                                            "Your seed phrase will be decrypted with this password"
-                                        }
-                                        type="password"
-                                        inputProps={{style: {color: "var(--primary-color)"}}}
-                                        onChange={passwordChange}
-                                        inputRef={(input) => {
-                                            if (input != null) {
-                                                input.focus();
-                                            }
-                                        }}
-                                        value={seedPhrasePassword}
-                                        onKeyDown={enterClick}
-                                    />
-                                </Box>
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        marginTop: "24px",
-                                    }}
-                                >
-                                    <button
-                                        style={{fontSize: "24px"}}
-                                        onClick={goIntoApp}
-                                        className="btn wallet-btn"
-                                    >
-                                        Set Password for your Wallet
-                                    </button>
-                                </Box>
-                            </Grid>
-                        )}
+                        {enterSeedPhraseSide === "setPassword" &&
+                            <PasswordEnterPopup
+                                goIntoApp={goIntoApp}
+                                enterClick={enterClick}
+                                passwordChange={passwordChange}
+                                validPassword={validPassword}
+                                submitText={"Set Password for your Wallet"}
+                                cancelText={null}
+                                handleBack={null}
+                            />
+                        }
                         {enterSeedPhraseSide === "loader" && (
                             <div>
                                 <Loader/>
