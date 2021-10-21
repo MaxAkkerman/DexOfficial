@@ -17,7 +17,7 @@ import {
     prepareClientDataForDeploy,
 } from "../../extensions/sdk/run";
 
-import {encrypt, encryptPure} from "../../extensions/seedPhrase";
+import {decrypt, encrypt, encryptPure} from "../../extensions/seedPhrase";
 
 import {
     enterSeedPhraseSaveToLocalStorage, hideEnterSeedPhraseUnlock,
@@ -53,7 +53,7 @@ import {
     setSubscribeReceiveTokens,
     setTransactionsList,
 } from "../../store/actions/wallet";
-import {setCurExt, setWalletIsConnected} from "../../store/actions/app";
+import {setCurExt, setTips, setWalletIsConnected} from "../../store/actions/app";
 import {getWalletExt} from "../../extensions/extensions/checkExtensions";
 import {useHistory} from "react-router-dom";
 import {
@@ -369,7 +369,19 @@ function EnterSeedPhrase(props) {
     async function login() {
         let clientDataLS = JSON.parse(localStorage.getItem("clientData"));
         let clientDataPreDeployLS = JSON.parse(localStorage.getItem("clientDataPreDeploy"));
-
+        let esp = localStorage.getItem("esp");
+        console.log("esp",esp,"seedPhrasePassword",seedPhrasePassword)
+        let decrypted = await decrypt(esp, seedPhrasePassword);
+console.log("decrypteddecrypted",decrypted)
+        if (decrypted.valid === false) {
+            dispatch(
+                setTips({
+                    message: `Some error, wrong password or seed phrase, please retry`,
+                    type: "error",
+                }),
+            );
+            return
+        }
         if (clientDataLS && !clientDataLS.status && clientDataPreDeployLS && clientDataPreDeployLS.address) {
             const dexClientAddress = clientDataPreDeployLS.address
             const dexClientBalance = await getClientBalance(dexClientAddress);
@@ -396,6 +408,13 @@ function EnterSeedPhrase(props) {
 
             return
 
+        }else{
+            dispatch(
+                setTips({
+                    message: `Some error, please retry`,
+                    type: "error",
+                }),
+            );
         }
 
 
@@ -593,6 +612,7 @@ async function handleSetEncription(){
     dispatch(enterSeedPhraseSaveToLocalStorage(encrypted));
 }
 async function goIntoApp() {
+    handleDeleteSeeds()
 
     if (!walletDeployed) {
         const dexClientAddress = clientPrepData.address
