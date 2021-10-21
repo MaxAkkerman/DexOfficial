@@ -63,16 +63,16 @@ function Account() {
         console.log("clientPrepData", clientPrepData)
         const accBalance = await getClientBalance(clientPrepData.address);
         setclientPrepData(clientPrepData)
-        // if (accBalance > 0.5) {
+        if (accBalance > 0.5) {
             setPasswordEnterPopup(true)
-        // } else {
-        //     dispatch(
-        //         setTips({
-        //             message: `Not enough balance, need at least 0.5 TONs`,
-        //             type: "error",
-        //         }),
-        //     );
-        // }
+        } else {
+            dispatch(
+                setTips({
+                    message: `Not enough balance, need at least 0.5 TONs`,
+                    type: "error",
+                }),
+            );
+        }
     }
 
     async function deployHandler() {
@@ -125,7 +125,7 @@ console.log("encClData",encClData)
         localStorage.removeItem("setSubscribeReceiveTokens");
 
 
-        localStorage.removeItem("esp");
+        // localStorage.removeItem("esp");
         // window.location.reload();
         // history.push("/account");
     }

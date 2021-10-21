@@ -37,6 +37,7 @@ export async function decrypt(enc, pin) {
 	const mnemonicValid = await client.crypto.mnemonic_verify({
 		phrase: decrypted,
 	});
+	console.log("mnemonicValid",mnemonicValid)
 	if (mnemonicValid.valid === false) return {valid: false, phrase: null};
 
 	return {valid: true, phrase: decrypted};
