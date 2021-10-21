@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import ReactDOM from "react-dom";
 import {useDispatch, useSelector} from "react-redux";
 import CloseBtn from "../CloseBtn/CloseBtn";
@@ -15,6 +15,13 @@ function PoolExplorer(props) {
 	const [filter, setFilter] = useState("");
 	const history = useHistory();
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
+
+	const [pairsArr,setPairsArray] = useState([])
+	useEffect(()=>{
+		setPairsArray(pairsList)
+
+	},[pairsList])
+
 
 	// const [st,setST] = useState(pairsList)
 
@@ -81,7 +88,7 @@ function PoolExplorer(props) {
 						<div className="head_wrapper">
 							<div className="left_block boldFont">Pool Explorer</div>
 						</div>
-						{!pairsList.length ? (
+						{!pairsArr.length ? (
 							<div
 								style={{
 									display: "flex",
@@ -97,7 +104,7 @@ function PoolExplorer(props) {
 									<SearchInput func={setFilter.bind(this)} />
 								</div>
 								<div className="select-list-pool">
-									{pairsList
+									{pairsArr
 										.sort(
 											(a, b) =>
 												b.reserveA - a.reserveA - (b.reservetB - a.reservetB),

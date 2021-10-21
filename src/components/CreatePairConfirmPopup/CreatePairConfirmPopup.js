@@ -83,7 +83,7 @@ function CreatePairConfirmPopup(props) {
                             {/*</div>*/}
                             <div style={{width: "100%", marginTop: "20px"}}>
                                 <div className="send_text_headers">Deploy Fee</div>
-                                <div className="DeployAssetConfirmPopup__data">~ 5 TONs</div>
+                                <div className="DeployAssetConfirmPopup__data">~ 25 TONs</div>
 
                             </div>
 

@@ -405,7 +405,7 @@ export async function checkClientPairExists(clientAddress, pairAddress) {
 		return newArr.length !== 0;
 	} catch (e) {
 		console.log("catch E", e);
-		return e;
+		return false;
 	}
 }
 
@@ -456,7 +456,21 @@ export async function checkwalletExists(clientAddress, pairAddress) {
 		// return newArr.length !== 0;
 	} catch (e) {
 		console.log("catch E", e);
-		return e;
+
+		return [
+			{
+				status: false,
+				walletAaddress: 0,
+			},
+			{
+				status: false,
+				walletBaddress: 0,
+			},
+			{
+				status: false,
+				walletABaddress: 0,
+			},
+		];
 	}
 }
 
@@ -695,7 +709,7 @@ export async function getClientBalance(clientAddress) {
 		return +clientBalance.result[0].balance / 1000000000;
 	} catch (e) {
 		console.log("catch E", e);
-		return e;
+		return 0;
 	}
 }
 
@@ -873,12 +887,6 @@ export async function subscribeClientBalance(address) {
 				result: "balance",
 			},
 			async (params, responseType) => {
-				console.log(
-					"params balance",
-					params.result.balance,
-					typeof params.result.balance,
-					Number(params.result.balance),
-				);
 				if (!params.result.balance) return;
 				// if(!checkMessagesAmountClient({tonLiveID:params.result.id}))return
 

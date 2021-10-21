@@ -90,9 +90,11 @@ function Header() {
 				{clientData.status ? (
 					<Wallet />
 				) : (
-					<button className="btn wallet-btn" onClick={handlePushToLogin}>
+					!clientData.address ? <button className="btn wallet-btn" onClick={handlePushToLogin}>
 						Connect wallet
 					</button>
+						:
+						<Wallet />
 				)}
 
 				{/*<Wallet />*/}

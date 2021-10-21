@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import MainBlock from "../../components/MainBlock/MainBlock";
 import AssetsList from "../../components/AssetsList/AssetsList";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {getClientKeys, queryRoots} from "../../extensions/webhook/script";
 import DeployAssetConfirmPopup from "../DeployAssetConfirmPopup/DeployAssetConfirmPopup";
 import {connectToPairStep2DeployWallets} from "../../extensions/sdk/run";
@@ -15,10 +15,11 @@ import {useHistory} from "react-router-dom";
 import nativeBtn from "../../images/nativeadd.svg";
 import useKeyPair from "../../hooks/useKeyPair";
 import DeployCustomTokenPopup from "../DeployCustomTokenPopup/DeployCustomTokenPopup";
+import {setTips} from "../../store/actions/app";
 
 function AssetsListForDeploy() {
 	const history = useHistory();
-
+	const dispatch = useDispatch();
 	const encryptedSeedPhrase = useSelector(
 		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
 	);
@@ -63,7 +64,17 @@ function AssetsListForDeploy() {
 
 	async function handleDeployAsset() {
 		console.log("curAssetForDeploy", curAssetForDeploy);
-		if (clientData.balance < 4) return;
+		if (clientData.balance < 4) {
+			dispatch(
+				setTips({
+					message: `You need at least 4 TON Crystal on balance to deploy ${curAssetForDeploy.tokenName} wallet`,
+					type: "error",
+				}),
+			);
+			return;
+		}
+
+
 		showConfirmAssetDeployPopup(false);
 		setdeployWalletIsWaiting(true);
 

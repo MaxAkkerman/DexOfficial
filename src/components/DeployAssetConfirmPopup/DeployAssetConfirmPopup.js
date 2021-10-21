@@ -69,12 +69,12 @@ function DeployAssetConfirmPopup(props) {
 										{props.currentAsset.rootAddress}
 									</span>
 								</div>
-								<div></div>
+
 							</div>
 							<div style={{width: "100%", marginTop: "20px"}}>
 								<div className="send_text_headers">Deploy Fee</div>
 								<div className="DeployAssetConfirmPopup__data">~ 4 TONs</div>
-								<div></div>
+
 							</div>
 
 							{/*</div>*/}

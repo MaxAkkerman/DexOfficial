@@ -56,7 +56,6 @@ const initialState = {
 };
 
 const walletSeedReducer = (state = initialState, {type, payload}) => {
-	console.log("payloadererer", payload);
 	switch (type) {
 		case SET_SHOW_WAITING_SEND_ASSET_POPUP:
 			return {

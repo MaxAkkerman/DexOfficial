@@ -9,7 +9,7 @@ import TokenChanger from "../TokenChanger/TokenChanger";
 import ShowBalance from "../AmountBlock/ShowBalance";
 import MainBlock from "../MainBlock/MainBlock";
 import QRCode from "qrcode.react";
-import {copyToClipboard} from "../../reactUtils/reactUtils";
+import {copyToClipboard,handleCutAddress} from "../../reactUtils/reactUtils";
 
 function ReceiveAssets() {
 	const currentTokenForReceive = useSelector(
@@ -20,14 +20,7 @@ function ReceiveAssets() {
 		(state) => state.walletSeedReducer.tokenForReceiveSetted,
 	);
 
-	function handleCutAddress(address) {
-		//todo add validation
-		let spliced = address.slice(0, 7);
-		let splicedpart2 = address.slice(59);
-		let view = spliced + "..." + splicedpart2;
-		console.log("addressTo", address);
-		return view;
-	}
+
 
 	const history = useHistory();
 

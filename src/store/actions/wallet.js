@@ -32,8 +32,9 @@ export function setWallet(payload) {
 }
 
 export function setClientData(payload) {
-	console.log("setPubKey", payload);
-	localStorage.setItem("pubKey", JSON.stringify(payload));
+	console.log("clientData", payload);
+	localStorage.setItem("clientData", JSON.stringify(payload));
+
 	return {type: SET_CLIENT_DATA, payload};
 }
 

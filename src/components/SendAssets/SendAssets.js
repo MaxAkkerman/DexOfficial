@@ -306,7 +306,7 @@ function SendAssets() {
 
 	return (
 
-		<div className="container" onClick={()=>get()}>
+		<div className="container" style={{"flex-Direction": "column"}} onClick={()=>get()}>
 
 		{/*<div className="container" style={{flexDirection: "column"}}>*/}
 
@@ -447,6 +447,7 @@ function SendAssets() {
 
 			{validationMsgForAmount === NOT_ENOUGH_CAUSE_COMMISSION && (
 				<FormHelperText
+					style={{marginLeft: "27px", marginTop: "4px"}}
 					error
 				>{`${NOT_ENOUGH_CAUSE_COMMISSION} (Commission = ${SEND_TOKEN} TON)`}</FormHelperText>
 			)}
