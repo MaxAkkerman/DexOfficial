@@ -61,6 +61,7 @@ export async function InitializeClient(clientPubKey) {
 
 
     }
+    return true
 }
 
 export async function getAllTokensAndSetToStore(clientAddress) {
