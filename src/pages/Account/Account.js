@@ -26,6 +26,7 @@ import Loader from "../../components/Loader/Loader";
 import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
 import PasswordEnterPopup from "../../components/PasswordEnterPopup/PasswordEnterPopup";
 import {decrypt, decryptPure, encryptPure} from "../../extensions/seedPhrase";
+import {store} from "../../index";
 
 function Account() {
     const history = useHistory();
@@ -121,7 +122,8 @@ console.log("encClData",encClData)
                 public: "",
             }),
         );
-
+        store.dispatch(setTokenList([]));
+        store.dispatch(setLiquidityList([]));
         localStorage.removeItem("setSubscribeReceiveTokens");
 
 

@@ -198,7 +198,6 @@ function EnterPassword(props) {
         let decrypted = await decrypt(esp, seedPhrasePassword);
         const clientKeys = await getClientKeys(decrypted.phrase);
 
-
         if (decrypted.valid === false) {
             setDecryptResult(false);
             dispatch(
@@ -237,10 +236,8 @@ function EnterPassword(props) {
 
             }
 
-
             await InitializeClient(clientKeys.public)
             dispatch(setSeedPassword(seedPhrasePassword));
-
 
             const receiveTokensData = JSON.parse(localStorage.getItem("setSubscribeReceiveTokens"));
             if (receiveTokensData) {dispatch(setSubscribeReceiveTokens(receiveTokensData))}
