@@ -20,7 +20,7 @@ import {
 import {decrypt, decryptPure, encrypt, encryptPure, verifySeed} from "../../extensions/seedPhrase";
 
 import {
-    enterSeedPhraseSaveToLocalStorage, hideEnterSeedPhraseUnlock,
+    enterSeedPhraseSaveToLocalStorage, hideEnterSeedPhraseUnlock, setAfterEnterSeedLoading,
     setNewSide,
     setSeedPassword,
     showEnterSeedPhrase,
@@ -435,12 +435,12 @@ function EnterSeedPhrase(props) {
             return
         }
 
-        let res = false;
+
         if (validSeedPhrase && validPassword && existsClientOnRoot.status && !notDeployedClientExists) {
 
 
             setloadingUserDataIsWaitingSeed(true);
-
+            // dispatch(setAfterEnterSeedLoading(false))
 
             handleDeleteSeeds()
             await handleSetEncription()
@@ -448,8 +448,10 @@ function EnterSeedPhrase(props) {
             disSetTips("All checks passed, welcome onboard!", "success")
             // dispatch(showEnterSeedPhrase(false));
 
-            dispatch(showEnterSeedPhrase(false));
+            // dispatch(showEnterSeedPhrase(false));
             setloadingUserDataIsWaitingSeed(false);
+            // dispatch(setAfterEnterSeedLoading(true))
+
             history.push("/wallet");
 
         } else {

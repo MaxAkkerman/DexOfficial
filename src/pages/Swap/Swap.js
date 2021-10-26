@@ -432,11 +432,15 @@ function Swap() {
 									borderError={errors.fromTokenAmount}
 									incorrectBalance={incorrectBalance}
 								/>
-								{errors.fromTokenAmount && (
-									<FormHelperText error sx={{color: "var(--text-color)"}}>
+								{errors.fromTokenAmount ? (
+									<FormHelperText error sx={{marginLeft:"27px",color: "var(--text-color)"}}>
 										{NOT_ENOUGH}
 									</FormHelperText>
-								)}
+								)
+								:
+									<div style={{height:"22px"}}/>
+
+								}
 								{/*<>   {incorrectBalance && <div>error</div>}</>*/}
 								<SwapBtn
 									fromToken={fromToken}

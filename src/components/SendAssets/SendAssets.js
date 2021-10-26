@@ -112,7 +112,7 @@ function SendAssets() {
 				console.log("currentTokenForSend.CHECK", selectedToken.tokenName);
 			}
 			console.log(
-				"error: amount should be set or you have not enought balance",
+				"error: amount should be set or you have not enough balance",
 			);
 		} else setsendConfirmPopupIsVisible(true);
 	}
@@ -357,7 +357,7 @@ function SendAssets() {
 
 								</div>
 							</div>
-							{isInvalidAddress && addressToSend && (
+							{(isInvalidAddress && addressToSend) ? (
 								<FormHelperText
 									style={{marginLeft: "27px", marginTop: "4px"}}
 									error
@@ -365,7 +365,10 @@ function SendAssets() {
 								>
 									{validationMsgForAddress}
 								</FormHelperText>
-							)}
+							)
+								:
+								<div style={{height:"23px"}}/>
+							}
 							{console.log(isInvalidAddress, validationMsgForAddress)}
 							<BlockItem
 								leftTitle={"Amount"}
@@ -393,8 +396,8 @@ function SendAssets() {
 										),
 								})}
 							/>
-							{isInvalidAmount &&
-								validationMsgForAmount !== NOT_ENOUGH_CAUSE_COMMISSION && (
+							{(isInvalidAmount &&
+								validationMsgForAmount !== NOT_ENOUGH_CAUSE_COMMISSION) ? (
 									<FormHelperText
 										style={{marginLeft: "27px", marginTop: "4px"}}
 										error
@@ -402,9 +405,13 @@ function SendAssets() {
 									>
 										{validationMsgForAmount}
 									</FormHelperText>
-								)}
+								)
+							:
+								<div style={{height:"23px"}}/>
 
-							<div className="btn_wrapper ">
+							}
+
+							<div className="btn_wrapper" style={{marginTop:"25px"}}>
 								<button
 									onClick={() => handleSetSendPopupVisibility()}
 									className={cls("btn mainblock-btn", {

@@ -31,7 +31,6 @@ export async function InitializeClient(clientPubKey) {
         const dexClientAddress = clientStatus.dexclient;
         const dexClientStatus = clientStatus.status;
         const dexClientBalance = await getClientBalance(dexClientAddress);
-        const dexClientPublicKey = clientPubKey;
         store.dispatch(
             setClientData({
                 status: dexClientStatus,
@@ -43,7 +42,7 @@ export async function InitializeClient(clientPubKey) {
 
         const extensionWallet = await getWalletExt(
             dexClientAddress,
-            dexClientPublicKey,
+            clientPubKey,
         );
 
         store.dispatch(setCurExt(extensionWallet[0]));

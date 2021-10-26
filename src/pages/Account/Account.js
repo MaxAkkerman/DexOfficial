@@ -36,7 +36,9 @@ function Account() {
     const transListReceiveTokens = useSelector(
         (state) => state.walletReducer.transListReceiveTokens,
     );
-
+    const afterEnterSeedLoading = useSelector(
+        (state) => state.enterSeedPhrase.afterEnterSeedLoading,
+    );
     const [transArr, setTransArr] = useState([]);
     useEffect(() => {
         setTransArr(transListReceiveTokens);
