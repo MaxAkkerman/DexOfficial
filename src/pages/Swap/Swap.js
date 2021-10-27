@@ -42,6 +42,7 @@ import {
 } from "../../constants/commissions";
 import useAssetList from "../../hooks/useAssetList";
 import {FormHelperText} from "@mui/material";
+import {checkDecimals} from "../../reactUtils/reactUtils";
 
 
 function Swap() {
@@ -341,9 +342,7 @@ function Swap() {
 		else setIsError(true);
 	}, [errors]);
 
-	function checkDecimals(value) {
-		return value.toFixed(4);
-	}
+
 
 	function validate(fromValue, toValue, fromToken, toToken) {
 		console.log(fromToken, toToken);

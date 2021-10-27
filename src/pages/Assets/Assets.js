@@ -25,6 +25,7 @@ import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
 import TONicon from "../../images/tonCrystalDefault.svg";
 import salary from "../../images/salary.svg";
 import WithDraw from "../../components/WithDraw/WithDraw";
+import {getFraction} from "../../reactUtils/reactUtils";
 // import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 
 function Assets() {
@@ -163,7 +164,26 @@ function Assets() {
 		setCurNFTForWithdraw(item)
 		console.log("item",item)
 	}
+	async function rule(num){
+		// const num = 1.204
+		const check = getFraction(num)
+		console.log("check",check)
+		// let tokenAamount = 1
+		// let tokenBamount = 0.0001
+		//
+		// let poolStatus = await processLiquidity(
+		//     clientData.address,
+		//     "0:5b0332fa7e6da60a7d545dc8c1a4b479347af8f7c63a8fd6bd3d6317d11e6112",
+		//     tokenAamount,
+		//     tokenBamount,
+		//     keyPair,
+		//     tokenA,
+		//     tokenB,
+		// );
+		// console.log("poolStatus",poolStatus)
 
+
+	}
 	const {assetList: tokensList} = useTokensList();
 	return (
 		<>
@@ -189,7 +209,7 @@ function Assets() {
 			}
 
 			{!showWrapMenu && !showWithdrawMenu &&
-			<div className="container">
+			<div className="container" onClick={()=>rule(1.022)}>
 				<MainBlock
 					smallTitle={false}
 					// title={'Assets'}

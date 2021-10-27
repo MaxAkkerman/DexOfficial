@@ -226,3 +226,26 @@ export function handleCutAddress(address) {
     let splicedpart2 = address.slice(59);
     return spliced + "..." + splicedpart2;
 }
+export function checkDecimals(value) {
+    return value.toFixed(4);
+}
+function qtyOneForOther(amountIn, reserveIn, reserveOut) {
+    return Math.floor((amountIn * reserveOut) / reserveIn);
+}
+
+export function getSumsForProvide(amountA, amountB, reserveA, reserveB, additional) {
+    let argA = qtyOneForOther(amountB, reserveB, reserveA);
+    let argB = qtyOneForOther(amountA, reserveA, reserveB);
+    let minAmountA = Math.min(amountA, argA);
+    let minAmountB = Math.min(amountB, argB);
+    let crmin = Math.min(reserveA, reserveB);
+    let crmax = Math.max(reserveA, reserveB);
+    let crquotient = ~~(crmax / crmin);
+    let crremainder = crmax % crmin;
+    let amountMin = Math.min(minAmountA, minAmountB) + (additional ? additional : 0);
+    let amountOther = amountMin * crquotient + (amountMin * crremainder) / crmin;
+    let acceptForProvideA = minAmountA < minAmountB ? amountMin : amountOther;
+    let acceptForProvideB = minAmountB < minAmountA ? amountMin : amountOther;
+
+    return [Math.floor(acceptForProvideA), Math.floor(acceptForProvideB)];
+}

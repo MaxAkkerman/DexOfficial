@@ -31,34 +31,38 @@ function CreatePair() {
     const history = useHistory();
     const dispatch = useDispatch();
 
-    const walletIsConnected = useSelector(
-        (state) => state.appReducer.walletIsConnected,
-    );
-
-    const pairsList = useSelector((state) => state.walletReducer.pairsList);
-
+    const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
     const fromToken = useSelector((state) => state.poolReducer.fromToken);
     const toToken = useSelector((state) => state.poolReducer.toToken);
-
-    const fromValue = useSelector((state) => state.poolReducer.fromInputValue);
-    const toValue = useSelector((state) => state.poolReducer.toInputValue);
-    const pairId = useSelector((state) => state.poolReducer.pairId);
-
-    const poolAsyncIsWaiting = useSelector(
-        (state) => state.poolReducer.poolAsyncIsWaiting,
-    );
-    const [poolConfirmPopupIsVisible, setPoolConfirmPopupIsVisible] =
-        useState(false);
-
-    const [rateAB, setRateAB] = useState(0);
-    const [rateBA, setRateBA] = useState(0);
     const tokenList = useSelector((state) => state.walletReducer.tokenList);
     const liquidityList = useSelector((state) => state.walletReducer.liquidityList);
-
-    const [fromTokenSymbol, setFromTokenSymbol] = useState("");
-    const [toTokenSymbol, setTotTokenSymbol] = useState("");
-    const [ratesData, setRatesData] = useState({});
     const tips = useSelector((state) => state.appReducer.tips);
+    const clientData = useSelector((state) => state.walletReducer.clientData);
+
+    const [newPairSymbol, setNewPairname] = useState("")
+
+    const [tokenA, setTokenA] = useState({})
+    const [tokenASetted, setTokenAsetted] = useState(false)
+
+    const [tokenB, setTokenB] = useState({})
+    const [tokenBSetted, setTokenBsetted] = useState(false)
+
+    const [tokenAamount, setAamount] = useState(null)
+    const [isInvalidAmountA, setisInvalidAmountA] = useState(false)
+
+    const [tokenBamount, setBamount] = useState(null)
+    const [isInvalidAmountB, setisInvalidAmountB] = useState(false)
+
+    const [assetsList, setAssetsList] = useState([])
+
+    const [showAssetList, setshowAssetList] = useState(false)
+    const [type, setType] = useState("")
+
+    const [createPairConfirmPopupIsVisible, setcreatePairConfirmPopupIsVisible] = useState(false)
+
+    const [createPairAsyncIsWaiting, setcreatePairAsyncIsWaiting] = useState(false)
+
+    const {keyPair} = useKeyPair();
 
     useEffect(async () => {
         if (!tips || tips.length) return;
@@ -89,111 +93,7 @@ function CreatePair() {
         }
     }, [tokenList]);
 
-    function qtyOneForOther(amountIn, reserveIn, reserveOut) {
-        return Math.floor((amountIn * reserveOut) / reserveIn);
-    }
 
-    function acceptForProvide(amountA, amountB, reserveA, reserveB) {
-        let argA = qtyOneForOther(amountB, reserveB, reserveA);
-        let argB = qtyOneForOther(amountA, reserveA, reserveB);
-        let minAmountA = Math.min(amountA, argA);
-        let minAmountB = Math.min(amountB, argB);
-        let crmin = Math.min(reserveA, reserveB);
-        let crmax = Math.max(reserveA, reserveB);
-        let crquotient = ~~(crmax / crmin);
-        let crremainder = crmax % crmin;
-        let amountMin = Math.min(minAmountA, minAmountB);
-        let amountOther =
-            amountMin * crquotient + (amountMin * crremainder) / crmin;
-        let acceptForProvideA = minAmountA < minAmountB ? amountMin : amountOther;
-        let acceptForProvideB = minAmountB < minAmountA ? amountMin : amountOther;
-
-        return [Math.floor(acceptForProvideA), Math.floor(acceptForProvideB)];
-    }
-
-    function qtyForProvide(amountA, amountB, reserveA, reserveB) {
-        let argA = qtyOneForOther(amountB, reserveB, reserveA);
-        let argB = qtyOneForOther(amountA, reserveA, reserveB);
-        let min = 1;
-        let minAmountA = Math.min(amountA, argA);
-        let minAmountB = Math.min(amountB, argB);
-        let crmin = Math.min(reserveA, reserveB);
-        let crmax = Math.max(reserveA, reserveB);
-        let crquotient = ~~(crmax / crmin);
-        let crremainder = crmax % crmin;
-        let amountMin = Math.min(minAmountA, minAmountB) + 1;
-        let amountOther =
-            amountMin * crquotient + (amountMin * crremainder) / crmin;
-        let acceptForProvideA = minAmountA < minAmountB ? amountMin : amountOther;
-        let acceptForProvideB = minAmountB < minAmountA ? amountMin : amountOther;
-        return [Math.floor(acceptForProvideA), Math.floor(acceptForProvideB)];
-    }
-
-    function getTotalLP(qtyA, qtyB, reserveA, reserveB, totalSupplyBefore) {
-        //console.log("qtyA, qtyB, reserveA, reserveB,totalSupplyBefore",qtyA, qtyB, reserveA, reserveB,totalSupplyBefore)
-        let qtyArr = qtyForProvide(qtyA, qtyB, reserveA, reserveB);
-        let provideArr = acceptForProvide(qtyArr[0], qtyArr[1], reserveA, reserveB);
-        //console.log("expectLiquidityTokens",expectLiquidityTokens)
-        return Math.min(
-            Math.floor((provideArr[0] * totalSupplyBefore) / reserveA),
-            Math.floor((provideArr[1] * totalSupplyBefore) / reserveB),
-        );
-    }
-
-    useEffect(() => {
-        if (!pairId) {
-        } else {
-            let curPair = pairsList.filter((item) => item.pairAddress === pairId);
-            let totalSupply = curPair[0].totalSupply;
-            let reservesA = curPair[0].reserveA;
-            let reservesB = curPair[0].reservetB;
-            let symbA = curPair[0].symbolA;
-            let symbB = curPair[0].symbolB;
-            //console.log("curPair",curPair)
-            setRatesData({
-                totalSupply: +totalSupply / 1000000000,
-                reservesA: +reservesA / 1000000000,
-                reservesB: +reservesB / 1000000000,
-                symbA: symbA,
-                symbB: symbB,
-            });
-        }
-    }, [pairId]);
-
-    useEffect(() => {
-        if (fromToken && toToken) {
-            pairsList.forEach((i) => {
-                if (i.symbolA === fromToken.symbol && i.symbolB === toToken.symbol) {
-                    setRateAB(i.rateAB);
-                    setRateBA(i.rateBA);
-                } else if (
-                    i.symbolB === fromToken.symbol &&
-                    i.symbolA === toToken.symbol
-                ) {
-                    setRateAB(i.rateAB);
-                    setRateBA(i.rateBA);
-                }
-            });
-
-            if (
-                (fromTokenSymbol === fromToken.symbol ||
-                    fromTokenSymbol === toToken.symbol) &&
-                (toTokenSymbol === fromToken.symbol || toTokenSymbol === toToken.symbol)
-            ) {
-            } else {
-                setFromTokenSymbol(fromToken.symbol);
-                setTotTokenSymbol(toToken.symbol);
-            }
-        }
-    }, [fromToken, toToken]);
-
-    const [newPairSymbol, setNewPairname] = useState("")
-
-    const [tokenA, setTokenA] = useState({})
-    const [tokenASetted, setTokenAsetted] = useState(false)
-
-    const [tokenB, setTokenB] = useState({})
-    const [tokenBSetted, setTokenBsetted] = useState(false)
 
     useEffect(() => {
         if (tokenBSetted) {
@@ -218,18 +118,7 @@ function CreatePair() {
         setcreatePairConfirmPopupIsVisible(true)
     }
 
-    let totalLP =
-        getTotalLP(
-            fromValue * 1000000000,
-            toValue * 1000000000,
-            ratesData.reservesA * 1000000000,
-            ratesData.reservesB * 1000000000,
-            ratesData.totalSupply * 1000000000,
-        ) / 1000000000;
-
-
     function handleSetToken(item, type) {
-        console.log("itemm", item)
         if (type === "typeA") {
             setTokenA(item)
             setTokenAsetted(true)
@@ -244,19 +133,11 @@ function CreatePair() {
 
     }
 
-    const [tokenAamount, setAamount] = useState(null)
-    const [isInvalidAmountA, setisInvalidAmountA] = useState(false)
-
-    const [tokenBamount, setBamount] = useState(null)
-    const [isInvalidAmountB, setisInvalidAmountB] = useState(false)
-
     function setTokenAamount(am) {
-        console.log("amA", am, "tokenA.balance", tokenA.balance, tokenA.balance < tokenAamount)
         setAamount(am)
     }
 
     function setTokenBamount(am) {
-        console.log("amA", am, "tokenA.balance", tokenA.balance, tokenA.balance < tokenAamount)
         setBamount(am)
     }
 
@@ -285,7 +166,6 @@ function CreatePair() {
 
     }
 
-    const [assetsList, setAssetsList] = useState([])
     useEffect(() => {
         const assetsList = [...tokenList, ...liquidityList]
         setAssetsList(assetsList)
@@ -302,40 +182,25 @@ function CreatePair() {
         setshowAssetList(false)
     }
 
-    const [showAssetList, setshowAssetList] = useState(false)
-    const [type, setType] = useState("")
-
     function handleshowAssetsList(type) {
         setshowAssetList(true)
         setType(type)
     }
 
-    const [createPairConfirmPopupIsVisible, setcreatePairConfirmPopupIsVisible] = useState(false)
-    const clientData = useSelector((state) => state.walletReducer.clientData);
-    const {keyPair} = useKeyPair();
+
 
     function handleSetCreatePairConfirmPopupIsVisible() {
         setcreatePairConfirmPopupIsVisible(false)
     }
 
     async function handleCreateNewPair() {
-
-
         setcreatePairConfirmPopupIsVisible(false)
         setcreatePairAsyncIsWaiting(true)
-        console.log("create new pair")
         const {rootABsouint, rootABaddress} = await getRootTokenAddress(keyPair.public, newPairSymbol, 9)
-        console.log("rootABsouint, rootABaddress",rootABsouint, rootABaddress)
-        const {
-            pairAddress,
-            pairSoArg
-        } = await getPairAddress(keyPair.public, clientData.address, tokenA.rootAddress, tokenB.rootAddress, rootABaddress)
+        const {pairAddress, pairSoArg} = await getPairAddress(keyPair.public, clientData.address, tokenA.rootAddress, tokenB.rootAddress, rootABaddress)
 
         const souintConnectorTokenA = await getWalletAddress(keyPair.public, pairAddress, tokenA.rootAddress)
         const souintConnectorTokenB = await getWalletAddress(keyPair.public, pairAddress, tokenB.rootAddress)
-        console.log("rootABsouint",rootABsouint,"rootABaddress",rootABaddress,"pairAddress",pairAddress,"pairSoArg",pairSoArg)
-
-        //check 20 tons minimun
         const res = await createNewPair(
             clientData.address,
             keyPair,
@@ -347,22 +212,17 @@ function CreatePair() {
             souintConnectorTokenB,
             rootABsouint
         )
-        console.log("create new pair res",res)
-
         setTimeout(async ()=>{
             let connectRes = await connectToPair(pairAddress, keyPair);
-            console.log("connectRes",connectRes)
             let getClientForConnectStatus = await getClientForConnect(
                 connectRes,
                 clientData.address,
             );
-            console.log("getClientForConnectStatus",getClientForConnectStatus)
 
             let connectToRootsStatus = await connectToPairStep2DeployWallets(
                 getClientForConnectStatus,
                 keyPair,
             );
-            console.log("connectToRootsStatus",connectToRootsStatus)
 
             setTimeout(async ()=>{
                 let poolStatus = await processLiquidity(
@@ -379,54 +239,17 @@ function CreatePair() {
 
 
         },15000)
-
-        console.log("after connect pair")
-
-
         setcreatePairAsyncIsWaiting(false)
-
-
-        console.log("finishing")
-
-
-
-
-
-
-
     }
 
-    const [createPairAsyncIsWaiting, setcreatePairAsyncIsWaiting] = useState(false)
 
     function handleClose() {
         setcreatePairConfirmPopupIsVisible(false)
         setcreatePairAsyncIsWaiting(false)
     }
-    async function rule(){
-        await setTimeout(()=>console.log(1),5000)
-        setTimeout(()=>console.log(2),5000)
-        // const num = 1.204
-        // const check = getFraction(num)
-        // console.log("check",check)
-        // let tokenAamount = 1
-        // let tokenBamount = 0.0001
-        //
-        // let poolStatus = await processLiquidity(
-        //     clientData.address,
-        //     "0:5b0332fa7e6da60a7d545dc8c1a4b479347af8f7c63a8fd6bd3d6317d11e6112",
-        //     tokenAamount,
-        //     tokenBamount,
-        //     keyPair,
-        //     tokenA,
-        //     tokenB,
-        // );
-        // console.log("poolStatus",poolStatus)
 
-
-    }
     return (
-        <div className="container" onClick={()=>console.log("tokenA,tokenB", tokenAamount,
-            tokenBamount)}>
+        <div className="container">
             {!createPairAsyncIsWaiting && !createPairConfirmPopupIsVisible && (
                 <MainBlock
                     smallTitle={false}
@@ -671,15 +494,14 @@ function CreatePair() {
                 />
             )}
 
-            {showAssetList &&
-
-            <AssetsModalCreatePair
+            {showAssetList ? <AssetsModalCreatePair
                 handleSet={(item, type) => handleSetToken(item, type)}
                 handleCloseAssetsListPopup={() => handleCloseAssetsListPopup()}
                 type={type}
                 assetsList={assetsList}
-            />}
-            {createPairConfirmPopupIsVisible && (
+            /> : null}
+
+            {createPairConfirmPopupIsVisible ? (
                 <CreatePairConfirmPopup
                     handleDeployAsset={() => handleCreateNewPair()}
                     amountA={tokenAamount}
@@ -690,14 +512,14 @@ function CreatePair() {
                     // currentAsset={curAssetForDeploy}
                     hideConfirmPopup={() => handleSetCreatePairConfirmPopupIsVisible()}
                 />
-            )}
+            ) : null }
 
-            {createPairAsyncIsWaiting && (
+            {createPairAsyncIsWaiting ? (
                 <WaitingPopup
                     text={`Deploying ${newPairSymbol} pair`}
                     handleClose={() => handleClose()}
                 />
-            )}
+            ) : null}
         </div>
     );
 }
