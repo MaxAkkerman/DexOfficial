@@ -195,6 +195,24 @@ export function getRootSymbol(symbolA, symbolB) {
 // 	}
 // 	return bytes;
 // }
+Number.prototype.noExponents = function() {
+    var data = String(this).split(/[eE]/);
+    if (data.length == 1) return data[0];
+
+    var z = '',
+        sign = this < 0 ? '-' : '',
+        str = data[0].replace('.', ''),
+        mag = Number(data[1]) + 1;
+
+    if (mag < 0) {
+        z = sign + '0.';
+        while (mag++) z += '0';
+        return z + str.replace(/^\-/, '');
+    }
+    mag -= str.length;
+    while (mag--) z += '0';
+    return str + z;
+}
 export function toHex(input) {
     let output = '';
     for (let i = 0; i < input.length; i++) {
@@ -204,19 +222,26 @@ export function toHex(input) {
 }
 
 export function getFraction(num) {
+    console.log("nuuum",num)
     let numStr = num.toString()
     let shouldBeFact = numStr.match(/0.0/)
-
+    const ar = Array.from(numStr)
     console.log(shouldBeFact)
     if (!shouldBeFact) return num
     console.log("numStr", numStr)
     let regNumsSub = numStr.match(/[^0]{4}/)
 
     let regNumsZeros = numStr.match(/^.*0/)
+    const newNum = []
+    for(let i = 0; i< ar.length; i++){
+        if(regNumsZeros[i] === "0" || regNumsZeros[i] === ".") {
+            newNum.push(regNumsZeros[i])
+            console.log("newNum", newNum, "regNumsZeros", newNum.toString())
+        }
+    }
+    console.log("newNum", newNum, "newNumarr", newNum.toString())
 
-    console.log("regNumsSub", regNumsSub, "regNumsZeros", regNumsZeros)
-
-    return Number(regNumsZeros[0].concat(regNumsSub[0]))
+    return newNum.toString()
 
 }
 

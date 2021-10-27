@@ -7,36 +7,25 @@ import PoolConfirmPopup from "../../components/PoolConfirmPopup/PoolConfirmPopup
 import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
 import "./AddLiquidity.scss";
 import {showPopup} from "../../store/actions/app";
-import {setSwapFromToken, setSwapToToken} from "../../store/actions/swap";
-import {
-    setPoolAsyncIsWaiting,
-    setPoolFromToken,
-    setPoolToToken,
-} from "../../store/actions/pool";
-import {useFormik} from "formik";
+import {setPoolAsyncIsWaiting, setPoolFromToken, setPoolToToken,} from "../../store/actions/pool";
 import {
     NOT_ENOUGH,
     NOT_ENOUGH as NOT_ENOUGH_MSG,
     NOT_ENOUGH_CAUSE_COMMISSION as NOT_ENOUGH_CAUSE_COMMISSION_MSG,
     NOT_TOUCHED,
-    NOT_TOUCHED as NOT_TOUCHED_MSG,
 } from "../../constants/validationMessages";
-import {
-    PROVIDE_LIQUIDITY,
-    PROVIDE_LIQUIDITY_COMMISSION,
-    WRAP_UNWRAP as WRAP_UNWRAP_COMMISSION,
-} from "../../constants/commissions";
+import {PROVIDE_LIQUIDITY_COMMISSION,} from "../../constants/commissions";
 import {FormHelperText} from "@mui/material";
 import useAssetList from "../../hooks/useAssetList";
-import {checkDecimals, getSumsForProvide} from "../../reactUtils/reactUtils";
+import {getDecimals, getFraction, getSumsForProvide} from "../../reactUtils/reactUtils";
 
 function AddLiquidity() {
     const history = useHistory();
     const dispatch = useDispatch();
 
-    const walletIsConnected = useSelector(
-        (state) => state.appReducer.walletIsConnected,
-    );
+    const {assetList} = useAssetList();
+
+    const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
 
     const pairsList = useSelector((state) => state.walletReducer.pairsList);
 
@@ -46,21 +35,30 @@ function AddLiquidity() {
     const fromValue = useSelector((state) => state.poolReducer.fromInputValue);
     const toValue = useSelector((state) => state.poolReducer.toInputValue);
     const pairId = useSelector((state) => state.poolReducer.pairId);
+    const tips = useSelector((state) => state.appReducer.tips);
+    const tokenList = useSelector((state) => state.walletReducer.tokenList);
 
-    const poolAsyncIsWaiting = useSelector(
-        (state) => state.poolReducer.poolAsyncIsWaiting,
-    );
-    const [poolConfirmPopupIsVisible, setPoolConfirmPopupIsVisible] =
-        useState(false);
+    const poolAsyncIsWaiting = useSelector((state) => state.poolReducer.poolAsyncIsWaiting);
+
+
+    const [errors, setErrors] = React.useState({});
+    const [isError, setIsError] = React.useState(true);
+
+    const [poolConfirmPopupIsVisible, setPoolConfirmPopupIsVisible] = useState(false);
 
     const [rateAB, setRateAB] = useState(0);
     const [rateBA, setRateBA] = useState(0);
-    const tokenList = useSelector((state) => state.walletReducer.tokenList);
 
     const [fromTokenSymbol, setFromTokenSymbol] = useState("");
     const [toTokenSymbol, setTotTokenSymbol] = useState("");
     const [ratesData, setRatesData] = useState({});
-    const tips = useSelector((state) => state.appReducer.tips);
+
+    const [incorrectBalance, setincorrectBalance] = useState(false);
+    const [incorrectBalanceToValue, setincorrectBalanceToValue] = useState(false);
+
+    const [totalLPs, settotalLPs] = useState(0);
+    const [poolSharePercentage, setpoolSharePercentage] = useState(0);
+
 
     useEffect(async () => {
         if (!tips || tips.length) return;
@@ -103,17 +101,25 @@ function AddLiquidity() {
     useEffect(() => {
         if (!pairId) {
         } else {
-            let curPair = pairsList.filter((item) => item.pairAddress === pairId);
-            let totalSupply = curPair[0].totalSupply;
-            let reservesA = curPair[0].reserveA;
-            let reservesB = curPair[0].reservetB;
-            let symbA = curPair[0].symbolA;
-            let symbB = curPair[0].symbolB;
+            const curPair = pairsList.filter((item) => item.pairAddress === pairId)[0];
+            console.log("curPair", curPair)
+            const totalSupply = curPair.totalSupply;
+            const reservesA = curPair.reserveA;
+            const reservesB = curPair.reservetB;
+            const symbA = curPair.symbolA;
+            const symbB = curPair.symbolB;
             //console.log("curPair",curPair)
+            console.log("ratesdata", {
+                totalSupply: +totalSupply / getDecimals(curPair.decimalsAB),
+                reservesA: +reservesA / getDecimals(curPair.decimalsA),
+                reservesB: +reservesB / getDecimals(curPair.decimalsB),
+                symbA: symbA,
+                symbB: symbB,
+            })
             setRatesData({
-                totalSupply: +totalSupply / 1000000000,
-                reservesA: +reservesA / 1000000000,
-                reservesB: +reservesB / 1000000000,
+                totalSupply: +totalSupply / getDecimals(curPair.decimalsAB),
+                reservesA: +reservesA / getDecimals(curPair.decimalsA),
+                reservesB: +reservesB / getDecimals(curPair.decimalsB),
                 symbA: symbA,
                 symbB: symbB,
             });
@@ -147,8 +153,6 @@ function AddLiquidity() {
         }
     }, [fromToken, toToken]);
 
-    const [incorrectBalance, setincorrectBalance] = useState(false);
-    const [incorrectBalanceToValue, setincorrectBalanceToValue] = useState(false);
 
     function handleConfirm() {
         if (!fromValue && !toValue) return;
@@ -185,9 +189,6 @@ function AddLiquidity() {
 
     function mixPercentValue(totalLP, totalSup) {
         let percOfTotal = (totalLP * 100) / totalSup;
-        //
-        // let percOfTotal = ((fromValue*100)/(totalSup+fromValue)).toFixed(6)
-        // //console.log("totalSup",totalSup)
         return +percOfTotal;
     }
 
@@ -204,10 +205,6 @@ function AddLiquidity() {
             ratesData.totalSupply * 1000000000,
         ) / 1000000000;
 
-    const {assetList} = useAssetList();
-
-    const [errors, setErrors] = React.useState({});
-    const [isError, setIsError] = React.useState(true);
 
     useEffect(() => {
         if (Object.keys(errors).length === 0) setIsError(false);
@@ -226,11 +223,10 @@ function AddLiquidity() {
 
             const fromTokenBalance = Number(fromToken.balance);
             const toTokenBalance = Number(toToken.balance);
-
-            if (fromValue > checkDecimals(fromTokenBalance))
+            if (fromValue > fromTokenBalance)
                 localErrors.fromTokenAmount = NOT_ENOUGH_MSG;
 
-            if (toValue > checkDecimals(toTokenBalance))
+            if (toValue > toTokenBalance)
                 localErrors.toTokenAmount = NOT_ENOUGH_MSG;
 
             if (toValue === 0 || fromValue === 0)
@@ -252,6 +248,44 @@ function AddLiquidity() {
         if (fromToken && toToken) validate(fromValue, toValue, fromToken, toToken);
     }, [fromValue, toValue, fromToken, toToken]);
 
+    useEffect(() => {
+        setpoolSharePercentage(0)
+        settotalLPs(0)
+    }, [fromToken,toToken]);
+
+    useEffect(() => {
+        if(!fromValue || !toValue){
+            settotalLPs(0)
+            setpoolSharePercentage(0)
+            return
+        }
+        const totals = (getTotalLP(
+            fromValue * 1000000000,
+            toValue * 1000000000,
+            ratesData.reservesA * 1000000000,
+            ratesData.reservesB * 1000000000,
+            ratesData.totalSupply * 1000000000,
+        ) / 1000000000).noExponents()
+
+        const poolShare = mixPercentValue(
+            totalLP,
+            ratesData.totalSupply,
+        ).toFixed(4)
+
+        setpoolSharePercentage(poolShare)
+        settotalLPs(totals)
+    }, [fromValue,toValue]);
+
+    function getNumType(num){
+        const t = parseFloat(num).noExponents()
+        let tt = +t
+        if(Number(tt.toFixed(4)) === 0){
+            return t
+        }else{
+            return tt.toFixed(4)
+        }
+
+    }
     return (
         <div className="container">
             {!poolAsyncIsWaiting && (
@@ -293,13 +327,17 @@ function AddLiquidity() {
                                         borderError={errors.fromTokenAmount}
                                         incorrectBalance={incorrectBalance}
                                     />
-                                    {errors.fromTokenAmount && (
-                                        <FormHelperText error sx={{color: "var(--text-color)"}}>
-                                            {NOT_ENOUGH}
-                                        </FormHelperText>
-                                    )}
+                                    {errors.fromTokenAmount ? (
+                                            <FormHelperText error sx={{marginLeft: "27px", color: "var(--text-color)"}}>
+                                                {NOT_ENOUGH}
+                                            </FormHelperText>
+                                        )
+                                        :
+                                        <div style={{height: "22px"}}/>
+                                    }
                                     <svg
                                         className="add-liquidity-plus"
+                                        style={{marginTop: "26px"}}
                                         width="45"
                                         height="46"
                                         viewBox="0 0 45 46"
@@ -328,11 +366,14 @@ function AddLiquidity() {
                                         readOnly
                                         incorrectBalanceToValue={incorrectBalanceToValue}
                                     />
-                                    {errors.toTokenAmount && (
-                                        <FormHelperText error sx={{color: "var(--text-color)"}}>
-                                            {NOT_ENOUGH}
-                                        </FormHelperText>
-                                    )}
+                                    {errors.toTokenAmount ? (
+                                            <FormHelperText error sx={{marginLeft: "27px", color: "var(--text-color)"}}>
+                                                {NOT_ENOUGH}
+                                            </FormHelperText>
+                                        )
+                                        :
+                                        <div style={{height: "22px"}}/>
+                                    }
                                     {fromToken.symbol && toToken.symbol && (
                                         <div
                                             style={{
@@ -344,53 +385,53 @@ function AddLiquidity() {
                                             <div className="add-liquidity-wrapper">
                                                 <div>
 													<span>
-														{
+														{totalLPs
                                                             //todo check
-                                                            getTotalLP(
-                                                                fromValue * 1000000000,
-                                                                toValue * 1000000000,
-                                                                ratesData.reservesA * 1000000000,
-                                                                ratesData.reservesB * 1000000000,
-                                                                ratesData.totalSupply * 1000000000,
-                                                            ) /
-                                                            1000000000 !==
-                                                            0
-                                                                ? getTotalLP(
-                                                                fromValue * 1000000000,
-                                                                toValue * 1000000000,
-                                                                ratesData.reservesA * 1000000000,
-                                                                ratesData.reservesB * 1000000000,
-                                                                ratesData.totalSupply * 1000000000,
-                                                                ) /
-                                                                1000000000 <
-                                                                0.0001
-                                                                ? (
-                                                                    getTotalLP(
-                                                                        fromValue * 1000000000,
-                                                                        toValue * 1000000000,
-                                                                        ratesData.reservesA * 1000000000,
-                                                                        ratesData.reservesB * 1000000000,
-                                                                        ratesData.totalSupply * 1000000000,
-                                                                    ) / 1000000000
-                                                                ).toFixed(6)
-                                                                : (
-                                                                    getTotalLP(
-                                                                        fromValue * 1000000000,
-                                                                        toValue * 1000000000,
-                                                                        ratesData.reservesA * 1000000000,
-                                                                        ratesData.reservesB * 1000000000,
-                                                                        ratesData.totalSupply * 1000000000,
-                                                                    ) / 1000000000
-                                                                ).toFixed(4)
-                                                                : (
-                                                                    getTotalLP(
-                                                                        fromValue * 1000000000,
-                                                                        toValue * 1000000000,
-                                                                        ratesData.reservesA * 1000000000,
-                                                                        ratesData.reservesB * 1000000000,
-                                                                        ratesData.totalSupply * 1000000000,
-                                                                    ) / 1000000000
-                                                                ).toFixed(4)
+                                                            // getTotalLP(
+                                                            //     fromValue * 1000000000,
+                                                            //     toValue * 1000000000,
+                                                            //     ratesData.reservesA * 1000000000,
+                                                            //     ratesData.reservesB * 1000000000,
+                                                            //     ratesData.totalSupply * 1000000000,
+                                                            // ) /
+                                                            // 1000000000 !==
+                                                            // 0
+                                                            //     ? getTotalLP(
+                                                            //     fromValue * 1000000000,
+                                                            //     toValue * 1000000000,
+                                                            //     ratesData.reservesA * 1000000000,
+                                                            //     ratesData.reservesB * 1000000000,
+                                                            //     ratesData.totalSupply * 1000000000,
+                                                            //     ) /
+                                                            //     1000000000 <
+                                                            //     0.0001
+                                                            //     ? (
+                                                            //         getTotalLP(
+                                                            //             fromValue * 1000000000,
+                                                            //             toValue * 1000000000,
+                                                            //             ratesData.reservesA * 1000000000,
+                                                            //             ratesData.reservesB * 1000000000,
+                                                            //             ratesData.totalSupply * 1000000000,
+                                                            //         ) / 1000000000
+                                                            //     ).toFixed(6)
+                                                            //     : (
+                                                            //         getTotalLP(
+                                                            //             fromValue * 1000000000,
+                                                            //             toValue * 1000000000,
+                                                            //             ratesData.reservesA * 1000000000,
+                                                            //             ratesData.reservesB * 1000000000,
+                                                            //             ratesData.totalSupply * 1000000000,
+                                                            //         ) / 1000000000
+                                                            //     ).toFixed(4)
+                                                            //     : (
+                                                            //         getTotalLP(
+                                                            //             fromValue * 1000000000,
+                                                            //             toValue * 1000000000,
+                                                            //             ratesData.reservesA * 1000000000,
+                                                            //             ratesData.reservesB * 1000000000,
+                                                            //             ratesData.totalSupply * 1000000000,
+                                                            //         ) / 1000000000
+                                                            //     ).toFixed(4)
                                                         }
 													</span>
                                                     You will receive LP tokens
@@ -398,18 +439,14 @@ function AddLiquidity() {
 
                                                 <div>
 													<span>
-														{rateBA < 0.0001
-                                                            ? parseFloat(rateBA.toFixed(8))
-                                                            : parseFloat(rateBA.toFixed(4))}
+                                                        {getNumType(rateBA)}
 													</span>
                                                     {fromTokenSymbol} per 1 {toTokenSymbol}
                                                 </div>
 
                                                 <div>
 													<span>
-														{rateAB < 0.0001
-                                                            ? parseFloat(rateAB.toFixed(8))
-                                                            : parseFloat(rateAB.toFixed(4))}
+														{getNumType(rateAB)}
 													</span>
                                                     {toTokenSymbol} per 1 {fromTokenSymbol}
                                                 </div>
@@ -417,40 +454,19 @@ function AddLiquidity() {
 
                                             <div className="add-liquidity-wrapper">
                                                 <div>
-													<span>{`${
-                                                        mixPercentValue(
-                                                            fromValue,
-                                                            ratesData.totalSupply,
-                                                        ) !== 0
-                                                            ? mixPercentValue(
-                                                            fromValue,
-                                                            ratesData.totalSupply,
-                                                            ) < 0.0001
-                                                            ? mixPercentValue(
-                                                                totalLP,
-                                                                ratesData.totalSupply,
-                                                            ).toFixed(8)
-                                                            : mixPercentValue(
-                                                                totalLP,
-                                                                ratesData.totalSupply,
-                                                            ).toFixed(4)
-                                                            : mixPercentValue(
-                                                            totalLP,
-                                                            ratesData.totalSupply,
-                                                            ).toFixed(4)
-                                                    } %`}</span>
+													<span>{`${poolSharePercentage} %`}</span>
                                                     Your share of pool
                                                 </div>
                                                 <div>
 													<span>
-														{parseFloat(ratesData.reservesA).toFixed(4)}
+														{getNumType(ratesData.reservesA)}
 													</span>
                                                     {fromTokenSymbol} pooled
                                                 </div>
 
                                                 <div>
 													<span>
-														{parseFloat(ratesData.reservesB).toFixed(4)}
+														{getNumType(ratesData.reservesB)}
 													</span>
                                                     {toTokenSymbol} pooled
                                                 </div>
@@ -500,21 +516,21 @@ function AddLiquidity() {
                 </>
             )}
 
-            {poolConfirmPopupIsVisible && (
+            {poolConfirmPopupIsVisible ? (
                 <PoolConfirmPopup
                     hideConfirmPopup={setPoolConfirmPopupIsVisible.bind(this, false)}
                     rateAB={rateAB}
                     rateBA={rateBA}
                     lpAmount={totalLP < 0.0001 ? totalLP.toFixed(8) : totalLP.toFixed(4)}
                 />
-            )}
+            ) : null}
 
-            {poolAsyncIsWaiting && (
+            {poolAsyncIsWaiting ? (
                 <WaitingPopup
                     text={`Supplying ${fromValue} ${fromToken.symbol} and ${toValue} ${toToken.symbol}`}
                     handleClose={() => handleClose()}
                 />
-            )}
+            ) : null}
         </div>
     );
 }

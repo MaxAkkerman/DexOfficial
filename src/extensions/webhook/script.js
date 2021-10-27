@@ -635,22 +635,27 @@ console.log("response.decoded.output",response.decoded.output)
 		console.log("curRootDataA", curRootDataA);
 		const decimalsRootA = Number(curRootDataA.decoded.output.value0.decimals);
 		const decimalsRootB = Number(curRootDataB.decoded.output.value0.decimals);
+		const decimalsRootAB = Number(curRootDataAB.decoded.output.value0.decimals);
 
 		const balanceA = Number(bal.decoded.output.balanceReserve[item[1].root0]);
 		const balanceB = Number(bal.decoded.output.balanceReserve[item[1].root1]);
 
-		const fixedA =  getFixedNums(decimalsRootA, balanceA);
-		const fixedB =  getFixedNums(decimalsRootB, balanceB);
+		const fixedA = getFixedNums(decimalsRootA, balanceA);
+		const fixedB = getFixedNums(decimalsRootB, balanceB);
 		// console.log("fixedA", fixedA, "fixedB", fixedB);
 		let itemData = {};
 		itemData.pairAddress = item[0];
 
 		// itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
 		itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol);
-		itemData.reserveA = fixedA;
+		itemData.reserveA = balanceA;
+		itemData.decimalsA = decimalsRootA;
 
 		itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
-		itemData.reservetB = fixedB;
+		itemData.reservetB = balanceB;
+		itemData.decimalsB = decimalsRootB;
+
+		itemData.decimalsAB = decimalsRootAB;
 
 		itemData.rateAB = fixedB / fixedA;
 		itemData.rateBA = fixedA / fixedB;
@@ -1656,7 +1661,7 @@ export async function getPairsTotalSupply(pairAddress) {
 	const acc = new Account(DEXPairContract, {address: pairAddress, client});
 	try {
 		const response = await acc.runLocal("totalSupply", {});
-		return response.decoded.output.totalSupply;
+		return +response.decoded.output.totalSupply;
 	} catch (e) {
 		console.log("catch E", e);
 		return e;
