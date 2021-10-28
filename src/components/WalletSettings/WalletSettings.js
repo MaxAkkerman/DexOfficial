@@ -4,27 +4,14 @@ import MainBlock from "../../components/MainBlock/MainBlock";
 import "./WalletSettings.scss";
 import arrowBack from "../../images/arrowBack.png";
 import {useHistory} from "react-router-dom";
-import MultilineTextFields from "./CustomList";
 import {showRevealSeedPhrase} from "../../store/actions/enterSeedPhrase";
 import {decrypt} from "../../extensions/tonUtils";
 
-const networksArray = [
-	{
-		value: "net.ton.dev",
-		label: "net.ton.dev",
-	},
-	{
-		value: "fld.ton.dev",
-		label: "fld.ton.dev",
-	},
-];
 
 function WalletSettings() {
 	const history = useHistory();
 	const dispatch = useDispatch();
-	const seedPhrasePassword = useSelector(
-		(state) => state.enterSeedPhrase.seedPhrasePassword,
-	);
+	const seedPhrasePassword = useSelector((state) => state.enterSeedPhrase.seedPhrasePassword);
 
 	function handleBack() {
 		history.push("/wallet");
@@ -32,10 +19,6 @@ function WalletSettings() {
 
 	function handlePushToKeys() {
 		history.push("/wallet/settings/keys");
-	}
-
-	function handleChangeNetwork(e) {
-		console.log("222", e);
 	}
 
 	async function openRevealSeedPhrase() {
@@ -57,25 +40,6 @@ function WalletSettings() {
 							</button>
 							<div className="left_block boldFont">Settings</div>
 						</div>
-						{/*<div className="recipient_wrapper">*/}
-						{/*    <div className="send_text_headers">*/}
-						{/*        Network*/}
-						{/*    </div>*/}
-						{/*    <div>*/}
-						{/*        <div className="send_inputs2">*/}
-
-						{/*            <MultilineTextFields*/}
-
-						{/*                networksArray={networksArray}*/}
-						{/*            />*/}
-
-						{/*        </div>*/}
-						{/*        <div>*/}
-
-						{/*        </div>*/}
-						{/*    </div>*/}
-						{/*</div>*/}
-
 						<div className="bottomBtnsWrapper">
 							<div className="btn_wrapper full_width">
 								<button

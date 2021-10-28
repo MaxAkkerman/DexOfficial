@@ -1,28 +1,17 @@
-import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import arrowBack from "../../images/arrowBack.png";
+import React, {useState} from "react";
 import AssetsList from "../AssetsList/AssetsList";
-import {useHistory} from "react-router-dom";
-import {
-	setAmountForSend,
-	setCurrentTokenForSend,
-	setInputNFTDisabled,
-	setTokenSetted,
-} from "../../store/actions/walletSeed";
 import SearchInput from "../SearchInput/SearchInput";
-import useAssetList from "../../hooks/useAssetList";
-
 import CloseBtn from "../CloseBtn/CloseBtn";
 import MainBlock from "../MainBlock/MainBlock";
-import {useMediatedState} from "react-use";
 
 function AssetsModalCreatePair(props) {
+
+	const [filter, setFilter] = useState("");
 
 	function handleSetToken(item) {
 		props.handleSet(item,props.type)
 	}
 
-	const [filter, setFilter] = useState("");
 	function handleSearch(text) {
 		setFilter(text);
 	}

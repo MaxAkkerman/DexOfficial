@@ -12,17 +12,10 @@ import QRCode from "qrcode.react";
 import {copyToClipboard,handleCutAddress} from "../../reactUtils/reactUtils";
 
 function ReceiveAssets() {
-	const currentTokenForReceive = useSelector(
-		(state) => state.walletSeedReducer.currentTokenForReceive,
-	);
-
-	const tokenForReceiveSetted = useSelector(
-		(state) => state.walletSeedReducer.tokenForReceiveSetted,
-	);
-
-
-
 	const history = useHistory();
+
+	const currentTokenForReceive = useSelector((state) => state.walletSeedReducer.currentTokenForReceive);
+	const tokenForReceiveSetted = useSelector((state) => state.walletSeedReducer.tokenForReceiveSetted);
 
 	function handleBack() {
 		history.push("/wallet");

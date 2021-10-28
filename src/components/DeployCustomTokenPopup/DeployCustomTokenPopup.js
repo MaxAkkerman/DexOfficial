@@ -7,7 +7,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import {FormHelperText} from "@material-ui/core";
 import {connectToPairStep2DeployWallets} from "../../extensions/sdk_run/run";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
-import {getAccType, getDetailsFromTokenRoot} from "../../extensions/sdk_get/get";
+import {getDetailsFromTokenRoot} from "../../extensions/sdk_get/get";
 import useKeyPair from "../../hooks/useKeyPair";
 import {hex2a} from "../../reactUtils/reactUtils"
 function DeployCustomTokenPopup(props) {

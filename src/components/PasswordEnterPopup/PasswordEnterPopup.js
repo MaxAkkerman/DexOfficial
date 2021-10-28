@@ -1,16 +1,11 @@
-import React, {useEffect, useState} from "react";
-import {useDispatch} from "react-redux";
+import React from "react";
 import {
     Box,
     Grid,
     TextField,
 } from "@material-ui/core";
-import {useHistory} from "react-router-dom";
 
 function PasswordEnterPopup(props) {
-    const history = useHistory();
-    const dispatch = useDispatch();
-console.log("PasswordEnterPopup")
     return (
 
         <Grid

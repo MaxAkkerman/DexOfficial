@@ -8,20 +8,14 @@ import {
 import {
 	setOrdersFromInputValue,
 	setOrdersFromToken,
-	setOrdersToInputValue,
 	setOrdersToToken,
 } from "../../store/actions/limitOrders";
 
 function SwapBtn(props) {
 	const dispatch = useDispatch();
 	const toSwapValue = useSelector((state) => state.swapReducer.toInputValue);
-	const fromSwapValue = useSelector(
-		(state) => state.swapReducer.fromInputValue,
-	);
 	const toOrdersValue = useSelector((state) => state.limitOrders.toInputValue);
-	const fromOrdersValue = useSelector(
-		(state) => state.limitOrders.fromInputValue,
-	);
+
 	function handleClick() {
 		const {fromToken, toToken} = props;
 

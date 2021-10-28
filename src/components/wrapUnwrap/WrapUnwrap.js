@@ -1,22 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import MainBlock from "../../components/MainBlock/MainBlock";
-// import './SendAssets.scss';
 import arrowBack from "../../images/arrowBack.png";
-import {useHistory} from "react-router-dom";
 import {
-	setAddressForSend,
 	setAmountForSend,
 	setShowWaitingSendAssetsPopup,
 } from "../../store/actions/walletSeed";
 import InputChangeLocal from "../AmountBlock/InputChangeLocal";
 import BlockItem from "../AmountBlock/AmountBlock";
-import MaxBtn from "../AmountBlock/MAXbtn";
 import ShowBalance from "../AmountBlock/ShowBalance";
 import {
 	connectToPairStep2DeployWallets,
-	sendNativeTons,
-	sendNFT,
 	sendToken,
 	unWrapTons,
 	wrapTons,
@@ -25,7 +19,6 @@ import WaitingPopup from "../WaitingPopup/WaitingPopup";
 import {setTips} from "../../store/actions/app";
 import SetTokenBlock from "../AmountBlock/SetTokenBlock";
 import useKeyPair from "../../hooks/useKeyPair";
-import {setTokenList} from "../../store/actions/wallet";
 import {decrypt} from "../../extensions/tonUtils";
 import {getClientKeys} from "../../extensions/sdk_get/get";
 import {useFormik} from "formik";
@@ -41,20 +34,20 @@ import {WRAP_UNWRAP as WRAP_UNWRAP_COMMISSION} from "../../constants/commissions
 
 function WrapUnwrap(props) {
 	const dispatch = useDispatch();
-	const history = useHistory();
+
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 
+	const encryptedSeedPhrase = useSelector((state) => state.enterSeedPhrase.encryptedSeedPhrase);
+	const seedPhrasePassword = useSelector((state) => state.enterSeedPhrase.seedPhrasePassword);
+
 	const [wrapConfirmIsVisible, setWrapConfirmIsVisible] = useState(false);
-
 	const [noWtonWallet, setNoWtonWallet] = useState(true);
+	const [mainIsVisible, setmainIsVisible] = useState(true);
+	const [deployWTONisVisible, setdeployWTONisVisible] = useState(false);
 
-	const encryptedSeedPhrase = useSelector(
-		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
-	);
-	const seedPhrasePassword = useSelector(
-		(state) => state.enterSeedPhrase.seedPhrasePassword,
-	);
+	const {keyPair} = useKeyPair();
+	const {assetList} = useAssetList();
 
 	useEffect(() => {
 		const wtonWallet = tokenList.filter(
@@ -62,13 +55,13 @@ function WrapUnwrap(props) {
 				item.rootAddress ===
 				"0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37",
 		);
-		console.log("wtonWallet", wtonWallet.length);
 		if (wtonWallet.length === 1) {
 			setNoWtonWallet(false);
 		} else {
 			setNoWtonWallet(true);
 		}
 	}, []);
+
 	useEffect(() => {
 		const wtonWallet = tokenList.filter(
 			(item) =>
@@ -82,7 +75,7 @@ function WrapUnwrap(props) {
 		}
 	}, [tokenList]);
 
-	const [mainIsVisible, setmainIsVisible] = useState(true);
+
 	async function handleDeployWtonWallet() {
 		if (clientData.balance < 4) {
 			dispatch(
@@ -112,14 +105,11 @@ function WrapUnwrap(props) {
 			setmainIsVisible(true);
 		}
 	}
-	const [deployWTONisVisible, setdeployWTONisVisible] = useState(false);
+
 	function handleCloseWTON() {
 		setmainIsVisible(true);
 		setdeployWTONisVisible(false);
 	}
-	const {keyPair} = useKeyPair();
-
-	const {assetList} = useAssetList();
 
 	const {
 		values,

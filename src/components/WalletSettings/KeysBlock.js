@@ -10,14 +10,13 @@ import {getClientKeys} from "../../extensions/sdk_get/get";
 import {copyToClipboard, handleCutAddress} from "../../reactUtils/reactUtils";
 
 function KeysBlock() {
-	const encryptedSeedPhrase = useSelector(
-		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
-	);
-	const seedPhrasePassword = useSelector(
-		(state) => state.enterSeedPhrase.seedPhrasePassword,
-	);
+	const history = useHistory();
+
+	const encryptedSeedPhrase = useSelector((state) => state.enterSeedPhrase.encryptedSeedPhrase);
+	const seedPhrasePassword = useSelector((state) => state.enterSeedPhrase.seedPhrasePassword);
 
 	const [keys, setKeys] = useState({});
+
 	useEffect(async () => {
 		let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
 		const keys = await getClientKeys(decrypted.phrase);
@@ -25,17 +24,8 @@ function KeysBlock() {
 		setKeys(keys);
 	}, []);
 
-
-
-	const history = useHistory();
-
 	function handleBack() {
 		history.push("/wallet/settings");
-	}
-
-	async function handleCopy(copy) {
-		await copyToClipboard(copy);
-		// navigator.clipboard.writeText(copy)
 	}
 
 	return (

@@ -7,8 +7,6 @@ import {decrypt} from "../../extensions/tonUtils";
 import TON from "../../images/tonCrystalDefault.svg";
 import {
 	setShowStakingWaitingPopup,
-	setStackingAmount,
-	setStackingPeriod,
 } from "../../store/actions/staking";
 import {setTips} from "../../store/actions/app";
 
@@ -16,23 +14,14 @@ function StackingConfirmPopup(props) {
 	const dispatch = useDispatch();
 	const curExt = useSelector((state) => state.appReducer.curExt);
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
-	console.log("propspropsprops", props);
-	const encryptedSeedPhrase = useSelector(
-		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
-	);
-	const seedPhrasePassword = useSelector(
-		(state) => state.enterSeedPhrase.seedPhrasePassword,
-	);
 
-	const periodForStacking = useSelector(
-		(state) => state.stakingReducer.periodForStacking,
-	);
-	const amountForStacking = useSelector(
-		(state) => state.stakingReducer.amountForStacking,
-	);
-	const apyForLockStake = useSelector(
-		(state) => state.stakingReducer.apyForLockStake,
-	);
+	const encryptedSeedPhrase = useSelector((state) => state.enterSeedPhrase.encryptedSeedPhrase);
+	const seedPhrasePassword = useSelector((state) => state.enterSeedPhrase.seedPhrasePassword);
+
+	const periodForStacking = useSelector((state) => state.stakingReducer.periodForStacking);
+	const amountForStacking = useSelector((state) => state.stakingReducer.amountForStacking);
+	const apyForLockStake = useSelector((state) => state.stakingReducer.apyForLockStake);
+
 	async function handleStake() {
 		props.handleClose();
 		dispatch(setShowStakingWaitingPopup(true));
@@ -64,9 +53,6 @@ function StackingConfirmPopup(props) {
 				}),
 			);
 		}
-		console.log("stakeRes", stakeRes);
-
-		// let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword)
 	}
 
 	return (
@@ -92,7 +78,6 @@ function StackingConfirmPopup(props) {
 				}
 				content={
 					<>
-						{/*<p className="confirm-subtitle">Confirm Stacking</p>*/}
 						<div className="confirm-block swap-confirm-block">
 							<span className="confirm-token">
 								<img
@@ -124,7 +109,7 @@ function StackingConfirmPopup(props) {
 											y2="-17.3695"
 											gradientUnits="userSpaceOnUse"
 										>
-											<stop stop-color="#41444E" />
+											<stop stopColor="#41444E" />
 											<stop offset="1" stopOpacity="0" />
 										</linearGradient>
 									</defs>
@@ -152,8 +137,8 @@ function StackingConfirmPopup(props) {
 											y2="-16.8695"
 											gradientUnits="userSpaceOnUse"
 										>
-											<stop stop-color="white" />
-											<stop offset="1" stop-color="white" stopOpacity="0" />
+											<stop stopColor="white" />
+											<stop offset="1" stopColor="white" stopOpacity="0" />
 										</linearGradient>
 									</defs>
 								</svg>

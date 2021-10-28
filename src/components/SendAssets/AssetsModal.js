@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import "./SendAssets.scss";
-import arrowBack from "../../images/arrowBack.png";
 import AssetsList from "../AssetsList/AssetsList";
 import {useHistory} from "react-router-dom";
 import {
@@ -15,28 +14,18 @@ import useAssetList from "../../hooks/useAssetList";
 
 import CloseBtn from "../CloseBtn/CloseBtn";
 import MainBlock from "../MainBlock/MainBlock";
-import {useMediatedState} from "react-use";
 
 function AssetsModal() {
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const NFTassets = useSelector((state) => state.walletSeedReducer.NFTassets);
 
-	const liquidityList = useSelector(
-		(state) => state.walletReducer.liquidityList,
-	);
+	const liquidityList = useSelector((state) => state.walletReducer.liquidityList);
 
 	const {assetList} = useAssetList();
 
-	function handleClear() {
-		dispatch(setInputNFTDisabled(null));
-		// dispatch(setAmountForSend(0))
-		history.push("/wallet/send");
-	}
-
 	function handleSetNFT(item) {
 		dispatch(setAmountForSend(""));
-		console.log("i am on vft");
 		dispatch(setInputNFTDisabled("disabled"));
 		dispatch(setAmountForSend(item.stakeTotal));
 		dispatch(setCurrentTokenForSend(item));
@@ -46,7 +35,6 @@ function AssetsModal() {
 	}
 
 	function handleSetToken(item) {
-		console.log("mey otiem", item);
 		dispatch(setAmountForSend(""));
 		dispatch(setInputNFTDisabled(null));
 		dispatch(setCurrentTokenForSend(item));
@@ -55,19 +43,9 @@ function AssetsModal() {
 		history.push("/wallet/send");
 	}
 
-	// const [showNFTdata, setShowNFTdata] = useState(false)
-	//
-	// function handleShowNFTData() {
-	//     setShowNFTdata(!showNFTdata)
-	//
-	// }
 	const [filter, setFilter] = useState("");
 	function handleSearch(text) {
 		setFilter(text);
-		// const assetsArrCopy = JSON.parse(JSON.stringify(assetsArr))
-		// const arr = assetsArrCopy.filter(item=>text===item.name)
-		//
-		// setAssetsArr(arr)
 	}
 	function handleClose() {
 		dispatch(setInputNFTDisabled(null));
@@ -76,19 +54,12 @@ function AssetsModal() {
 
 	return (
 		<>
-			{/*{showAssetsForSend &&*/}
-
 			<div className="select-wrapper">
 				<MainBlock
 					title={"Select a token"}
 					button={<CloseBtn func={() => handleClose()} />}
 					content={
 						<>
-							{/*<div className="head_wrapper">*/}
-							{/*    <button className="arrow_back" onClick={() => handleClear()}>*/}
-							{/*        <img src={arrowBack} alt={"arrow"}/>*/}
-							{/*    </button>*/}
-							{/*</div>*/}
 							<SearchInput func={(e) => handleSearch(e)} />
 
 							<AssetsList
@@ -99,7 +70,6 @@ function AssetsModal() {
 								orderAssetsArray={null}
 								showItBeShown={false}
 								filter={filter}
-								// showNFTdata={false}
 							/>
 						</>
 					}

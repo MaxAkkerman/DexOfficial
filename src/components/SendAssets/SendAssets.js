@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import cls from "classnames";
 import MainBlock from "../../components/MainBlock/MainBlock";
@@ -30,12 +30,9 @@ import {setTips} from "../../store/actions/app";
 
 import useSendAssetsSelectedToken from "../../hooks/useSendAssetsSelectedToken";
 import {
-	getAccType, getAccType2,
-	getDetailsFromTONtokenWallet,
-	getDetailsFromTONtokenWallet2,
+	getAccType2,
 	getExpectedWalletAddressByOwner
 } from "../../extensions/sdk_get/get";
-import Loader from "../Loader/Loader";
 
 import useKeyPair from "../../hooks/useKeyPair";
 
@@ -49,43 +46,24 @@ import {SEND_TOKEN} from "../../constants/commissions";
 function SendAssets() {
 	const dispatch = useDispatch();
 	const history = useHistory();
-	const amountToSend = useSelector(
-		(state) => state.walletSeedReducer.amountToSend,
-	);
-	const addressToSend = useSelector(
-		(state) => state.walletSeedReducer.addressToSend,
-	);
-	const showAssetsForSend = useSelector(
-		(state) => state.walletSeedReducer.showAssetsForSend,
-	);
-	const tokenSetted = useSelector(
-		(state) => state.walletSeedReducer.tokenSetted,
-	);
-	const showWaitingSendAssetPopup = useSelector(
-		(state) => state.walletSeedReducer.showWaitingSendAssetPopup,
-	);
-	const [sendConfirmPopupIsVisible, setsendConfirmPopupIsVisible] =
-		useState(false);
-
+	const amountToSend = useSelector((state) => state.walletSeedReducer.amountToSend);
+	const addressToSend = useSelector((state) => state.walletSeedReducer.addressToSend);
+	const tokenSetted = useSelector((state) => state.walletSeedReducer.tokenSetted);
+	const showWaitingSendAssetPopup = useSelector((state) => state.walletSeedReducer.showWaitingSendAssetPopup);
+	let curExt = useSelector((state) => state.appReducer.curExt);
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 
-	const encryptedSeedPhrase = useSelector(
-		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
-	);
-	const seedPhrasePassword = useSelector(
-		(state) => state.enterSeedPhrase.seedPhrasePassword,
-	);
+	const encryptedSeedPhrase = useSelector((state) => state.enterSeedPhrase.encryptedSeedPhrase);
+	const seedPhrasePassword = useSelector((state) => state.enterSeedPhrase.seedPhrasePassword);
 
-	let curExt = useSelector((state) => state.appReducer.curExt);
-	const {invalid: isInvalidAmount, validationMsg: validationMsgForAmount} =
-		useSendAssetsCheckAmount();
-	const {
-		invalid: isInvalidAddress,
-		loading: isLoading,
-		validationMsg: validationMsgForAddress,
-	} = useSendAssetsCheckAddress();
+	const [sendConfirmPopupIsVisible, setsendConfirmPopupIsVisible] = useState(false);
+	const [addressToSendView, setaddressToSendView] = useState("");
+
+	const {invalid: isInvalidAmount, validationMsg: validationMsgForAmount} = useSendAssetsCheckAmount();
+	const {invalid: isInvalidAddress,loading: isLoading,validationMsg: validationMsgForAddress} = useSendAssetsCheckAddress();
 	const {selectedToken} = useSendAssetsSelectedToken();
-	// const [currentAsset, setcurrentAsset] = useState([])
+	const {keyPair} = useKeyPair()
+
 	function handleSetSendPopupVisibility() {
 		if (
 			isInvalidAddress ||
@@ -124,33 +102,23 @@ function SendAssets() {
 
 	function handleChangeAddress(e) {
 		setaddressToSendView(e.currentTarget.value);
-		// console.log()
 		dispatch(setAddressForSend(e.currentTarget.value));
 	}
 
-	const [addressToSendView, setaddressToSendView] = useState("");
 
 	function handleSetView() {
-		//todo add validation
-		//         if(!addressToSend.length){return}
 		let spliced = addressToSend.slice(0, 7);
 		let splicedpart2 = addressToSend.slice(59);
 		let view = spliced + "..." + splicedpart2;
 		console.log("addressTo", addressToSend);
 		setaddressToSendView(view);
 	}
-	const {keyPair} = useKeyPair()
+
 
 	async function handleSendAsset() {
-		console.log(
-			"addrto, nftLockStakeAddress",
-			addressToSend,
-			selectedToken.addrData,
-		);
 		if (!addressToSend) {
 			return;
 		}
-		//todo refactor this
 
 		setsendConfirmPopupIsVisible(false);
 		dispatch(setShowWaitingSendAssetsPopup(true));
@@ -179,7 +147,6 @@ function SendAssets() {
 					}),
 				);
 			}
-			console.log("sendTokens", res);
 		} else if (selectedToken.symbol === "TON Crystal") {
 			if (!amountToSend) {
 				return;
@@ -206,7 +173,6 @@ function SendAssets() {
 					}),
 				);
 			}
-			console.log("sendNFT", res);
 		} else {
 			if (!amountToSend) {
 				return;
@@ -215,13 +181,9 @@ function SendAssets() {
 				selectedToken.rootAddress,
 				addressToSend,
 			);
-			console.log("walletAddrByOwner222", walletAddrByOwner);
 			const { acc_type } = await getAccType2(walletAddrByOwner.name)
-			console.log("acc_type", acc_type);
 			let sendTres
 			if(acc_type === 1){
-
-				console.log("if acc_type 1");
 				const sendRes = await sendToken(
 						clientData.address,
 						curExt,
@@ -231,12 +193,8 @@ function SendAssets() {
 						keyPair,
 						selectedToken,
 					);
-				console.log("if acc_type 1 sendRes",sendRes);
 			}else {
-				console.log("deployEmptyWallet",clientData.address, keyPair, selectedToken.rootAddress, walletAddrByOwner.name)
 				const deployRes = await deployEmptyWallet(clientData.address, keyPair, selectedToken.rootAddress, addressToSend)
-				console.log("deployRes",deployRes);
-
 				if (!deployRes.code) {
 					sendTres = await sendToken(
 						clientData.address,
@@ -247,7 +205,6 @@ function SendAssets() {
 						keyPair,
 						selectedToken,
 					);
-					console.log("sendtokens",sendTres)
 				}
 			}
 
@@ -276,21 +233,7 @@ function SendAssets() {
 		dispatch(setAddressForSend(""));
 		dispatch(setShowWaitingSendAssetsPopup(false));
 	}
-	async function get(){
 
-		// const walletAddrByOwner = await getExpectedWalletAddressByOwner(
-		// 	"0:751b6e22687891bdc1706c8d91bf77281237f7453d27dc3106c640ec165a2abf",
-		// 	"0:d771d527e4a49dad13af1a6eff628ddd3eb2512ad9f3481eeb82fb431bd9bfb7",
-		// );
-		// console.log("walletAddrByOwner",walletAddrByOwner)
-		// const det = await getDetailsFromTONtokenWallet2(walletAddrByOwner.name)
-		// // 0:59ef9f31c63a783d3e62a9038293dfc6166cecf13197bab1e107de89c324d33c
-		// console.log("det",det)
-
-
-		// const accType = await getAccType2("0:6b7da6d98817281c83aa5a863372d3efd89b96b6c087275b2b8193d1779e62ee")
-		// console.log("accType", accType.acc_type);
-	}
 	function handleClearInput() {
 		setaddressToSendView("");
 		dispatch(setAddressForSend(""));
@@ -306,10 +249,7 @@ function SendAssets() {
 
 	return (
 
-		<div className="container" style={{"flex-Direction": "column"}} onClick={()=>get()}>
-
-		{/*<div className="container" style={{flexDirection: "column"}}>*/}
-
+		<div className="container" style={{"flex-Direction": "column"}}>
 			{!showWaitingSendAssetPopup && (
 				<MainBlock
 					style={{
@@ -322,7 +262,6 @@ function SendAssets() {
 					content={
 						<div>
 							<div className="head_wrapper">
-								{/*//TODO*/}
 								<button
 									className="arrow_back"
 									onClick={() => handleBack(false)}
@@ -347,9 +286,7 @@ function SendAssets() {
 											className="recipient_input"
 											placeholder={"0:..."}
 										/>
-
 										<CloseIcon
-											// style=
 											fontSize="medium"
 											onClick={() => handleClearInput("address")}
 										/>
@@ -369,7 +306,6 @@ function SendAssets() {
 								:
 								<div style={{height:"23px"}}/>
 							}
-							{console.log(isInvalidAddress, validationMsgForAddress)}
 							<BlockItem
 								leftTitle={"Amount"}
 								// currentToken={currentToken}
@@ -408,7 +344,6 @@ function SendAssets() {
 								)
 							:
 								<div style={{height:"23px"}}/>
-
 							}
 
 							<div className="btn_wrapper" style={{marginTop:"25px"}}>

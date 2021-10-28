@@ -39,11 +39,6 @@ function Select(props) {
 	if (location.pathname.includes("orders")) toToken = ordersToToken;
 	const [filter, setFilter] = useState("");
 
-	const [fromTokenList, setFromTokenList] = useState([]);
-	const [toTokenList, setToTokenList] = useState([]);
-
-	const [isLoading, setIsLoading] = useState(true);
-
 	// useEffect(() => {
 	let fromArr = [];
 

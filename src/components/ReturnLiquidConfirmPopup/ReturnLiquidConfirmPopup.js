@@ -3,7 +3,6 @@ import {useSelector, useDispatch} from "react-redux";
 import {returnLiquidity} from "../../extensions/sdk_run/run";
 import {iconGenerator} from "../../iconGenerator";
 import MainBlock from "../MainBlock/MainBlock";
-import {decrypt} from "../../extensions/tonUtils";
 import "./ReturnLiquidConfirmPopup.scss";
 import {setTips} from "../../store/actions/app";
 import {setManageAsyncIsWaiting} from "../../store/actions/manage";
@@ -17,13 +16,8 @@ function ReturnLiquidConfirmPopup(props) {
 	const balance = useSelector((state) => state.manageReducer.balance);
 	const pairId = useSelector((state) => state.manageReducer.pairId);
 
-	// const encryptedSeedPhrase = useSelector(state => state.enterSeedPhrase.encryptedSeedPhrase);
-	// const seedPhrasePassword = useSelector(state => state.enterSeedPhrase.seedPhrasePassword);
-	const manageAsyncIsWaiting = useSelector(
-		(state) => state.manageReducer.manageAsyncIsWaiting,
-	);
-
 	const {keyPair} = useKeyPair();
+
 	async function handleRemoveConfirm() {
 		// let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword)
 		props.hideConfirmPopup();
@@ -34,7 +28,6 @@ function ReturnLiquidConfirmPopup(props) {
 			((balance * props.rangeValue) / 100) * 1000000000,
 			keyPair,
 		);
-		console.log("returnStatus", returnStatus);
 		dispatch(setManageAsyncIsWaiting(false));
 		if (!returnStatus.code) {
 			dispatch(
@@ -54,58 +47,8 @@ function ReturnLiquidConfirmPopup(props) {
 		props.setQtyA(0);
 		props.setQtyB(0);
 		props.setRangeValue(0);
-		// let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword)
-		// dispatch(setPoolAsyncIsWaiting(true));
-		// props.hideConfirmPopup();
-		// console.log("fromValue",fromValue,"toValue",toValue)
-		//   let poolStatus = await processLiquidity(curExt, pairId, (fromValue * 1000000000).toFixed(), (toValue * 1000000000).toFixed(),decrypted.phrase);
-		// console.log("pairId",pairId)
-		//   console.log("poolStatus",poolStatus)
-		// if(!poolStatus || (poolStatus && (poolStatus.code === 1000 || poolStatus.code === 3))){
-		//   dispatch(setPoolAsyncIsWaiting(false))
-		// }
-		//
-		// let olderLength = transactionsList.length;
-		// let newLength = transactionsList.push({
-		//   type: "processLiquidity",
-		//   fromValue: fromValue,
-		//   toValue: toValue,
-		//   fromSymbol: fromToken.symbol,
-		//   toSymbol: toToken.symbol,
-		//   lpTokens: null,
-		//   LPsymbol:`DS-W${fromToken.symbol}/W${toToken.symbol}`
-		// })
-		// let item = newLength - 1
-		// console.log("itemitem",typeof item,item,"prop",newLength - 1, "menu",newLength.length - olderLength.length)
-		// localStorage.setItem("currentElement", item);
-		// localStorage.setItem("lastType", "processLiquidity");
-		// if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
 
-		// if(poolStatus && poolStatus.code){
-		//   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-		//   dispatch(setPoolAsyncIsWaiting(false))
-		// }
-		// if(!poolStatus.code){
-		//   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-		// }
-		//  if(poolStatus.code){
-		//    dispatch(setPoolAsyncIsWaiting(false))
-		// switch (poolStatus.text) {
-		//
-		//   case 'Canceled by user.':
-		//     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-		//     break;
-		//   case 'Rejected by user':
-		//     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-		//     break;
-		//   default:
-		//     dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-		//     break;
-		//
-		// }
 	}
-
-	// dispatch(setPoolAsyncIsWaiting(false))
 
 	return (
 		<div className="popup-wrapper confirm-popup">

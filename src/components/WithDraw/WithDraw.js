@@ -15,7 +15,7 @@ import ShowBalance from "../AmountBlock/ShowBalance";
 import SendConfirmPopup from "../SendConfirmPopup/SendConfirmPopup";
 import {withdrawAll, withdrawPart} from "../../extensions/sdk_run/run";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
-import {getAccType, getAccTypeHex} from "../../extensions/sdk_get/get";
+import {getAccTypeHex} from "../../extensions/sdk_get/get";
 import SetTokenBlock from "../AmountBlock/SetTokenBlock";
 import useKeyPair from "../../hooks/useKeyPair";
 

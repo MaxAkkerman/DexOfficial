@@ -1,7 +1,6 @@
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useLocation} from "react-router-dom";
-// import { getPairReserves } from '../../extensions/sdk_run/run3';
 import {iconGenerator} from "../../iconGenerator";
 import {
 	hidePoolFromSelect,
@@ -37,17 +36,11 @@ function SelectItem(props) {
 	const walletIsConnected = useSelector(
 		(state) => state.appReducer.walletIsConnected,
 	);
-	console.log("assets list",props)
-	const swapFromToken = useSelector((state) => state.swapReducer.fromToken);
+
 	const swapToToken = useSelector((state) => state.swapReducer.toToken);
-	const poolFromToken = useSelector((state) => state.poolReducer.fromToken);
 	const poolToToken = useSelector((state) => state.poolReducer.toToken);
-	console.log("props", props);
 
 	async function handleClick() {
-		// if (props.isActive) {
-		//     return
-		// }
 		if (props.type === "from") {
 			const payload = {
 				walletAddress: "",

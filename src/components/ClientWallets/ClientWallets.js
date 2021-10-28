@@ -13,17 +13,14 @@ import includesTextInToken from "../../utils/includesTextInToken";
 
 function ClientWallets(props) {
 	const dispatch = useDispatch();
-	const [filter, setFilter] = useState("");
 
 	const clientData = useSelector((state) => state.walletReducer.clientData);
-	const walletIsConnected = useSelector(
-		(state) => state.appReducer.walletIsConnected,
-	);
+	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const LPTokenList = useSelector((state) => state.walletReducer.liquidityList);
-	console.log("tokenList", tokenList, "LPTokenList", LPTokenList);
 
 	const [at, setAT] = useState(toArray(tokenList, LPTokenList));
+	const [filter, setFilter] = useState("");
 
 	function toArray(tokenList2, LPTokenList2) {
 		let toArr = [];
@@ -46,13 +43,11 @@ function ClientWallets(props) {
 		return toArr;
 	}
 
-	//console.log(LPTokenList);
 	useEffect(() => {
 		if (!walletIsConnected) {
 			return;
 		}
 		setAT(toArray(tokenList, LPTokenList));
-		console.log("--------------------", tokenList, LPTokenList);
 	}, [tokenList, LPTokenList]);
 
 	useEffect(async () => {
@@ -69,9 +64,6 @@ function ClientWallets(props) {
 
 			let tokenListST = allWallets.filter((i) => !i.symbol.includes("/"));
 
-			//localStorage.setItem('tokenList', JSON.stringify(tokenListST));
-			//localStorage.setItem('liquidityList', JSON.stringify(liquidityListST));
-
 			tokenListST.map((i) => {
 				i.lp = false;
 			});
@@ -83,7 +75,6 @@ function ClientWallets(props) {
 			dispatch(setLiquidityList(liquidityListST));
 
 			return;
-			// setAT(toArray(tokenListST, liquidityListST))
 		}
 
 		let changeba =

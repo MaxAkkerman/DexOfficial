@@ -5,7 +5,6 @@ import "./DeployAssetConfirmPopup.scss";
 import {copyToClipboard} from "../../reactUtils/reactUtils";
 
 function DeployAssetConfirmPopup(props) {
-	console.log("assssss", props);
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
 	return (
 		<div className="popup-wrapper">
