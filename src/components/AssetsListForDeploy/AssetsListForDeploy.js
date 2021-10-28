@@ -29,6 +29,8 @@ function AssetsListForDeploy() {
     const [deployWalletIsWaiting, setdeployWalletIsWaiting] = useState(false);
     const [showDeployCustomWalletPopup, setshowDeployCustomWalletPopup] = useState(false)
 
+    const [filter, setFilter] = useState("");
+
     function handleSetCustomAddrPopup() {
         setshowDeployCustomWalletPopup(true)
     }
@@ -42,6 +44,9 @@ function AssetsListForDeploy() {
         showConfirmAssetDeployPopup(false);
     }
 
+    function handleSearch(text) {
+        setFilter(text);
+    }
 
     async function handleDeployAsset() {
         if (clientData.balance < 4) {
@@ -121,11 +126,11 @@ function AssetsListForDeploy() {
                                     </button>
                                 </div>
 
-                                <SearchInput func={() => console.log("func")}/>
+                                <SearchInput func={(e) => handleSearch(e)}/>
                                 {assetsFromGraphQL.length ? (
                                     <AssetsList
                                         assetWrap="heightfixWrap assetsList_off_padding"
-                                        TokenAssetsArray={assetsFromGraphQL}
+                                        TokenAssetsArray={assetsFromGraphQL.filter((i) => i.symbol.includes(filter.toUpperCase()))}
                                         NFTassetsArray={null}
                                         isAssetsInspector={true}
                                         handleClickNFT={() => console.log("token item")}
