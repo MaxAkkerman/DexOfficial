@@ -20,12 +20,12 @@ import {
     setSeedPassword,
     wordOneEnterSeedPhrase,
 } from "../../store/actions/enterSeedPhrase";
-import {getClientBalance} from "../../extensions/webhook/script";
-import {deployClient} from "../../extensions/sdk/run";
+import {getClientBalance} from "../../extensions/sdk_get/get";
+import {deployClient} from "../../extensions/sdk_run/run";
 import Loader from "../../components/Loader/Loader";
 import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
 import PasswordEnterPopup from "../../components/PasswordEnterPopup/PasswordEnterPopup";
-import {decrypt, decryptPure, encryptPure} from "../../extensions/seedPhrase";
+import {decrypt, decryptPure, encryptPure} from "../../extensions/tonUtils";
 import {store} from "../../index";
 
 function Account() {
@@ -33,24 +33,20 @@ function Account() {
     const dispatch = useDispatch();
     const [isCopied, setCopied] = useState(false);
     const clientData = useSelector((state) => state.walletReducer.clientData);
-    const transListReceiveTokens = useSelector(
-        (state) => state.walletReducer.transListReceiveTokens,
-    );
-    const afterEnterSeedLoading = useSelector(
-        (state) => state.enterSeedPhrase.afterEnterSeedLoading,
-    );
+    const transListReceiveTokens = useSelector((state) => state.walletReducer.transListReceiveTokens);
     const [transArr, setTransArr] = useState([]);
+
+    const [onDeploy, setonDeploy] = useState(false)
+    const [passEnterPopup, setPasswordEnterPopup] = useState(false)
+
+    const [clientPrepData, setclientPrepData] = useState({})
+
     useEffect(() => {
         setTransArr(transListReceiveTokens);
     }, [transListReceiveTokens]);
     useEffect(() => {
         setTransArr(transListReceiveTokens);
     }, []);
-
-    const [onDeploy, setonDeploy] = useState(false)
-    const [passEnterPopup, setPasswordEnterPopup] = useState(false)
-
-    const [clientPrepData, setclientPrepData] = useState({})
 
     async function onPassEnter() {
         const clientPrepData = JSON.parse(localStorage.getItem("clientDataPreDeploy"))
@@ -63,7 +59,6 @@ function Account() {
             );
             return
         }
-        console.log("clientPrepData", clientPrepData)
         const accBalance = await getClientBalance(clientPrepData.address);
         setclientPrepData(clientPrepData)
         if (accBalance > 0.5) {
@@ -83,7 +78,6 @@ function Account() {
         const encClData = await decryptPure(clientPrepData.secret, seedPhrasePassword)
         const encrData = JSON.parse(JSON.stringify(clientPrepData))
         encrData.secret = encClData
-console.log("encClData",encClData)
         setPasswordEnterPopup(false)
         setonDeploy(true)
         const deployRes = await deployClient(

@@ -10,36 +10,8 @@ import {
 	SET_SHOW_WAITING_SEND_ASSET_POPUP,
 	SET_TOKEN_SETTED,
 } from "../actions/types";
-import wETH from "../../images/tokens/wETH.svg";
-import TON from "../../images/tokens/TON.svg";
-import wBTC from "../../images/tokens/wBTC.svg";
 
-const assetstestArray = [
-	{
-		tokenName: "Ethereum",
-		balance: "1002",
-		tokenSymbol: "ETH",
-		icon: wETH,
-		address:
-			"0:4594ac781bdcdee350c9c8c25dfaf08d067b1214fa86c687f4deca048a76551f",
-	},
-	{
-		tokenName: "TON Crystal",
-		balance: "1052",
-		tokenSymbol: "TON",
-		icon: TON,
-		address:
-			"0:4594ac781bdcdee350c9c8c25dfaf08d067b1214fa86c687f4deca048a76551f",
-	},
-	{
-		tokenName: "Bitcoin",
-		balance: "102",
-		tokenSymbol: "BTC",
-		icon: wBTC,
-		address:
-			"0:4594ac781bdcdee350c9c8c25dfaf08d067b1214fa86c687f4deca048a76551f",
-	},
-];
+import {assetstestArray} from "../../constants/defaultData";
 
 const initialState = {
 	amountToSend: "",

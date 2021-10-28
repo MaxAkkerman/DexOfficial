@@ -1,11 +1,11 @@
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {setPoolAsyncIsWaiting} from "../../store/actions/pool";
-import {processLiquidity} from "../../extensions/sdk/run";
+import {processLiquidity} from "../../extensions/sdk_run/run";
 import {iconGenerator} from "../../iconGenerator";
 import MainBlock from "../MainBlock/MainBlock";
 import {setTransactionsList} from "../../store/actions/wallet";
-import {decrypt} from "../../extensions/seedPhrase";
+import {decrypt} from "../../extensions/tonUtils";
 import {setTips} from "../../store/actions/app";
 import useKeyPair from "../../hooks/useKeyPair";
 

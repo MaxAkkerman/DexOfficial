@@ -5,8 +5,8 @@ import {useHistory} from "react-router-dom";
 import BlockItem from "../AmountBlock/AmountBlock";
 import {useSelector} from "react-redux";
 import MainBlock from "../MainBlock/MainBlock";
-import {decrypt} from "../../extensions/seedPhrase";
-import {getClientKeys} from "../../extensions/webhook/script";
+import {decrypt} from "../../extensions/tonUtils";
+import {getClientKeys} from "../../extensions/sdk_get/get";
 import {copyToClipboard, handleCutAddress} from "../../reactUtils/reactUtils";
 
 function KeysBlock() {

@@ -7,15 +7,9 @@ import "./Pool.scss";
 
 function Pool() {
 	const history = useHistory();
-	const dispatch = useDispatch();
-	const location = useLocation();
 
-	const walletIsConnected = useSelector(
-		(state) => state.appReducer.walletIsConnected,
-	);
-	const liquidityList = useSelector(
-		(state) => state.walletReducer.liquidityList,
-	);
+	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
+	const liquidityList = useSelector((state) => state.walletReducer.liquidityList);
 
 	return (
 		<div className="container">

@@ -10,40 +10,34 @@ import nativeBtn from "../../images/nativeadd.svg";
 import AssetsList from "../../components/AssetsList/AssetsList";
 
 import {useDispatch, useSelector} from "react-redux";
-import {showTip} from "../../store/actions/app";
 import useTokensList from "../../hooks/useAssetList";
 import {setTokenList} from "../../store/actions/wallet";
-import {unWrapTons, wrapTons} from "../../extensions/sdk/run";
-import {decrypt} from "../../extensions/seedPhrase";
 import useKeyPair from "../../hooks/useKeyPair";
-import client, {queryRoots} from "../../extensions/webhook/script";
-
 import fetchLimitOrders from "../../utils/fetchLimitOrders";
 
 import {setOrderList} from "../../store/actions/limitOrders";
 import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
-import TONicon from "../../images/tonCrystalDefault.svg";
-import salary from "../../images/salary.svg";
 import WithDraw from "../../components/WithDraw/WithDraw";
 import {getFraction} from "../../reactUtils/reactUtils";
-// import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 
 function Assets() {
 	const history = useHistory();
 	const dispatch = useDispatch();
-	const [assets, setAssets] = useState([]);
-	const tokenList = useSelector((state) => state.walletReducer.tokenList);
-	const walletIsConnected = useSelector(
-		(state) => state.appReducer.walletIsConnected,
-	);
+	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
 	const NFTassets = useSelector((state) => state.walletSeedReducer.NFTassets);
 	const orderList = useSelector((state) => state.limitOrders.orderList);
-	// const tokenList = useSelector(state => state.walletReducer.tokenList);
+	const liquidityList = useSelector((state) => state.walletReducer.liquidityList);
 
-	const liquidityList = useSelector(
-		(state) => state.walletReducer.liquidityList,
-	);
-	const clientData = useSelector((state) => state.walletReducer.clientData);
+	const {assetList: tokensList} = useTokensList();
+
+	const [assets, setAssets] = useState([]);
+	const [showWrapMenu, setshowWrapMenu] = useState(false);
+
+	const [currentTokenForWrap, setcurrentTokenForWrap] = useState({});
+	const [viewData, setViewData] = useState({});
+
+	const [showWithdrawMenu,setshowWithdrawMenu] = useState(false)
+	const [curNFTForWithdraw,setCurNFTForWithdraw] = useState(false)
 
 	useEffect(async () => {
 		const orders = await fetchLimitOrders();
@@ -51,27 +45,6 @@ function Assets() {
 	}, []);
 
 	useEffect(() => {
-		// const pureNFT = [
-		// 	{
-		// 		walletAddress:
-		// 			"0:e0b0495751895edc29c5e453f122f25fffebd2bf21c0a0c3d8e98a8ae7b87e3a",
-		// 		type:"Ordinary",
-		// 		balance: 0,
-		// 		stakeTotal: 10000000000,
-		// 		icon: salary,
-		// 		symbol: "DP",
-		// 		owner_address: "default",
-		// 		details:{
-		// 			periodLockStake:10000000,
-		// 			apyLockStake:0,
-		// 			timeStartLockStake:10,
-		// 		}
-		//
-		//
-		//
-		// 	},
-		// ];
-		// setAssets(pureNFT);
 		setAssets(NFTassets);
 	}, [NFTassets]);
 
@@ -96,22 +69,16 @@ function Assets() {
 	}
 
 	function handleShowNFTData(curItem) {
-		console.log("curItem", curItem, "NFTassets", NFTassets);
 		const copyAssets = JSON.parse(JSON.stringify(assets));
 		copyAssets.map((item) => {
-			console.log("item.id", item.id, "curItem.id", curItem.id);
-
 			if (item.id === curItem.id) {
-				console.log("item.showNftData", item.showNftData, !item.showNftData);
 				item.showNftData = !item.showNftData;
 			}
 		});
 		setAssets(copyAssets);
 	}
-	// const [tokensListChanged,settokensListChanged] = useState([])
 	function handleClickToken(curItem) {
 		if (curItem.type !== "Native Tons") return;
-		console.log("curItem", curItem);
 		const copyAssets = JSON.parse(JSON.stringify(tokensList));
 		copyAssets.map((item) => {
 			if ("Native Tons" === item.type) {
@@ -120,15 +87,10 @@ function Assets() {
 		});
 		dispatch(setTokenList(copyAssets));
 	}
-	const {keyPair} = useKeyPair();
 
-	const [showWrapMenu, setshowWrapMenu] = useState(false);
 
-	const [currentTokenForWrap, setcurrentTokenForWrap] = useState({});
-	const [viewData, setViewData] = useState({});
 	async function handleWrapTons() {
 		const tonObj = tokensList.filter((item) => item.type === "Native Tons");
-		console.log("tonObj", tonObj);
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
 			type: "wrap",
@@ -137,8 +99,6 @@ function Assets() {
 			title: "TON Crystal → WTON",
 		});
 		setshowWrapMenu(true);
-		// const wrapRes = await wrapTons(clientData.address,keyPair,1000000000)
-		// console.log("wrapRes",wrapRes)
 	}
 	async function handleUnWrapTons() {
 		const tonObj = tokensList.filter((item) => item.symbol === "WTON");
@@ -149,42 +109,15 @@ function Assets() {
 			tokenSetted: true,
 			title: "WTON → TON Crystal",
 		});
-		console.log("tonObj", tonObj);
 		setshowWrapMenu(true);
-
-		// const unWrapTonsRes = await unWrapTons(clientData.address,keyPair,1000000000)
-		// console.log("unWrapTonsRes",unWrapTonsRes)
 	}
 
-	const [showWithdrawMenu,setshowWithdrawMenu] = useState(false)
-	const [curNFTForWithdraw,setCurNFTForWithdraw] = useState(false)
 	function handleWithdraw(item){
 		setshowWithdrawMenu(true)
 		setshowWrapMenu(false);
 		setCurNFTForWithdraw(item)
-		console.log("item",item)
 	}
-	async function rule(num){
-		// const num = 1.204
-		const check = getFraction(num)
-		console.log("check",check)
-		// let tokenAamount = 1
-		// let tokenBamount = 0.0001
-		//
-		// let poolStatus = await processLiquidity(
-		//     clientData.address,
-		//     "0:5b0332fa7e6da60a7d545dc8c1a4b479347af8f7c63a8fd6bd3d6317d11e6112",
-		//     tokenAamount,
-		//     tokenBamount,
-		//     keyPair,
-		//     tokenA,
-		//     tokenB,
-		// );
-		// console.log("poolStatus",poolStatus)
 
-
-	}
-	const {assetList: tokensList} = useTokensList();
 	return (
 		<>
 			{showWrapMenu && !showWithdrawMenu &&
@@ -209,7 +142,7 @@ function Assets() {
 			}
 
 			{!showWrapMenu && !showWithdrawMenu &&
-			<div className="container" onClick={()=>rule(1.022)}>
+			<div className="container">
 				<MainBlock
 					smallTitle={false}
 					// title={'Assets'}

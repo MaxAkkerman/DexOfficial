@@ -4,10 +4,9 @@ import {iconGenerator} from "../../iconGenerator";
 import "./Item.scss";
 import {
 	checkPubKey,
-	getFullName,
 	mintTokens,
-} from "../../extensions/webhook/script";
-import {copyToClipboard} from "../../reactUtils/reactUtils";
+} from "../../extensions/sdk_get/get";
+import {copyToClipboard, getFullName} from "../../reactUtils/reactUtils";
 
 function Item(props) {
 	const walletIsConnected = useSelector(

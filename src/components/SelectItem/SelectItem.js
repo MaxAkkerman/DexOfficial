@@ -1,7 +1,7 @@
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useLocation} from "react-router-dom";
-// import { getPairReserves } from '../../extensions/sdk/run3';
+// import { getPairReserves } from '../../extensions/sdk_run/run3';
 import {iconGenerator} from "../../iconGenerator";
 import {
 	hidePoolFromSelect,
@@ -28,7 +28,7 @@ import {
 	setOrdersPairId,
 	setOrdersToToken,
 } from "../../store/actions/limitOrders";
-import {getFullName} from "../../extensions/webhook/script";
+import {getFullName} from "../../reactUtils/reactUtils";
 
 function SelectItem(props) {
 	const dispatch = useDispatch();

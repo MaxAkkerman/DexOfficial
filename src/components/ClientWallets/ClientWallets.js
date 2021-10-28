@@ -7,7 +7,7 @@ import MainBlock from "../MainBlock/MainBlock";
 import SearchInput from "../SearchInput/SearchInput";
 import Item from "../Item/Item";
 import "./ClientWallets.scss";
-import {getAllClientWallets, subscribe} from "../../extensions/webhook/script";
+import {getAllClientWallets, subscribe} from "../../extensions/sdk_get/get";
 import {setLiquidityList, setTokenList} from "../../store/actions/wallet";
 import includesTextInToken from "../../utils/includesTextInToken";
 

@@ -1,13 +1,13 @@
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {swapA, swapB} from "../../extensions/sdk/run";
+import {swapA, swapB} from "../../extensions/sdk_run/run";
 import {setTips, showPopup} from "../../store/actions/app";
 import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
 import MainBlock from "../MainBlock/MainBlock";
 import {iconGenerator} from "../../iconGenerator";
 import miniSwap from "../../images/icons/mini-swap.png";
 import "./SwapConfirmPopup.scss";
-import {decrypt} from "../../extensions/seedPhrase";
+import {decrypt} from "../../extensions/tonUtils";
 import {store} from "../../index";
 
 function SwapConfirmPopup(props) {

@@ -13,12 +13,22 @@ import client, {
     getShardConnectPairQUERY,
     getsoUINT,
     pairs,
-} from "../webhook/script";
+} from "../sdk_get/get";
 import {signerKeys} from "@tonclient/core";
 import {NftRootContract} from "../contracts/NftRoot";
 import {DEXConnectorContract} from "../contracts/DEXConnector";
 import {getDecimals, toHex} from "../../reactUtils/reactUtils";
 import {RootTokenContract} from "../contracts/RootTokenContract";
+import {
+    grammsForConnector,
+    grammsForPair,
+    grammsForRoot,
+    grammsForWallet,
+    grammsTotal,
+    rootDecimals,
+    withdrawFee,
+    zeroAddress
+} from "./constants";
 // TonClient.useBinaryLibrary(libWeb);
 
 const Radiance = require("../Radiance.json");
@@ -34,12 +44,6 @@ function getShard(string) {
     return string[2];
 }
 
-const rootDecimals = 9;
-const grammsForPair = 1500000000;
-const grammsForRoot = 1600000000;
-const grammsForConnector = 1100000000;
-const grammsForWallet = 3200000000;
-const grammsTotal = 15000000000;
 
 export async function deployEmptyWallet(clientAddr, clientKeys, rootAddress, ownerAddress) {
     const clientAcc = new Account(DEXClientContract, {
@@ -108,7 +112,7 @@ export async function createNewPair(
 }
 
 
-const withdrawFee = 1000000000;
+
 
 export async function withdrawAll(dataAddr, clientAddr, clientKeys) {
     const clientAcc = new Account(DEXClientContract, {
@@ -192,18 +196,6 @@ export async function wrapTons(clientAddr, clientKeys, amount) {
             Radiance.networks["2"].rootWTONAddr
             ];
 
-    console.log("connectorData", connectorData);
-    console.log(
-        "clientAddr",
-        clientAddr,
-        "clientKeys",
-        clientKeys,
-        "fixedAmount",
-        fixedAmount,
-        "connectorWTONAddr",
-        connectorWTONAddr,
-    );
-
     const {body} = await client.abi.encode_message_body({
         abi: {type: "Contract", value: WrappedTONVaultContract.abi},
         signer: {type: "None"},
@@ -219,18 +211,13 @@ export async function wrapTons(clientAddr, clientKeys, amount) {
         },
     });
     try {
-        const wrapRes = await clientAcc.run("sendTransaction", {
+        return await clientAcc.run("sendTransaction", {
             dest: Radiance.networks["2"].vaultAddr,
             value: fixedAmount + 1200000000,
             bounce: true,
             flags: 3,
             payload: body,
         });
-        console.log(
-            "Contract reacted to your sendTransaction for wrap:",
-            wrapRes.decoded.output,
-        );
-        return wrapRes;
     } catch (e) {
         console.log(e);
         return e;
@@ -244,14 +231,6 @@ export async function unWrapTons(clientAddr, clientKeys, amount) {
         client,
     });
     const fixedAmount = Number(amount) * 1000000000;
-    console.log(
-        "clientAddr",
-        clientAddr,
-        "clientKeys",
-        clientKeys,
-        "amount",
-        amount,
-    );
     try {
         const unWrapres = await clientAcc.run("sendTokens", {
             tokenRoot: Radiance.networks["2"].rootWTONAddr,
@@ -383,8 +362,6 @@ export async function onSharding(pubkey) {
     }
 }
 
-const zeroAddress =
-    "0:0000000000000000000000000000000000000000000000000000000000000000";
 
 async function logEvents(params, response_type) {
     console.log(`params = ${JSON.stringify(params, null, 2)}`);
@@ -458,7 +435,6 @@ export async function deployClient(clientSet) {
  */
 
 export async function createDEXclient(curExt, shardData) {
-    console.log("shardData", shardData);
     const {pubkey, contract, callMethod} = curExt._extLib;
 
     try {
@@ -486,14 +462,10 @@ export async function createDEXclient(curExt, shardData) {
                 return e;
             }
         });
-        console.log("createDEXclientStatus", createDEXclientStatus);
         let checkDexClientExists = await checkPubKey(pubkey);
         let n = 0;
-        console.log("checkDexClientExists", checkDexClientExists);
         while (!checkDexClientExists.status) {
-            console.log("checkDexClientExists", checkDexClientExists);
             checkDexClientExists = await checkPubKey(pubkey);
-
             if (n > 1500) {
                 console.log({status: false, text: "checking pubkey failed"});
                 return {status: false, text: "checking pubkey failed"};
@@ -541,7 +513,11 @@ export async function transfer(SendTransfer, addressTo, amount) {
  * @param curExt
  * @param pairAddr
  * @param qtyA
+ * @param slippage
  * @param phrase
+ * @param qtyB
+ * @param fromtokenData
+ * @param toTokenData
  * @param curExt
  * @param pairAddr
  * @param qtyA
@@ -558,7 +534,6 @@ export async function swapA(
     fromtokenData,
     toTokenData,
 ) {
-    console.log("phrase", phrase);
 
     //fix types
     if (slippage === 0 || !slippage) {
@@ -570,22 +545,11 @@ export async function swapA(
     const maxQtyB = Math.round(qtBToNum + slippageValueofTokenB);
     const qtyANum = Number(qtyA) * getDecimals(fromtokenData.decimals);
 
-    console.log(
-        "qtyANum",
-        qtyANum,
-        "slippage",
-        slippage,
-        "minQtyB",
-        minQtyB,
-        "maxQtyB",
-        maxQtyB,
-    );
-    const {pubkey, contract, callMethod, SendTransfer} = curExt._extLib;
+    const {pubkey} = curExt._extLib;
 
     const keys = await getClientKeys(phrase);
     let getClientAddressFromRoot = await checkPubKey(pubkey);
 
-    console.log("getClientAddressFromRoot", getClientAddressFromRoot);
     if (getClientAddressFromRoot.status === false) {
         return getClientAddressFromRoot;
     }
@@ -596,7 +560,6 @@ export async function swapA(
         signer: signerKeys(keys),
     });
     try {
-        // console.log("hello bitchas")
         return await acc.run("processSwapA", {
             pairAddr: pairAddr,
             qtyA: qtyANum,
@@ -621,7 +584,11 @@ export async function swapA(
  * @param curExt
  * @param pairAddr
  * @param qtyB
+ * @param slippage
  * @param phrase
+ * @param qtyA
+ * @param fromtokenData
+ * @param toTokenData
  * @param curExt
  * @param pairAddr
  * @param qtyB
@@ -638,7 +605,6 @@ export async function swapB(
     fromtokenData,
     toTokenData,
 ) {
-    console.log("qtyB", qtyB);
     if (slippage === 0 || !slippage) {
         slippage = 2;
     }
@@ -649,19 +615,7 @@ export async function swapB(
     const maxQtyA = Math.round(qtAToNum + slippageValueofTokenA);
     const qtyBNum = Number(qtyB) * getDecimals(fromtokenData.decimals);
 
-    console.log(
-        "qtAToNum",
-        qtAToNum,
-        "qtyBNum",
-        qtyBNum,
-        "slippageValueofTokenA",
-        slippageValueofTokenA,
-        "minQtyA",
-        minQtyA,
-        "maxQtyA",
-        maxQtyA,
-    );
-    const {pubkey, contract, callMethod, SendTransfer} = curExt._extLib;
+    const {pubkey} = curExt._extLib;
     let getClientAddressFromRoot = await checkPubKey(pubkey);
 
     const keys = await getClientKeys(phrase);
@@ -675,7 +629,6 @@ export async function swapB(
         signer: signerKeys(keys),
     });
     try {
-        // console.log("hello bitchas")
         return await acc.run("processSwapB", {
             pairAddr: pairAddr,
             qtyB: qtyBNum,
@@ -692,25 +645,21 @@ export async function swapB(
  * Function to return liquid from pair, tokens - are the liquidityProvider tokens type
  * @author   max_akkerman
  * @param tokens
- * @param phrase
  * @param curExt
  * @param pairAddr
  * @param tokens
- * @param phrase
+ * @param curExt
+ * @param pairAddr
+ * @param keys
+ * @param tokens
  * @param curExt
  * @param pairAddr
  * @param tokens
- * @param phrase
- * @param curExt
- * @param pairAddr
- * @param tokens
- * @param phrase
  */
 
 export async function returnLiquidity(curExt, pairAddr, tokens, keys) {
-    const {pubkey, contract, SendTransfer, callMethod} = curExt._extLib;
+    const {pubkey} = curExt._extLib;
     let getClientAddressFromRoot = await checkPubKey(pubkey);
-    // const keys = await getClientKeys(phrase)
 
     if (getClientAddressFromRoot.status === false) {
         return getClientAddressFromRoot;
@@ -721,13 +670,10 @@ export async function returnLiquidity(curExt, pairAddr, tokens, keys) {
         signer: signerKeys(keys),
     });
     try {
-        const returnLiquidity = await acc.run("returnLiquidity", {
+        return await acc.run("returnLiquidity", {
             pairAddr: pairAddr,
             tokens: tokens.toFixed(),
         });
-
-        console.log("returnLiquidity", returnLiquidity);
-        return returnLiquidity;
     } catch (e) {
         console.log("catch E", e);
         return e;
@@ -772,20 +718,7 @@ export async function processLiquidity(
 
     const qtyAfixed = Math.round(qtyAnum * getDecimals(fromtokenData.decimals));
     const qtyBfixed = Math.round(qtyBnum * getDecimals(toTokenData.decimals));
-    console.log("processLiquidity data", clientAddress,
-        pairAddr,
-        qtyA,
-        qtyB,
-        keys,
-        fromtokenData,
-        toTokenData,)
-    // let getClientAddressFromRoot = await checkPubKey(pubkey);
 
-    // const keys = await getClientKeys(phrase);
-
-    // if (getClientAddressFromRoot.status === false) {
-    //     return getClientAddressFromRoot;
-    // }
     const acc = new Account(DEXClientContract, {
         address: clientAddress,
         signer: signerKeys(keys),
@@ -793,16 +726,6 @@ export async function processLiquidity(
 
     });
 
-    console.log(
-        "qtyAfixed",
-        qtyAfixed,
-        "qtyBfixed",
-        qtyBfixed,
-        "fromtokenData",
-        fromtokenData,
-        "toTokenData",
-        toTokenData,
-    );
     try {
         return await acc.run("processLiquidity", {
             pairAddr: pairAddr,
@@ -825,27 +748,10 @@ export async function processLiquidity(
  */
 
 export async function connectToPair(pairAddr, keys) {
-    // console.log("pairAddr",pairAddr,"curExt",curExt)
     let getClientAddressFromRoot = await checkPubKey(keys.public);
     if (getClientAddressFromRoot.status === false) {
         return getClientAddressFromRoot;
     }
-    // console.log("curPia",curPia)
-    // transferFromGiver(getClientAddressFromRoot.dexclient, 4500000000).then(res=>console.log("secess transfered from giver",res))
-
-    // let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
-    // if(6000000000 > (checkClientBalance*1000000000)){
-    //     await transfer(SendTransfer,getClientAddressFromRoot.dexclient,8000000000)
-    // }
-    // console.log("getClientAddressFromRoot",getClientAddressFromRoot)
-    // let pairsTT = await pairs(getClientAddressFromRoot && getClientAddressFromRoot.dexclient)
-    //
-    //
-    //   let curP = pairsTT[pairAddr]
-    //
-    //
-    //
-    // if(!curP){
     const acc = new Account(DEXClientContract, {
         address: getClientAddressFromRoot.dexclient,
         client,
@@ -853,7 +759,6 @@ export async function connectToPair(pairAddr, keys) {
     });
     try {
         const connectPairres = await acc.run("connectPair", {pairAddr: pairAddr});
-        console.log("connectPairres", connectPairres);
         if (
             !connectPairres ||
             (connectPairres &&
@@ -885,13 +790,11 @@ export async function getClientForConnect(data, clientAddress) {
             pairsT = await pairs(clientAddress);
 
             curPair = pairsT[pairAddr];
-            console.log("pairsT", pairsT, "pairAddr", pairAddr);
             n++;
             if (n > 500) {
                 return {code: 3, text: "time limit in checking cur pair"};
             }
         }
-        // console.log("cure pair finded")
         return {
             ...soUINT,
             curPair,
@@ -908,9 +811,6 @@ export async function connectToPairStep2DeployWallets(connectionData, keys) {
     let {curPair, clientAdr, clientRoots} = connectionData;
     let targetShard = getShard(clientAdr);
     let cureClientRoots = [curPair.rootA, curPair.rootB, curPair.rootAB];
-    console.log("cureClientRoots", cureClientRoots);
-    console.log("clientRoots", clientRoots);
-    console.log("connectionData", connectionData);
     let newArr = cureClientRoots.filter(function (item) {
         return clientRoots.indexOf(item) === -1;
     });
@@ -925,8 +825,6 @@ export async function connectToPairStep2DeployWallets(connectionData, keys) {
         signer: signerKeys(keys),
     });
 
-    console.log("newArr", newArr);
-
     try {
         for (const item of newArr) {
             let soUint = await getShardConnectPairQUERY(clientAdr, targetShard, item);
@@ -940,9 +838,7 @@ export async function connectToPairStep2DeployWallets(connectionData, keys) {
             });
 
             resArray.push(connectRootRes);
-            console.log("connectRootRes.code", resArray);
             if (connectRootRes.code) {
-                console.log("connectRootRes.code", connectRootRes.code);
                 return connectRootRes;
             }
         }
@@ -951,25 +847,7 @@ export async function connectToPairStep2DeployWallets(connectionData, keys) {
         console.log("connectRoot e");
         return e;
     }
-
-    // let connectedItem = []
-    // newArr.map(async (item,i)=> {
-    //     connectedItem.push(await connectToPairDeployWallets(connectToRootsStatus,item))
-    // })
-    // console.log("connectedItem-----------------",connectedItem)
-    // return {newArr:newArr,clientAdr:clientAdr,targetShard:targetShard,clientContract:clientContract,callMethod:callMethod}
 }
-
-// export async function connectToPairDeployWallets(data,item){
-// let { clientAdr,targetShard,clientContract,callMethod } = data
-// let soUint = await getShardConnectPairQUERY(clientAdr,targetShard,item)
-// console.log("connection to roots",soUint)
-//     let connectStatus = await callMethod("connectRoot", {root: item, souint:soUint,gramsToConnector:500000000,gramsToRoot:1500000000}, clientContract)
-//
-// return {status:"success", connectStatus:connectStatus,connectedRoot:item}
-// )
-
-// }
 
 /*
     WALLET
@@ -984,39 +862,20 @@ export async function sendToken(
     selectedToken,
 ) {
     const gramsForSend = 1000000000;
-    // const {pubkey, contract, callMethod} = curExt._extLib;
-    // let getClientAddressFromRoot = await checkPubKey(pubkey);
-    //
-    // const keys = await getClientKeys(phrase);
-    //
-    // if (getClientAddressFromRoot.status === false) {
-    //     return getClientAddressFromRoot;
-    // }
+
     const acc = new Account(DEXClientContract, {
         address: clientAddress,
         client,
         signer: signerKeys(keys),
     });
     try {
-        const sendTokensres = await acc.run("sendTokens", {
+        return await acc.run("sendTokens", {
             tokenRoot: tokenRootAddress,
             to: addressTo,
             //todo check why 10000000 here
             tokens: tokensAmount * getDecimals(selectedToken.decimals),
             grams: gramsForSend,
         });
-
-        console.log(
-            "tokensAmount * getDecimals(selectedToken.decimals)",
-            tokensAmount * getDecimals(selectedToken.decimals),
-            "tokenRootAddress",
-            tokenRootAddress,
-            "addressTo",
-            addressTo,
-            "tokensAmount",
-            tokensAmount,
-        );
-        return sendTokensres;
     } catch (e) {
         console.log("catch E", e);
         return e;
@@ -1024,10 +883,9 @@ export async function sendToken(
 }
 
 export async function sendNFT(curExt, addrto, nftLockStakeAddress, phrase) {
-    const {pubkey, contract, callMethod} = curExt._extLib;
+    const {pubkey} = curExt._extLib;
     let getClientAddressFromRoot = await checkPubKey(pubkey);
 
-    console.log("addrto", addrto, "nftLockStakeAddressЭ", nftLockStakeAddress);
     if (getClientAddressFromRoot.status === false) {
         return getClientAddressFromRoot;
     }
@@ -1055,78 +913,18 @@ export async function sendNFT(curExt, addrto, nftLockStakeAddress, phrase) {
         },
     });
 
-    const sendTransactionTransferOwnership = await acc.run("sendTransaction", {
+    return await acc.run("sendTransaction", {
         dest: nftLockStakeAddress,
         value: 1500000000,
         bounce: true,
         flags: 3,
         payload: body,
     });
-    console.log(
-        "sendTransactionTransferOwnership",
-        sendTransactionTransferOwnership,
-    );
-    return sendTransactionTransferOwnership;
 }
 
 /*
      stakeToDePool
 */
-// const rootAddrNFT = "0:92855a57cadfa517a334d281a5afe9648cd3072d66e3f6051453b13909110e02"
-// const depoolAddress = '0:268864dfa2abb35976d8ab2ccd5f359f02143bb36f2f9cdcf770f2ec1a3e2c76';
-// const period = 10800
-// const lockStake = 40_000_000_000;
-//
-// export async function stakeToDePool(curExt, phrase) {
-//     const {pubkey, contract, callMethod} = curExt._extLib
-//     let getClientAddressFromRoot = await checkPubKey(pubkey)
-//     console.log("lockStake",lockStake,"period",period)
-//     const keys = await getClientKeys(phrase)
-//     if (getClientAddressFromRoot.status === false) {
-//         return getClientAddressFromRoot
-//     }
-//
-//     const acc = new Account(DEXClientContract, {
-//         address: getClientAddressFromRoot.dexclient,
-//         client,
-//         signer: signerKeys(keys),
-//     });
-//
-//
-//     const {body} = await client.abi.encode_message_body({
-//         abi: {type: "Contract", value: NftRootContract.abi},
-//         signer: {type: "None"},
-//         is_internal: true,
-//         call_set: {
-//             function_name: "createLockStakeSafeWithNftKey",
-//             input: {
-//                 _donor: getClientAddressFromRoot.dexclient,
-//                 _depoolAddress: depoolAddress,
-//                 _depoolFee: 500000000,
-//                 _depoolMinStake: 10000000000,
-//                 _periodLockStake: period,
-//             },
-//         },
-//     });
-//
-//     const sendTransactionStacking = await acc.run("sendTransaction", {
-//         dest: rootAddrNFT,
-//         value: lockStake,
-//         bounce: true,
-//         flags: 3,
-//         payload: body,
-//     });
-//     console.log("sendTransactionStacking", sendTransactionStacking);
-//     return sendTransactionStacking
-// }
-
-//mainnet
-// const rootAddrNFT = "0:84fcbfeaa219e2f8fa919f13923a3ae01c6308f469e9de7eb08998a66e38de17";
-// const depoolAddress = "0:aaaaaaa9f87e476ec16a0b03b4dc4d4801466d6d85a44100e0790d58fd51d33d";
-
-
-// testnet
-
 
 export async function stakeToDePool(
     curExt,
@@ -1135,16 +933,8 @@ export async function stakeToDePool(
     period,
     apyForStake,
 ) {
-    const {pubkey, contract, callMethod} = curExt._extLib;
+    const {pubkey} = curExt._extLib;
     let getClientAddressFromRoot = await checkPubKey(pubkey);
-    console.log(
-        "lockStake",
-        lockStake,
-        "period",
-        period,
-        "apyForStake",
-        apyForStake,
-    );
 
     const APY = apyForStake.toFixed(2) * 100;
 
@@ -1157,7 +947,9 @@ export async function stakeToDePool(
         client,
         signer: signerKeys(keys),
     });
-    console.log("acc", acc);
+    try{
+
+
     const {body} = await client.abi.encode_message_body({
         abi: {type: "Contract", value: NftRootContract.abi},
         signer: {type: "None"},
@@ -1180,16 +972,16 @@ export async function stakeToDePool(
             },
         },
     });
-    console.log("body", body);
-    const sendTransactionStacking = await acc.run("sendTransaction", {
+    return await acc.run("sendTransaction", {
         dest: rootAddrNFT,
         value: lockStake + 4000000000,
         bounce: true,
         flags: 3,
         payload: body,
     });
-    console.log("sendTransactionStacking", sendTransactionStacking);
-    return sendTransactionStacking;
+    } catch(e){
+        return e
+    }
 }
 
 export async function sendNativeTons(
@@ -1205,19 +997,14 @@ export async function sendNativeTons(
         signer: signerKeys(keys),
     });
 
-    console.log("addressTo", addressTo, "tokensAmount", tokensAmount);
-
     try {
-        const sendNativeTons = await acc.run("sendTransaction", {
+        return await acc.run("sendTransaction", {
             dest: addressTo,
             value: tokensAmount * 1000000000,
             bounce: false,
             flags: 3,
             payload: "",
         });
-
-        console.log("sendNativeTons", sendNativeTons);
-        return sendNativeTons;
     } catch (e) {
         console.log("catch E", e);
         return e;

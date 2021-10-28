@@ -2,8 +2,9 @@ import {useSnackbar} from "notistack";
 import {useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
-import client, {decode} from "../extensions/webhook/script";
+import client from "../extensions/sdk_get/get";
 import {setOrderList} from "../store/actions/limitOrders";
+import {decode} from "../extensions/tonUtils";
 
 export default async function useSubLimitOrders() {
 	const dispatch = useDispatch();

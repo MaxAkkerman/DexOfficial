@@ -20,8 +20,8 @@ import BlockItem from "../AmountBlock/AmountBlock";
 import MaxBtn from "../AmountBlock/MAXbtn";
 import ShowBalance from "../AmountBlock/ShowBalance";
 import SendConfirmPopup from "../SendConfirmPopup/SendConfirmPopup";
-import {deployEmptyWallet, sendNativeTons, sendNFT, sendToken} from "../../extensions/sdk/run";
-import {decrypt} from "../../extensions/seedPhrase";
+import {deployEmptyWallet, sendNativeTons, sendNFT, sendToken} from "../../extensions/sdk_run/run";
+import {decrypt} from "../../extensions/tonUtils";
 import useSendAssetsCheckAmount from "../../hooks/useSendAssetsCheckAmount";
 import useSendAssetsCheckAddress from "../../hooks/useSendAssetsCheckAddress";
 
@@ -34,7 +34,7 @@ import {
 	getDetailsFromTONtokenWallet,
 	getDetailsFromTONtokenWallet2,
 	getExpectedWalletAddressByOwner
-} from "../../extensions/webhook/script";
+} from "../../extensions/sdk_get/get";
 import Loader from "../Loader/Loader";
 
 import useKeyPair from "../../hooks/useKeyPair";

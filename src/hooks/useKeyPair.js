@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
-import {decrypt} from "../extensions/seedPhrase";
-import {getClientKeys} from "../extensions/webhook/script";
+import {decrypt} from "../extensions/tonUtils";
+import {getClientKeys} from "../extensions/sdk_get/get";
 
 export default function useKeyPair() {
 	const encryptedSeedPhrase = useSelector(

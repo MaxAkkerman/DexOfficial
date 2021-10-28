@@ -9,9 +9,6 @@ export const CLOSE_CONNECTING = "CLOSE_CONNECTING";
 
 export const SET_WALLET_IS_CONNECTED = "SET_WALLET_IS_CONNECTED";
 
-export const SHOW_ACCOUNT = "SHOW_ACCOUNT";
-export const HIDE_ACCOUNT = "HIDE_ACCOUNT";
-
 export const SHOW_POPUP = "SHOW_POPUP";
 export const HIDE_POPUP = "HIDE_POPUP";
 

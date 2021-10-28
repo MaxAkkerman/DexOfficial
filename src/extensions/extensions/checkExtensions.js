@@ -7,7 +7,7 @@ import ton, {
 	Contract,
 	hasTonProvider,
 } from "ton-inpage-provider";
-import client from "../webhook/script";
+import client from "../sdk_get/get";
 const {Account} = require("@tonclient/appkit");
 
 export async function checkExtensions() {

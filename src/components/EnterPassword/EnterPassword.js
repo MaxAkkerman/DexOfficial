@@ -11,8 +11,8 @@ import client, {
     getClientKeys,
     subscribeClient,
     subscribeClientBalance,
-} from "../../extensions/webhook/script";
-import {decrypt, encrypt} from "../../extensions/seedPhrase";
+} from "../../extensions/sdk_get/get";
+import {decrypt, encrypt} from "../../extensions/tonUtils";
 import {
     enterSeedPhraseSaveToLocalStorage,
     hideEnterSeedPhraseUnlock,

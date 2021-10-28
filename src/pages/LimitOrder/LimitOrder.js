@@ -11,18 +11,18 @@ import {
 	connectToPairStep2DeployWallets,
 	getClientForConnect,
 	setCreator,
-} from "../../extensions/sdk/run";
+} from "../../extensions/sdk_run/run";
 import {
 	checkClientPairExists,
 	getAllClientWallets,
 	getClientKeys,
 	subscribe,
-} from "../../extensions/webhook/script";
+} from "../../extensions/sdk_get/get";
 import {
 	setSlippageValue,
 	setSwapAsyncIsWaiting,
 } from "../../store/actions/swap";
-import {decrypt} from "../../extensions/seedPhrase";
+import {decrypt} from "../../extensions/tonUtils";
 import {Box, Stack, TextField, Typography} from "@material-ui/core";
 import OrdersInput from "../../components/OrdersInput/OrdersInput";
 import {

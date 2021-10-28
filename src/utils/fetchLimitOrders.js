@@ -2,7 +2,7 @@ import {Account} from "@tonclient/appkit";
 import {signerKeys} from "@tonclient/core";
 import {LimitOrderRootContract} from "../extensions/contracts/LimitOrderRoot";
 import {LimitOrderContract} from "../extensions/contracts/LimitOrder";
-import client from "../extensions/webhook/script";
+import client from "../extensions/sdk_get/get";
 
 export default async function fetchLimitOrders() {
 	const rootAcc = new Account(LimitOrderRootContract, {

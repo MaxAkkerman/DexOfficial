@@ -5,9 +5,9 @@ import MainBlock from "../../components/MainBlock/MainBlock";
 import arrowBack from "../../images/arrowBack.png";
 import CloseIcon from "@material-ui/icons/Close";
 import {FormHelperText} from "@material-ui/core";
-import {connectToPairStep2DeployWallets} from "../../extensions/sdk/run";
+import {connectToPairStep2DeployWallets} from "../../extensions/sdk_run/run";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
-import {getAccType, getDetailsFromTokenRoot} from "../../extensions/webhook/script";
+import {getAccType, getDetailsFromTokenRoot} from "../../extensions/sdk_get/get";
 import useKeyPair from "../../hooks/useKeyPair";
 import {hex2a} from "../../reactUtils/reactUtils"
 function DeployCustomTokenPopup(props) {

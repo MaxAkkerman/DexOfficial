@@ -6,7 +6,7 @@ import arrowBack from "../../images/arrowBack.png";
 import {useHistory} from "react-router-dom";
 import MultilineTextFields from "./CustomList";
 import {showRevealSeedPhrase} from "../../store/actions/enterSeedPhrase";
-import {decrypt} from "../../extensions/seedPhrase";
+import {decrypt} from "../../extensions/tonUtils";
 
 const networksArray = [
 	{

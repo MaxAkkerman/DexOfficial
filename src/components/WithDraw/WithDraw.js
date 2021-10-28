@@ -13,9 +13,9 @@ import BlockItem from "../AmountBlock/AmountBlock";
 import MaxBtn from "../AmountBlock/MAXbtn";
 import ShowBalance from "../AmountBlock/ShowBalance";
 import SendConfirmPopup from "../SendConfirmPopup/SendConfirmPopup";
-import {withdrawAll, withdrawPart} from "../../extensions/sdk/run";
+import {withdrawAll, withdrawPart} from "../../extensions/sdk_run/run";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
-import {getAccType, getAccTypeHex} from "../../extensions/webhook/script";
+import {getAccType, getAccTypeHex} from "../../extensions/sdk_get/get";
 import SetTokenBlock from "../AmountBlock/SetTokenBlock";
 import useKeyPair from "../../hooks/useKeyPair";
 

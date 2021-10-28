@@ -21,7 +21,7 @@ import Select from "../Select/Select";
 import "./Input.scss";
 import {iconGenerator} from "../../iconGenerator";
 
-// import { getPairReserves } from '../../extensions/sdk/run3';
+// import { getPairReserves } from '../../extensions/sdk_run/run3';
 
 function Input(props) {
 	const dispatch = useDispatch();

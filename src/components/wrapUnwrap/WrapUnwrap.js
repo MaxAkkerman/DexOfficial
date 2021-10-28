@@ -20,14 +20,14 @@ import {
 	sendToken,
 	unWrapTons,
 	wrapTons,
-} from "../../extensions/sdk/run";
+} from "../../extensions/sdk_run/run";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
 import {setTips} from "../../store/actions/app";
 import SetTokenBlock from "../AmountBlock/SetTokenBlock";
 import useKeyPair from "../../hooks/useKeyPair";
 import {setTokenList} from "../../store/actions/wallet";
-import {decrypt} from "../../extensions/seedPhrase";
-import {getClientKeys} from "../../extensions/webhook/script";
+import {decrypt} from "../../extensions/tonUtils";
+import {getClientKeys} from "../../extensions/sdk_get/get";
 import {useFormik} from "formik";
 import cls from "classnames";
 import {FormHelperText} from "@mui/material";

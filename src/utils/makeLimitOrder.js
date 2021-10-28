@@ -1,7 +1,7 @@
 import {Account} from "@tonclient/appkit";
 import {signerKeys} from "@tonclient/core";
 import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
-import client from "../extensions/webhook/script";
+import client from "../extensions/sdk_get/get";
 
 const TOKEN_ROUTER_MAP = {
 	USDT: process.env.LIMIT_ROUTER_USDT_ADDRESS,

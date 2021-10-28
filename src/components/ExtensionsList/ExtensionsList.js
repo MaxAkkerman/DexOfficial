@@ -3,8 +3,8 @@ import {useHistory} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {connectWallet, setCurExt, showPopup} from "../../store/actions/app";
 import {getCurrentExtension} from "../../extensions/extensions/checkExtensions";
-import extratonIcon from "../../extensions/extratonIcon.png";
-import broxusIcon from "../../extensions/broxusIcon.png";
+import extratonIcon from "../../images/extratonIcon.png";
+import broxusIcon from "../../images/broxusIcon.png";
 import MainBlock from "../MainBlock/MainBlock";
 import "./ExtensionsList.scss";
 

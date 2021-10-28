@@ -22,9 +22,9 @@ import {
     connectToPairStep2DeployWallets,
     createNewPair,
     getClientForConnect, processLiquidity
-} from "../../extensions/sdk/run";
+} from "../../extensions/sdk_run/run";
 import useKeyPair from "../../hooks/useKeyPair";
-import {getPairAddress, getRootTokenAddress, getWalletAddress} from "../../extensions/webhook/script";
+import {getPairAddress, getRootTokenAddress, getWalletAddress} from "../../extensions/sdk_get/get";
 import {setTips} from "../../store/actions/app";
 
 function CreatePair() {

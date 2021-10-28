@@ -1,9 +1,9 @@
 import React from "react";
 import {useSelector, useDispatch} from "react-redux";
-import {returnLiquidity} from "../../extensions/sdk/run";
+import {returnLiquidity} from "../../extensions/sdk_run/run";
 import {iconGenerator} from "../../iconGenerator";
 import MainBlock from "../MainBlock/MainBlock";
-import {decrypt} from "../../extensions/seedPhrase";
+import {decrypt} from "../../extensions/tonUtils";
 import "./ReturnLiquidConfirmPopup.scss";
 import {setTips} from "../../store/actions/app";
 import {setManageAsyncIsWaiting} from "../../store/actions/manage";

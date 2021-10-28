@@ -3,7 +3,7 @@ import {useSelector} from "react-redux";
 import tonClient, {
 	getDetailsFromTONtokenWallet,
 	getExpectedWalletAddressByOwner,
-} from "../extensions/webhook/script";
+} from "../extensions/sdk_get/get";
 import {Account} from "@tonclient/appkit";
 import {TONTokenWalletContract} from "../extensions/contracts/TONTokenWallet";
 

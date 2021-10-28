@@ -1,9 +1,9 @@
 import React from "react";
 import {useSelector, useDispatch} from "react-redux";
-import {stakeToDePool} from "../../extensions/sdk/run";
+import {stakeToDePool} from "../../extensions/sdk_run/run";
 import MainBlock from "../MainBlock/MainBlock";
 import "./StackingConfirmPopup.scss";
-import {decrypt} from "../../extensions/seedPhrase";
+import {decrypt} from "../../extensions/tonUtils";
 import TON from "../../images/tonCrystalDefault.svg";
 import {
 	setShowStakingWaitingPopup,
