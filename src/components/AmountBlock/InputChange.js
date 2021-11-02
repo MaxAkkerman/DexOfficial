@@ -8,10 +8,14 @@ function InputChange(props) {
     function handleChangeAmount(e) {
         console.log("i am on inp change");
         props.changeAmout ?
-            props.changeAmout(e.currentTarget.value) :
-            dispatch(setAmountForSend(e.currentTarget.value));
+            props.changeAmout(e) :
+            dispatch(setAmountForSend(e));
     }
-
+    function handleKeyPress(event) {
+        if (event.key === "-" || event.key === "+") {
+            event.preventDefault();
+        }
+    }
     const amountToSend = useSelector(
         (state) => state.walletSeedReducer.amountToSend,
     );
@@ -22,11 +26,13 @@ function InputChange(props) {
     return (
         <div className="send_inputs">
             <input
-                onChange={(e) => handleChangeAmount(e)}
+                type="number"
+                min={0}
+                onChange={(e) => handleChangeAmount(e.currentTarget.value)}
+                onKeyPress={(event) => handleKeyPress(event)}
                 value={props.amount ? props.amount : amountToSend}
                 className="amount_input"
                 placeholder={"0"}
-                type="number"
                 disabled={inputNFTdisabled}
                 // max={props.currentToken.balance}
             />

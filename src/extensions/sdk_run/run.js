@@ -44,7 +44,6 @@ function getShard(string) {
     return string[2];
 }
 
-
 export async function deployEmptyWallet(clientAddr, clientKeys, rootAddress, ownerAddress) {
     const clientAcc = new Account(DEXClientContract, {
         address: clientAddr,
@@ -77,15 +76,9 @@ export async function deployEmptyWallet(clientAddr, clientKeys, rootAddress, own
         console.log(e)
         return e
     }
-
-
 }
 
-
-export async function createNewPair(
-    clientAddr, clientKeys, rootName, root0, root1, pairSoArg, connectorSoArg0, connectorSoArg1, rootSoArg) {
-
-
+export async function createNewPair(clientAddr, clientKeys, rootName, root0, root1, pairSoArg, connectorSoArg0, connectorSoArg1, rootSoArg) {
     const clientAcc = new Account(DEXClientContract, {
         address: clientAddr,
         signer: signerKeys(clientKeys),
@@ -110,9 +103,6 @@ export async function createNewPair(
     return RootCreators.decoded.output;
 
 }
-
-
-
 
 export async function withdrawAll(dataAddr, clientAddr, clientKeys) {
     const clientAcc = new Account(DEXClientContract, {
@@ -378,7 +368,6 @@ export async function prepareClientDataForDeploy(phrase) {
         clientSoArg: clientSet.data.clientSoArg,
         ...clientKeys
     }
-
 }
 
 export async function deployClient(clientSet) {

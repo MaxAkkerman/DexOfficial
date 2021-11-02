@@ -46,7 +46,7 @@ function Input(props) {
 	const poolRate = useSelector((state) => state.poolReducer.rate);
 
 	const [value, setValue] = useState(props.value);
-	const [changer, setChanger] = useState(0);
+	const [changer, setChanger] = useState("");
 
 	const [tokenBalance, setTokenBalance] = useState(0);
 	const [incorrectValue, setIncorrect] = useState(false);
@@ -94,10 +94,11 @@ function Input(props) {
 	}, [swapFromToken, swapToToken, poolFromToken, poolToToken, pairsList]);
 
 	useEffect(() => {
-		changeValue(props.token.balance);
+		changeValue();
 	}, [value, swapRate, poolRate]);
 
 	useEffect(() => {
+		console.log("changer",changer)
 		if (
 			location.pathname.includes("swap") &&
 			swapFromToken.symbol &&
@@ -175,7 +176,6 @@ function Input(props) {
 				val < 0.0001
 					? (val = parseFloat(val.toFixed(8)))
 					: (val = parseFloat(val.toFixed(4)));
-
 				let val2 = Number(value);
 				val2 < 0.0001
 					? (val2 = parseFloat(Number(value).toFixed(8)))
@@ -237,11 +237,11 @@ function Input(props) {
 							props.value > 0 ? "input-field" : "input-field input-field--zero"
 						}
 						value={props.value}
-						onChange={(event) => setChanger(+event.target.value)}
+						onChange={(event) => setChanger(event.target.value)}
 						onKeyPress={(event) => handleKeyPress(event)}
-						min="0"
+						min={0}
 						autoFocus={props.autoFocus || false}
-						placeholder="0"
+						placeholder={"0"}
 						readOnly={props.readOnly}
 					/>
 

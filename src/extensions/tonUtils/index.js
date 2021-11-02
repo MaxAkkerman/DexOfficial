@@ -15,13 +15,11 @@ export async function encryptPure(seedPhrase, pin) {
 	console.log("tonUtils",seedPhrase,"pin",pin)
 	const aes = new pidCrypt.AES.CBC();
 	return aes.encryptText(seedPhrase, pin);
-
 }
 
 export async function decryptPure(enc, pin) {
 	const aes = new pidCrypt.AES.CBC();
 	return aes.decryptText(enc, pin);
-
 }
 
 export async function verifySeed(seed){

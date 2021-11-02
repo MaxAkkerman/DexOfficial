@@ -54,22 +54,33 @@ import LimitOrder from "./pages/LimitOrder/LimitOrder";
 import useFetchLimitOrders from "./hooks/useFetchLimitOrders";
 import useSubLimitOrders from "./hooks/useSubLimitOrders";
 import CreatePair from "./pages/CreatePair/CreatePair";
+import PinPopup from "./components/LoginViaPIN/PinPopup";
 
 function App() {
-	const {enqueueSnackbar} = useSnackbar();
 	const dispatch = useDispatch();
 	const location = useLocation();
+
 	const popup = useSelector((state) => state.appReducer.popup);
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
 	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
 	const swapAsyncIsWaiting = useSelector((state) => state.swapReducer.swapAsyncIsWaiting);
 	const poolAsyncIsWaiting = useSelector((state) => state.poolReducer.poolAsyncIsWaiting);
 	const manageAsyncIsWaiting = useSelector((state) => state.manageReducer.manageAsyncIsWaiting);
-
 	const revealSeedPhraseIsVisible = useSelector((state) => state.enterSeedPhrase.revealSeedPhraseIsVisible);
+
+	const visibleEnterSeedPhraseUnlock = useSelector((state) => state.enterSeedPhrase.enterSeedPhraseUnlockIsVisible);
+	const emptyStorage = useSelector((state) => state.enterSeedPhrase.emptyStorage);
+	const clientData = useSelector((state) => state.walletReducer.clientData);
+
+	const tips = useSelector((state) => state.appReducer.tips);
+	const transListReceiveTokens = useSelector((state) => state.walletReducer.transListReceiveTokens);
+
+	const {enqueueSnackbar} = useSnackbar();
 
 	const [onloading, setonloading] = useState(false);
 
+	useFetchLimitOrders();
+	useSubLimitOrders();
 
 	const chrome = localStorage.getItem("chrome");
 	if (chrome === null) showChromePopup();
@@ -80,12 +91,6 @@ function App() {
 		localStorage.setItem("chrome", "true");
 	}
 
-	useFetchLimitOrders();
-	useSubLimitOrders();
-
-	/*
-        get pairs from dexroot
-    */
 	useEffect(async () => {
 		const pairs2 = await getAllPairsWoithoutProvider();
 		dispatch(setPairsList(pairs2));
@@ -102,16 +107,12 @@ function App() {
 		setonloading(false);
 	}, []);
 
-	// const transListReceiveTokens = useSelector(state => state.walletReducer.transListReceiveTokens);
-
 	useEffect(() => {
 		window.addEventListener("beforeunload", function (e) {
 			if (swapAsyncIsWaiting || poolAsyncIsWaiting || manageAsyncIsWaiting)
 				e.returnValue = "";
 		});
 	}, [swapAsyncIsWaiting, poolAsyncIsWaiting, manageAsyncIsWaiting]);
-
-
 
 	async function checkOnLogin() {
 		let esp = localStorage.getItem("esp");
@@ -128,14 +129,7 @@ function App() {
 	useMount(async () => {
 		await checkOnLogin();
 	});
-	const visibleEnterSeedPhraseUnlock = useSelector(
-		(state) => state.enterSeedPhrase.enterSeedPhraseUnlockIsVisible,
-	);
-	const emptyStorage = useSelector(
-		(state) => state.enterSeedPhrase.emptyStorage,
-	);
 
-	const clientData = useSelector((state) => state.walletReducer.clientData);
 	useEffect(async () => {
 		console.log("clientData", clientData);
 		const NFTassets = await agregateQueryNFTassets(clientData.address);
@@ -143,10 +137,7 @@ function App() {
 		dispatch(setNFTassets(NFTassets));
 	}, [clientData.address]);
 
-	const tips = useSelector((state) => state.appReducer.tips);
-	const transListReceiveTokens = useSelector(
-		(state) => state.walletReducer.transListReceiveTokens,
-	);
+
 
 	useEffect(async () => {
 		if (!tips) return;
@@ -202,45 +193,46 @@ function App() {
 
 	return (
 		<>
-			{visibleEnterSeedPhraseUnlock === true &&
-				emptyStorage === false &&
-				!onloading && <EnterPassword />}
-			<div className="beta" onClick={onTipClosed}>
-				Beta version. Use desktop Google Chrome
-			</div>
-			<Header />
-			<Switch location={location}>
-				<Route exact path="/native-login" component={NativeLogin} />
-				<Route exact path="/pool-explorer" component={PoolExplorer} />
-				<Route exact path="/pool" component={Pool} />
-				<Route exact path="/account" component={Account} />
-				<Route exact path="/swap" component={Swap} />
-				<Route exact path="/manage" component={Manage} />
-				<Route exact path="/add-liquidity" component={AddLiquidity} />
-				<Route exact path="/create-pair" component={CreatePair} />
-				<Route exact path="/staking" component={Stacking} />
-				<Route exact path="/wallet" component={Assets} />
-				<Route exact path="/orders" component={LimitOrder} />
-				<Route exact path="/">
-					<Redirect from="/" to="/wallet" />
-				</Route>
+			{/*<PinPopup/>*/}
+				{visibleEnterSeedPhraseUnlock === true &&
+					emptyStorage === false &&
+					!onloading && <EnterPassword />}
+				<div className="beta" onClick={onTipClosed}>
+					Beta version. Use desktop Google Chrome
+				</div>
+				<Header />
+				<Switch location={location}>
+					<Route exact path="/native-login" component={NativeLogin} />
+					<Route exact path="/pool-explorer" component={PoolExplorer} />
+					<Route exact path="/pool" component={Pool} />
+					<Route exact path="/account" component={Account} />
+					<Route exact path="/swap" component={Swap} />
+					<Route exact path="/manage" component={Manage} />
+					<Route exact path="/add-liquidity" component={AddLiquidity} />
+					<Route exact path="/create-pair" component={CreatePair} />
+					<Route exact path="/staking" component={Stacking} />
+					<Route exact path="/wallet" component={Assets} />
+					<Route exact path="/orders" component={LimitOrder} />
+					<Route exact path="/">
+						<Redirect from="/" to="/wallet" />
+					</Route>
 
-				{walletIsConnected ? (
-					<>
-						<Route exact path="/wallet/settings/keys" component={KeysBlock} />
-						<Route exact path="/wallet/send" component={SendAssets} />
-						<Route exact path="/wallet/receive" component={ReceiveAssets} />
-						<Route exact path="/wallet/settings" component={WalletSettings} />
-						<Route exact path="/wallet/deployAssets" component={AssetsListForDeploy} />
-						<Route exact path="/wallet/receive/receive-modal" component={AssetsModalReceive} />
-						<Route exact path="/wallet/send/send-modal" component={AssetsModal} />
-					</>
+					{walletIsConnected ? (
+						<>
+							<Route exact path="/wallet/settings/keys" component={KeysBlock} />
+							<Route exact path="/wallet/send" component={SendAssets} />
+							<Route exact path="/wallet/receive" component={ReceiveAssets} />
+							<Route exact path="/wallet/settings" component={WalletSettings} />
+							<Route exact path="/wallet/deployAssets" component={AssetsListForDeploy} />
+							<Route exact path="/wallet/receive/receive-modal" component={AssetsModalReceive} />
+							<Route exact path="/wallet/send/send-modal" component={AssetsModal} />
+						</>
+					) : null}
+				</Switch>
+				{popup.isVisible ? (
+					<Popup type={popup.type} message={popup.message} link={popup.link} />
 				) : null}
-			</Switch>
-			{popup.isVisible ? (
-				<Popup type={popup.type} message={popup.message} link={popup.link} />
-			) : null}
-			{revealSeedPhraseIsVisible ? <RevealSeedPhrase /> : null}
+				{revealSeedPhraseIsVisible ? <RevealSeedPhrase /> : null}
 		</>
 	);
 }

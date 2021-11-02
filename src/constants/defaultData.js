@@ -136,3 +136,67 @@ export const assetstestArray = [
             "0:4594ac781bdcdee350c9c8c25dfaf08d067b1214fa86c687f4deca048a76551f",
     },
 ];
+
+export const pincodeArray = [
+    {
+        id: 1,
+        value: null,
+        error: false,
+    },
+    {
+        id: 2,
+        value: null,
+        error: false,
+
+    },
+    {
+        id: 3,
+        value: null,
+        error: false,
+
+    },
+    {
+        id: 4,
+        value: null,
+        error: false,
+
+    }
+]
+export const numPadArr = [
+    {
+        value:1,
+    },
+    {
+        value:2,
+    },
+    {
+        value:3,
+    },
+    {
+        value:4,
+    },
+    {
+        value:5,
+    },
+    {
+        value:6,
+    },
+    {
+        value:7,
+    },
+    {
+        value:8,
+    },
+    {
+        value:9,
+    },
+    {
+        value:10,
+    },
+    {
+        value:11,
+    },
+    {
+        value:12,
+    },
+]
