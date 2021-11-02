@@ -116,6 +116,19 @@ function EnterSeedPhrase(props) {
     const [wordTwelveError, setWordTwelveError] = useState(true);
 
     function handleClose() {
+        dispatch(wordOneEnterSeedPhrase(""));
+        dispatch(wordTwoEnterSeedPhrase(""));
+        dispatch(wordThreeEnterSeedPhrase(""));
+        dispatch(wordFourEnterSeedPhrase(""));
+        dispatch(wordFiveEnterSeedPhrase(""));
+        dispatch(wordSixEnterSeedPhrase(""));
+        dispatch(wordSevenEnterSeedPhrase(""));
+        dispatch(wordEightEnterSeedPhrase(""));
+        dispatch(wordNineEnterSeedPhrase(""));
+        dispatch(wordTenEnterSeedPhrase(""));
+        dispatch(wordElevenEnterSeedPhrase(""));
+        dispatch(wordTwelveEnterSeedPhrase(""));
+        setSeedPhraseString("")
         return dispatch(showEnterSeedPhrase(false));
     }
 
@@ -385,23 +398,36 @@ function EnterSeedPhrase(props) {
 
     async function login() {
         let clientDataPreDeployLS = JSON.parse(localStorage.getItem("clientDataPreDeploy"));
-        const clientKeys = await getClientKeys(seedPhraseString)
-        const existsClientOnRoot = await checkPubKey(clientKeys.public)
 
-        let verifSeedFromLS = await decryptPure(clientDataPreDeployLS.esp, seedPhrasePassword);
-        console.log("verifSeedFromLS", verifSeedFromLS, verifSeedFromLS === seedPhraseString)
-        const notDeployedClientExists = verifSeedFromLS === seedPhraseString
         const verStatus = await verifySeed(seedPhraseString)
-        // const validationSeedRes = validationSeeds(verifSeedSetted,verifSeedFromLS)
+
         if (!verStatus) {
             disSetTips("Some error, seed phrase or password not valid, please retry", "error")
             return
         }
 
 
-        // const isPreDeployStatus = clientDataPreDeployLS
+        const clientKeys = await getClientKeys(seedPhraseString)
+        const existsClientOnRoot = await checkPubKey(clientKeys.public)
 
-        if (validSeedPhrase && validPassword && notDeployedClientExists && !existsClientOnRoot.status) {
+        let verifSeedFromLS;
+        let notDeployedClientExists;
+        if(clientDataPreDeployLS){
+            verifSeedFromLS = await decryptPure(clientDataPreDeployLS.esp, seedPhrasePassword);
+            notDeployedClientExists = verifSeedFromLS === seedPhraseString
+        }
+
+
+
+        if (validSeedPhrase && validPassword && existsClientOnRoot.status) {
+            setloadingUserDataIsWaitingSeed(true);
+            handleDeleteSeeds()
+            await handleSetEncription()
+            await InitializeClient(clientKeys.public)
+            disSetTips("All checks passed, welcome onboard!", "success")
+            setloadingUserDataIsWaitingSeed(false);
+            history.push("/wallet");
+        } else if(validSeedPhrase && validPassword && !existsClientOnRoot.status && notDeployedClientExists) {
             setloadingUserDataIsWaitingSeed(true);
             const dexClientAddress = clientDataPreDeployLS.address
             const dexClientBalance = await getClientBalance(dexClientAddress);
@@ -424,35 +450,10 @@ function EnterSeedPhrase(props) {
             setloadingUserDataIsWaitingSeed(false);
             disSetTips("All checks passed, welcome onboard!", "success")
             history.push("/wallet");
+        }else{
+            disSetTips("Some error, no such client on root, please use another seed or create new client", "error")
 
-            return
         }
-
-
-        if (validSeedPhrase && validPassword && existsClientOnRoot.status && !notDeployedClientExists) {
-
-
-            setloadingUserDataIsWaitingSeed(true);
-            // dispatch(setAfterEnterSeedLoading(false))
-
-            handleDeleteSeeds()
-            await handleSetEncription()
-            await InitializeClient(clientKeys.public)
-            disSetTips("All checks passed, welcome onboard!", "success")
-            // dispatch(showEnterSeedPhrase(false));
-
-            // dispatch(showEnterSeedPhrase(false));
-            setloadingUserDataIsWaitingSeed(false);
-            // dispatch(setAfterEnterSeedLoading(true))
-
-            history.push("/wallet");
-
-        } else {
-            disSetTips("Something goes wrong, no such client", "error")
-        }
-
-
-
 
     }
 
