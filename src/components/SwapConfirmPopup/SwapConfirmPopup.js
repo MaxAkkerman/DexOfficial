@@ -1,13 +1,18 @@
+import "./SwapConfirmPopup.scss";
+
+import {gql, request} from "graphql-request";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
+
+import {NO_PAIR, NO_TOKEN} from "../../constants/runtimeErrors";
 import {swapA, swapB} from "../../extensions/sdk_run/run";
-import {setTips, showPopup} from "../../store/actions/app";
-import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
-import MainBlock from "../MainBlock/MainBlock";
+import {decrypt} from "../../extensions/tonUtils";
 import {iconGenerator} from "../../iconGenerator";
 import miniSwap from "../../images/icons/mini-swap.png";
-import "./SwapConfirmPopup.scss";
-import {decrypt} from "../../extensions/tonUtils";
+import {setTips, showPopup} from "../../store/actions/app";
+import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
+import takeLimitOrder from "../../utils/takeLimitOrder";
+import MainBlock from "../MainBlock/MainBlock";
 
 function SwapConfirmPopup(props) {
 	const dispatch = useDispatch();
@@ -22,7 +27,7 @@ function SwapConfirmPopup(props) {
 	const toValue = useSelector((state) => state.swapReducer.toInputValue);
 
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
-	const pairsList = useSelector((state) => state.walletReducer.pairsList);
+	const pairList = useSelector((state) => state.walletReducer.pairsList);
 	const pairId = useSelector((state) => state.swapReducer.pairId);
 
 	const encryptedSeedPhrase = useSelector(
@@ -36,85 +41,108 @@ function SwapConfirmPopup(props) {
 	async function handleSwap() {
 		dispatch(setSwapAsyncIsWaiting(true));
 		props.hideConfirmPopup();
+
 		let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
-		try {
-			await pairsList.forEach(async (i) => {
-				if (fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
-					console.log("swap fromValue", fromValue);
 
-					let fromtokenData = tokenList.filter(
-						(item) => item.symbol === fromToken.symbol,
-					);
+		const pairAB = pairList.find(
+			(p) => fromToken.symbol === p.symbolA && toToken.symbol === p.symbolB,
+		);
+		const pairBA = pairList.find(
+			(p) => fromToken.symbol === p.symbolB && toToken.symbol === p.symbolA,
+		);
 
-					let toTokenData = tokenList.filter(
-						(item) => item.symbol === toToken.symbol,
-					);
-					let res = await swapA(
-						curExt,
-						pairId,
-						fromValue,
-						slippageValue,
-						decrypted.phrase,
-						toValue,
-						fromtokenData[0],
-						toTokenData[0],
-					);
-					dispatch(setSwapAsyncIsWaiting(false));
-					if (!res.code) {
-						dispatch(
-							setTips({
-								message: `Sended message to blockchain`,
-								type: "info",
-							}),
-						);
-					} else {
-						dispatch(
-							setTips({
-								message: `Something goes wrong - error code ${res.code}`,
-								type: "error",
-							}),
-						);
-					}
-				} else if (
-					fromToken.symbol === i.symbolB &&
-					toToken.symbol === i.symbolA
+		if (!pairAB && !pairBA) throw new Error(NO_PAIR);
+
+		const directionPair = pairAB ? "4" : "5";
+
+		const query = gql`
+			query ($addrPair: String!, $directionPair: String!, $amount: Float!) {
+				limitOrdersForSwap(
+					addrPair: $addrPair
+					directionPair: $directionPair
+					amount: $amount
 				) {
-					let fromtokenData = tokenList.filter(
-						(item) => item.symbol === fromToken.symbol,
-					);
-
-					let toTokenData = tokenList.filter(
-						(item) => item.symbol === toToken.symbol,
-					);
-					let res = await swapB(
-						curExt,
-						pairId,
-						fromValue,
-						slippageValue,
-						decrypted.phrase,
-						toValue,
-						fromtokenData[0],
-						toTokenData[0],
-					);
-					dispatch(setSwapAsyncIsWaiting(false));
-					console.log("res", res);
-					if (!res.code) {
-						dispatch(
-							setTips({
-								message: `Sended message to blockchain`,
-								type: "info",
-							}),
-						);
-					} else {
-						dispatch(
-							setTips({
-								message: `Something goes wrong - error code ${res.code}`,
-								type: "error",
-							}),
-						);
+					leftoverSwap
+					limitOrders {
+						addrOrder
+						priceRaw
+						amountRaw
 					}
 				}
-			});
+			}
+		`;
+		const data = await request(process.env.LIMIT_ORDER_GRAPHQL_URL, query, {
+			addrPair: pairId,
+			directionPair,
+			amount: fromValue,
+			slippage: slippageValue,
+		});
+		console.log("request->data", data);
+
+		const processingOrders = [];
+		for (const limitOrder of data.limitOrdersForSwap.limitOrders)
+			processingOrders.push(
+				takeLimitOrder({
+					pairAddr: pairId,
+					orderAddr: limitOrder.addrOrder,
+					price: limitOrder.priceRaw,
+					qty: limitOrder.amountRaw,
+					directionPair,
+					toTokenSymbol: toToken.symbol,
+				}),
+			);
+		await Promise.all(processingOrders);
+
+		const fromTokenData = tokenList.find(
+			(item) => item.symbol === fromToken.symbol,
+		);
+		const toTokenData = tokenList.find(
+			(item) => item.symbol === toToken.symbol,
+		);
+
+		if (!fromTokenData || !toTokenData) throw new Error(NO_TOKEN);
+
+		try {
+			let res = null;
+			if (directionPair === "4") {
+				res = await swapA(
+					curExt,
+					pairId,
+					data.limitOrdersForSwap.leftoverSwap,
+					slippageValue,
+					decrypted.phrase,
+					data.limitOrdersForSwap.leftoverSwap * rate,
+					fromTokenData,
+					toTokenData,
+				);
+			} else {
+				res = await swapB(
+					curExt,
+					pairId,
+					data.limitOrdersForSwap.leftoverSwap,
+					slippageValue,
+					decrypted.phrase,
+					data.limitOrdersForSwap.leftoverSwap * rate,
+					fromTokenData,
+					toTokenData,
+				);
+			}
+			console.log("swap(A|B)->res", res);
+
+			if (!res.code)
+				dispatch(
+					setTips({
+						message: `Sended message to blockchain`,
+						type: "info",
+					}),
+				);
+			else
+				dispatch(
+					setTips({
+						message: `Something goes wrong - error code ${res.code}`,
+						type: "error",
+					}),
+				);
 		} catch (e) {
 			switch (e.text) {
 				case "Canceled by user.":
@@ -132,19 +160,19 @@ function SwapConfirmPopup(props) {
 					);
 					break;
 			}
-			dispatch(setSwapAsyncIsWaiting(false));
 		}
-		// }
+
+		dispatch(setSwapAsyncIsWaiting(false));
 	}
 
 	function getAmountOut(amountIn) {
 		if (!amountIn) {
 			return 0;
 		}
-		let reserves = pairsList.filter((item) => item.pairAddress === pairId);
+		let reserves = pairList.filter((item) => item.pairAddress === pairId);
 		let rootIn = 0;
 		let rootOut = 0;
-		pairsList.forEach(async (i) => {
+		pairList.forEach(async (i) => {
 			if (fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
 				rootIn = reserves[0].reserveA;
 				rootOut = reserves[0].reservetB;

@@ -1,5 +1,4 @@
 import {Account} from "@tonclient/appkit";
-import {signerKeys} from "@tonclient/core";
 
 import {LIMIT_ORDER_AMOUNT} from "../constants/denominators";
 import {LimitOrderContract} from "../extensions/contracts/LimitOrder";
@@ -9,10 +8,6 @@ import client from "../extensions/sdk_get/get";
 export default async function fetchLimitOrders({clientAddress}) {
 	const rootAcc = new Account(LimitOrderRootContract, {
 		address: process.env.LIMIT_ROOT_ADDRESS,
-		signer: signerKeys({
-			public: process.env.LIMIT_ROOT_PUBLIC_KEY,
-			secret: process.env.LIMIT_ROOT_PRIVATE_KEY,
-		}),
 		client,
 	});
 
