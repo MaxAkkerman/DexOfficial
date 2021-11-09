@@ -139,25 +139,29 @@ export const assetstestArray = [
 
 export const pincodeArray = [
     {
-        id: 1,
-        value: null,
+        id: 0,
+        focused:true,
+        value: "",
         error: false,
     },
     {
+        id: 1,
+        focused:false,
+        value: "",
+        error: false,
+
+    },
+    {
         id: 2,
-        value: null,
+        focused:false,
+        value: "",
         error: false,
 
     },
     {
         id: 3,
-        value: null,
-        error: false,
-
-    },
-    {
-        id: 4,
-        value: null,
+        focused:false,
+        value: "",
         error: false,
 
     }
@@ -192,11 +196,13 @@ export const numPadArr = [
     },
     {
         value:10,
+        disabled:true
     },
     {
-        value:11,
+        value:0,
     },
     {
         value:12,
+        disabled:true
     },
 ]
