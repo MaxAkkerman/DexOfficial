@@ -12,6 +12,7 @@ import {
 	SET_UPDATED_BALANCE,
 	SET_WALLET,
 	SHOW_STACKING_CONFIRM_POPUP,
+	SET_PIN
 } from "../actions/types";
 
 const initialState = {
@@ -24,6 +25,7 @@ const initialState = {
 		address: "",
 		balance: 0,
 	},
+	pin:[],
 	tokenList: [],
 	pairsList: [],
 	liquidityList: [],
@@ -38,6 +40,11 @@ const initialState = {
 
 const walletReducer = (state = initialState, {type, payload}) => {
 	switch (type) {
+		case SET_PIN:
+			return {
+				...state,
+				pin: payload,
+			};
 		case SET_ASSET_LIST_FOR_DEPLOY:
 			return {
 				...state,

@@ -14,7 +14,6 @@ const pattern = "[0-9]+"
 
 function PinPopup(props) {
     const [pinArr, setPinArr] = useState(pincodeArray)
-    const [pinError, setPinError] = useState(false)
     const [completed, setCompleted] = useState(false)
 
     let myRefs = [];
@@ -34,7 +33,7 @@ function PinPopup(props) {
 
 
     useEffect(()=>{
-        props.handleCheckPin(pinArr)
+        props.handleCheckPin(pinArr, props.step)
     },[pinArr])
 
     function handleClickNumKeyboard(e) {
@@ -104,17 +103,22 @@ function PinPopup(props) {
 
                 content={
                     <>
-                    <div className="head_wrapper" style={{marginBottom: "40px"}}>
+                    <div className="head_wrapper" style={{marginBottom: "20px"}}>
                         <button className="arrow_back" onClick={() => props.handleClickBack(props.prevStep)}>
                             <img src={arrowBack} alt={"arrow"}/>
                         </button>
                         <div className="left_block boldFont fixMedia">{props.title}</div>
                     </div>
 
-                        {completed && pinError &&
-                        <Grid style={{color: "red"}}>
+                        {completed && !props.pinCorrect ?
+                        <Grid style={{color: "red", textAlign:"center"}}>
                             PINS don't match!
-                        </Grid>}
+                        </Grid>
+                        :
+                        <div style={{height:"23px"}}>
+
+                        </div>
+                        }
                         <Grid className="numsInputContainer">
                             {pinArr.map((item, i) => {
                                 return <input
@@ -124,8 +128,8 @@ function PinPopup(props) {
                                     style={{
                                         cursor: "pointer",
                                         caretColor: "transparent",
-                                        borderBottomColor: completed ? (item.error ? "red" : "#3569f0") : (item.focused ? "#3569f0" : null),
-                                        color: completed ? (item.error ? "red" : "#3569f0") : null
+                                        borderBottomColor: completed ? (!props.pinCorrect ? "red" : "#3569f0") : (item.focused ? "#3569f0" : null),
+                                        color: completed ? (!props.pinCorrect ? "red" : "#3569f0") : null
                                     }}
                                     className="pinInput"
                                     readOnly
@@ -148,7 +152,7 @@ function PinPopup(props) {
                         />
                         <NextBtn
                             btnText={props.btnText}
-                            handleClickNext={() => props.handleClickNext(props.nextStep)}
+                            handleClickNext={() => props.handleClickNext(props.nextStep,completed)}
                         />
 
                     </>
