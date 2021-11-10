@@ -17,7 +17,7 @@ import "./Account.scss";
 import {copyToClipboard, InitializeClient} from "../../reactUtils/reactUtils";
 import {
     setNewSide,
-    setSeedPassword,
+    setSeedPassword, showEnterSeedPhrase,
     wordOneEnterSeedPhrase,
 } from "../../store/actions/enterSeedPhrase";
 import {getClientBalance} from "../../extensions/sdk_get/get";
@@ -121,11 +121,11 @@ function Account() {
         store.dispatch(setTokenList([]));
         store.dispatch(setLiquidityList([]));
         localStorage.removeItem("setSubscribeReceiveTokens");
-
+        dispatch(showEnterSeedPhrase(false))
 
         // localStorage.removeItem("esp");
         // window.location.reload();
-        // history.push("/account");
+        history.push("/account");
     }
 
     function copied() {

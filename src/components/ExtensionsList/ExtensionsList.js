@@ -22,6 +22,8 @@ function ExtensionsList() {
     const enterSeedPhraseIsVisible = useSelector((state) => state.enterSeedPhrase.enterSeedPhraseIsVisible);
 
     const [loadingUserData, setloadingUserData] = useState(false)
+    const [loginViaPinIsVisible, setloginViaPinIsVisible] = useState(false)
+
 
     function handleClick(name) {
         extensionsList.forEach(async (i) => {
@@ -92,22 +94,25 @@ function ExtensionsList() {
                                 <button
                                     style={{fontSize: "16px", width: "100%"}}
                                     className="btn wallet-btn"
-                                    onClick={() => dispatch(showEnterSeedPhraseRegister())}
+                                    onClick={() => setloginViaPinIsVisible(true)}
                                 >
                                     Create a new Seed Phrase and Wallet
                                 </button>
-                                {enterSeedPhraseIsVisible === true &&
-                                <LoginViaPin
-                                    setloadingUserData={(bl)=>setloadingUserData(bl)}
+                                {enterSeedPhraseIsVisible &&
+                                    <EnterSeedPhrase/>
+                                }
+                                {loginViaPinIsVisible &&
+                                    <LoginViaPin
+                                        setloadingUserData={(bl) => setloadingUserData(bl)}
                                 />}
                                 {loadingUserData ?
-									<div className="select-wrapper">
-									<WaitingPopup
-                                    hide={true}
-                                    title={"Connecting to blockchain"}
-                                    text={`Loading user data...`}
-                                />
-									</div>: null}
+                                    <div className="select-wrapper">
+                                        <WaitingPopup
+                                            hide={true}
+                                            title={"Connecting to blockchain"}
+                                            text={`Loading user data...`}
+                                        />
+                                    </div> : null}
                             </div>
                         </div>
                     </div>

@@ -32,9 +32,9 @@ function PinPopup(props) {
     }, [pinArr])
 
 
-    useEffect(()=>{
+    useEffect(() => {
         props.handleCheckPin(pinArr, props.step)
-    },[pinArr])
+    }, [pinArr])
 
     function handleClickNumKeyboard(e) {
         let newPin = JSON.parse(JSON.stringify(pinArr))
@@ -61,6 +61,45 @@ function PinPopup(props) {
         })
         setPinArr(newPin)
     }
+
+    // useEffect(() => {
+    //     window.addEventListener("keydown", keyDownHandler)
+    // }, [])
+    //
+    // function keyDownHandler(e) {
+    //
+    //     const fRefs = myRefs.filter(item => item)
+    //     if (e.key === "Meta") return
+    //     let newPin = JSON.parse(JSON.stringify(pinArr))
+    //     const curEmptyPin = newPin.filter(item => item.focused)
+    //     console.log("curEmptyPin", curEmptyPin)
+    //
+    //     if (!curEmptyPin.length) return
+    //     let nextId;
+    //     let ind;
+    //     newPin.map((item,i) => {
+    //
+    //         if (item.id === curEmptyPin[0].id) {
+    //             console.log("item.id",item.id)
+    //             item.value = e.key
+    //             item.focused = false
+    //             ind = i
+    //             nextId = +item.id + 1
+    //         }
+    //     })
+    //     // newPin.map(item => {
+    //     //     console.log("next one ocused")
+    //     //     if(item.id === nextId){
+    //     //         item.focused = true
+    //     //     }
+    //     // })
+    //     if (ind < fRefs.length) {
+    //         fRefs[nextId].focus();
+    //         newPin[nextId].focused = true;
+    //     }
+    //
+    //     setPinArr(newPin)
+    // }
 
     function handleClickNum(e, i) {
         let newPin = JSON.parse(JSON.stringify(pinArr))
@@ -103,21 +142,21 @@ function PinPopup(props) {
 
                 content={
                     <>
-                    <div className="head_wrapper" style={{marginBottom: "20px"}}>
-                        <button className="arrow_back" onClick={() => props.handleClickBack(props.prevStep)}>
-                            <img src={arrowBack} alt={"arrow"}/>
-                        </button>
-                        <div className="left_block boldFont fixMedia">{props.title}</div>
-                    </div>
+                        <div className="head_wrapper" style={{marginBottom: "20px"}}>
+                            <button className="arrow_back" onClick={() => props.handleClickBack(props.prevStep)}>
+                                <img src={arrowBack} alt={"arrow"}/>
+                            </button>
+                            <div className="left_block boldFont fixMedia">{props.title}</div>
+                        </div>
 
                         {completed && !props.pinCorrect ?
-                        <Grid style={{color: "red", textAlign:"center"}}>
-                            PINS don't match!
-                        </Grid>
-                        :
-                        <div style={{height:"23px"}}>
+                            <Grid style={{color: "red", textAlign: "center"}}>
+                                PINS don't match!
+                            </Grid>
+                            :
+                            <div style={{height: "23px"}}>
 
-                        </div>
+                            </div>
                         }
                         <Grid className="numsInputContainer">
                             {pinArr.map((item, i) => {
@@ -152,7 +191,7 @@ function PinPopup(props) {
                         />
                         <NextBtn
                             btnText={props.btnText}
-                            handleClickNext={() => props.handleClickNext(props.nextStep,completed)}
+                            handleClickNext={() => props.handleClickNext(props.nextStep, completed)}
                         />
 
                     </>

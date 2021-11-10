@@ -5,7 +5,7 @@ import WelcomePopup from "./WelcomePopup";
 import {enterSeedPhraseSaveToLocalStorage, showEnterSeedPhrase} from "../../store/actions/enterSeedPhrase";
 import {useDispatch, useSelector} from "react-redux";
 import {setTips} from "../../store/actions/app";
-import {setClientData, setPin, setTransactionsList} from "../../store/actions/wallet";
+import {setClientData, setPin, setSubscribeReceiveTokens, setTransactionsList} from "../../store/actions/wallet";
 import client, {getClientBalance} from "../../extensions/sdk_get/get";
 import {encrypt, encryptPure} from "../../extensions/tonUtils";
 import {prepareClientDataForDeploy} from "../../extensions/sdk_run/run";
@@ -97,12 +97,17 @@ function LoginViaPin(props) {
             makeNextStep.map(item => {
                 item.weAreHere = item.name === "step1";
             })
-            setStep(makeNextStep)
+            dispatch(setSubscribeReceiveTokens([]));
 
-            props.setloadingUserData(true)
+            dispatch(
+                setTips({
+                    message: "All checks passed, welcome onboard!",
+                    type: "success",
+                }),
+            );
+            props.setloadingUserData(false)
             return
         }
-
 
         makeNextStep.map(item => {
             item.weAreHere = item.name === nxtStp;
