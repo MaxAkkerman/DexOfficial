@@ -23,6 +23,7 @@ import {
 	ENTER_ENCRYPTED_SEED_PHRASE,
 	HIDE_REVEAL_SEED_PHRASE,
 	SHOW_REVEAL_SEED_PHRASE,
+	SET_AFTER_ENTER_SEED_LOADING,
 	SET_TIP,
 } from "./types";
 
@@ -38,6 +39,9 @@ export function hideRevealSeedPhrase() {
 	return {type: HIDE_REVEAL_SEED_PHRASE};
 }
 
+export function setAfterEnterSeedLoading(payload) {
+	return {type: SET_AFTER_ENTER_SEED_LOADING, payload};
+}
 export function showEnterSeedPhrase(payload) {
 	return {type: SHOW_ENTER_SEED_PHRASE, payload};
 }

@@ -1,7 +1,7 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useSelector, useDispatch} from "react-redux";
 import {useLocation} from "react-router-dom";
-import {hidePopup, showPopup} from "../../store/actions/app";
+import {showPopup} from "../../store/actions/app";
 import {
 	setSwapFromInputValue,
 	setSwapRate,
@@ -20,8 +20,6 @@ import {
 import Select from "../Select/Select";
 import "./Input.scss";
 import {iconGenerator} from "../../iconGenerator";
-
-// import { getPairReserves } from '../../extensions/sdk/run3';
 
 function Input(props) {
 	const dispatch = useDispatch();
@@ -49,25 +47,19 @@ function Input(props) {
 	const swapFromToken = useSelector((state) => state.swapReducer.fromToken);
 	const swapToToken = useSelector((state) => state.swapReducer.toToken);
 
-	const swapFromValue = useSelector(
-		(state) => state.swapReducer.fromInputValue,
-	);
-	const swapToValue = useSelector((state) => state.swapReducer.toInputValue);
-
 	const poolFromToken = useSelector((state) => state.poolReducer.fromToken);
 	const poolToToken = useSelector((state) => state.poolReducer.toToken);
-
-	const poolFromValue = useSelector(
-		(state) => state.poolReducer.fromInputValue,
-	);
-	const poolToValue = useSelector((state) => state.poolReducer.toInputValue);
 
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
 
 	const swapRate = useSelector((state) => state.swapReducer.rate);
 	const poolRate = useSelector((state) => state.poolReducer.rate);
-	//console.log(pairsList, swapRate, poolRate, poolFromToken, poolToToken, poolFromValue, swapFromValue, swapFromToken, poolToValue, swapToValue);
+
 	const [value, setValue] = useState(props.value);
+	const [changer, setChanger] = useState("");
+
+	const [tokenBalance, setTokenBalance] = useState(0);
+	const [incorrectValue, setIncorrect] = useState(false);
 
 	useEffect(async () => {
 		if (
@@ -111,18 +103,41 @@ function Input(props) {
 	}, [swapFromToken, swapToToken, poolFromToken, poolToToken, pairsList]);
 
 	useEffect(() => {
-		// if(revertValue){
-		//   console.log("revert", revertValue)
-		//   changeValue(revertValue);
-		// }else{
-		console.log("revert +++++++", props.token.balance);
-		changeValue(props.token.balance);
-		// }
+		changeValue();
 	}, [value, swapRate, poolRate]);
 
-	// useEffect(() => {
-	//   changeValue(revertValue);
-	// }, [revertValue])
+	useEffect(() => {
+		console.log("changer", changer);
+		if (
+			location.pathname.includes("swap") &&
+			swapFromToken.symbol &&
+			swapToToken.symbol
+		) {
+			setValue(changer);
+		}
+		if (
+			location.pathname.includes("add-liquidity") &&
+			poolFromToken.symbol &&
+			poolToToken.symbol
+		) {
+			setValue(changer);
+		}
+	}, [changer]);
+	useEffect(() => {
+		setValue(revertValue);
+	}, [revertValue]);
+
+	useEffect(() => {
+		if (props.type === "to") {
+			setIncorrect(props.incorrectBalanceToValue);
+		} else {
+			setIncorrect(props.incorrectBalance);
+		}
+	}, [props.incorrectBalanceToValue, props.incorrectBalance]);
+
+	useEffect(() => {
+		setTokenBalance(props.token.balance);
+	}, [props.token.balance]);
 
 	async function handleClick() {
 		try {
@@ -163,36 +178,19 @@ function Input(props) {
 		}
 	}
 
-	function changeValue(curValue) {
+	function changeValue() {
 		if (location.pathname.includes("swap")) {
 			if (props.type === "from") {
-				console.log("hange vvalue", props.token.balance);
-				// if(curValue && value > curValue) {
 				let val = Number(value) * swapRate;
 				val < 0.0001
 					? (val = parseFloat(val.toFixed(8)))
 					: (val = parseFloat(val.toFixed(4)));
-
 				let val2 = Number(value);
 				val2 < 0.0001
 					? (val2 = parseFloat(Number(value).toFixed(8)))
 					: (val2 = parseFloat(Number(value).toFixed(4)));
 				dispatch(setSwapFromInputValue(val2));
 				dispatch(setSwapToInputValue(val));
-				console.log("val2", val2);
-				// }
-				// else  {
-				//   dispatch(setSwapFromInputValue(value));
-				//   let val = value * swapRate;
-				//   let val1 = 0;
-				//   if(val < 0.0001) val1 = parseFloat(val.toFixed(8))
-				//   else val1 = parseFloat(val.toFixed(4))
-				//   dispatch(setSwapToInputValue(val1));
-				// }
-
-				// } else if(props.type === 'to') {
-				// dispatch(setSwapToInputValue(value));
-				// dispatch(setSwapFromInputValue(parseFloat((value / swapRate).toFixed(4))));
 			}
 		} else if (location.pathname.includes("add-liquidity")) {
 			if (props.type === "from") {
@@ -207,52 +205,11 @@ function Input(props) {
 	}
 
 	function handleKeyPress(event) {
-		console.log(event, "evern");
 		if (event.key === "-" || event.key === "+") {
 			event.preventDefault();
 		}
 	}
 
-	const [changer, setChanger] = useState(0);
-	useEffect(() => {
-		console.log(changer, "changer");
-		if (
-			location.pathname.includes("swap") &&
-			swapFromToken.symbol &&
-			swapToToken.symbol
-		) {
-			// if()
-			setValue(changer);
-		}
-		if (
-			location.pathname.includes("add-liquidity") &&
-			poolFromToken.symbol &&
-			poolToToken.symbol
-		) {
-			setValue(changer);
-		}
-	}, [changer]);
-	useEffect(() => {
-		setValue(revertValue);
-	}, [revertValue]);
-
-	const [incorrectValue, setIncorrect] = useState(false);
-	useEffect(() => {
-		if (props.type === "to") {
-			console.log(
-				"props.incorrectBalanceToValue",
-				props.incorrectBalanceToValue,
-			);
-			setIncorrect(props.incorrectBalanceToValue);
-		} else {
-			console.log("props.incorrectBalance", props.incorrectBalance);
-			setIncorrect(props.incorrectBalance);
-		}
-	}, [props.incorrectBalanceToValue, props.incorrectBalance]);
-	const [tokenBalance, setTokenBalance] = useState(0);
-	useEffect(() => {
-		setTokenBalance(props.token.balance);
-	}, [props.token.balance]);
 	return (
 		<>
 			<div
@@ -288,11 +245,11 @@ function Input(props) {
 							props.value > 0 ? "input-field" : "input-field input-field--zero"
 						}
 						value={props.value}
-						onChange={(event) => setChanger(+event.target.value)}
+						onChange={(event) => setChanger(event.target.value)}
 						onKeyPress={(event) => handleKeyPress(event)}
-						min="0"
+						min={0}
 						autoFocus={props.autoFocus || false}
-						placeholder="0"
+						placeholder={"0"}
 						readOnly={props.readOnly}
 					/>
 

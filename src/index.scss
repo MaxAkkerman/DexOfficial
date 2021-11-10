@@ -3,7 +3,9 @@
 		color: var(--accent);
 	}
 }
-
+input:focus {
+	outline: none;
+}
 @font-face {
 	font-family: "Gilroy";
 	src: url("./fonts/Gilroy-Regular.woff") format("woff");

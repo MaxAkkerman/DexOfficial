@@ -7,8 +7,6 @@ import "./Pool.scss";
 
 function Pool() {
 	const history = useHistory();
-	const dispatch = useDispatch();
-	const location = useLocation();
 
 	const walletIsConnected = useSelector(
 		(state) => state.appReducer.walletIsConnected,
@@ -23,7 +21,11 @@ function Pool() {
 				class={"pool"}
 				title={"Your liquidity"}
 				button={
-					<Link to="/create-pair" className="btn liquidity-btn" style={{fontSize:"20px",borderRadius:"12px"}}>
+					<Link
+						to="/create-pair"
+						className="btn liquidity-btn"
+						style={{fontSize: "20px", borderRadius: "12px"}}
+					>
 						Create Pair
 					</Link>
 				}

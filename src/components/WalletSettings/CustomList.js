@@ -4,20 +4,10 @@ import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
 import {FormControl} from "@material-ui/core";
 
-const stylesSelect = {
-	backgroundColor: "skybkue",
-	"&$focused": {
-		color: "black",
-	},
-};
-
-//todo fkn styles
 const useStyles = makeStyles((theme) => ({
 	active: {
-		// color:"red",
 		backgroundColor: "skybkue",
 		"& .Mui-focused": {
-			// backgroundColor: "transparent",
 			background: "transparent",
 			// fontWeight: "bold"
 		},

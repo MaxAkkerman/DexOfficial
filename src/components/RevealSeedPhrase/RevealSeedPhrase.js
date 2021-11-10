@@ -16,9 +16,8 @@ import {useMount} from "react-use";
 import {copyToClipboard} from "../../reactUtils/reactUtils";
 import styled from "@emotion/styled";
 
-function RevealSeedPhrase(props) {
+function RevealSeedPhrase() {
 	const dispatch = useDispatch();
-	const [filter, setFilter] = useState("");
 
 	/*
 

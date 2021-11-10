@@ -1,10 +1,8 @@
-import React from "react";
+import React, {useState} from "react";
 import {useHistory} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {connectWallet, setCurExt, showPopup} from "../../store/actions/app";
 import {getCurrentExtension} from "../../extensions/extensions/checkExtensions";
-import extratonIcon from "../../extensions/extratonIcon.png";
-import broxusIcon from "../../extensions/broxusIcon.png";
 import MainBlock from "../MainBlock/MainBlock";
 import "./ExtensionsList.scss";
 
@@ -13,25 +11,12 @@ import {
 	showEnterSeedPhrase,
 	showEnterSeedPhraseRegister,
 } from "../../store/actions/enterSeedPhrase";
-
-function extensionIcon(name) {
-	switch (name) {
-		case "mnemonic":
-			return extratonIcon;
-
-		case "extraton":
-			return extratonIcon;
-		case "broxus":
-			return broxusIcon;
-		default:
-			break;
-	}
-}
+import LoginViaPin from "../LoginViaPIN/LoginViaPin";
+import WaitingPopup from "../WaitingPopup/WaitingPopup";
 
 function ExtensionsList() {
 	const history = useHistory();
 	const dispatch = useDispatch();
-	// const [extensionsList,setExtensionsList] = useState([])
 	const extensionsList = useSelector(
 		(state) => state.appReducer.extensionsList,
 	);
@@ -39,18 +24,9 @@ function ExtensionsList() {
 		(state) => state.enterSeedPhrase.enterSeedPhraseIsVisible,
 	);
 
-	// useEffect(async ()=>{
-	//   try {
-	//     await checkExtensions().then(res=>
-	//         setExtensionsList(res)
-	//     )
-	//   }catch(e){
-	//     return e
-	//   }
-	// },[])
+	const [loadingUserData, setloadingUserData] = useState(false);
+
 	function handleClick(name) {
-		// let checkEX = await checkExtensions()
-		//  console.log("checkEX",checkEX)
 		extensionsList.forEach(async (i) => {
 			if (i.name === name) {
 				if (i.available) {
@@ -68,8 +44,6 @@ function ExtensionsList() {
 	}
 
 	return (
-		// !extensionsList.length ?
-		//   <Loader /> :
 		<MainBlock
 			//TODO: Пересмотреть строчку ниже.
 			title={"Login or Sign Up"}
@@ -93,15 +67,6 @@ function ExtensionsList() {
 			}
 			content={
 				<>
-					{/*// <div className="extensions-list">*/}
-					{/*//   {extensionsList.map(item => (*/}
-					{/*//     <div className="extensions-list-item" onClick={() => handleClick(item.name)} key={item.name}>*/}
-					{/*//       <img src={extensionIcon(item.name)} alt={item.name} />*/}
-					{/*//       <span>{item.name}</span>*/}
-					{/*//     </div>*/}
-					{/*//   ))}*/}
-					{/*// </div>*/}
-
 					<div className="extensions-list">
 						<div
 							className="extensions-list-item"
@@ -134,7 +99,20 @@ function ExtensionsList() {
 								>
 									Create a new Seed Phrase and Wallet
 								</button>
-								{enterSeedPhraseIsVisible === true && <EnterSeedPhrase />}
+								{enterSeedPhraseIsVisible === true && (
+									<LoginViaPin
+										setloadingUserData={(bl) => setloadingUserData(bl)}
+									/>
+								)}
+								{loadingUserData ? (
+									<div className="select-wrapper">
+										<WaitingPopup
+											hide={true}
+											title={"Connecting to blockchain"}
+											text={`Loading user data...`}
+										/>
+									</div>
+								) : null}
 							</div>
 						</div>
 					</div>

@@ -9,20 +9,17 @@ import TokenChanger from "../TokenChanger/TokenChanger";
 import ShowBalance from "../AmountBlock/ShowBalance";
 import MainBlock from "../MainBlock/MainBlock";
 import QRCode from "qrcode.react";
-import {copyToClipboard,handleCutAddress} from "../../reactUtils/reactUtils";
+import {copyToClipboard, handleCutAddress} from "../../reactUtils/reactUtils";
 
 function ReceiveAssets() {
+	const history = useHistory();
+
 	const currentTokenForReceive = useSelector(
 		(state) => state.walletSeedReducer.currentTokenForReceive,
 	);
-
 	const tokenForReceiveSetted = useSelector(
 		(state) => state.walletSeedReducer.tokenForReceiveSetted,
 	);
-
-
-
-	const history = useHistory();
 
 	function handleBack() {
 		history.push("/wallet");

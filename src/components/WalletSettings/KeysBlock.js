@@ -5,11 +5,13 @@ import {useHistory} from "react-router-dom";
 import BlockItem from "../AmountBlock/AmountBlock";
 import {useSelector} from "react-redux";
 import MainBlock from "../MainBlock/MainBlock";
-import {decrypt} from "../../extensions/seedPhrase";
-import {getClientKeys} from "../../extensions/webhook/script";
+import {decrypt} from "../../extensions/tonUtils";
+import {getClientKeys} from "../../extensions/sdk_get/get";
 import {copyToClipboard, handleCutAddress} from "../../reactUtils/reactUtils";
 
 function KeysBlock() {
+	const history = useHistory();
+
 	const encryptedSeedPhrase = useSelector(
 		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
 	);
@@ -18,6 +20,7 @@ function KeysBlock() {
 	);
 
 	const [keys, setKeys] = useState({});
+
 	useEffect(async () => {
 		let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
 		const keys = await getClientKeys(decrypted.phrase);
@@ -25,17 +28,8 @@ function KeysBlock() {
 		setKeys(keys);
 	}, []);
 
-
-
-	const history = useHistory();
-
 	function handleBack() {
 		history.push("/wallet/settings");
-	}
-
-	async function handleCopy(copy) {
-		await copyToClipboard(copy);
-		// navigator.clipboard.writeText(copy)
 	}
 
 	return (

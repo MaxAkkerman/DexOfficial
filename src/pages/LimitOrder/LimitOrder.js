@@ -11,14 +11,12 @@ import {
 	connectToPair,
 	connectToPairStep2DeployWallets,
 	getClientForConnect,
-} from "../../extensions/sdk/run";
+} from "../../extensions/sdk_run/run";
+import {openOrderDeployPopup} from "../../extensions/sdk_run/run";
 import useKeyPair from "../../hooks/useKeyPair";
 import {iconGenerator} from "../../iconGenerator";
 import {showPopup} from "../../store/actions/app";
-import {
-	openOrderDeployPopup,
-	setOrdersRate,
-} from "../../store/actions/limitOrders";
+import {setOrdersRate} from "../../store/actions/limitOrders";
 import truncateNum from "../../utils/truncateNum";
 import MainBlock from "./../../components/MainBlock/MainBlock";
 

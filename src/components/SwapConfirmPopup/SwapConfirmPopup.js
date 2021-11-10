@@ -1,37 +1,27 @@
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {swapA, swapB} from "../../extensions/sdk/run";
+import {swapA, swapB} from "../../extensions/sdk_run/run";
 import {setTips, showPopup} from "../../store/actions/app";
 import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
 import MainBlock from "../MainBlock/MainBlock";
 import {iconGenerator} from "../../iconGenerator";
 import miniSwap from "../../images/icons/mini-swap.png";
 import "./SwapConfirmPopup.scss";
-import {decrypt} from "../../extensions/seedPhrase";
-import {store} from "../../index";
+import {decrypt} from "../../extensions/tonUtils";
 
 function SwapConfirmPopup(props) {
 	const dispatch = useDispatch();
 
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
-
-	let curExt = useSelector((state) => state.appReducer.curExt);
-	let clientData = useSelector((state) => state.walletReducer.clientData);
-
-	const transactionsList = useSelector(
-		(state) => state.walletReducer.transactionsList,
-	);
+	const curExt = useSelector((state) => state.appReducer.curExt);
 
 	const fromToken = useSelector((state) => state.swapReducer.fromToken);
 	const toToken = useSelector((state) => state.swapReducer.toToken);
 	const rate = useSelector((state) => state.swapReducer.rate);
 	const fromValue = useSelector((state) => state.swapReducer.fromInputValue);
 	const toValue = useSelector((state) => state.swapReducer.toInputValue);
-	const swapAsyncIsWaiting = useSelector(
-		(state) => state.swapReducer.swapAsyncIsWaiting,
-	);
-	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 
+	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
 	const pairId = useSelector((state) => state.swapReducer.pairId);
 
@@ -47,51 +37,6 @@ function SwapConfirmPopup(props) {
 		dispatch(setSwapAsyncIsWaiting(true));
 		props.hideConfirmPopup();
 		let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
-		// let pairIsConnected = await checkClientPairExists(clientData.address, pairId);
-		// if(!pairIsConnected) {
-		//   try {
-		//     let connectRes = await connectToPair(curExt, pairId);
-		//     let tokenList = await getAllClientWallets(pubKey.address);
-		//     let countT = tokenList.length
-		//     let y = 0
-		//     while(tokenList.length < countT){
-		//
-		//       tokenList = await getAllClientWallets(pubKey.address);
-		//       y++
-		//       if(y>500){
-		//         dispatch(showPopup({type: 'error', message: 'Oops, too much time for deploying. Please connect your wallet again.'}));
-		//       }
-		//     }
-		//
-		//     dispatch(setTokenList(tokenList));
-		//
-		//
-		//     let liquidityList = [];
-		//
-		//     if(tokenList.length) {
-		//       tokenList.forEach(async item => await subscribe(item.walletAddress));
-		//
-		//       liquidityList = tokenList.filter(i => i.symbol.includes('/'));
-		//
-		//       tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
-		//           {
-		//             ...i,
-		//             symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-		//           })
-		//       );
-		//       localStorage.setItem('tokenList', JSON.stringify(tokenList));
-		//       localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
-		//       dispatch(setTokenList(tokenList));
-		//       dispatch(setLiquidityList(liquidityList));
-		//     }
-		//     dispatch(setSwapAsyncIsWaiting(false));
-		//     pairIsConnected = true;
-		//   } catch(e) {
-		//     dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-		//   }
-		// }
-
-		// if(pairIsConnected) {
 		try {
 			await pairsList.forEach(async (i) => {
 				if (fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
@@ -104,12 +49,6 @@ function SwapConfirmPopup(props) {
 					let toTokenData = tokenList.filter(
 						(item) => item.symbol === toToken.symbol,
 					);
-					console.log(
-						"fromtokenData",
-						fromtokenData,
-						"toTokenData",
-						toTokenData,
-					);
 					let res = await swapA(
 						curExt,
 						pairId,
@@ -121,8 +60,6 @@ function SwapConfirmPopup(props) {
 						toTokenData[0],
 					);
 					dispatch(setSwapAsyncIsWaiting(false));
-
-					console.log("res", res);
 					if (!res.code) {
 						dispatch(
 							setTips({
@@ -138,47 +75,16 @@ function SwapConfirmPopup(props) {
 							}),
 						);
 					}
-
-					// if(!res || (res && (res.code === 1000 || res.code === 3))){
-					//   dispatch(setSwapAsyncIsWaiting(false))
-					// }
-					//
-					//
-					// if(res && !res.code) {
-					//   let olderLength = transactionsList.length;
-					//   let newLength = transactionsList.push({
-					//     type: "swap",
-					//     fromValue: fromValue,
-					//     fromSymbol: fromToken.symbol,
-					//     toValue: null,
-					//     toSymbol: toToken.symbol
-					//   })
-					//   let item = newLength - 1
-					//   localStorage.setItem("currentElement", item);
-					//   localStorage.setItem("lastType", "swap");
-					//   if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
-					//
-					// }else{
-					//   dispatch(setSwapAsyncIsWaiting(false))
-					//
-					// }
 				} else if (
 					fromToken.symbol === i.symbolB &&
 					toToken.symbol === i.symbolA
 				) {
-					console.log("swap B fromValue", fromValue);
 					let fromtokenData = tokenList.filter(
 						(item) => item.symbol === fromToken.symbol,
 					);
 
 					let toTokenData = tokenList.filter(
 						(item) => item.symbol === toToken.symbol,
-					);
-					console.log(
-						"fromtokenData",
-						fromtokenData,
-						"toTokenData",
-						toTokenData,
 					);
 					let res = await swapB(
 						curExt,
@@ -207,49 +113,9 @@ function SwapConfirmPopup(props) {
 							}),
 						);
 					}
-					// if(!res){
-					//   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-					//   dispatch(setSwapAsyncIsWaiting(false));
-					// }
-
-					//user cancalled for both broxus & extraton
-					// if(!res || (res && (res.code === 1000 || res.code === 3))){
-					//   dispatch(setSwapAsyncIsWaiting(false))
-					// }
-
-					// if(res && res.code) {
-					//   if(res.code === 1000) {
-					//     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-					//     dispatch(setSwapAsyncIsWaiting(false));
-					//   }
-					//   else {
-					//     dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-					//     dispatch(setSwapAsyncIsWaiting(false));
-					//   }
-					// }
-					// if(res && !res.code) {
-					//   let olderLength = transactionsList.length;
-					//   let newLength = transactionsList.push({
-					//     type: "swap",
-					//     fromValue: fromValue,
-					//     fromSymbol: fromToken.symbol,
-					//     toValue: null,
-					//     toSymbol: toToken.symbol
-					//   })
-					//   let item = newLength - 1
-					//   localStorage.setItem("currentElement", item);
-					//   localStorage.setItem("lastType", "swap");
-					//   if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
-					//
-					// }else{
-					//   dispatch(setSwapAsyncIsWaiting(false))
-					//
-					//
-					// }
 				}
 			});
 		} catch (e) {
-			console.log(e);
 			switch (e.text) {
 				case "Canceled by user.":
 					dispatch(showPopup({type: "error", message: "Operation canceled."}));
@@ -287,8 +153,6 @@ function SwapConfirmPopup(props) {
 				rootOut = reserves[0].reserveA;
 			}
 		});
-
-		console.log("rootIn", rootIn, "amountIn", amountIn, "rootOut", rootOut);
 		let amountInWithFee = amountIn * 997;
 		let numerator = amountInWithFee * rootOut;
 		let denominator = amountInWithFee + rootIn * 1000;
@@ -350,7 +214,7 @@ function SwapConfirmPopup(props) {
 											y2="-17.3695"
 											gradientUnits="userSpaceOnUse"
 										>
-											<stop stop-color="#41444E" />
+											<stop stopColor="#41444E" />
 											<stop offset="1" stopOpacity="0" />
 										</linearGradient>
 									</defs>
@@ -378,8 +242,8 @@ function SwapConfirmPopup(props) {
 											y2="-16.8695"
 											gradientUnits="userSpaceOnUse"
 										>
-											<stop stop-color="white" />
-											<stop offset="1" stop-color="white" stopOpacity="0" />
+											<stop stopColor="white" />
+											<stop offset="1" stopColor="white" stopOpacity="0" />
 										</linearGradient>
 									</defs>
 								</svg>

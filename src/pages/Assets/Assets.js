@@ -9,13 +9,13 @@ import MainBlock from "../../components/MainBlock/MainBlock";
 import WithDraw from "../../components/WithDraw/WithDraw";
 import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
 import useTokensList from "../../hooks/useAssetList";
+// import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 import goToExchange from "../../images/goToExchange.svg";
 import nativeBtn from "../../images/nativeadd.svg";
 import receiveAssets from "../../images/receiveAssets.svg";
 import sendAssetsimg from "../../images/sendAssets.svg";
 import settingsBtn from "../../images/Vector.svg";
 import {setTokenList} from "../../store/actions/wallet";
-// import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 
 function Assets() {
 	const history = useHistory();
@@ -26,36 +26,23 @@ function Assets() {
 	);
 	const NFTassets = useSelector((state) => state.walletSeedReducer.NFTassets);
 	const orderList = useSelector((state) => state.limitOrders.orderList);
-	// const tokenList = useSelector(state => state.walletReducer.tokenList);
-
 	const liquidityList = useSelector(
 		(state) => state.walletReducer.liquidityList,
 	);
 
+	const {assetList: tokensList} = useTokensList();
+
+	const [showWrapMenu, setshowWrapMenu] = useState(false);
+
+	const [currentTokenForWrap, setcurrentTokenForWrap] = useState({});
+	const [viewData, setViewData] = useState({});
+
+	const [showWithdrawMenu, setshowWithdrawMenu] = useState(false);
+	const [curNFTForWithdraw, setCurNFTForWithdraw] = useState(false);
+
 	const pairList = useSelector((state) => state.walletReducer.pairsList);
 
 	useEffect(() => {
-		// const pureNFT = [
-		// 	{
-		// 		walletAddress:
-		// 			"0:e0b0495751895edc29c5e453f122f25fffebd2bf21c0a0c3d8e98a8ae7b87e3a",
-		// 		type:"Ordinary",
-		// 		balance: 0,
-		// 		stakeTotal: 10000000000,
-		// 		icon: salary,
-		// 		symbol: "DP",
-		// 		owner_address: "default",
-		// 		details:{
-		// 			periodLockStake:10000000,
-		// 			apyLockStake:0,
-		// 			timeStartLockStake:10,
-		// 		}
-		//
-		//
-		//
-		// 	},
-		// ];
-		// setAssets(pureNFT);
 		setAssets(NFTassets);
 	}, [NFTassets]);
 
@@ -80,22 +67,16 @@ function Assets() {
 	}
 
 	function handleShowNFTData(curItem) {
-		console.log("curItem", curItem, "NFTassets", NFTassets);
 		const copyAssets = JSON.parse(JSON.stringify(assets));
 		copyAssets.map((item) => {
-			console.log("item.id", item.id, "curItem.id", curItem.id);
-
 			if (item.id === curItem.id) {
-				console.log("item.showNftData", item.showNftData, !item.showNftData);
 				item.showNftData = !item.showNftData;
 			}
 		});
 		setAssets(copyAssets);
 	}
-	// const [tokensListChanged,settokensListChanged] = useState([])
 	function handleClickToken(curItem) {
 		if (curItem.type !== "Native Tons") return;
-		console.log("curItem", curItem);
 		const copyAssets = JSON.parse(JSON.stringify(tokensList));
 		copyAssets.map((item) => {
 			if ("Native Tons" === item.type) {
@@ -105,13 +86,8 @@ function Assets() {
 		dispatch(setTokenList(copyAssets));
 	}
 
-	const [showWrapMenu, setshowWrapMenu] = useState(false);
-
-	const [currentTokenForWrap, setcurrentTokenForWrap] = useState({});
-	const [viewData, setViewData] = useState({});
 	async function handleWrapTons() {
 		const tonObj = tokensList.filter((item) => item.type === "Native Tons");
-		console.log("tonObj", tonObj);
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
 			type: "wrap",
@@ -120,8 +96,6 @@ function Assets() {
 			title: "TON Crystal → WTON",
 		});
 		setshowWrapMenu(true);
-		// const wrapRes = await wrapTons(clientData.address,keyPair,1000000000)
-		// console.log("wrapRes",wrapRes)
 	}
 	async function handleUnWrapTons() {
 		const tonObj = tokensList.filter((item) => item.symbol === "WTON");
@@ -132,15 +106,9 @@ function Assets() {
 			tokenSetted: true,
 			title: "WTON → TON Crystal",
 		});
-		console.log("tonObj", tonObj);
 		setshowWrapMenu(true);
-
-		// const unWrapTonsRes = await unWrapTons(clientData.address,keyPair,1000000000)
-		// console.log("unWrapTonsRes",unWrapTonsRes)
 	}
 
-	const [showWithdrawMenu, setshowWithdrawMenu] = useState(false);
-	const [curNFTForWithdraw, setCurNFTForWithdraw] = useState(false);
 	function handleWithdraw(item) {
 		setshowWithdrawMenu(true);
 		setshowWrapMenu(false);
@@ -148,7 +116,6 @@ function Assets() {
 		console.log("item", item);
 	}
 
-	const {assetList: tokensList} = useTokensList();
 	return (
 		<>
 			{showWrapMenu && !showWithdrawMenu && (

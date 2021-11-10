@@ -13,7 +13,7 @@ import {
 	connectToPair,
 	connectToPairStep2DeployWallets,
 	getClientForConnect,
-} from "../../extensions/sdk/run";
+} from "../../extensions/sdk_run/run";
 
 import {
 	setSlippageValue,
@@ -22,10 +22,6 @@ import {
 	setSwapToToken,
 } from "../../store/actions/swap";
 
-import {getClientKeys} from "../../extensions/webhook/script";
-// import { setSlippageValue } from "../../store/actions/swap";
-
-import {decrypt} from "../../extensions/seedPhrase";
 import settingsBtn from "../../images/Vector.svg";
 import SlippagePopper from "../../components/SlippagePopper/SlippagePopper";
 import useSlippagePopper from "../../hooks/useSlippagePopper";
@@ -36,13 +32,10 @@ import {
 	NOT_ENOUGH_CAUSE_COMMISSION as NOT_ENOUGH_CAUSE_COMMISSION_MSG,
 	NOT_TOUCHED,
 } from "../../constants/validationMessages";
-import {
-	PROVIDE_LIQUIDITY_COMMISSION,
-	SWAP_COMMISSION,
-} from "../../constants/commissions";
+import {SWAP_COMMISSION} from "../../constants/commissions";
 import useAssetList from "../../hooks/useAssetList";
 import {FormHelperText} from "@mui/material";
-
+import {checkDecimals} from "../../reactUtils/reactUtils";
 
 function Swap() {
 	const history = useHistory();
@@ -64,14 +57,8 @@ function Swap() {
 	const swapAsyncIsWaiting = useSelector(
 		(state) => state.swapReducer.swapAsyncIsWaiting,
 	);
-
-	const encryptedSeedPhrase = useSelector(
-		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
-	);
 	const clientData = useSelector((state) => state.walletReducer.clientData);
-	const seedPhrasePassword = useSelector(
-		(state) => state.enterSeedPhrase.seedPhrasePassword,
-	);
+	const tips = useSelector((state) => state.appReducer.tips);
 
 	const [swapConfirmPopupIsVisible, setSwapConfirmPopupIsVisible] =
 		useState(false);
@@ -79,12 +66,13 @@ function Swap() {
 	const [curExist, setExistsPair] = useState(false);
 	const [notDeployedWallets, setNotDeployedWallets] = useState([]);
 	const [connectPairStatusText, setconnectPairStatusText] = useState("");
-
-	const tips = useSelector((state) => state.appReducer.tips);
-
 	const [incorrectBalance, setincorrectBalance] = useState(false);
+	const [errors, setErrors] = useState({});
+	const [isError, setIsError] = useState(true);
 
 	const {slippageState, popperState} = useSlippagePopper();
+	const {keyPair} = useKeyPair();
+	const {assetList} = useAssetList();
 
 	useEffect(() => {
 		if (!pairsList.length || !pairId) {
@@ -99,7 +87,6 @@ function Swap() {
 		if (!tips || tips.length) return;
 		if (tips.name === "tokensReceivedCallback" || tips.name === "sendTokens") {
 			if (fromToken.symbol || toToken.Symbol) {
-				console.log("I am at chakeee");
 				const fromTokenCopy = JSON.parse(JSON.stringify(fromToken));
 				const toTokenCopy = JSON.parse(JSON.stringify(toToken));
 				const newFromTokenData = tokenList.filter(
@@ -156,8 +143,7 @@ function Swap() {
 			);
 		}
 	}
-	const {keyPair} = useKeyPair();
-	const [balanceError, setNotEnoughtBalanceError] = useState(false);
+
 	async function handleConnectPair() {
 		if (clientData.balance < 12) {
 			dispatch(
@@ -168,9 +154,6 @@ function Swap() {
 			);
 			return;
 		}
-
-		// let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
-		// const keys = await getClientKeys(decrypted.phrase);
 
 		setconnectAsyncIsWaiting(true);
 		setconnectPairStatusText("getting data from pair.");
@@ -235,39 +218,6 @@ function Swap() {
 		}
 
 		setconnectPairStatusText("finishing");
-
-		//     let tokenList = await getAllClientWallets(pubKey.address);
-		// // tokenList.forEach(async item => await subscribe(item.walletAddress));
-		//     let countT = tokenList.length
-		//     let y = 0
-		//     while (tokenList.length < countT) {
-		//
-		//         tokenList = await getAllClientWallets(pubKey.address);
-		//         y++
-		//         if (y > 500) {
-		//             dispatch(showPopup({
-		//                 type: 'error',
-		//                 message: 'Oops, too much time for deploying. Please connect your wallet again.'
-		//             }));
-		//         }
-		//     }
-		//
-		//     dispatch(setTokenList(tokenList));
-		//
-		//
-		//     let liquidityList = [];
-		//
-		//     if (tokenList.length) {
-		//         tokenList.forEach(async item => await subscribe(item.walletAddress));
-		//
-		//         liquidityList = tokenList.filter(i => i.symbol.includes('/'));
-		//
-		//         tokenList = tokenList.filter(i => !i.symbol.includes('/'))
-		//         //localStorage.setItem('tokenList', JSON.stringify(tokenList));
-		//         //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
-		//         dispatch(setTokenList(tokenList));
-		//         dispatch(setLiquidityList(liquidityList));
-		//     }
 		setconnectAsyncIsWaiting(false);
 		setExistsPair(true);
 	}
@@ -331,19 +281,10 @@ function Swap() {
 		dispatch(setSwapAsyncIsWaiting(false));
 	}
 
-	const {assetList} = useAssetList();
-
-	const [errors, setErrors] = React.useState({});
-	const [isError, setIsError] = React.useState(true);
-
 	useEffect(() => {
 		if (Object.keys(errors).length === 0) setIsError(false);
 		else setIsError(true);
 	}, [errors]);
-
-	function checkDecimals(value) {
-		return value.toFixed(4);
-	}
 
 	function validate(fromValue, toValue, fromToken, toToken) {
 		console.log(fromToken, toToken);
@@ -369,7 +310,6 @@ function Swap() {
 
 				if (nativeTONBalance < SWAP_COMMISSION)
 					localErrors.commission = `${NOT_ENOUGH_CAUSE_COMMISSION_MSG} (Commission = ${SWAP_COMMISSION} TON Crystal)`;
-				console.log(localErrors);
 				setErrors(localErrors);
 			}
 		}
@@ -380,21 +320,7 @@ function Swap() {
 	}, [fromValue, toValue, fromToken, toToken]);
 
 	return (
-		<div
-			className="container"
-			onClick={() =>
-				console.log(
-					"curExist",
-					curExist,
-					"fromToken",
-					fromToken,
-					"toToken",
-					toToken,
-					"notDeployedWallets",
-					notDeployedWallets,
-				)
-			}
-		>
+		<div className="container">
 			{!swapAsyncIsWaiting && !connectAsyncIsWaiting && (
 				<MainBlock
 					style={{
@@ -432,10 +358,15 @@ function Swap() {
 									borderError={errors.fromTokenAmount}
 									incorrectBalance={incorrectBalance}
 								/>
-								{errors.fromTokenAmount && (
-									<FormHelperText error sx={{color: "var(--text-color)"}}>
+								{errors.fromTokenAmount ? (
+									<FormHelperText
+										error
+										sx={{marginLeft: "27px", color: "var(--text-color)"}}
+									>
 										{NOT_ENOUGH}
 									</FormHelperText>
+								) : (
+									<div style={{height: "22px"}} />
 								)}
 								{/*<>   {incorrectBalance && <div>error</div>}</>*/}
 								<SwapBtn
@@ -497,7 +428,10 @@ function Swap() {
 					}
 					footer={
 						<div className="mainblock-footer">
-							<div className="mainblock-footer-wrap" style={{justifyContent: "space-around"}}>
+							<div
+								className="mainblock-footer-wrap"
+								style={{justifyContent: "space-around"}}
+							>
 								<div className="swap-confirm-wrap">
 									<p className="mainblock-footer-value">
 										{parseFloat(

@@ -5,7 +5,6 @@ import "./DeployAssetConfirmPopup.scss";
 import {copyToClipboard} from "../../reactUtils/reactUtils";
 
 function DeployAssetConfirmPopup(props) {
-	console.log("assssss", props);
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
 	return (
 		<div className="popup-wrapper">
@@ -69,12 +68,10 @@ function DeployAssetConfirmPopup(props) {
 										{props.currentAsset.rootAddress}
 									</span>
 								</div>
-
 							</div>
 							<div style={{width: "100%", marginTop: "20px"}}>
 								<div className="send_text_headers">Deploy Fee</div>
 								<div className="DeployAssetConfirmPopup__data">~ 4 TONs</div>
-
 							</div>
 
 							{/*</div>*/}
