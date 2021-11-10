@@ -1,22 +1,18 @@
 import React from "react";
 import {useSelector, useDispatch} from "react-redux";
-import {stakeToDePool} from "../../extensions/sdk/run";
+import {stakeToDePool} from "../../extensions/sdk_run/run";
 import MainBlock from "../MainBlock/MainBlock";
 import "./StackingConfirmPopup.scss";
-import {decrypt} from "../../extensions/seedPhrase";
+import {decrypt} from "../../extensions/tonUtils";
 import TON from "../../images/tonCrystalDefault.svg";
-import {
-	setShowStakingWaitingPopup,
-	setStackingAmount,
-	setStackingPeriod,
-} from "../../store/actions/staking";
+import {setShowStakingWaitingPopup} from "../../store/actions/staking";
 import {setTips} from "../../store/actions/app";
 
 function StackingConfirmPopup(props) {
 	const dispatch = useDispatch();
 	const curExt = useSelector((state) => state.appReducer.curExt);
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
-	console.log("propspropsprops", props);
+
 	const encryptedSeedPhrase = useSelector(
 		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
 	);
@@ -33,6 +29,7 @@ function StackingConfirmPopup(props) {
 	const apyForLockStake = useSelector(
 		(state) => state.stakingReducer.apyForLockStake,
 	);
+
 	async function handleStake() {
 		props.handleClose();
 		dispatch(setShowStakingWaitingPopup(true));
@@ -64,9 +61,6 @@ function StackingConfirmPopup(props) {
 				}),
 			);
 		}
-		console.log("stakeRes", stakeRes);
-
-		// let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword)
 	}
 
 	return (
@@ -92,7 +86,6 @@ function StackingConfirmPopup(props) {
 				}
 				content={
 					<>
-						{/*<p className="confirm-subtitle">Confirm Stacking</p>*/}
 						<div className="confirm-block swap-confirm-block">
 							<span className="confirm-token">
 								<img
@@ -124,7 +117,7 @@ function StackingConfirmPopup(props) {
 											y2="-17.3695"
 											gradientUnits="userSpaceOnUse"
 										>
-											<stop stop-color="#41444E" />
+											<stop stopColor="#41444E" />
 											<stop offset="1" stopOpacity="0" />
 										</linearGradient>
 									</defs>
@@ -152,8 +145,8 @@ function StackingConfirmPopup(props) {
 											y2="-16.8695"
 											gradientUnits="userSpaceOnUse"
 										>
-											<stop stop-color="white" />
-											<stop offset="1" stop-color="white" stopOpacity="0" />
+											<stop stopColor="white" />
+											<stop offset="1" stopColor="white" stopOpacity="0" />
 										</linearGradient>
 									</defs>
 								</svg>

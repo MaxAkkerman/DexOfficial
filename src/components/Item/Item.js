@@ -2,33 +2,23 @@ import React, {useState} from "react";
 import {useSelector} from "react-redux";
 import {iconGenerator} from "../../iconGenerator";
 import "./Item.scss";
-import {
-	checkPubKey,
-	getFullName,
-	mintTokens,
-} from "../../extensions/webhook/script";
-import {copyToClipboard} from "../../reactUtils/reactUtils";
+import {checkPubKey, mintTokens} from "../../extensions/sdk_get/get";
+import {copyToClipboard, getFullName} from "../../reactUtils/reactUtils";
 
 function Item(props) {
 	const walletIsConnected = useSelector(
 		(state) => state.appReducer.walletIsConnected,
 	);
+	let curExt = useSelector((state) => state.appReducer.curExt);
+
 	const [isVisible, setVisible] = useState(false);
 	const [isVisibleFaucet, setVisibleFaucet] = useState(false);
-	const pairsList = useSelector((state) => state.walletReducer.pairsList);
-	let curExt = useSelector((state) => state.appReducer.curExt);
 
 	async function copyAddress() {
 		await copyToClipboard(props.walletAddress);
-		// await navigator.clipboard.writeText(props.walletAddress);
 		await setVisible(true);
 		await timer();
 	}
-
-	// async function getTokens() {
-	//   await setVisible(true);
-	//   await timer();
-	// }
 
 	async function faucet() {
 		console.log(props);

@@ -16,7 +16,8 @@ import {
 	STATUS_ORDER_UPDATE_PRICE,
 } from "../constants/runtimeVariables";
 import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
-import client, {decode} from "../extensions/webhook/script";
+import client from "../extensions/sdk_get/get";
+import {decode} from "../extensions/tonUtils";
 import {
 	addToOrderList,
 	removeFromOrderList,

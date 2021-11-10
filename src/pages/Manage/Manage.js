@@ -1,22 +1,19 @@
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {Link} from "react-router-dom";
-import {getPairsTotalSupply} from "../../extensions/webhook/script";
+import {getPairsTotalSupply} from "../../extensions/sdk_get/get";
 import {setManageAsyncIsWaiting} from "../../store/actions/manage";
-import {returnLiquidity} from "../../extensions/sdk/run";
 import {iconGenerator} from "../../iconGenerator";
 import Slider from "react-rangeslider";
 import MainBlock from "../../components/MainBlock/MainBlock";
 import ManageConfirmPopup from "../../components/ManageConfirmPopup/ManageConfirmPopup";
 import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
 import "./Manage.scss";
-import {decrypt} from "../../extensions/seedPhrase";
 import ReturnLiquidConfirmPopup from "../../components/ReturnLiquidConfirmPopup/ReturnLiquidConfirmPopup";
 
 function Manage() {
 	const dispatch = useDispatch();
 
-	let curExt = useSelector((state) => state.appReducer.curExt);
 	const fromToken = useSelector((state) => state.manageReducer.fromToken);
 	const toToken = useSelector((state) => state.manageReducer.toToken);
 	const rateAB = useSelector((state) => state.manageReducer.rateAB);
@@ -26,14 +23,7 @@ function Manage() {
 	const manageAsyncIsWaiting = useSelector(
 		(state) => state.manageReducer.manageAsyncIsWaiting,
 	);
-	const encryptedSeedPhrase = useSelector(
-		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
-	);
-	const seedPhrasePassword = useSelector(
-		(state) => state.enterSeedPhrase.seedPhrasePassword,
-	);
 
-	console.log("pair", pairId);
 	const [managePopupIsVisible, setManagePopupIsVisible] = useState(true);
 	const [manageRemoveIsVisible, setManageRemoveIsVisible] = useState(false);
 
@@ -42,6 +32,8 @@ function Manage() {
 
 	const [qtyA, setQtyA] = useState(0);
 	const [qtyB, setQtyB] = useState(0);
+
+	const [showReturnLiqidPopup, setshowReturnLiqidPopup] = useState(false);
 
 	useEffect(async () => {
 		const total = await getPairsTotalSupply(pairId);
@@ -55,49 +47,17 @@ function Manage() {
 
 	const handleChange = (value) => {
 		setRangeValue(value);
-		console.log(
-			"((fromToken.reserve * percent) / 100) * value) / 100",
-			(((fromToken.reserve * percent) / 100) * value) / 100,
-		);
 		setQtyA((((fromToken.reserve * percent) / 100) * value) / 100);
 		setQtyB((((toToken.reserve * percent) / 100) * value) / 100);
 	};
-	// const [showConfirmPopup,setshowConfirmPopup] = useState(false)
 	const handleRemove = async () => {
-		// dispatch(setManageAsyncIsWaiting(true));
 		setshowReturnLiqidPopup(true);
-		// let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword)
-		// let returnStatus = await returnLiquidity(curExt, pairId, ((balance * rangeValue) / 100) * 1000000000, decrypted.phrase);
-
-		// if (!returnStatus || (returnStatus && (returnStatus.code === 1000 || returnStatus.code === 3))) {
-		//     dispatch(setManageAsyncIsWaiting(false))
-		// }
-
-		// dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-		// dispatch(setPoolAsyncIsWaiting(false))
-
-		// if(returnStatus && returnStatus.code) {
-		// dispatch(setPoolAsyncIsWaiting(false))
-		// switch (returnStatus.text) {
-		//   case 'Canceled by user.':
-		//     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-		//     break;
-		//   case 'Rejected by user':
-		//     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-		//     break;
-		//   default:
-		//     dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-		//     break;
-		// }
-		// }
-		// if(returnStatus && !returnStatus.code) {
-		//   dispatch(setManageAsyncIsWaiting(false));
-		// }
 	};
+
 	function handleCloseReturnConfirm() {
 		setshowReturnLiqidPopup(false);
 	}
-	const [showReturnLiqidPopup, setshowReturnLiqidPopup] = useState(false);
+
 	function handleClose() {
 		setRangeValue(0);
 		setQtyA(0);

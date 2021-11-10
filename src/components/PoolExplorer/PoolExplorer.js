@@ -1,88 +1,23 @@
 import React, {useEffect, useState} from "react";
-import ReactDOM from "react-dom";
-import {useDispatch, useSelector} from "react-redux";
-import CloseBtn from "../CloseBtn/CloseBtn";
+import {useSelector} from "react-redux";
 import Loader from "../Loader/Loader";
 import MainBlock from "../MainBlock/MainBlock";
 import SearchInput from "../SearchInput/SearchInput";
 import PoolExplorerItem from "../PoolExplorerItem/PoolExplorerItem";
 import "./PoolExplorer.scss";
-import {useHistory} from "react-router-dom";
-import {showTip} from "../../store/actions/app";
 
-function PoolExplorer(props) {
-	const dispatch = useDispatch();
+function PoolExplorer() {
 	const [filter, setFilter] = useState("");
-	const history = useHistory();
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
 
-	const [pairsArr,setPairsArray] = useState([])
-	useEffect(()=>{
-		setPairsArray(pairsList)
-
-	},[pairsList])
-
-
-	// const [st,setST] = useState(pairsList)
-
-	// function arrPairs(tokenList2, LPTokenList2){
-	//     let toArr = [];
-	//     tokenList2.map((i) => {
-	//         toArr.push({
-	//             symbol: i.symbol,
-	//             balance: i.balance,
-	//             walletAddress: i.walletAddress,
-	//             lp: false
-	//         })
-	//     })
-	//     LPTokenList2.map((i) => {
-	//         toArr.push({
-	//             symbol: i.symbol,
-	//             balance: i.balance,
-	//             walletAddress: i.walletAddress,
-	//             lp: true
-	//         })
-	//     })
-	//     return toArr
-	// }
-	// const [chekCurDaata, setchekCurDaata] = useState(true)
-	// useEffect(async()=>{
-	//     setchekCurDaata(true)
-	// },[])
-
-	// useEffect(async()=>{
-	//
-	//     // if(chekCurDaata){
-	//         setInterval(async() => {
-	//             console.log("1122")
-	//             setST(await getAllPairsWoithoutProvider())
-	//
-	//         }, 2000)
-	//
-	//     // }
-	//
-	//
-	// },[])
-
-	//todo dispatch error is here
-
-	function handleClose() {
-		// setchekCurDaata(false)
-		// clearTimeout = () => {
-		//     // use clearTimeout on the stored timeout in the class property "timeout"
-		//     window.clearInterval();
-		// }
-		history.push("/swap");
-		// return dispatch(hidePoolExplorer())
-	}
+	const [pairsArr, setPairsArray] = useState([]);
+	useEffect(() => {
+		setPairsArray(pairsList);
+	}, [pairsList]);
 
 	return (
-		// <div className="select-wrapper">
 		<div className="container" onClick={() => console.log("pool")}>
 			<MainBlock
-				// title={'Pool explorer'}
-				// classTitle={{justifyContent: "center !important"}}
-				// button={<CloseBtn func={handleClose}/>}
 				content={
 					<>
 						<div className="head_wrapper">
@@ -131,7 +66,6 @@ function PoolExplorer(props) {
 				}
 			/>
 		</div>
-		// document.querySelector('body')
 	);
 }
 

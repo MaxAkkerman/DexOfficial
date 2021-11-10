@@ -25,10 +25,12 @@ import {
 	SET_PERIOD_FOR_STACkING,
 	SET_TIP,
 	SHOW_ENTER_SEED_PHRASE,
+	SET_AFTER_ENTER_SEED_LOADING,
 	SHOW_REVEAL_SEED_PHRASE,
 } from "../actions/types";
 
 const initialState = {
+	afterEnterSeedLoading: true,
 	enterSeedPhraseIsVisible: false,
 	side: "register",
 	wordOne: null, //"",
@@ -56,6 +58,11 @@ const initialState = {
 
 const enterSeedPhrase = (state = initialState, {type, payload}) => {
 	switch (type) {
+		case SET_AFTER_ENTER_SEED_LOADING:
+			return {
+				...state,
+				afterEnterSeedLoading: payload,
+			};
 		case SET_TIP:
 			return {
 				...state,

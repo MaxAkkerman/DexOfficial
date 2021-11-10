@@ -9,8 +9,6 @@ import {
 	setPoolPairId,
 	setPoolToToken,
 } from "../../store/actions/pool";
-import ReturnLiquidConfirmPopup from "../ReturnLiquidConfirmPopup/ReturnLiquidConfirmPopup";
-import {getDecimals} from "../../reactUtils/reactUtils";
 
 function ManageConfirmPopup(props) {
 	const history = useHistory();
@@ -22,10 +20,13 @@ function ManageConfirmPopup(props) {
 	const balance = useSelector((state) => state.manageReducer.balance);
 	const pairId = useSelector((state) => state.manageReducer.pairId);
 	const pairS = useSelector((state) => state.walletReducer.pairsList);
+
 	let curPair = pairS.filter((item) => item.pairAddress === pairId);
-	console.log("curPair", curPair);
 
 	const [poolShare, setPoolShare] = useState(1);
+	const [pooledTokensA, setpooledTokensA] = useState(1);
+	const [pooledTokensB, setpooledTokensB] = useState(1);
+
 	useEffect(() => {
 		if (!curPair[0]) return;
 		let curP = curPair;
@@ -35,22 +36,14 @@ function ManageConfirmPopup(props) {
 		setPoolShare(poolS);
 	}, [pairId]);
 
-	// let poolShare = (balance*100)/(curPair && (curPair[0].totalSupply ? curPair[0].totalSupply : 1)/1000000000)
-	console.log("poolShare", poolShare);
-
-	const [pooledTokensA, setpooledTokensA] = useState(1);
-	const [pooledTokensB, setpooledTokensB] = useState(1);
 	useEffect(() => {
 		if (!curPair[0]) return;
 		let curP = curPair;
-		console.log("curP",curP,"fromToken",fromToken,"toToken",toToken,"poolshare",poolShare)
+		const tokeB = tokenList.filter((item) => item.symbol === curP[0].symbolB);
 
-		// const tokeA = tokenList.filter(item=>item.symbol === curP[0].symbolA)
-		const tokeB = tokenList.filter(item=>item.symbol === curP[0].symbolB)
+		let pooledTokensA = ((curP[0].reserveA / 1000000000) * poolShare) / 100;
+		let pooledTokensB = ((curP[0].reservetB / 1000000000) * poolShare) / 100;
 
-		// console.log("tokeA",tokeA,tokeB)
-		let pooledTokensA = ((curP[0].reserveA / 1000000000) * poolShare)/100;
-		let pooledTokensB = ((curP[0].reservetB / 1000000000) * poolShare)/100;
 		setpooledTokensA(pooledTokensA);
 		setpooledTokensB(pooledTokensB);
 	}, [poolShare]);

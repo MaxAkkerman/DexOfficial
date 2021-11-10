@@ -1,4 +1,5 @@
 import "./MainBlock.scss";
+import React from "react";
 
 function MainBlock({
 	smallTitle,

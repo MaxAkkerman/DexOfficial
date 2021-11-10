@@ -6,10 +6,10 @@ import {DEXClientContract} from "../contracts/DEXClientMainNet.js";
 import {GContract} from "../contracts/GContract.js";
 import {TONTokenWalletContract} from "../contracts/TONTokenWallet.js";
 import {RootTokenContract} from "../contracts/RootTokenContract.js";
-import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
+import {SafeMultisigWallet} from "../contracts/SafeMultisigWallet.js";
 import {DEXPairContract} from "../contracts/DEXPair.js";
 import {DEXConnectorContract} from "../contracts/DEXConnector.js";
-import {abiContract, signerKeys, signerNone} from "@tonclient/core";
+import {signerKeys, signerNone} from "@tonclient/core";
 import {iconGenerator} from "../../iconGenerator";
 /*
     NFT contracts
@@ -21,9 +21,15 @@ import salary from "../../images/salary.svg";
 import {libWeb} from "@tonclient/lib-web";
 import {store} from "../../index";
 import {setTips} from "../../store/actions/app";
-import {setUpdatedBalance,} from "../../store/actions/wallet";
-import TON from "../../images/tokens/TON.svg";
-import {getDecimals, getFixedNums, toHex} from "../../reactUtils/reactUtils";
+import {setUpdatedBalance} from "../../store/actions/wallet";
+import {
+	getDecimals,
+	getFixedNums,
+	getFullName,
+	hex2a,
+	toHex,
+} from "../../reactUtils/reactUtils";
+import {checkMessagesAmountClient, decode, getShardThis} from "../tonUtils";
 
 const {ResponseType} = require("@tonclient/core/dist/bin");
 const {TonClient} = require("@tonclient/core");
@@ -31,31 +37,25 @@ const {Account} = require("@tonclient/appkit");
 TonClient.useBinaryLibrary(libWeb);
 
 const Radiance = require("../Radiance.json");
-const dexroot = Radiance.networks["2"].dexroot
-const rootAddrNFT = Radiance.networks["2"].rootAddrNFT
-const BroxusRootCodeHash = Radiance.networks["2"].BroxusRootCodeHash
+const dexroot = Radiance.networks["2"].dexroot;
+const rootAddrNFT = Radiance.networks["2"].rootAddrNFT;
+const BroxusRootCodeHash = Radiance.networks["2"].BroxusRootCodeHash;
 
-const DappServer = Radiance.networks["2"].DappServer
+const DappServer = Radiance.networks["2"].DappServer;
 
 const client = new TonClient({network: {endpoints: [DappServer]}});
 export default client;
 
+import memoize from "lodash.memoize";
 
-
-import {hex2a} from "../../reactUtils/reactUtils"
-
-function getShardThis(string) {
-	return string[2];
-}
-
-export async function getWalletAddress(clientPubkey,pairAddress,rootAddress) {
+export async function getWalletAddress(clientPubkey, pairAddress, rootAddress) {
 	const rootAcc = new Account(DEXRootContract, {
 		address: dexroot,
 		signer: signerNone(),
 		client,
 	});
-	const RTacc = new Account(RootTokenContract, {address: rootAddress,client,});
-	let pubk = "0x" + clientPubkey
+	const RTacc = new Account(RootTokenContract, {address: rootAddress, client});
+	let pubk = "0x" + clientPubkey;
 
 	let connectorSoArg0;
 	let status = false;
@@ -68,7 +68,7 @@ export async function getWalletAddress(clientPubkey,pairAddress,rootAddress) {
 			_answer_id: 0,
 			connectorPubKey: pubk,
 			connectorSoArg: n,
-			connectorCommander: pairAddress
+			connectorCommander: pairAddress,
 		});
 		let connectorAddr = res.decoded.output.value0;
 		let shardC = getShardThis(connectorAddr);
@@ -78,7 +78,7 @@ export async function getWalletAddress(clientPubkey,pairAddress,rootAddress) {
 			res = await RTacc.runLocal("getWalletAddress", {
 				_answer_id: 0,
 				wallet_public_key_: 0,
-				owner_address_: connectorAddr
+				owner_address_: connectorAddr,
 			});
 			let walletAddr = res.decoded.output.value0;
 			let shardW = getShardThis(walletAddr);
@@ -89,18 +89,17 @@ export async function getWalletAddress(clientPubkey,pairAddress,rootAddress) {
 				console.log("connectorSoArg0:", n);
 				status = true;
 			} else {
-				console.log("n",n);
+				console.log("n", n);
 			}
 		} else {
-			console.log("n",n);
+			console.log("n", n);
 		}
 		n++;
 	}
-	return connectorSoArg0
+	return connectorSoArg0;
 }
 
-
-export async function getRootTokenAddress(clientPubkey,rootName,decimals) {
+export async function getRootTokenAddress(clientPubkey, rootName, decimals) {
 	const rootAcc = new Account(DEXRootContract, {
 		address: dexroot,
 		client,
@@ -111,9 +110,8 @@ export async function getRootTokenAddress(clientPubkey,rootName,decimals) {
 	let targetShard = getShardThis(dexroot);
 	let n = 0;
 	let res;
-	let pubk = "0x" + clientPubkey
+	let pubk = "0x" + clientPubkey;
 
-	console.log("pubk",pubk,"n",n,"rootName",rootName,"decimals",decimals)
 	try {
 		while (!status) {
 			res = await rootAcc.runLocal("getRootTokenAddress", {
@@ -122,9 +120,9 @@ export async function getRootTokenAddress(clientPubkey,rootName,decimals) {
 				rootSoArg: n,
 				rootName: toHex(rootName),
 				rootSymbol: toHex(rootName),
-				rootDecimals: decimals
+				rootDecimals: decimals,
 			});
-			console.log("targetShard", targetShard, n)
+			console.log("targetShard", targetShard, n);
 			rootABaddress = res.decoded.output.value0;
 			rootABsouint = n;
 			let shard = getShardThis(rootABaddress);
@@ -137,22 +135,27 @@ export async function getRootTokenAddress(clientPubkey,rootName,decimals) {
 				console.log(n);
 			}
 			n++;
-
 		}
-		return {rootABsouint: rootABsouint, rootABaddress: rootABaddress}
-	}catch(e){
-console.log("e",e)
-		return e
+		return {rootABsouint: rootABsouint, rootABaddress: rootABaddress};
+	} catch (e) {
+		console.log("e", e);
+		return e;
 	}
 }
 
-export async function getPairAddress(clientPubkey,clientAddr,rootAddrA,rootAddrB,rootABaddress){
+export async function getPairAddress(
+	clientPubkey,
+	clientAddr,
+	rootAddrA,
+	rootAddrB,
+	rootABaddress,
+) {
 	const rootAcc = new Account(DEXRootContract, {
 		address: dexroot,
 		signer: signerNone(),
 		client,
 	});
-	let pubk = "0x" + clientPubkey
+	let pubk = "0x" + clientPubkey;
 
 	let targetShard = getShardThis(dexroot);
 	let pairAddress;
@@ -161,7 +164,15 @@ export async function getPairAddress(clientPubkey,clientAddr,rootAddrA,rootAddrB
 	let n = 0;
 	let res;
 	while (!status) {
-		res = await rootAcc.runLocal("getPairAddress", {_answer_id:0,pairPubKey:pubk,pairSoArg:n,pairCreator:clientAddr,pairRootA:rootAddrA,pairRootB:rootAddrB,pairRootAB:rootABaddress});
+		res = await rootAcc.runLocal("getPairAddress", {
+			_answer_id: 0,
+			pairPubKey: pubk,
+			pairSoArg: n,
+			pairCreator: clientAddr,
+			pairRootA: rootAddrA,
+			pairRootB: rootAddrB,
+			pairRootAB: rootABaddress,
+		});
 		pairAddress = res.decoded.output.value0;
 		let shard = getShardThis(pairAddress);
 		if (shard === targetShard) {
@@ -170,14 +181,13 @@ export async function getPairAddress(clientPubkey,clientAddr,rootAddrA,rootAddrB
 			pairSoArg = n;
 			console.log("pairAddress Address:", pairAddress);
 			status = true;
-		} else {console.log(n);}
+		} else {
+			console.log(n);
+		}
 		n++;
 	}
-	return {pairAddress:pairAddress,pairSoArg:pairSoArg}
-
+	return {pairAddress: pairAddress, pairSoArg: pairSoArg};
 }
-
-
 
 export async function queryRoots(minBalance) {
 	try {
@@ -188,13 +198,13 @@ export async function queryRoots(minBalance) {
 					code_hash: {
 						eq: BroxusRootCodeHash,
 					},
-					balance:{
-						gt: minBalance
+					balance: {
+						gt: minBalance,
 					},
 				},
-				order_by:{
-					path:"balance",
-					direction:"DESC"
+				order_by: {
+					path: "balance",
+					direction: "DESC",
 				},
 				result: "id balance",
 			})
@@ -203,6 +213,7 @@ export async function queryRoots(minBalance) {
 		console.error(error);
 	}
 }
+
 export async function getAccType2(addr) {
 	try {
 		const curWalletContract = new Account(TONTokenWalletContract, {
@@ -210,12 +221,13 @@ export async function getAccType2(addr) {
 			client,
 		});
 
-		return await curWalletContract.getAccount()
+		return await curWalletContract.getAccount();
 	} catch (e) {
 		console.log("catch E", e);
 		return e;
 	}
 }
+
 export async function getAccTypeHex(addr) {
 	try {
 		return await client.utils.convert_address({
@@ -223,15 +235,14 @@ export async function getAccTypeHex(addr) {
 			output_format: {
 				type: "Hex",
 			},
-		})
-	} catch(e) {
-
+		});
+	} catch (e) {
 		return e;
 	}
-
 }
 
-let GiverAd ="0:ed069a52b79f0bc21d13da9762a591e957ade1890d4a1c355e0010a8cb291ae4";
+let GiverAd =
+	"0:ed069a52b79f0bc21d13da9762a591e957ade1890d4a1c355e0010a8cb291ae4";
 
 export async function transferFromGiver(addr, count) {
 	const gSigner = signerKeys({
@@ -480,31 +491,6 @@ export async function checkwalletExists(clientAddress, pairAddress) {
  * @return   string
  * @param name
  */
-export function getFullName(name) {
-	if (name === "TON") {
-		return "TON Crystal";
-	} else if (name === "WTON") {
-		return "Wrapped TON Crystal";
-	} else if (name === "fBTC") {
-		return "fBitcoin";
-	} else if (name === "WETH") {
-		return "Wrapped Ethereum";
-	} else if (name === "fETH") {
-		return "fEthereum";
-	} else if (name === "WBTC") {
-		return "Wrapped Bitcoin";
-	} else if (name === "DS-WTON/USDT") {
-		return "Pool tokens of TON/USDT pair";
-	} else if (name === "DS-WTON/WETH") {
-		return "Pool tokens of TON/ETH pair";
-	} else if (name === "DS-WTON/WBTC") {
-		return "Pool tokens of TON/BTC pair";
-	} else if (name === "USDT") {
-		return "Tether";
-	} else {
-		return name;
-	}
-}
 
 export async function getAllClientWallets(clientAddress) {
 	console.log("clientAddress____", clientAddress);
@@ -549,11 +535,12 @@ export async function getAllClientWallets(clientAddress) {
 				+curWalletData.decoded.output.value0.balance /
 				getDecimals(curRootData.decoded.output.value0.decimals);
 
-			if(itemData.walletAddress !== "0:eac2a309de0d777b820bd5b5fbfcb07733be5c068234333bd83ad35f610fe82d"){
+			if (
+				itemData.walletAddress !==
+				"0:eac2a309de0d777b820bd5b5fbfcb07733be5c068234333bd83ad35f610fe82d"
+			) {
 				normalizeWallets.push(itemData);
 			}
-
-
 		}
 		console.log("normalizeWallets", normalizeWallets);
 		return normalizeWallets;
@@ -594,13 +581,13 @@ export async function checkPubKey(clientPubkey) {
  * @return   number{pairAddress:string,symbolA:string,reserveA:number,symbolB:string,reserveB:number,rateAB:nubmer,rateBA:number}]
  */
 
-export async function getAllPairsWoithoutProvider() {
+export const getAllPairsWoithoutProvider = memoize(async () => {
 	const acc = new Account(DEXRootContract, {
 		address: Radiance.networks["2"].dexroot,
 		client,
 	});
 	const response = await acc.runLocal("pairs", {});
-console.log("response.decoded.output",response.decoded.output)
+	console.log("response.decoded.output", response.decoded.output);
 	let normlizeWallets = [];
 
 	for (const item of Object.entries(response.decoded.output.pairs)) {
@@ -635,33 +622,39 @@ console.log("response.decoded.output",response.decoded.output)
 		console.log("curRootDataA", curRootDataA);
 		const decimalsRootA = Number(curRootDataA.decoded.output.value0.decimals);
 		const decimalsRootB = Number(curRootDataB.decoded.output.value0.decimals);
+		const decimalsRootAB = Number(curRootDataAB.decoded.output.value0.decimals);
 
 		const balanceA = Number(bal.decoded.output.balanceReserve[item[1].root0]);
 		const balanceB = Number(bal.decoded.output.balanceReserve[item[1].root1]);
 
-		const fixedA =  getFixedNums(decimalsRootA, balanceA);
-		const fixedB =  getFixedNums(decimalsRootB, balanceB);
+		const fixedA = getFixedNums(decimalsRootA, balanceA);
+		const fixedB = getFixedNums(decimalsRootB, balanceB);
 		// console.log("fixedA", fixedA, "fixedB", fixedB);
 		let itemData = {};
 		itemData.pairAddress = item[0];
 
 		// itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
 		itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol);
-		itemData.reserveA = fixedA;
+		itemData.reserveA = balanceA;
+		itemData.decimalsA = decimalsRootA;
 
 		itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
-		itemData.reservetB = fixedB;
+		itemData.reservetB = balanceB;
+		itemData.decimalsB = decimalsRootB;
+
+		itemData.decimalsAB = decimalsRootAB;
 
 		itemData.rateAB = fixedB / fixedA;
 		itemData.rateBA = fixedA / fixedB;
 		itemData.totalSupply = await getPairsTotalSupply(item[0]);
 
-
-		if(itemData.pairAddress !== "0:ea784f5e3434beb91fa56c8b0131cac0be703d6551a3bb297e4d6db95ae0af8e"){
-			console.log("alert",itemData.symbolA)
+		if (
+			itemData.pairAddress !==
+			"0:ea784f5e3434beb91fa56c8b0131cac0be703d6551a3bb297e4d6db95ae0af8e"
+		) {
+			console.log("alert", itemData.symbolA);
 			normlizeWallets.push(itemData);
 		}
-
 
 		// let wrongPairID = normlizeWallets.find((item,i)=>{
 		// 	if(item.pairAddress === "0:ea784f5e3434beb91fa56c8b0131cac0be703d6551a3bb297e4d6db95ae0af8e")
@@ -678,7 +671,7 @@ console.log("response.decoded.output",response.decoded.output)
 		console.log("normlizeWallets!!normlizeWallets", normlizeWallets);
 	}
 	return normlizeWallets;
-}
+});
 
 /**
  * Function to get native balance of address in tons
@@ -713,46 +706,6 @@ export async function getClientBalance(clientAddress) {
 	}
 }
 
-export const decode = {
-	async message(abi, boc) {
-		try {
-			return await TonClient.default.abi.decode_message({
-				abi: abiContract(abi),
-				message: boc,
-			});
-		} catch (e) {
-			// console.log(e)
-			return e.code;
-		}
-	},
-};
-
-async function body(abi, body, internal = true) {
-	try {
-		return await TonClient.default.abi.decode_message_body({
-			abi: abiContract(abi),
-			body: body,
-			is_internal: internal,
-		});
-	} catch (e) {
-		console.log(e);
-		return e.code;
-	}
-}
-
-async function _body(abi, body, internal = true) {
-	try {
-		return await TonClient.default.abi.decode_message_body({
-			abi: abiContract(abi),
-			body: body,
-			is_internal: internal,
-		});
-	} catch (e) {
-		console.log(e);
-		return e.code;
-	}
-}
-
 export async function getDetailsFromTokenRoot(address) {
 	const rootAcc = new Account(RootTokenContract, {address: address, client});
 
@@ -766,6 +719,7 @@ export async function getDetailsFromTokenRoot(address) {
 		decimals: rootDetails.decoded.output.value0.decimals,
 	};
 }
+
 export async function getExpectedWalletAddressByOwner(rootAddress, toAddress) {
 	const rootAcc = new Account(RootTokenContract, {
 		address: rootAddress,
@@ -785,6 +739,7 @@ export async function getExpectedWalletAddressByOwner(rootAddress, toAddress) {
 		name: walletAddress.decoded.output.value0,
 	};
 }
+
 export async function getRootFromTonWallet(address) {
 	const tokenWalletAcc = new Account(TONTokenWalletContract, {
 		address: address,
@@ -796,7 +751,6 @@ export async function getRootFromTonWallet(address) {
 }
 
 export async function getDetailsFromTONtokenWallet2(address) {
-	console.log("address", address);
 	const tokenWalletAcc = new Account(TONTokenWalletContract, {
 		address: address,
 		client,
@@ -805,10 +759,6 @@ export async function getDetailsFromTONtokenWallet2(address) {
 		let tokenWalletDetails = await tokenWalletAcc.runLocal("getDetails", {
 			_answer_id: 0,
 		});
-		console.log(
-			"atokenWalletDetails.decoded.output.value0.root_addressddress",
-			tokenWalletDetails,
-		);
 
 		return tokenWalletDetails.decoded.output;
 	} catch (e) {
@@ -818,7 +768,6 @@ export async function getDetailsFromTONtokenWallet2(address) {
 }
 
 export async function getDetailsFromTONtokenWallet(address) {
-	console.log("address", address);
 	const tokenWalletAcc = new Account(TONTokenWalletContract, {
 		address: address,
 		client,
@@ -827,10 +776,7 @@ export async function getDetailsFromTONtokenWallet(address) {
 		let tokenWalletDetails = await tokenWalletAcc.runLocal("getDetails", {
 			_answer_id: 0,
 		});
-		console.log(
-			"atokenWalletDetails.decoded.output.value0.root_addressddress",
-			tokenWalletDetails,
-		);
+
 		if (!tokenWalletDetails.decoded.output.value0.root_address) {
 			return undefined;
 		}
@@ -840,41 +786,6 @@ export async function getDetailsFromTONtokenWallet(address) {
 		return e;
 	}
 }
-
-// // const transListReceiveTokens = useSelector(state => state.walletReducer.transListReceiveTokens);
-// export async function subscribeClientBalanceForTips(address) {
-//
-//     let subscribeID = (await client.net.subscribe_collection({
-//         collection: "messages",
-//         filter: {
-//             dst: {eq: address},
-//         },
-//         result: "id created_at src value",
-//     }, async (params, responseType) => {
-//         // console.log("params balance", params.result.balance, typeof params.result.balance, Number(params.result.balance))
-//
-//         console.log("paramsparams", params)
-//
-//         if(Number(params.result.value) === 0)return
-//         // store.dispatch(setTips(
-//         //     {
-//         //         name:"getTons",
-//         //         message: `you get ${Number(params.result.value)} from ${params.result.src}`,
-//         //         tonLiveID: params.result.id,
-//         //         created_at: params.result.created_at,
-//         //         type: "info",
-//         //         src:params.result.src,
-//         //         amount:Number(params.result.value)
-//         //     }
-//         // ))
-//
-//
-//         // store.dispatch(setTips({message:`you get ${Number(params.result.balance) / 1000000000}`,type:"info"}))
-//
-//     })).handle;
-//     console.log("status subscribedAddress: address")
-//
-// }
 
 export async function subscribeClientBalance(address) {
 	let subscribeID = (
@@ -1319,10 +1230,8 @@ export async function subscribeClient(address) {
 							token_name: hex2a(rootD.name) || "default",
 							token_symbol: hex2a(rootD.symbol) || "default",
 						};
-						console.log("checkedDuple", checkedDuple);
 
 						if (payloadFlag === 0) {
-							console.log("decodedPayl.arg0 === 0");
 							const rootAddressA = await getDetailsFromTONtokenWallet(
 								decodedPayl.arg1,
 							);
@@ -1454,36 +1363,6 @@ export async function subscribeClient(address) {
 	).handle;
 	console.log("SUBSCRIBED TO client", address);
 	return {status: "success", subscribedAddress: address};
-}
-
-let checkerArrClient = [];
-let checkMessagesAmountClient = function (messageID) {
-	for (let i = 0; i < checkerArrClient.length; i++) {
-		if (checkerArrClient[i].tonLiveID === messageID.tonLiveID) {
-			return false;
-		}
-	}
-	checkerArrClient.push(messageID);
-	return messageID;
-};
-
-export async function decodePayload(payload) {
-	try {
-		const RootContract = new Account(DEXRootContract, {
-			address: Radiance.networks["2"].dexroot,
-			client,
-		});
-
-		let response = await RootContract.runLocal("encodePayload", {
-			payload: payload,
-		});
-		let args = response.decoded.output;
-		console.log("args", args);
-		return args;
-	} catch (e) {
-		console.log("catch E", e);
-		return e;
-	}
 }
 
 export async function subscribe(address) {
@@ -1641,22 +1520,11 @@ export async function subscribe(address) {
 	return {status: "success", subscribedAddress: address};
 }
 
-let checkerArr = [];
-let checkMessagesAmount = function (messageID) {
-	for (let i = 0; i < checkerArr.length; i++) {
-		if (checkerArr[i].transactionID === messageID.transactionID) {
-			return null;
-		}
-	}
-	checkerArr.push(messageID);
-	return messageID;
-};
-
 export async function getPairsTotalSupply(pairAddress) {
 	const acc = new Account(DEXPairContract, {address: pairAddress, client});
 	try {
 		const response = await acc.runLocal("totalSupply", {});
-		return response.decoded.output.totalSupply;
+		return +response.decoded.output.totalSupply;
 	} catch (e) {
 		console.log("catch E", e);
 		return e;
@@ -1668,9 +1536,7 @@ export async function pairs(clientAddress) {
 	const acc = new Account(DEXClientContract, {address: clientAddress, client});
 	try {
 		const response = await acc.runLocal("pairs", {});
-		let pairsC = response.decoded.output.pairs;
-		console.log("pairs", pairsC);
-		return pairsC;
+		return response.decoded.output.pairs;
 	} catch (e) {
 		console.log("catch E", e);
 		return e;
@@ -1688,9 +1554,7 @@ export async function getClientAddrAtRootForShard(pubkey, n) {
 			clientPubKey: "0x" + pubkey,
 			clientSoArg: n,
 		});
-		let value0 = response.decoded.output.value0;
-		console.log("value0", value0);
-		return value0;
+		return response.decoded.output.value0;
 	} catch (e) {
 		console.log("catch E", e);
 		return e;
@@ -1698,15 +1562,10 @@ export async function getClientAddrAtRootForShard(pubkey, n) {
 }
 
 export async function getsoUINT(clientAddress) {
-	console.log("clientAddress", clientAddress);
 	const acc = new Account(DEXClientContract, {address: clientAddress, client});
 	try {
-		console.log("sstrt");
 		const response = await acc.runLocal("soUINT", {});
-		console.log("response", response);
-		let soUINTC = response.decoded.output.soUINT;
-		console.log("soUINTC", soUINTC);
-		return soUINTC;
+		return response.decoded.output.soUINT;
 	} catch (e) {
 		console.log("catch E", e);
 		return e;
@@ -1717,7 +1576,6 @@ export async function getAllDataPrep(clientAddress) {
 	const acc = new Account(DEXClientContract, {address: clientAddress, client});
 	try {
 		const response = await acc.runLocal("getAllDataPreparation", {});
-		console.log("response get all data", response);
 		return response.decoded.output;
 	} catch (e) {
 		console.log("catch E", e);
@@ -1754,11 +1612,6 @@ export async function getSouint(connectorAddress) {
 	});
 	try {
 		const response = await accConnector.runLocal("soUINT", {});
-		const response2 = await accConnector.runLocal("statusConnected", {});
-		console.log(
-			"response2.decoded.output.soUINT",
-			response2.decoded.output.statusConnected,
-		);
 		return response.decoded.output.soUINT;
 	} catch (e) {
 		console.log("catch E", e);
@@ -1774,8 +1627,6 @@ export async function checkSouint(clientAddress) {
 			let BIValue = Number(await getSouint(item));
 			souintArr.push(BIValue);
 		}
-
-		console.log("sountArr", souintArr.filter((item) => item === 39).length);
 		return souintArr;
 	} catch (e) {
 		console.log("catch E", e);
@@ -1783,6 +1634,9 @@ export async function checkSouint(clientAddress) {
 	}
 }
 
+/*
+    DEV
+*/
 const secretKeys = {
 	"0:8ed631b2691e55ddc65065e0475d82a0b776307797b31a2683a3af7b5c26b984": {
 		public: "0ce403a4a20165155788f0517d1a455b4f1e82899f3782fadcf07413b2a56730",
@@ -1852,9 +1706,7 @@ const RootCodeHash =
 let RootCodeHashmyCode =
 	"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";
 
-
-
-export async function getAssetsForDeploy() {
+export const getAssetsForDeploy = memoize(async () => {
 	// const rootAddresses = [];
 	// let minBalance = 0
 	// const arrPart = await queryRoots(minBalance.toString())
@@ -1865,7 +1717,6 @@ export async function getAssetsForDeploy() {
 	// const arrPart6 = await queryRoots(arrPart5[49].balance.toString())
 	// rootAddresses.push(...arrPart,...arrPart2,...arrPart3,...arrPart4,...arrPart5,...arrPart6)
 
-
 	// let rootAddresses = [
 	// 	{id: "0:b129553a53652983183374f5beb4652268641325726eccbb81feb5e98be0eef6"},
 	// 	{id: "0:dccb2920d677e2587c79cb9b479d28d8ddd2bbfe0202dc7dc537b5406d32569a"},
@@ -1875,29 +1726,28 @@ export async function getAssetsForDeploy() {
 	// 	{id: "0:7d58a33a03bfdb2aac393b15a2c9767ea194006c53278fd63046a946f437b81b"},
 	// ]
 
-/*
-	DONT DELETE
-		// wton 0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37
-		// uni 0:471c9d737254a0044695c7e50ec5b8f6f94eadd49511b298d4a331b95106652b
-		// weth 0:45f682b7e783283caef3f268e10073cf08842bce20041d5224c38d87df9f2e90
-		// dai 0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef
-		// usdt 0:751b6e22687891bdc1706c8d91bf77281237f7453d27dc3106c640ec165a2abf
-		// usdc 0:1ad0575f0f98f87a07ec505c39839cb9766c70a11dadbfc171f59b2818759819
-		// wbtc 0:6e76bccb41be2210dc9d7a4d0f3cbf0d5da592d0cb6b87662d5510f5b5efe497
-*/
+	/*
+        DONT DELETE
+            // wton 0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37
+            // uni 0:471c9d737254a0044695c7e50ec5b8f6f94eadd49511b298d4a331b95106652b
+            // weth 0:45f682b7e783283caef3f268e10073cf08842bce20041d5224c38d87df9f2e90
+            // dai 0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef
+            // usdt 0:751b6e22687891bdc1706c8d91bf77281237f7453d27dc3106c640ec165a2abf
+            // usdc 0:1ad0575f0f98f87a07ec505c39839cb9766c70a11dadbfc171f59b2818759819
+            // wbtc 0:6e76bccb41be2210dc9d7a4d0f3cbf0d5da592d0cb6b87662d5510f5b5efe497
+    */
 
 	const rootAddresses = [
-		{id:"0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37"},
-		{id:"0:471c9d737254a0044695c7e50ec5b8f6f94eadd49511b298d4a331b95106652b"},
-		{id:"0:45f682b7e783283caef3f268e10073cf08842bce20041d5224c38d87df9f2e90"},
-		{id:"0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef"},
-		{id:"0:751b6e22687891bdc1706c8d91bf77281237f7453d27dc3106c640ec165a2abf"},
-		{id:"0:1ad0575f0f98f87a07ec505c39839cb9766c70a11dadbfc171f59b2818759819"},
-		{id:"0:6e76bccb41be2210dc9d7a4d0f3cbf0d5da592d0cb6b87662d5510f5b5efe497"},
+		{id: "0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37"},
+		{id: "0:471c9d737254a0044695c7e50ec5b8f6f94eadd49511b298d4a331b95106652b"},
+		{id: "0:45f682b7e783283caef3f268e10073cf08842bce20041d5224c38d87df9f2e90"},
+		{id: "0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef"},
+		{id: "0:751b6e22687891bdc1706c8d91bf77281237f7453d27dc3106c640ec165a2abf"},
+		{id: "0:1ad0575f0f98f87a07ec505c39839cb9766c70a11dadbfc171f59b2818759819"},
+		{id: "0:6e76bccb41be2210dc9d7a4d0f3cbf0d5da592d0cb6b87662d5510f5b5efe497"},
+	];
 
-	]
-
-	console.log("rootAddresses",rootAddresses)
+	console.log("rootAddresses", rootAddresses);
 	const rootDataArray = [];
 
 	console.log(
@@ -1922,7 +1772,7 @@ export async function getAssetsForDeploy() {
 
 	console.log("rootDataArray", rootDataArray);
 	return rootDataArray;
-}
+});
 
 export async function queryByCode(code) {
 	try {
@@ -1943,7 +1793,6 @@ export async function queryByCode(code) {
 		console.error(error);
 	}
 }
-
 
 export async function getCodeHashFromNFTRoot() {
 	const acc = new Account(NftRootContract, {
@@ -1975,7 +1824,7 @@ export async function agregateQueryNFTassets(addrClient) {
 	let k = 0;
 	for (const item of nftTokenItemAddress) {
 		const dataNFT = await getDataInfo(item.id, addrClient);
-//todo add type
+		//todo add type
 		if (dataNFT) {
 			k++;
 			dataNFT["type"] = "DePoolStake";
@@ -1997,6 +1846,7 @@ export async function agregateQueryNFTassets(addrClient) {
 
 	return datainfo;
 }
+
 export async function getDetailsFromDataContract(address) {
 	const accNFTdata = new Account(DataContract, {address: address, client});
 	try {
@@ -2022,12 +1872,6 @@ export async function getLockStakeSafeInfo(address) {
 		const receiveAnswerList = await acc.runLocal("receiveAnswerList", {});
 		const onTransferList = await acc.runLocal("onTransferList", {});
 		const depoolStakeReturn = await acc.runLocal("depoolStakeReturn", {});
-		console.log("stakeTotal", stakeTotal.decoded.output);
-		console.log("depoolStakeReturn", depoolStakeReturn.decoded.output);
-		console.log("onRoundCompleteList", onRoundCompleteList.decoded.output);
-		console.log("receiveAnswerList", receiveAnswerList.decoded.output);
-		console.log("onTransferList", onTransferList.decoded.output);
-		console.log("depoolStakeReturn", depoolStakeReturn.decoded.output);
 		return {
 			...depoolAddress.decoded.output,
 			...depoolFee.decoded.output,

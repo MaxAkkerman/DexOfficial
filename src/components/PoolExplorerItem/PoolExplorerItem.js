@@ -1,13 +1,8 @@
 import React from "react";
-import {useSelector} from "react-redux";
 import {iconGenerator} from "../../iconGenerator";
 import "./PoolExplorerItem.scss";
 
 function PoolExplorerItem(props) {
-	const walletIsConnected = useSelector(
-		(state) => state.appReducer.walletIsConnected,
-	);
-
 	return (
 		<React.Fragment>
 			<div>

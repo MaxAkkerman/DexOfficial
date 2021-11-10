@@ -2,14 +2,11 @@ import React, {useState} from "react";
 import MainBlock from "../../components/MainBlock/MainBlock";
 import AssetsList from "../../components/AssetsList/AssetsList";
 import {useDispatch, useSelector} from "react-redux";
-import {getClientKeys, queryRoots} from "../../extensions/webhook/script";
 import DeployAssetConfirmPopup from "../DeployAssetConfirmPopup/DeployAssetConfirmPopup";
-import {connectToPairStep2DeployWallets} from "../../extensions/sdk/run";
-import {decrypt} from "../../extensions/seedPhrase";
+import {connectToPairStep2DeployWallets} from "../../extensions/sdk_run/run";
 import "./AssetsListForDeploy.scss";
 import SearchInput from "../SearchInput/SearchInput";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
-import includesTextInToken from "../../utils/includesTextInToken";
 import arrowBack from "../../images/arrowBack.png";
 import {useHistory} from "react-router-dom";
 import nativeBtn from "../../images/nativeadd.svg";
@@ -20,24 +17,26 @@ import {setTips} from "../../store/actions/app";
 function AssetsListForDeploy() {
 	const history = useHistory();
 	const dispatch = useDispatch();
-	const encryptedSeedPhrase = useSelector(
-		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
-	);
-	const seedPhrasePassword = useSelector(
-		(state) => state.enterSeedPhrase.seedPhrasePassword,
-	);
+
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 	const assetsFromGraphQL = useSelector(
 		(state) => state.walletReducer.assetsFromGraphQL,
 	);
 
-	// const [assetsList,setAssetsList] = useState([])
+	const {keyPair} = useKeyPair();
+
 	const [curAssetForDeploy, setcurAssetForDeploy] = useState({});
 	const [showAssetDepPopup, showConfirmAssetDeployPopup] = useState(false);
-	const [loadingRoots, setLoadingRoots] = useState(false);
-	// useEffect(async () => {
-	//     setAssetsList(assetsFromGraphQL)
-	// }, [assetsFromGraphQL])
+
+	const [deployWalletIsWaiting, setdeployWalletIsWaiting] = useState(false);
+	const [showDeployCustomWalletPopup, setshowDeployCustomWalletPopup] =
+		useState(false);
+
+	const [filter, setFilter] = useState("");
+
+	function handleSetCustomAddrPopup() {
+		setshowDeployCustomWalletPopup(true);
+	}
 
 	function handleSetAssetForDeploy(item) {
 		showConfirmAssetDeployPopup(true);
@@ -47,23 +46,12 @@ function AssetsListForDeploy() {
 	function hideConfirm() {
 		showConfirmAssetDeployPopup(false);
 	}
-	const [deployWalletIsWaiting, setdeployWalletIsWaiting] = useState(false);
-	const {keyPair} = useKeyPair();
 
-	const [customRootAddr, setcustomRootAddr] = useState("")
-
-	const [showDeployCustomWalletPopup, setshowDeployCustomWalletPopup] = useState(false)
-
-
-	function handleSetCustomAddrPopup() {
-		setshowDeployCustomWalletPopup(true)
+	function handleSearch(text) {
+		setFilter(text);
 	}
 
-
-
-
 	async function handleDeployAsset() {
-		console.log("curAssetForDeploy", curAssetForDeploy);
 		if (clientData.balance < 4) {
 			dispatch(
 				setTips({
@@ -73,7 +61,6 @@ function AssetsListForDeploy() {
 			);
 			return;
 		}
-
 
 		showConfirmAssetDeployPopup(false);
 		setdeployWalletIsWaiting(true);
@@ -85,31 +72,30 @@ function AssetsListForDeploy() {
 			clientAdr: clientData.address,
 			clientRoots: "",
 		};
-		const deployRes = await connectToPairStep2DeployWallets(deployData, keyPair);
+		const deployRes = await connectToPairStep2DeployWallets(
+			deployData,
+			keyPair,
+		);
 		console.log("deployRes", deployRes);
 		setdeployWalletIsWaiting(true);
 		showConfirmAssetDeployPopup(false);
 	}
+
 	function handleClose() {
 		setdeployWalletIsWaiting(false);
 	}
+
 	function handleBack() {
 		history.push("/wallet");
 	}
 
-
-
-
-
 	return (
 		<>
-
-			{showDeployCustomWalletPopup &&
-			<DeployCustomTokenPopup
-				handleShow={()=>setshowDeployCustomWalletPopup(false)}
-			/>
-
-			}
+			{showDeployCustomWalletPopup && (
+				<DeployCustomTokenPopup
+					handleShow={() => setshowDeployCustomWalletPopup(false)}
+				/>
+			)}
 			{showAssetDepPopup && (
 				<DeployAssetConfirmPopup
 					handleDeployAsset={() => handleDeployAsset()}
@@ -140,15 +126,17 @@ function AssetsListForDeploy() {
 										className={"settings_btn"}
 										onClick={() => handleSetCustomAddrPopup()}
 									>
-										<img src={nativeBtn} alt={"native"}/>
+										<img src={nativeBtn} alt={"native"} />
 									</button>
 								</div>
 
-								<SearchInput func={() => console.log("func")} />
+								<SearchInput func={(e) => handleSearch(e)} />
 								{assetsFromGraphQL.length ? (
 									<AssetsList
 										assetWrap="heightfixWrap assetsList_off_padding"
-										TokenAssetsArray={assetsFromGraphQL}
+										TokenAssetsArray={assetsFromGraphQL.filter((i) =>
+											i.symbol.includes(filter.toUpperCase()),
+										)}
 										NFTassetsArray={null}
 										isAssetsInspector={true}
 										handleClickNFT={() => console.log("token item")}
