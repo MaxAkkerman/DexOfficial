@@ -3,15 +3,16 @@ import {signerKeys} from "@tonclient/core";
 
 import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
 import client from "../extensions/sdk_get/get";
+import getPair from "./getPair";
 import getTokenRouter from "./getTokenRouter";
 
 export default async function takeLimitOrder(
-	{pairAddr, orderAddr, directionPair, toTokenSymbol, qty, price},
+	{pairAddr, orderAddr, directionPair, qty, price},
 	{clientAddr, clientKeyPair},
 ) {
 	console.log(
 		"takeLimitOrder->params",
-		`${pairAddr},${orderAddr},${toTokenSymbol},${qty},${price}`,
+		`${pairAddr},${orderAddr},${directionPair},${qty},${price}`,
 	);
 
 	const clientAcc = new Account(DEXClientContract, {
@@ -20,10 +21,12 @@ export default async function takeLimitOrder(
 		signer: signerKeys(clientKeyPair),
 	});
 
-	const routerAddr = getTokenRouter(toTokenSymbol);
+	const pair = await getPair(pairAddr);
 
 	try {
 		if (directionPair === "4") {
+			const routerAddr = await getTokenRouter(pair.rootB);
+			console.log("Router address->B", routerAddr);
 			const res = await clientAcc.run("takeLimitOrderA", {
 				pairAddr,
 				limitOrderA: orderAddr,
@@ -33,6 +36,8 @@ export default async function takeLimitOrder(
 			});
 			console.log("takeLimitOrderA->response", res.decoded);
 		} else {
+			const routerAddr = await getTokenRouter(pair.rootA);
+			console.log("Router address->B", routerAddr);
 			const res = await clientAcc.run("takeLimitOrderB", {
 				pairAddr,
 				limitOrderB: orderAddr,

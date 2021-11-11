@@ -1,17 +1,20 @@
 import "./SwapConfirmPopup.scss";
 
 import {gql, request} from "graphql-request";
+import {useSnackbar} from "notistack";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 
-import {NO_PAIR, NO_TOKEN} from "../../constants/runtimeErrors";
+import {PAIR_NULL, TOKEN_NULL} from "../../constants/runtimeErrors";
 import {swapA, swapB} from "../../extensions/sdk_run/run";
 import {decrypt} from "../../extensions/tonUtils";
+import useKeyPair from "../../hooks/useKeyPair";
 import {iconGenerator} from "../../iconGenerator";
 import miniSwap from "../../images/icons/mini-swap.png";
 import {setTips, showPopup} from "../../store/actions/app";
 import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
 import takeLimitOrder from "../../utils/takeLimitOrder";
+import truncateNum from "../../utils/truncateNum";
 import MainBlock from "../MainBlock/MainBlock";
 
 function SwapConfirmPopup(props) {
@@ -38,6 +41,11 @@ function SwapConfirmPopup(props) {
 	);
 	const slippageValue = useSelector((state) => state.swapReducer.slippageValue);
 
+	const {enqueueSnackbar} = useSnackbar();
+
+	const clientData = useSelector((state) => state.walletReducer.clientData);
+	const {keyPair} = useKeyPair();
+
 	async function handleSwap() {
 		dispatch(setSwapAsyncIsWaiting(true));
 		props.hideConfirmPopup();
@@ -51,20 +59,28 @@ function SwapConfirmPopup(props) {
 			(p) => fromToken.symbol === p.symbolB && toToken.symbol === p.symbolA,
 		);
 
-		if (!pairAB && !pairBA) throw new Error(NO_PAIR);
+		if (!pairAB && !pairBA) throw new Error(PAIR_NULL);
 
 		const directionPair = pairAB ? "4" : "5";
 
 		const query = gql`
-			query ($addrPair: String!, $directionPair: String!, $amount: Float!) {
+			query (
+				$addrPair: String!
+				$directionPair: String!
+				$amount: Float!
+				$slippage: Float!
+			) {
 				limitOrdersForSwap(
 					addrPair: $addrPair
 					directionPair: $directionPair
 					amount: $amount
+					slippage: $slippage
 				) {
 					leftoverSwap
 					limitOrders {
 						addrOrder
+						amount
+						price
 						priceRaw
 						amountRaw
 					}
@@ -75,23 +91,37 @@ function SwapConfirmPopup(props) {
 			addrPair: pairId,
 			directionPair,
 			amount: fromValue,
-			slippage: slippageValue,
+			slippage: slippageValue || 0,
 		});
 		console.log("request->data", data);
 
-		const processingOrders = [];
-		for (const limitOrder of data.limitOrdersForSwap.limitOrders)
-			processingOrders.push(
-				takeLimitOrder({
+		const processing = [];
+		data.limitOrdersForSwap.limitOrders.forEach((limitOrder) => {
+			const promise = takeLimitOrder(
+				{
 					pairAddr: pairId,
 					orderAddr: limitOrder.addrOrder,
 					price: limitOrder.priceRaw,
 					qty: limitOrder.amountRaw,
 					directionPair,
-					toTokenSymbol: toToken.symbol,
-				}),
-			);
-		await Promise.all(processingOrders);
+				},
+				{
+					clientAddress: clientData.address,
+					clientKeyPair: keyPair,
+				},
+			).then(() => {
+				enqueueSnackbar({
+					type: "info",
+					message: `Taking limit order ${truncateNum(limitOrder.amount, 2)} ${
+						fromToken.symbol
+					} - ${truncateNum(limitOrder.amount * limitOrder.price)} ${
+						toToken.symbol
+					} ⏳`,
+				});
+			});
+			processing.push(promise);
+		});
+		await Promise.all(processing);
 
 		const fromTokenData = tokenList.find(
 			(item) => item.symbol === fromToken.symbol,
@@ -99,68 +129,72 @@ function SwapConfirmPopup(props) {
 		const toTokenData = tokenList.find(
 			(item) => item.symbol === toToken.symbol,
 		);
+		if (!fromTokenData || !toTokenData) throw new Error(TOKEN_NULL);
 
-		if (!fromTokenData || !toTokenData) throw new Error(NO_TOKEN);
+		if (data.limitOrdersForSwap.leftoverSwap !== 0)
+			try {
+				let res = null;
+				if (directionPair === "4") {
+					res = await swapA(
+						curExt,
+						pairId,
+						data.limitOrdersForSwap.leftoverSwap,
+						slippageValue,
+						decrypted.phrase,
+						data.limitOrdersForSwap.leftoverSwap * rate,
+						fromTokenData,
+						toTokenData,
+					);
+				} else {
+					res = await swapB(
+						curExt,
+						pairId,
+						data.limitOrdersForSwap.leftoverSwap,
+						slippageValue,
+						decrypted.phrase,
+						data.limitOrdersForSwap.leftoverSwap * rate,
+						fromTokenData,
+						toTokenData,
+					);
+				}
+				console.log("swap(A|B)->res", res);
 
-		try {
-			let res = null;
-			if (directionPair === "4") {
-				res = await swapA(
-					curExt,
-					pairId,
-					data.limitOrdersForSwap.leftoverSwap,
-					slippageValue,
-					decrypted.phrase,
-					data.limitOrdersForSwap.leftoverSwap * rate,
-					fromTokenData,
-					toTokenData,
-				);
-			} else {
-				res = await swapB(
-					curExt,
-					pairId,
-					data.limitOrdersForSwap.leftoverSwap,
-					slippageValue,
-					decrypted.phrase,
-					data.limitOrdersForSwap.leftoverSwap * rate,
-					fromTokenData,
-					toTokenData,
-				);
-			}
-			console.log("swap(A|B)->res", res);
-
-			if (!res.code)
-				dispatch(
-					setTips({
-						message: `Sended message to blockchain`,
-						type: "info",
-					}),
-				);
-			else
-				dispatch(
-					setTips({
-						message: `Something goes wrong - error code ${res.code}`,
-						type: "error",
-					}),
-				);
-		} catch (e) {
-			switch (e.text) {
-				case "Canceled by user.":
-					dispatch(showPopup({type: "error", message: "Operation canceled."}));
-					break;
-				case "Rejected by user":
-					dispatch(showPopup({type: "error", message: "Operation canceled."}));
-					break;
-				default:
+				if (!res.code)
 					dispatch(
-						showPopup({
-							type: "error",
-							message: "Oops, something went wrong. Please try again.",
+						setTips({
+							message: `Sended message to blockchain`,
+							type: "info",
 						}),
 					);
-					break;
+				else
+					dispatch(
+						setTips({
+							message: `Something goes wrong - error code ${res.code}`,
+							type: "error",
+						}),
+					);
+			} catch (e) {
+				switch (e.text) {
+					case "Canceled by user.":
+						dispatch(
+							showPopup({type: "error", message: "Operation canceled."}),
+						);
+						break;
+					case "Rejected by user":
+						dispatch(
+							showPopup({type: "error", message: "Operation canceled."}),
+						);
+						break;
+					default:
+						dispatch(
+							showPopup({
+								type: "error",
+								message: "Oops, something went wrong. Please try again.",
+							}),
+						);
+						break;
+				}
 			}
-		}
 
 		dispatch(setSwapAsyncIsWaiting(false));
 	}
