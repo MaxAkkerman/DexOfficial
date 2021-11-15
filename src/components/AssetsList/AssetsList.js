@@ -7,7 +7,7 @@ import {
 	getDurationFromSeconds,
 } from "../../reactUtils/getDurationFromSeconds";
 import {calculateRate} from "../../reactUtils/reactUtils";
-import AssetsListOrderItem from "../AssetsListOrderItem/AssetsListOrderItem";
+import AssetListOrderItem from "../AssetListOrderItem/AssetListOrderItem";
 
 function AssetsList(props) {
 	return (
@@ -310,20 +310,10 @@ function AssetsList(props) {
 						</div>
 					</div>
 				))}
-
-			{props.orderAssetsArray &&
-				props.pairList &&
-				props.orderAssetsArray.length >= 1 &&
-				props.pairList.length >= 1 &&
-				props.orderAssetsArray
-					.map((order) => ({
-						order,
-						pair: props.pairList.find((p) => p.pairAddress === order.addrPair),
-					}))
-					.filter(({pair}) => pair)
-					.map(({order, pair}) => (
-						<AssetsListOrderItem key={order.id} order={order} pair={pair} />
-					))}
+			{props.orderAssetArray &&
+				props.orderAssetArray.map((lo) => (
+					<AssetListOrderItem key={lo.addrOrder} limitOrder={lo} />
+				))}
 		</div>
 	);
 }

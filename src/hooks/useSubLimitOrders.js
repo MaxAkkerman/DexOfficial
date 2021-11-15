@@ -8,8 +8,8 @@ import {
 	INVALID_ORDER_STATUS,
 } from "../constants/runtimeErrorMessages";
 import {
-	A_B_DIRECTION,
-	B_A_DIRECTION,
+	AB_DIRECTION,
+	BA_DIRECTION,
 	STATUS_ORDER_CANCEL,
 	STATUS_ORDER_CHANGE_OWNER,
 	STATUS_ORDER_DEPLOY,
@@ -75,10 +75,10 @@ export default async function useSubLimitOrders() {
 				let fromSymbol = null;
 				let toSymbol = null;
 
-				if (directionPair === A_B_DIRECTION) {
+				if (directionPair === AB_DIRECTION) {
 					fromSymbol = pair.symbolA;
 					toSymbol = pair.symbolB;
-				} else if (directionPair === B_A_DIRECTION) {
+				} else if (directionPair === BA_DIRECTION) {
 					fromSymbol = pair.symbolB;
 					toSymbol = pair.symbolA;
 				} else {

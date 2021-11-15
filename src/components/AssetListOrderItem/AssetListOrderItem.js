@@ -3,39 +3,36 @@ import cls from "classnames";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
 
-import {B_A_DIRECTION} from "../../constants/runtimeVariables";
+import {BA_DIRECTION} from "../../constants/runtimeVariables";
 import {iconGenerator} from "../../iconGenerator";
 import {
 	openOrderCancelPopup,
 	openOrderUpdatePopup,
 } from "../../store/actions/limitOrders";
+import truncateNum from "../../utils/truncateNum";
 import IconCross from "../IconCross/IconCross";
 import IconEdit from "../IconEdit/IconEdit";
-import classes from "./AssetsListOrderItem.module.scss";
+import classes from "./AssetListOrderItem.module.scss";
 
-function AssetsListOrderItem({order, pair}) {
-	const {amount, price, directionPair, id} = order;
-
-	let {symbolA, symbolB} = pair;
-
-	if (directionPair === B_A_DIRECTION) [symbolA, symbolB] = [symbolB, symbolA];
+export default function AssetListOrderItem({limitOrder}) {
+	const {amount, price, directionPair, addrOrder, pair} = limitOrder;
+	let {aSymbol, bSymbol} = pair;
+	if (directionPair === BA_DIRECTION) [aSymbol, bSymbol] = [bSymbol, aSymbol];
 
 	const dispatch = useDispatch();
-
 	const [fold, setFold] = useState(false);
 
 	async function handleCancel(e) {
 		e.stopPropagation();
-
 		dispatch(
 			openOrderCancelPopup({
 				order: {
-					fromSymbol: symbolA,
-					toSymbol: symbolB,
+					fromSymbol: aSymbol,
+					toSymbol: bSymbol,
 					fromValue: amount,
 					toValue: amount * price,
 					price,
-					id,
+					id: addrOrder,
 				},
 			}),
 		);
@@ -43,16 +40,15 @@ function AssetsListOrderItem({order, pair}) {
 
 	async function handleUpdate(e) {
 		e.stopPropagation();
-
 		dispatch(
 			openOrderUpdatePopup({
 				order: {
-					fromSymbol: symbolA,
-					toSymbol: symbolB,
+					fromSymbol: aSymbol,
+					toSymbol: bSymbol,
 					fromValue: amount,
 					toValue: amount * price,
 					price,
-					id,
+					id: addrOrder,
 				},
 			}),
 		);
@@ -64,26 +60,26 @@ function AssetsListOrderItem({order, pair}) {
 				<Stack direction="row" className={classes.container}>
 					<Box>
 						<img
-							src={iconGenerator(symbolA)}
-							alt={symbolA}
+							src={iconGenerator(aSymbol)}
+							alt={aSymbol}
 							className={cls(classes.icon, classes.icon_first)}
 						/>
 						<img
-							src={iconGenerator(symbolB)}
-							alt={symbolB}
+							src={iconGenerator(bSymbol)}
+							alt={bSymbol}
 							className={classes.icon}
 						/>
 					</Box>
 					<Stack alignItems="flex-start" className={classes.content}>
 						<Typography className={classes.header} component="h2">
-							{symbolA} - {symbolB}
+							{aSymbol} - {bSymbol}
 						</Typography>
 						<Typography className={classes.subheader} component="span">
 							Limit order
 						</Typography>
 					</Stack>
 					<Typography component="span" className={classes.amount}>
-						{amount} {symbolA}
+						{truncateNum(amount)} {aSymbol}
 					</Typography>
 				</Stack>
 				<Collapse in={fold}>
@@ -112,14 +108,14 @@ function AssetsListOrderItem({order, pair}) {
 						</Stack>
 						<Stack alignItems="flex-start" className={classes.content}>
 							<Typography component="span" className={classes.header}>
-								{price} {symbolB}
+								{truncateNum(price)} {bSymbol}
 							</Typography>
 							<Typography className={classes.subheader} component="span">
 								Price
 							</Typography>
 						</Stack>
 						<Typography component="span" className={classes.amount}>
-							{amount * price} {symbolB}
+							{truncateNum(amount * price)} {bSymbol}
 						</Typography>
 					</Stack>
 				</Collapse>
@@ -127,5 +123,3 @@ function AssetsListOrderItem({order, pair}) {
 		</>
 	);
 }
-
-export default AssetsListOrderItem;
