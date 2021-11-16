@@ -1,6 +1,6 @@
 import "./SwapConfirmPopup.scss";
 
-import {gql} from "@apollo/client";
+import {gql, request} from "graphql-request";
 import {useSnackbar} from "notistack";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
@@ -63,36 +63,39 @@ function SwapConfirmPopup(props) {
 		if (!pairAB && !pairBA) throw new Error(PAIR_NULL);
 		const directionPair = pairAB ? AB_DIRECTION : BA_DIRECTION;
 
-		const query = gql`
-			query (
-				$addrPair: String!
-				$directionPair: String!
-				$amount: Float!
-				$slippage: Float!
-			) {
-				limitOrdersForSwap(
-					addrPair: $addrPair
-					directionPair: $directionPair
-					amount: $amount
-					slippage: $slippage
+		const data = await request(
+			Radiance.networks[2].graphqlUrl,
+			gql`
+				query LimitOrdersForSwap(
+					$addrPair: String!
+					$directionPair: DirectionPair!
+					$amount: Float!
+					$slippage: Float!
 				) {
-					leftoverSwap
-					limitOrders {
-						addrOrder
-						amount
-						price
-						priceRaw
-						amountRaw
+					limitOrdersForSwap(
+						addrPair: $addrPair
+						directionPair: $directionPair
+						amount: $amount
+						slippage: $slippage
+					) {
+						leftoverSwap
+						limitOrders {
+							addrOrder
+							amount
+							price
+							priceRaw
+							amountRaw
+						}
 					}
 				}
-			}
-		`;
-		const data = await fetch(Radiance.networks[2].limitOrderGraphqlUrl, query, {
-			addrPair: pairId,
-			directionPair,
-			amount: fromValue,
-			slippage: slippageValue || 0,
-		});
+			`,
+			{
+				addrPair: pairId,
+				directionPair: directionPair === AB_DIRECTION ? "AB" : "BA",
+				amount: fromValue,
+				slippage: slippageValue || 0,
+			},
+		);
 		console.log("request->data", data);
 
 		const processing = [];
