@@ -20,7 +20,7 @@ import MainBlock from "../MainBlock/MainBlock";
 import classes from "./OrderPopupCancel.module.scss";
 
 export default function OrderPopupCancel({order, close}) {
-	const {fromSymbol, toSymbol, fromValue, toValue, price, id} = order;
+	const {addrOrder, fromSymbol, toSymbol, fromValue, toValue, price} = order;
 
 	const dispatch = useDispatch();
 
@@ -39,7 +39,7 @@ export default function OrderPopupCancel({order, close}) {
 			}),
 		);
 
-		const {cancelOrderStatus} = await cancelLimitOrder(id, {
+		const {cancelOrderStatus} = await cancelLimitOrder(addrOrder, {
 			clientAddress: clientData.address,
 			clientKeyPair: keyPair,
 		});

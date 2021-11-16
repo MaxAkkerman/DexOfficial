@@ -5,7 +5,7 @@ import {DEXClientContract} from "../extensions/contracts/DEXClient";
 import client from "../extensions/sdk_get/get";
 
 export default async function cancelLimitOrder(
-	limitOrderId,
+	addrOrder,
 	{clientAddress, clientKeyPair},
 ) {
 	const acc = new Account(DEXClientContract, {
@@ -15,7 +15,7 @@ export default async function cancelLimitOrder(
 	});
 
 	const response = await acc.run("cancelLimitOrder", {
-		limitOrder: limitOrderId,
+		limitOrder: addrOrder,
 	});
 
 	return response.decoded.output;

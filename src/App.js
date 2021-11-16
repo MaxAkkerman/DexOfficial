@@ -1,3 +1,4 @@
+import {gql, useLazyQuery} from "@apollo/client";
 import {useSnackbar} from "notistack";
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
@@ -19,12 +20,22 @@ import SendAssets from "./components/SendAssets/SendAssets";
 import KeysBlock from "./components/WalletSettings/KeysBlock";
 import WalletSettings from "./components/WalletSettings/WalletSettings";
 import {
+	APPLY_ORDER,
+	BA_DIRECTION,
+	CANCEL_ORDER,
+	CHANGE_OWNER,
+	CHANGE_PRICE,
+	CLOSE_ORDER,
+	DEPLOY_ORDER,
+	GIFT_ORDER,
+	PART_CLOSE_ORDER,
+} from "./constants/runtimeVariables";
+import {
 	agregateQueryNFTassets,
 	getAllPairsWoithoutProvider,
 	getAssetsForDeploy,
 } from "./extensions/sdk_get/get";
-import useFetchLimitOrders from "./hooks/useFetchLimitOrders";
-import useSubLimitOrders from "./hooks/useSubLimitOrders";
+import {LIMIT_ORDER_FIELDS} from "./graphql/fragments";
 import Account from "./pages/Account/Account";
 import AddLiquidity from "./pages/AddLiquidity/AddLiquidity";
 import Assets from "./pages/Assets/Assets";
@@ -89,9 +100,6 @@ function App() {
 	const {enqueueSnackbar} = useSnackbar();
 
 	const [onloading, setonloading] = useState(false);
-
-	useFetchLimitOrders();
-	useSubLimitOrders();
 
 	const chrome = localStorage.getItem("chrome");
 	if (chrome === null) showChromePopup();
@@ -197,6 +205,123 @@ function App() {
 		const addrArray = await getAssetsForDeploy();
 		dispatch(setAssetsFromGraphQL(addrArray));
 	}, []);
+
+	const [getLimitOrders, {subscribeToMore, called}] = useLazyQuery(
+		gql`
+			${LIMIT_ORDER_FIELDS}
+			query LimitOrdersForOwner($addrOwner: String!) {
+				limitOrders: limitOrdersForOwner(addrOwner: $addrOwner) {
+					...LimitOrderFields
+				}
+			}
+		`,
+	);
+
+	useEffect(async () => {
+		if (clientData && clientData.address && !called)
+			getLimitOrders({variables: {addrOwner: clientData.address}});
+	}, [clientData]);
+
+	useEffect(() => {
+		if (subscribeToMore)
+			subscribeToMore({
+				document: gql`
+					${LIMIT_ORDER_FIELDS}
+					subscription LimitOrderUpdate($addrOwner: String!) {
+						updateLimitOrder(addrOwner: $addrOwner) {
+							status
+							limitOrder {
+								...LimitOrderFields
+							}
+						}
+					}
+				`,
+				variables: {addrOwner: clientData.address},
+				updateQuery(prev, {subscriptionData}) {
+					if (!subscriptionData.data) return prev;
+
+					const {status, limitOrder} = subscriptionData.data.updateLimitOrder;
+
+					let {aSymbol, bSymbol} = limitOrder.pair;
+					if (limitOrder.directionPair === BA_DIRECTION)
+						[aSymbol, bSymbol] = [bSymbol, aSymbol];
+
+					if (status === DEPLOY_ORDER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Created limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.concat(limitOrder),
+						};
+					} else if (status === CANCEL_ORDER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Canceled limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.filter(
+								(lo) => lo.addrOrder !== limitOrder.addrOrder,
+							),
+						};
+					} else if (status === CHANGE_PRICE) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Updated price of limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.map((lo) =>
+								lo.addrOrder === limitOrder.addrOrder ? limitOrder : lo,
+							),
+						};
+					} else if (status === CHANGE_OWNER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Transferred limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.filter(
+								(lo) => lo.addrOrder !== limitOrder.addrOrder,
+							),
+						};
+					} else if (status === APPLY_ORDER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Applied limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return prev;
+					} else if (status === CLOSE_ORDER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Fully taken limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.filter(
+								(lo) => lo.addrOrder !== limitOrder.addrOrder,
+							),
+						};
+					} else if (status === PART_CLOSE_ORDER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Partially taken limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.map((lo) =>
+								lo.addrOrder === limitOrder.addrOrder ? limitOrder : lo,
+							),
+						};
+					} else if (status === GIFT_ORDER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Received limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.concat(limitOrder),
+						};
+					}
+				},
+			});
+	}, [subscribeToMore]);
 
 	return (
 		<>

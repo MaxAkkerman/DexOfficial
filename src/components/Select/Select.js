@@ -72,16 +72,6 @@ function Select(props) {
 		});
 	});
 
-	console.log("@liketurbo", fromArr);
-
-	// !PLEASE DELETE NEXT FILTER STATEMENT
-	if (location.pathname.includes("orders"))
-		fromArr = fromArr.filter((t) => t.symbol === "WTON" || t.symbol === "USDT");
-
-	console.log("@liketurbo", fromArr);
-
-	// setFromTokenList(fromArr);
-
 	let toArr = [];
 	if (props.type === "to") {
 		const arr = pairsList.filter(
@@ -117,12 +107,6 @@ function Select(props) {
 				}
 			});
 		});
-
-		// !PLEASE DELETE NEXT FILTER STATEMENT
-		if (location.pathname.includes("orders"))
-			toArr = toArr.filter((t) => t.symbol === "WTON" || t.symbol === "USDT");
-
-		// setToTokenList(toArr);
 	}
 	// console.log('render select');
 	// if(toTokenList.length || fromTokenList.length) { setIsLoading(false); }

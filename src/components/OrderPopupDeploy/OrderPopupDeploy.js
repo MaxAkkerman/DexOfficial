@@ -5,11 +5,12 @@ import {useSnackbar} from "notistack";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 
+import {PAIR_NULL} from "../../constants/runtimeErrors";
+import {AB_DIRECTION, BA_DIRECTION} from "../../constants/runtimeVariables";
 import useKeyPair from "../../hooks/useKeyPair";
 import {iconGenerator} from "../../iconGenerator";
 import miniSwap from "../../images/icons/mini-swap.png";
 import {
-	closeOrderDeployPopup,
 	closeOrderWaitPopup,
 	openOrderWaitPopup,
 } from "../../store/actions/limitOrders";
@@ -23,28 +24,36 @@ export default function OrderPopupDeploy({order, close}) {
 	const {fromSymbol, toSymbol, fromValue, toValue, price, pairId} = order;
 
 	const dispatch = useDispatch();
-
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
-
+	const pairList = useSelector((state) => state.walletReducer.pairsList);
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 	const {keyPair} = useKeyPair();
 
 	const {enqueueSnackbar} = useSnackbar();
 
 	async function handleConfirm() {
-		dispatch(closeOrderDeployPopup());
+		close();
 		dispatch(
 			openOrderWaitPopup({
 				text: `Sending message to create limit order ${fromSymbol} - ${toSymbol}`,
 			}),
 		);
 
+		const pairAB = pairList.find(
+			(p) => fromSymbol === p.symbolA && toSymbol === p.symbolB,
+		);
+		const pairBA = pairList.find(
+			(p) => fromSymbol === p.symbolB && toSymbol === p.symbolA,
+		);
+		if (!pairAB && !pairBA) throw new Error(PAIR_NULL);
+		const directionPair = pairAB ? AB_DIRECTION : BA_DIRECTION;
+
 		const {makeLimitOrderStatus} = await makeLimitOrder(
 			{
+				pairAddr: pairId,
+				directionPair,
 				price,
 				qty: fromValue,
-				tokenSymbol: fromSymbol,
-				pairAddr: pairId,
 			},
 			{
 				clientAddress: clientData.address,

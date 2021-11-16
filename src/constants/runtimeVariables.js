@@ -1,7 +1,11 @@
-export const A_B_DIRECTION = "4";
-export const B_A_DIRECTION = "5";
-
-export const STATUS_ORDER_CANCEL = "4";
-export const STATUS_ORDER_DEPLOY = "1";
-export const STATUS_ORDER_UPDATE_PRICE = "2";
-export const STATUS_ORDER_CHANGE_OWNER = "3";
+export const AB_DIRECTION = "4";
+export const BA_DIRECTION = "5";
+export const LIMIT_ORDER_PRICE_DENOMINATOR = 1e18;
+export const DEPLOY_ORDER = "DEPLOY_ORDER";
+export const CHANGE_PRICE = "CHANGE_PRICE";
+export const CHANGE_OWNER = "CHANGE_OWNER";
+export const CANCEL_ORDER = "CANCEL_ORDER";
+export const APPLY_ORDER = "APPLY_ORDER";
+export const CLOSE_ORDER = "CLOSE_ORDER";
+export const PART_CLOSE_ORDER = "PART_CLOSE_ORDER";
+export const GIFT_ORDER = "GIFT_ORDER";

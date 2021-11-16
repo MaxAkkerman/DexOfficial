@@ -1,5 +1,6 @@
 import "./Assets.scss";
 
+import {gql, useLazyQuery} from "@apollo/client";
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
@@ -8,6 +9,7 @@ import AssetsList from "../../components/AssetsList/AssetsList";
 import MainBlock from "../../components/MainBlock/MainBlock";
 import WithDraw from "../../components/WithDraw/WithDraw";
 import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
+import {LIMIT_ORDER_FIELDS} from "../../graphql/fragments";
 import useTokensList from "../../hooks/useAssetList";
 // import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 import goToExchange from "../../images/goToExchange.svg";
@@ -20,31 +22,44 @@ import {setTokenList} from "../../store/actions/wallet";
 function Assets() {
 	const history = useHistory();
 	const dispatch = useDispatch();
+
 	const [assets, setAssets] = useState([]);
-	const walletIsConnected = useSelector(
-		(state) => state.appReducer.walletIsConnected,
-	);
 	const NFTassets = useSelector((state) => state.walletSeedReducer.NFTassets);
-	const orderList = useSelector((state) => state.limitOrders.orderList);
 	const liquidityList = useSelector(
 		(state) => state.walletReducer.liquidityList,
 	);
-
 	const {assetList: tokensList} = useTokensList();
+	const pairList = useSelector((state) => state.walletReducer.pairsList);
+	const [getLimitOrders, {data: limitOrdersData}] = useLazyQuery(
+		gql`
+			${LIMIT_ORDER_FIELDS}
+			query LimitOrdersForOwner($addrOwner: String!) {
+				limitOrders: limitOrdersForOwner(addrOwner: $addrOwner) {
+					...LimitOrderFields
+				}
+			}
+		`,
+		{},
+	);
 
+	const walletIsConnected = useSelector(
+		(state) => state.appReducer.walletIsConnected,
+	);
 	const [showWrapMenu, setshowWrapMenu] = useState(false);
-
 	const [currentTokenForWrap, setcurrentTokenForWrap] = useState({});
 	const [viewData, setViewData] = useState({});
-
 	const [showWithdrawMenu, setshowWithdrawMenu] = useState(false);
 	const [curNFTForWithdraw, setCurNFTForWithdraw] = useState(false);
-
-	const pairList = useSelector((state) => state.walletReducer.pairsList);
+	const clientData = useSelector((state) => state.walletReducer.clientData);
 
 	useEffect(() => {
 		setAssets(NFTassets);
 	}, [NFTassets]);
+
+	useEffect(async () => {
+		if (clientData && clientData.address)
+			getLimitOrders({variables: {addrOwner: clientData.address}});
+	}, [clientData]);
 
 	function handleChangeOnSend() {
 		history.push("/wallet/send");
@@ -230,10 +245,12 @@ function Assets() {
 									<>
 										{(NFTassets && NFTassets.length) ||
 										(tokensList && tokensList.length) ||
-										(orderList && orderList.length) ? (
+										(limitOrdersData && limitOrdersData.limitOrders.length) ? (
 											<AssetsList
 												TokenAssetsArray={[...tokensList, ...liquidityList]}
-												orderAssetsArray={orderList}
+												orderAssetArray={
+													limitOrdersData && limitOrdersData.limitOrders
+												}
 												pairList={pairList}
 												NFTassetsArray={assets}
 												handleClickNFT={(item) => handleShowNFTData(item)}
