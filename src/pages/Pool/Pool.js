@@ -8,8 +8,12 @@ import "./Pool.scss";
 function Pool() {
 	const history = useHistory();
 
-	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
-	const liquidityList = useSelector((state) => state.walletReducer.liquidityList);
+	const walletIsConnected = useSelector(
+		(state) => state.appReducer.walletIsConnected,
+	);
+	const liquidityList = useSelector(
+		(state) => state.walletReducer.liquidityList,
+	);
 
 	return (
 		<div className="container">
@@ -17,7 +21,11 @@ function Pool() {
 				class={"pool"}
 				title={"Your liquidity"}
 				button={
-					<Link to="/create-pair" className="btn liquidity-btn" style={{fontSize:"20px",borderRadius:"12px"}}>
+					<Link
+						to="/create-pair"
+						className="btn liquidity-btn"
+						style={{fontSize: "20px", borderRadius: "12px"}}
+					>
 						Create Pair
 					</Link>
 				}

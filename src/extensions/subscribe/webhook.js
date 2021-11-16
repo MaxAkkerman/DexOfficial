@@ -8,4 +8,3 @@
 //
 // const res = await queryRoots(BroxusRootCodeHash)
 // console.log(res)
-

@@ -20,7 +20,9 @@ function Manage() {
 	const rateBA = useSelector((state) => state.manageReducer.rateBA);
 	const balance = useSelector((state) => state.manageReducer.balance);
 	const pairId = useSelector((state) => state.manageReducer.pairId);
-	const manageAsyncIsWaiting = useSelector((state) => state.manageReducer.manageAsyncIsWaiting);
+	const manageAsyncIsWaiting = useSelector(
+		(state) => state.manageReducer.manageAsyncIsWaiting,
+	);
 
 	const [managePopupIsVisible, setManagePopupIsVisible] = useState(true);
 	const [manageRemoveIsVisible, setManageRemoveIsVisible] = useState(false);

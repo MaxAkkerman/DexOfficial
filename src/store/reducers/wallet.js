@@ -12,7 +12,7 @@ import {
 	SET_UPDATED_BALANCE,
 	SET_WALLET,
 	SHOW_STACKING_CONFIRM_POPUP,
-	SET_PIN
+	SET_PIN,
 } from "../actions/types";
 
 const initialState = {
@@ -25,7 +25,7 @@ const initialState = {
 		address: "",
 		balance: 0,
 	},
-	pin:[],
+	pin: [],
 	tokenList: [],
 	pairsList: [],
 	liquidityList: [],

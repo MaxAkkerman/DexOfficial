@@ -47,7 +47,6 @@ function ReturnLiquidConfirmPopup(props) {
 		props.setQtyA(0);
 		props.setQtyB(0);
 		props.setRangeValue(0);
-
 	}
 
 	return (

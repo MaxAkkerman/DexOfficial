@@ -20,7 +20,12 @@ import BlockItem from "../AmountBlock/AmountBlock";
 import MaxBtn from "../AmountBlock/MAXbtn";
 import ShowBalance from "../AmountBlock/ShowBalance";
 import SendConfirmPopup from "../SendConfirmPopup/SendConfirmPopup";
-import {deployEmptyWallet, sendNativeTons, sendNFT, sendToken} from "../../extensions/sdk_run/run";
+import {
+	deployEmptyWallet,
+	sendNativeTons,
+	sendNFT,
+	sendToken,
+} from "../../extensions/sdk_run/run";
 import {decrypt} from "../../extensions/tonUtils";
 import useSendAssetsCheckAmount from "../../hooks/useSendAssetsCheckAmount";
 import useSendAssetsCheckAddress from "../../hooks/useSendAssetsCheckAddress";
@@ -31,7 +36,7 @@ import {setTips} from "../../store/actions/app";
 import useSendAssetsSelectedToken from "../../hooks/useSendAssetsSelectedToken";
 import {
 	getAccType2,
-	getExpectedWalletAddressByOwner
+	getExpectedWalletAddressByOwner,
 } from "../../extensions/sdk_get/get";
 
 import useKeyPair from "../../hooks/useKeyPair";
@@ -42,27 +47,44 @@ import {
 } from "../../constants/validationMessages";
 import {SEND_TOKEN} from "../../constants/commissions";
 
-
 function SendAssets() {
 	const dispatch = useDispatch();
 	const history = useHistory();
-	const amountToSend = useSelector((state) => state.walletSeedReducer.amountToSend);
-	const addressToSend = useSelector((state) => state.walletSeedReducer.addressToSend);
-	const tokenSetted = useSelector((state) => state.walletSeedReducer.tokenSetted);
-	const showWaitingSendAssetPopup = useSelector((state) => state.walletSeedReducer.showWaitingSendAssetPopup);
+	const amountToSend = useSelector(
+		(state) => state.walletSeedReducer.amountToSend,
+	);
+	const addressToSend = useSelector(
+		(state) => state.walletSeedReducer.addressToSend,
+	);
+	const tokenSetted = useSelector(
+		(state) => state.walletSeedReducer.tokenSetted,
+	);
+	const showWaitingSendAssetPopup = useSelector(
+		(state) => state.walletSeedReducer.showWaitingSendAssetPopup,
+	);
 	let curExt = useSelector((state) => state.appReducer.curExt);
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 
-	const encryptedSeedPhrase = useSelector((state) => state.enterSeedPhrase.encryptedSeedPhrase);
-	const seedPhrasePassword = useSelector((state) => state.enterSeedPhrase.seedPhrasePassword);
+	const encryptedSeedPhrase = useSelector(
+		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
+	);
+	const seedPhrasePassword = useSelector(
+		(state) => state.enterSeedPhrase.seedPhrasePassword,
+	);
 
-	const [sendConfirmPopupIsVisible, setsendConfirmPopupIsVisible] = useState(false);
+	const [sendConfirmPopupIsVisible, setsendConfirmPopupIsVisible] =
+		useState(false);
 	const [addressToSendView, setaddressToSendView] = useState("");
 
-	const {invalid: isInvalidAmount, validationMsg: validationMsgForAmount} = useSendAssetsCheckAmount();
-	const {invalid: isInvalidAddress,loading: isLoading,validationMsg: validationMsgForAddress} = useSendAssetsCheckAddress();
+	const {invalid: isInvalidAmount, validationMsg: validationMsgForAmount} =
+		useSendAssetsCheckAmount();
+	const {
+		invalid: isInvalidAddress,
+		loading: isLoading,
+		validationMsg: validationMsgForAddress,
+	} = useSendAssetsCheckAddress();
 	const {selectedToken} = useSendAssetsSelectedToken();
-	const {keyPair} = useKeyPair()
+	const {keyPair} = useKeyPair();
 
 	function handleSetSendPopupVisibility() {
 		if (
@@ -89,9 +111,7 @@ function SendAssets() {
 			if (!selectedToken.tokenName) {
 				console.log("currentTokenForSend.CHECK", selectedToken.tokenName);
 			}
-			console.log(
-				"error: amount should be set or you have not enough balance",
-			);
+			console.log("error: amount should be set or you have not enough balance");
 		} else setsendConfirmPopupIsVisible(true);
 	}
 
@@ -105,7 +125,6 @@ function SendAssets() {
 		dispatch(setAddressForSend(e.currentTarget.value));
 	}
 
-
 	function handleSetView() {
 		let spliced = addressToSend.slice(0, 7);
 		let splicedpart2 = addressToSend.slice(59);
@@ -113,7 +132,6 @@ function SendAssets() {
 		console.log("addressTo", addressToSend);
 		setaddressToSendView(view);
 	}
-
 
 	async function handleSendAsset() {
 		if (!addressToSend) {
@@ -181,20 +199,25 @@ function SendAssets() {
 				selectedToken.rootAddress,
 				addressToSend,
 			);
-			const { acc_type } = await getAccType2(walletAddrByOwner.name)
-			let sendTres
-			if(acc_type === 1){
+			const {acc_type} = await getAccType2(walletAddrByOwner.name);
+			let sendTres;
+			if (acc_type === 1) {
 				const sendRes = await sendToken(
-						clientData.address,
-						curExt,
-						selectedToken.rootAddress,
-						walletAddrByOwner.name,
-						amountToSend,
-						keyPair,
-						selectedToken,
-					);
-			}else {
-				const deployRes = await deployEmptyWallet(clientData.address, keyPair, selectedToken.rootAddress, addressToSend)
+					clientData.address,
+					curExt,
+					selectedToken.rootAddress,
+					walletAddrByOwner.name,
+					amountToSend,
+					keyPair,
+					selectedToken,
+				);
+			} else {
+				const deployRes = await deployEmptyWallet(
+					clientData.address,
+					keyPair,
+					selectedToken.rootAddress,
+					addressToSend,
+				);
 				if (!deployRes.code) {
 					sendTres = await sendToken(
 						clientData.address,
@@ -224,7 +247,6 @@ function SendAssets() {
 					}),
 				);
 			}
-
 		}
 		setaddressToSendView("");
 		dispatch(setCurrentTokenForSend({}));
@@ -248,7 +270,6 @@ function SendAssets() {
 	}
 
 	return (
-
 		<div className="container" style={{"flex-Direction": "column"}}>
 			{!showWaitingSendAssetPopup && (
 				<MainBlock
@@ -291,10 +312,9 @@ function SendAssets() {
 											onClick={() => handleClearInput("address")}
 										/>
 									</div>
-
 								</div>
 							</div>
-							{(isInvalidAddress && addressToSend) ? (
+							{isInvalidAddress && addressToSend ? (
 								<FormHelperText
 									style={{marginLeft: "27px", marginTop: "4px"}}
 									error
@@ -302,10 +322,9 @@ function SendAssets() {
 								>
 									{validationMsgForAddress}
 								</FormHelperText>
-							)
-								:
-								<div style={{height:"23px"}}/>
-							}
+							) : (
+								<div style={{height: "23px"}} />
+							)}
 							<BlockItem
 								leftTitle={"Amount"}
 								// currentToken={currentToken}
@@ -332,21 +351,20 @@ function SendAssets() {
 										),
 								})}
 							/>
-							{(isInvalidAmount &&
-								validationMsgForAmount !== NOT_ENOUGH_CAUSE_COMMISSION) ? (
-									<FormHelperText
-										style={{marginLeft: "27px", marginTop: "4px"}}
-										error
-										id="component-error-text"
-									>
-										{validationMsgForAmount}
-									</FormHelperText>
-								)
-							:
-								<div style={{height:"23px"}}/>
-							}
+							{isInvalidAmount &&
+							validationMsgForAmount !== NOT_ENOUGH_CAUSE_COMMISSION ? (
+								<FormHelperText
+									style={{marginLeft: "27px", marginTop: "4px"}}
+									error
+									id="component-error-text"
+								>
+									{validationMsgForAmount}
+								</FormHelperText>
+							) : (
+								<div style={{height: "23px"}} />
+							)}
 
-							<div className="btn_wrapper" style={{marginTop:"25px"}}>
+							<div className="btn_wrapper" style={{marginTop: "25px"}}>
 								<button
 									onClick={() => handleSetSendPopupVisibility()}
 									className={cls("btn mainblock-btn", {

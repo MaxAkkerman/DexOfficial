@@ -10,10 +10,10 @@ function PoolExplorer() {
 	const [filter, setFilter] = useState("");
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
 
-	const [pairsArr,setPairsArray] = useState([])
-	useEffect(()=>{
-		setPairsArray(pairsList)
-	},[pairsList])
+	const [pairsArr, setPairsArray] = useState([]);
+	useEffect(() => {
+		setPairsArray(pairsList);
+	}, [pairsList]);
 
 	return (
 		<div className="container" onClick={() => console.log("pool")}>

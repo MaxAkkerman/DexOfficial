@@ -7,11 +7,12 @@ import {useHistory} from "react-router-dom";
 import {showRevealSeedPhrase} from "../../store/actions/enterSeedPhrase";
 import {decrypt} from "../../extensions/tonUtils";
 
-
 function WalletSettings() {
 	const history = useHistory();
 	const dispatch = useDispatch();
-	const seedPhrasePassword = useSelector((state) => state.enterSeedPhrase.seedPhrasePassword);
+	const seedPhrasePassword = useSelector(
+		(state) => state.enterSeedPhrase.seedPhrasePassword,
+	);
 
 	function handleBack() {
 		history.push("/wallet");

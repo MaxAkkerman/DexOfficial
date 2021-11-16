@@ -6,10 +6,8 @@ import {FormControl} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
 	active: {
-
 		backgroundColor: "skybkue",
 		"& .Mui-focused": {
-
 			background: "transparent",
 			// fontWeight: "bold"
 		},

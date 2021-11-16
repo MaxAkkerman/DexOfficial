@@ -1,81 +1,78 @@
 .welcomeWrapper {
-  font-weight: bold;
-  margin: auto;
-  text-align: center;
-  font-size: 28px;
+	font-weight: bold;
+	margin: auto;
+	text-align: center;
+	font-size: 28px;
 }
 
 .linkedText {
-  color: #3569F0;
-  text-decoration: underline;
-  cursor: pointer;
+	color: #3569f0;
+	text-decoration: underline;
+	cursor: pointer;
 }
 //.fixMedia {
 //  font-size:30px;
 //}
 .welcomeTextWrapper {
-  width: 55%;
-  text-align: center;
-
+	width: 55%;
+	text-align: center;
 }
 
 .agreementCheckBox {
-  width: 40px;
-  height: 40px;
+	width: 40px;
+	height: 40px;
 }
 
 .welcomeAgreementContainer {
-  display: flex;
-  width: 118.5%;
-  margin-left: -50px;
-  text-align: center;
-  height: 200px;
-  background: silver;
-  align-items: center;
-  justify-content: center;
-  margin-top: 50px;
-  //margin-bottom: 247px;
+	display: flex;
+	width: 118.5%;
+	margin-left: -50px;
+	text-align: center;
+	height: 200px;
+	background: silver;
+	align-items: center;
+	justify-content: center;
+	margin-top: 50px;
+	//margin-bottom: 247px;
 }
 
 .agreementText {
-  width: 31%;
-  margin-left: 20px;
-  text-Align: left
+	width: 31%;
+	margin-left: 20px;
+	text-align: left;
 }
 @media screen and (max-width: 550px) {
-
-  .fixMedia {
-    font-size: 21px !important;
-  }
+	.fixMedia {
+		font-size: 21px !important;
+	}
 }
 @media screen and (max-width: 400px) {
-  .welcomeTextWrapper {
-    width: 100%;
-    font-size: 16px;
-  }
-  .welcomeWrapper {
-    font-size: 26px;
-  }
-  .welcomeAgreementContainer {
-    width: 121.5%;
-    margin-left: -31px;
-  }
-  //.fixMedia {
-  //  font-size: 21px !important;
-  //}
-  .numsInputContainer {
-    width: 90%;
-
-  }
-  .pinInput {
-    width: 50px;
-    height: 50px;
-    font-size: 50px;
-  }
-  .agreementText {
-    width: 45%;
-  }
-  .arrowImg {
-    height: 15px;
-  }
+	.welcomeTextWrapper {
+		width: 100%;
+		font-size: 16px;
+	}
+	.welcomeWrapper {
+		font-size: 26px;
+	}
+	.welcomeAgreementContainer {
+		width: 121.5%;
+		margin-left: -31px;
+	}
+	//.fixMedia {
+	//  font-size: 21px !important;
+	//}
+	.numsInputContainer {
+		width: 90%;
+	}
+	.pinInput {
+		width: 50px;
+		height: 50px;
+		font-size: 50px;
+	}
+	.agreementText {
+		width: 45%;
+	}
+	.arrowImg {
+		height: 15px;
+	}
 }

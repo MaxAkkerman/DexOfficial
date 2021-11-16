@@ -1,61 +1,66 @@
+import {gql, useLazyQuery} from "@apollo/client";
+import {useSnackbar} from "notistack";
 import React, {useEffect, useState} from "react";
-import {useSelector, useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {Redirect, Route, Switch, useLocation} from "react-router-dom";
+import {useMount} from "react-use";
+
+import AssetsListForDeploy from "./components/AssetsListForDeploy/AssetsListForDeploy";
+import EnterPassword from "./components/EnterPassword/EnterPassword";
+import Header from "./components/Header/Header";
+import NativeLogin from "./components/NativeLogin/NativeLogin";
+import PoolExplorer from "./components/PoolExplorer/PoolExplorer";
+import Popup from "./components/Popup/Popup";
+import PopupManager from "./components/PopupManager/PopupManager";
+import AssetsModalReceive from "./components/ReceiveAssets/AssetsModalReceive";
+import ReceiveAssets from "./components/ReceiveAssets/ReceiveAssets";
+import RevealSeedPhrase from "./components/RevealSeedPhrase/RevealSeedPhrase";
+import AssetsModal from "./components/SendAssets/AssetsModal";
+import SendAssets from "./components/SendAssets/SendAssets";
+import KeysBlock from "./components/WalletSettings/KeysBlock";
+import WalletSettings from "./components/WalletSettings/WalletSettings";
 import {
-	Switch,
-	Route,
-	Redirect,
-	useLocation,
-} from "react-router-dom";
-import {changeTheme, hideTip, showPopup} from "./store/actions/app";
-import {
-	setAssetsFromGraphQL,
-	setPairsList,
-	setSubscribeReceiveTokens,
-} from "./store/actions/wallet";
+	APPLY_ORDER,
+	BA_DIRECTION,
+	CANCEL_ORDER,
+	CHANGE_OWNER,
+	CHANGE_PRICE,
+	CLOSE_ORDER,
+	DEPLOY_ORDER,
+	GIFT_ORDER,
+	PART_CLOSE_ORDER,
+} from "./constants/runtimeVariables";
 import {
 	agregateQueryNFTassets,
 	getAllPairsWoithoutProvider,
 	getAssetsForDeploy,
 } from "./extensions/sdk_get/get";
+import {LIMIT_ORDER_FIELDS} from "./graphql/fragments";
 import Account from "./pages/Account/Account";
-import Swap from "./pages/Swap/Swap";
-import Pool from "./pages/Pool/Pool";
-import Popup from "./components/Popup/Popup";
-import Header from "./components/Header/Header";
-import Manage from "./pages/Manage/Manage";
 import AddLiquidity from "./pages/AddLiquidity/AddLiquidity";
-import PoolExplorer from "./components/PoolExplorer/PoolExplorer";
-import NativeLogin from "./components/NativeLogin/NativeLogin";
 import Assets from "./pages/Assets/Assets";
-import SendAssets from "./components/SendAssets/SendAssets";
-import ReceiveAssets from "./components/ReceiveAssets/ReceiveAssets";
-import AssetsModal from "./components/SendAssets/AssetsModal";
-import AssetsModalReceive from "./components/ReceiveAssets/AssetsModalReceive";
-import {useMount} from "react-use";
+import CreatePair from "./pages/CreatePair/CreatePair";
+import LimitOrder from "./pages/LimitOrder/LimitOrder";
+import Manage from "./pages/Manage/Manage";
+import Pool from "./pages/Pool/Pool";
+import Stacking from "./pages/Stacking/Stacking";
+import Swap from "./pages/Swap/Swap";
+import {
+	getAllPairsAndSetToStore,
+	getAllTokensAndSetToStore,
+} from "./reactUtils/reactUtils";
+import {changeTheme, hideTip, showPopup} from "./store/actions/app";
 import {
 	enterSeedPhraseEmptyStorage,
 	setEncryptedSeedPhrase,
 	showEnterSeedPhraseUnlock,
 } from "./store/actions/enterSeedPhrase";
-import EnterPassword from "./components/EnterPassword/EnterPassword";
-import WalletSettings from "./components/WalletSettings/WalletSettings";
-import KeysBlock from "./components/WalletSettings/KeysBlock";
-import Stacking from "./pages/Stacking/Stacking";
-import RevealSeedPhrase from "./components/RevealSeedPhrase/RevealSeedPhrase";
-import {setNFTassets} from "./store/actions/walletSeed";
-
-import AssetsListForDeploy from "./components/AssetsListForDeploy/AssetsListForDeploy";
-import {useSnackbar} from "notistack";
 import {
-	getAllPairsAndSetToStore,
-	getAllTokensAndSetToStore,
-} from "./reactUtils/reactUtils";
-import LimitOrder from "./pages/LimitOrder/LimitOrder";
-import useFetchLimitOrders from "./hooks/useFetchLimitOrders";
-import useSubLimitOrders from "./hooks/useSubLimitOrders";
-import CreatePair from "./pages/CreatePair/CreatePair";
-import PinPopup from "./components/LoginViaPIN/PinPopup";
-import LoginViaPin from "./components/LoginViaPIN/LoginViaPin";
+	setAssetsFromGraphQL,
+	setPairsList,
+	setSubscribeReceiveTokens,
+} from "./store/actions/wallet";
+import {setNFTassets} from "./store/actions/walletSeed";
 
 function App() {
 	const dispatch = useDispatch();
@@ -63,25 +68,38 @@ function App() {
 
 	const popup = useSelector((state) => state.appReducer.popup);
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
-	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
-	const swapAsyncIsWaiting = useSelector((state) => state.swapReducer.swapAsyncIsWaiting);
-	const poolAsyncIsWaiting = useSelector((state) => state.poolReducer.poolAsyncIsWaiting);
-	const manageAsyncIsWaiting = useSelector((state) => state.manageReducer.manageAsyncIsWaiting);
-	const revealSeedPhraseIsVisible = useSelector((state) => state.enterSeedPhrase.revealSeedPhraseIsVisible);
+	const walletIsConnected = useSelector(
+		(state) => state.appReducer.walletIsConnected,
+	);
+	const swapAsyncIsWaiting = useSelector(
+		(state) => state.swapReducer.swapAsyncIsWaiting,
+	);
+	const poolAsyncIsWaiting = useSelector(
+		(state) => state.poolReducer.poolAsyncIsWaiting,
+	);
+	const manageAsyncIsWaiting = useSelector(
+		(state) => state.manageReducer.manageAsyncIsWaiting,
+	);
+	const revealSeedPhraseIsVisible = useSelector(
+		(state) => state.enterSeedPhrase.revealSeedPhraseIsVisible,
+	);
 
-	const visibleEnterSeedPhraseUnlock = useSelector((state) => state.enterSeedPhrase.enterSeedPhraseUnlockIsVisible);
-	const emptyStorage = useSelector((state) => state.enterSeedPhrase.emptyStorage);
+	const visibleEnterSeedPhraseUnlock = useSelector(
+		(state) => state.enterSeedPhrase.enterSeedPhraseUnlockIsVisible,
+	);
+	const emptyStorage = useSelector(
+		(state) => state.enterSeedPhrase.emptyStorage,
+	);
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 
 	const tips = useSelector((state) => state.appReducer.tips);
-	const transListReceiveTokens = useSelector((state) => state.walletReducer.transListReceiveTokens);
+	const transListReceiveTokens = useSelector(
+		(state) => state.walletReducer.transListReceiveTokens,
+	);
 
 	const {enqueueSnackbar} = useSnackbar();
 
 	const [onloading, setonloading] = useState(false);
-
-	useFetchLimitOrders();
-	useSubLimitOrders();
 
 	const chrome = localStorage.getItem("chrome");
 	if (chrome === null) showChromePopup();
@@ -138,8 +156,6 @@ function App() {
 		dispatch(setNFTassets(NFTassets));
 	}, [clientData.address]);
 
-
-
 	useEffect(async () => {
 		if (!tips) return;
 		if (
@@ -152,10 +168,8 @@ function App() {
 		}
 
 		const newTransList = JSON.parse(JSON.stringify(transListReceiveTokens));
-		if (tips.name === "deployLockStakeSafeCallback" ||	"transferOwnershipCallback") {
-			const NFTassets = await agregateQueryNFTassets(clientData.address);
-			dispatch(setNFTassets(NFTassets));
-		}
+		const NFTassets = await agregateQueryNFTassets(clientData.address);
+		dispatch(setNFTassets(NFTassets));
 		if (tips.name === "connectRoot") {
 			await getAllPairsAndSetToStore(clientData.address);
 			await getAllTokensAndSetToStore(clientData.address);
@@ -192,48 +206,180 @@ function App() {
 		dispatch(setAssetsFromGraphQL(addrArray));
 	}, []);
 
+	const [getLimitOrders, {subscribeToMore, called}] = useLazyQuery(
+		gql`
+			${LIMIT_ORDER_FIELDS}
+			query LimitOrdersForOwner($addrOwner: String!) {
+				limitOrders: limitOrdersForOwner(addrOwner: $addrOwner) {
+					...LimitOrderFields
+				}
+			}
+		`,
+	);
+
+	useEffect(async () => {
+		if (clientData && clientData.address && !called)
+			getLimitOrders({variables: {addrOwner: clientData.address}});
+	}, [clientData]);
+
+	useEffect(() => {
+		if (subscribeToMore)
+			subscribeToMore({
+				document: gql`
+					${LIMIT_ORDER_FIELDS}
+					subscription LimitOrderUpdate($addrOwner: String!) {
+						updateLimitOrder(addrOwner: $addrOwner) {
+							status
+							limitOrder {
+								...LimitOrderFields
+							}
+						}
+					}
+				`,
+				variables: {addrOwner: clientData.address},
+				updateQuery(prev, {subscriptionData}) {
+					if (!subscriptionData.data) return prev;
+
+					const {status, limitOrder} = subscriptionData.data.updateLimitOrder;
+
+					let {aSymbol, bSymbol} = limitOrder.pair;
+					if (limitOrder.directionPair === BA_DIRECTION)
+						[aSymbol, bSymbol] = [bSymbol, aSymbol];
+
+					if (status === DEPLOY_ORDER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Created limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.concat(limitOrder),
+						};
+					} else if (status === CANCEL_ORDER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Canceled limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.filter(
+								(lo) => lo.addrOrder !== limitOrder.addrOrder,
+							),
+						};
+					} else if (status === CHANGE_PRICE) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Updated price of limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.map((lo) =>
+								lo.addrOrder === limitOrder.addrOrder ? limitOrder : lo,
+							),
+						};
+					} else if (status === CHANGE_OWNER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Transferred limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.filter(
+								(lo) => lo.addrOrder !== limitOrder.addrOrder,
+							),
+						};
+					} else if (status === APPLY_ORDER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Applied limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return prev;
+					} else if (status === CLOSE_ORDER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Fully taken limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.filter(
+								(lo) => lo.addrOrder !== limitOrder.addrOrder,
+							),
+						};
+					} else if (status === PART_CLOSE_ORDER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Partially taken limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.map((lo) =>
+								lo.addrOrder === limitOrder.addrOrder ? limitOrder : lo,
+							),
+						};
+					} else if (status === GIFT_ORDER) {
+						enqueueSnackbar({
+							type: "success",
+							message: `Received limit order ${aSymbol} - ${bSymbol}`,
+						});
+						return {
+							limitOrders: prev.limitOrders.concat(limitOrder),
+						};
+					}
+				},
+			});
+	}, [subscribeToMore]);
+
 	return (
 		<>
+			{visibleEnterSeedPhraseUnlock === true &&
+				emptyStorage === false &&
+				!onloading && <EnterPassword />}
+			<div className="beta" onClick={onTipClosed}>
+				Beta version. Use desktop Google Chrome
+			</div>
+			<Header />
+			<Switch location={location}>
+				<Route exact path="/native-login" component={NativeLogin} />
+				<Route exact path="/pool-explorer" component={PoolExplorer} />
+				<Route exact path="/pool" component={Pool} />
+				<Route exact path="/account" component={Account} />
+				<Route exact path="/swap" component={Swap} />
+				<Route exact path="/manage" component={Manage} />
+				<Route exact path="/add-liquidity" component={AddLiquidity} />
+				<Route exact path="/create-pair" component={CreatePair} />
+				<Route exact path="/staking" component={Stacking} />
+				<Route exact path="/wallet" component={Assets} />
+				<Route exact path="/orders" component={LimitOrder} />
+				<Route exact path="/">
+					<Redirect from="/" to="/wallet" />
+				</Route>
 
-				{visibleEnterSeedPhraseUnlock === true &&
-					emptyStorage === false &&
-					!onloading && <EnterPassword/>}
-				<div className="beta" onClick={onTipClosed}>
-					Beta version. Use desktop Google Chrome
-				</div>
-				<Header />
-				<Switch location={location}>
-					<Route exact path="/native-login" component={NativeLogin} />
-					<Route exact path="/pool-explorer" component={PoolExplorer} />
-					<Route exact path="/pool" component={Pool} />
-					<Route exact path="/account" component={Account} />
-					<Route exact path="/swap" component={Swap} />
-					<Route exact path="/manage" component={Manage} />
-					<Route exact path="/add-liquidity" component={AddLiquidity} />
-					<Route exact path="/create-pair" component={CreatePair} />
-					<Route exact path="/staking" component={Stacking} />
-					<Route exact path="/wallet" component={Assets} />
-					<Route exact path="/orders" component={LimitOrder} />
-					<Route exact path="/">
-						<Redirect from="/" to="/wallet" />
-					</Route>
-
-					{walletIsConnected ? (
-						<>
-							<Route exact path="/wallet/settings/keys" component={KeysBlock} />
-							<Route exact path="/wallet/send" component={SendAssets} />
-							<Route exact path="/wallet/receive" component={ReceiveAssets} />
-							<Route exact path="/wallet/settings" component={WalletSettings} />
-							<Route exact path="/wallet/deployAssets" component={AssetsListForDeploy} />
-							<Route exact path="/wallet/receive/receive-modal" component={AssetsModalReceive} />
-							<Route exact path="/wallet/send/send-modal" component={AssetsModal} />
-						</>
-					) : null}
-				</Switch>
-				{popup.isVisible ? (
-					<Popup type={popup.type} message={popup.message} link={popup.link} />
+				{walletIsConnected ? (
+					<>
+						<Route exact path="/wallet/settings/keys" component={KeysBlock} />
+						<Route exact path="/wallet/send" component={SendAssets} />
+						<Route exact path="/wallet/receive" component={ReceiveAssets} />
+						<Route exact path="/wallet/settings" component={WalletSettings} />
+						<Route
+							exact
+							path="/wallet/deployAssets"
+							component={AssetsListForDeploy}
+						/>
+						<Route
+							exact
+							path="/wallet/receive/receive-modal"
+							component={AssetsModalReceive}
+						/>
+						<Route
+							exact
+							path="/wallet/send/send-modal"
+							component={AssetsModal}
+						/>
+					</>
 				) : null}
-				{revealSeedPhraseIsVisible ? <RevealSeedPhrase /> : null}
+			</Switch>
+			{popup.isVisible ? (
+				<Popup type={popup.type} message={popup.message} link={popup.link} />
+			) : null}
+			<PopupManager />
+			{popup.isVisible ? (
+				<Popup type={popup.type} message={popup.message} link={popup.link} />
+			) : null}
+			{revealSeedPhraseIsVisible ? <RevealSeedPhrase /> : null}
 		</>
 	);
 }

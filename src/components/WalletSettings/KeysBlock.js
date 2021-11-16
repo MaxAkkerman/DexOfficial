@@ -12,8 +12,12 @@ import {copyToClipboard, handleCutAddress} from "../../reactUtils/reactUtils";
 function KeysBlock() {
 	const history = useHistory();
 
-	const encryptedSeedPhrase = useSelector((state) => state.enterSeedPhrase.encryptedSeedPhrase);
-	const seedPhrasePassword = useSelector((state) => state.enterSeedPhrase.seedPhrasePassword);
+	const encryptedSeedPhrase = useSelector(
+		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
+	);
+	const seedPhrasePassword = useSelector(
+		(state) => state.enterSeedPhrase.seedPhrasePassword,
+	);
 
 	const [keys, setKeys] = useState({});
 

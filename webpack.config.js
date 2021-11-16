@@ -73,8 +73,6 @@ module.exports = {
 		new ReactRefreshWebpackPlugin({
 			overlay: false,
 		}),
-		new Dotenv({
-			defaults: true,
-		}),
+		new Dotenv(),
 	],
 };

@@ -15,7 +15,9 @@ function ClientWallets(props) {
 	const dispatch = useDispatch();
 
 	const clientData = useSelector((state) => state.walletReducer.clientData);
-	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
+	const walletIsConnected = useSelector(
+		(state) => state.appReducer.walletIsConnected,
+	);
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const LPTokenList = useSelector((state) => state.walletReducer.liquidityList);
 

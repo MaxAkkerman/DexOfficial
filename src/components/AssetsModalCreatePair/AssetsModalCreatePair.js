@@ -5,18 +5,17 @@ import CloseBtn from "../CloseBtn/CloseBtn";
 import MainBlock from "../MainBlock/MainBlock";
 
 function AssetsModalCreatePair(props) {
-
 	const [filter, setFilter] = useState("");
 
 	function handleSetToken(item) {
-		props.handleSet(item,props.type)
+		props.handleSet(item, props.type);
 	}
 
 	function handleSearch(text) {
 		setFilter(text);
 	}
 	function handleClose() {
-		props.handleCloseAssetsListPopup()
+		props.handleCloseAssetsListPopup();
 	}
 
 	return (
@@ -33,7 +32,9 @@ function AssetsModalCreatePair(props) {
 							<AssetsList
 								handleClickNFT={null}
 								handleClickToken={(item) => handleSetToken(item)}
-								TokenAssetsArray={props.assetsList.filter((i) => i.symbol.includes(filter.toUpperCase()))}
+								TokenAssetsArray={props.assetsList.filter((i) =>
+									i.symbol.includes(filter.toUpperCase()),
+								)}
 								NFTassetsArray={null}
 								orderAssetsArray={null}
 								showItBeShown={false}

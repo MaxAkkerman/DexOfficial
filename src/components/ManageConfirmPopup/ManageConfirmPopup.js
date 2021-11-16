@@ -36,14 +36,13 @@ function ManageConfirmPopup(props) {
 		setPoolShare(poolS);
 	}, [pairId]);
 
-
 	useEffect(() => {
 		if (!curPair[0]) return;
 		let curP = curPair;
-		const tokeB = tokenList.filter(item=>item.symbol === curP[0].symbolB)
+		const tokeB = tokenList.filter((item) => item.symbol === curP[0].symbolB);
 
-		let pooledTokensA = ((curP[0].reserveA / 1000000000) * poolShare)/100;
-		let pooledTokensB = ((curP[0].reservetB / 1000000000) * poolShare)/100;
+		let pooledTokensA = ((curP[0].reserveA / 1000000000) * poolShare) / 100;
+		let pooledTokensB = ((curP[0].reservetB / 1000000000) * poolShare) / 100;
 
 		setpooledTokensA(pooledTokensA);
 		setpooledTokensB(pooledTokensB);

@@ -38,15 +38,24 @@ function Stacking() {
 	const history = useHistory();
 	const dispatch = useDispatch();
 
-	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
-	const showWaitingStakingPopup = useSelector((state) => state.stakingReducer.showWaitingStakingPopup);
+	const walletIsConnected = useSelector(
+		(state) => state.appReducer.walletIsConnected,
+	);
+	const showWaitingStakingPopup = useSelector(
+		(state) => state.stakingReducer.showWaitingStakingPopup,
+	);
 
 	const [period, setPeriod] = useState(1 / 30);
 	const [curProgram, setProgram] = useState(0);
 	const [showConfirmPopup, setStackingConfirmPopup] = useState(false);
 
 	const {assetList} = useAssetList();
-	const {values,setFieldValue,errors,isValid: valid,} = useFormik({
+	const {
+		values,
+		setFieldValue,
+		errors,
+		isValid: valid,
+	} = useFormik({
 		initialValues: {
 			stake: 1000,
 			profit: 0.1619,
@@ -326,7 +335,6 @@ function Stacking() {
 									</div>
 
 									<Stack spacing={2}>
-
 										<Stack
 											spacing={2}
 											direction={"row"}
@@ -350,9 +358,7 @@ function Stacking() {
 														size="small"
 														variant="outlined"
 														error={errors.stake ? errors.stake : null}
-														helperText={
-															walletIsConnected ? errors.stake : null
-														}
+														helperText={walletIsConnected ? errors.stake : null}
 														disabled={walletIsConnected ? null : "disabled"}
 
 														// placeholder="1000"
@@ -380,8 +386,9 @@ function Stacking() {
 																src={TON}
 																alt={"Ton Crystal"}
 															/>{" "}
-															{Number(values.stake + values.profit).toFixed(4) ||
-															0}
+															{Number(values.stake + values.profit).toFixed(
+																4,
+															) || 0}
 														</Typography>
 													</Stack>
 												</Stack>
@@ -409,92 +416,91 @@ function Stacking() {
 										{/*			helperText={walletIsConnected ? errors.stake : null}*/}
 										{/*			disabled={walletIsConnected ? null : "disabled"}*/}
 
+										{/*// placeholder="1000"*/}
+										{/*/>*/}
+									</Stack>
 
-													{/*// placeholder="1000"*/}
-												{/*/>*/}
-											</Stack>
+									{/*<Stack*/}
+									{/*	spacing={1}*/}
+									{/*	className={"Stacking__calculator_item end"}*/}
+									{/*>*/}
+									{/*	<div className="Stacking__calculator_deposit_term_text end">*/}
+									{/*		In {period} months you will have*/}
+									{/*	</div>*/}
+									{/*	<Stack spacing={1} direction={"row"}>*/}
+									{/*		<Typography*/}
+									{/*			sx={{*/}
+									{/*				fontWeight: "700",*/}
+									{/*				fontSize: "24px",*/}
+									{/*				lineHeight: "unset",*/}
+									{/*				color: "var(--primary-color)",*/}
+									{/*				wordBreak: "break-all",*/}
+									{/*			}}*/}
+									{/*		>*/}
+									{/*			<img*/}
+									{/*				style={{marginRight: "5px"}}*/}
+									{/*				src={TON}*/}
+									{/*				alt={"Ton Crystal"}*/}
+									{/*			/>{" "}*/}
 
-											{/*<Stack*/}
-											{/*	spacing={1}*/}
-											{/*	className={"Stacking__calculator_item end"}*/}
-											{/*>*/}
-											{/*	<div className="Stacking__calculator_deposit_term_text end">*/}
-											{/*		In {period} months you will have*/}
-											{/*	</div>*/}
-											{/*	<Stack spacing={1} direction={"row"}>*/}
-											{/*		<Typography*/}
-											{/*			sx={{*/}
-											{/*				fontWeight: "700",*/}
-											{/*				fontSize: "24px",*/}
-											{/*				lineHeight: "unset",*/}
-											{/*				color: "var(--primary-color)",*/}
-											{/*				wordBreak: "break-all",*/}
-											{/*			}}*/}
-											{/*		>*/}
-											{/*			<img*/}
-											{/*				style={{marginRight: "5px"}}*/}
-											{/*				src={TON}*/}
-											{/*				alt={"Ton Crystal"}*/}
-											{/*			/>{" "}*/}
+									{/*			{Number(profit).toFixed(4) || 0}*/}
 
-											{/*			{Number(profit).toFixed(4) || 0}*/}
+									{/*			/!*{Number(values.stake + values.profit).toFixed(1) ||*!/*/}
+									{/*			/!*	0}*!/*/}
 
-											{/*			/!*{Number(values.stake + values.profit).toFixed(1) ||*!/*/}
-											{/*			/!*	0}*!/*/}
+									{/*		</Typography>*/}
+									{/*	</Stack>*/}
+									{/*</Stack>*/}
+									{/*</div>*/}
 
-											{/*		</Typography>*/}
-											{/*	</Stack>*/}
-											{/*</Stack>*/}
-										{/*</div>*/}
-
-										<div className={"Stacking__calculator_div_container"}>
-											<Stack
-												spacing={1}
-												className={"Stacking__calculator_item end"}
+									<div className={"Stacking__calculator_div_container"}>
+										<Stack
+											spacing={1}
+											className={"Stacking__calculator_item end"}
+										>
+											<div className="Stacking__calculator_deposit_term_text">
+												Your profit
+											</div>
+											<Typography
+												sx={{
+													fontWeight: "700",
+													fontSize: "24px",
+													lineHeight: "unset",
+													color: "var(--primary-color)",
+													wordBreak: "break-all",
+												}}
 											>
-												<div className="Stacking__calculator_deposit_term_text">
-													Your profit
-												</div>
+												<img
+													style={{marginRight: "5px"}}
+													src={TON}
+													alt={"Ton Crystal"}
+												/>{" "}
+												{Number(values.profit).toFixed(1) || 0}
+											</Typography>
+										</Stack>
+										<Stack
+											spacing={1}
+											className={"Stacking__calculator_item end"}
+										>
+											<div className="Stacking__calculator_deposit_term_text end">
+												Annual Percentage Yield (APY)
+											</div>
+											<Stack spacing={1} direction={"row"}>
 												<Typography
 													sx={{
 														fontWeight: "700",
 														fontSize: "24px",
 														lineHeight: "unset",
 														color: "var(--primary-color)",
-														wordBreak: "break-all",
 													}}
 												>
-													<img
-														style={{marginRight: "5px"}}
-														src={TON}
-														alt={"Ton Crystal"}
-													/>{" "}
-													{Number(values.profit).toFixed(1) || 0}
+													{values.APY || 0}%
 												</Typography>
 											</Stack>
-											<Stack
-												spacing={1}
-												className={"Stacking__calculator_item end"}
-											>
-												<div className="Stacking__calculator_deposit_term_text end">
-													Annual Percentage Yield (APY)
-												</div>
-												<Stack spacing={1} direction={"row"}>
-													<Typography
-														sx={{
-															fontWeight: "700",
-															fontSize: "24px",
-															lineHeight: "unset",
-															color: "var(--primary-color)",
-														}}
-													>
-														{values.APY || 0}%
-													</Typography>
-												</Stack>
-											</Stack>
-										</div>
-									</Stack>
-								<Stack style={{width:"100%"}}>
+										</Stack>
+									</div>
+								</Stack>
+								<Stack style={{width: "100%"}}>
 									{walletIsConnected ? (
 										<button
 											// disabled
@@ -508,7 +514,9 @@ function Stacking() {
 											// 	? "btn mainblock-btn btn--disabled"
 											// 	: "btn mainblock-btn"
 											// 	}
-											> {period === 1 / 30 ? "Stake" : "Coming soon"}
+										>
+											{" "}
+											{period === 1 / 30 ? "Stake" : "Coming soon"}
 										</button>
 									) : (
 										<button

@@ -32,19 +32,18 @@ import {
 	NOT_ENOUGH_CAUSE_COMMISSION as NOT_ENOUGH_CAUSE_COMMISSION_MSG,
 	NOT_TOUCHED,
 } from "../../constants/validationMessages";
-import {
-	SWAP_COMMISSION,
-} from "../../constants/commissions";
+import {SWAP_COMMISSION} from "../../constants/commissions";
 import useAssetList from "../../hooks/useAssetList";
 import {FormHelperText} from "@mui/material";
 import {checkDecimals} from "../../reactUtils/reactUtils";
-
 
 function Swap() {
 	const history = useHistory();
 	const dispatch = useDispatch();
 
-	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
+	const walletIsConnected = useSelector(
+		(state) => state.appReducer.walletIsConnected,
+	);
 
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
@@ -55,11 +54,14 @@ function Swap() {
 	const toValue = useSelector((state) => state.swapReducer.toInputValue);
 	const rate = useSelector((state) => state.swapReducer.rate);
 	const pairId = useSelector((state) => state.swapReducer.pairId);
-	const swapAsyncIsWaiting = useSelector((state) => state.swapReducer.swapAsyncIsWaiting);
+	const swapAsyncIsWaiting = useSelector(
+		(state) => state.swapReducer.swapAsyncIsWaiting,
+	);
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 	const tips = useSelector((state) => state.appReducer.tips);
 
-	const [swapConfirmPopupIsVisible, setSwapConfirmPopupIsVisible] = useState(false);
+	const [swapConfirmPopupIsVisible, setSwapConfirmPopupIsVisible] =
+		useState(false);
 	const [connectAsyncIsWaiting, setconnectAsyncIsWaiting] = useState(false);
 	const [curExist, setExistsPair] = useState(false);
 	const [notDeployedWallets, setNotDeployedWallets] = useState([]);
@@ -71,7 +73,6 @@ function Swap() {
 	const {slippageState, popperState} = useSlippagePopper();
 	const {keyPair} = useKeyPair();
 	const {assetList} = useAssetList();
-
 
 	useEffect(() => {
 		if (!pairsList.length || !pairId) {
@@ -280,14 +281,10 @@ function Swap() {
 		dispatch(setSwapAsyncIsWaiting(false));
 	}
 
-
-
 	useEffect(() => {
 		if (Object.keys(errors).length === 0) setIsError(false);
 		else setIsError(true);
 	}, [errors]);
-
-
 
 	function validate(fromValue, toValue, fromToken, toToken) {
 		console.log(fromToken, toToken);
@@ -362,14 +359,15 @@ function Swap() {
 									incorrectBalance={incorrectBalance}
 								/>
 								{errors.fromTokenAmount ? (
-									<FormHelperText error sx={{marginLeft:"27px",color: "var(--text-color)"}}>
+									<FormHelperText
+										error
+										sx={{marginLeft: "27px", color: "var(--text-color)"}}
+									>
 										{NOT_ENOUGH}
 									</FormHelperText>
-								)
-								:
-									<div style={{height:"22px"}}/>
-
-								}
+								) : (
+									<div style={{height: "22px"}} />
+								)}
 								{/*<>   {incorrectBalance && <div>error</div>}</>*/}
 								<SwapBtn
 									fromToken={fromToken}
@@ -430,7 +428,10 @@ function Swap() {
 					}
 					footer={
 						<div className="mainblock-footer">
-							<div className="mainblock-footer-wrap" style={{justifyContent: "space-around"}}>
+							<div
+								className="mainblock-footer-wrap"
+								style={{justifyContent: "space-around"}}
+							>
 								<div className="swap-confirm-wrap">
 									<p className="mainblock-footer-value">
 										{parseFloat(

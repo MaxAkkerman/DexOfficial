@@ -13,10 +13,11 @@ import {
 import "./LiquidityItem.scss";
 
 function LiquidityItem({symbol, balance}) {
-
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 
-	const liquidityList = useSelector((state) => state.walletReducer.liquidityList);
+	const liquidityList = useSelector(
+		(state) => state.walletReducer.liquidityList,
+	);
 
 	const history = useHistory();
 	const dispatch = useDispatch();
@@ -24,32 +25,28 @@ function LiquidityItem({symbol, balance}) {
 	const symbols = symbol.split("/");
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
 
-
 	const handleClick = () => {
 		const fromToken = symbols[0].replaceAll("DS-W", "");
 
-		let assetsArr = tokenList.concat(liquidityList)
+		let assetsArr = tokenList.concat(liquidityList);
 		let fromT;
 		let toT;
-		const curSymbolPair = []
-		symbols.map(item=> {
-			if(item.includes("DS-")){
-
-				curSymbolPair.push(item.replaceAll("DS-", ""))
-			}else{
-				curSymbolPair.push(item)
-
+		const curSymbolPair = [];
+		symbols.map((item) => {
+			if (item.includes("DS-")) {
+				curSymbolPair.push(item.replaceAll("DS-", ""));
+			} else {
+				curSymbolPair.push(item);
 			}
-		})
-		assetsArr.map(item=> {
-
-			if(item.symbol === curSymbolPair[0]){
-				fromT = item.symbol
+		});
+		assetsArr.map((item) => {
+			if (item.symbol === curSymbolPair[0]) {
+				fromT = item.symbol;
 			}
-			if(item.symbol === curSymbolPair[1]){
-				toT = item.symbol
+			if (item.symbol === curSymbolPair[1]) {
+				toT = item.symbol;
 			}
-		})
+		});
 		dispatch(setManageBalance(balance));
 
 		pairsList.forEach((i) => {
@@ -59,10 +56,7 @@ function LiquidityItem({symbol, balance}) {
 				dispatch(setManagePairId(i.pairAddress));
 				dispatch(setManageRateAB(i.rateAB));
 				dispatch(setManageRateBA(i.rateBA));
-			} else if (
-				i.symbolB.includes(fromT) &&
-				i.symbolA.includes(toT)
-			) {
+			} else if (i.symbolB.includes(fromT) && i.symbolA.includes(toT)) {
 				dispatch(setManageFromToken({symbol: fromT, reserve: i.reservetB}));
 				dispatch(setManageToToken({symbol: toT, reserve: i.reserveA}));
 				dispatch(setManagePairId(i.pairAddress));
