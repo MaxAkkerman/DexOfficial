@@ -112,16 +112,29 @@ function SwapConfirmPopup(props) {
 					clientAddress: clientData.address,
 					clientKeyPair: keyPair,
 				},
-			).then(() => {
-				enqueueSnackbar({
-					type: "info",
-					message: `Taking limit order ${truncateNum(limitOrder.amount, 2)} ${
-						fromToken.symbol
-					} - ${truncateNum(limitOrder.amount * limitOrder.price)} ${
-						toToken.symbol
-					} ⏳`,
+			)
+				.then(() => {
+					enqueueSnackbar({
+						type: "info",
+						message: `Taking limit order ${truncateNum(limitOrder.amount, 2)} ${
+							fromToken.symbol
+						} - ${truncateNum(limitOrder.amount * limitOrder.price)} ${
+							toToken.symbol
+						} ⏳`,
+					});
+				})
+				.catch(() => {
+					enqueueSnackbar({
+						type: "error",
+						message: `Failed limit order take ${truncateNum(
+							limitOrder.amount,
+							2,
+						)} ${fromToken.symbol} - ${truncateNum(
+							limitOrder.amount * limitOrder.price,
+							2,
+						)} ${toToken.symbol} ⏳`,
+					});
 				});
-			});
 			processing.push(promise);
 		});
 		await Promise.all(processing);

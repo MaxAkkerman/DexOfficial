@@ -22,11 +22,10 @@ export default async function takeLimitOrder(
 	});
 
 	const pair = await getPair(pairAddr);
-
 	try {
 		if (directionPair === "4") {
 			const routerAddr = await getTokenRouter(pair.rootB);
-			console.log("Router address->B", routerAddr);
+			console.log("Router_address->B", routerAddr);
 			const res = await clientAcc.run("takeLimitOrderA", {
 				pairAddr,
 				limitOrderA: orderAddr,
@@ -35,9 +34,10 @@ export default async function takeLimitOrder(
 				priceB: price,
 			});
 			console.log("takeLimitOrderA->response", res.decoded);
+			res.decoded;
 		} else {
 			const routerAddr = await getTokenRouter(pair.rootA);
-			console.log("Router address->B", routerAddr);
+			console.log("Router_address->A", routerAddr);
 			const res = await clientAcc.run("takeLimitOrderB", {
 				pairAddr,
 				limitOrderB: orderAddr,
@@ -46,11 +46,12 @@ export default async function takeLimitOrder(
 				priceA: price,
 			});
 			console.log("takeLimitOrderB->response", res.decoded);
+			return res.decoded;
 		}
 
 		return true;
 	} catch (err) {
 		console.log("takeLimitOrder->error", err);
-		return false;
+		throw err;
 	}
 }

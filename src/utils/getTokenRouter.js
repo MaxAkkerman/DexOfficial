@@ -16,7 +16,7 @@ const getAllRouters = memoize(async () => {
 	let res = await rootAcc.runLocal("_deployedRouter", {});
 	if (!res.decoded) throw new Error(FUNC_FAIL);
 	const {_deployedRouter} = res.decoded.output;
-	console.log("LimitOrderRoot->router_address", _deployedRouter);
+	console.log("LimitOrderRoot->deployed_router_address", _deployedRouter);
 
 	const routerAcc = new Account(LimitOrderRouterContract, {
 		address: _deployedRouter,
@@ -26,7 +26,6 @@ const getAllRouters = memoize(async () => {
 	res = await routerAcc.runLocal("walletFor", {});
 	if (!res.decoded) throw new Error(FUNC_FAIL);
 	const {walletFor} = res.decoded.output;
-	console.log("LimitOrderRouter->root_router_map", walletFor);
 
 	return walletFor;
 });
