@@ -1,7 +1,7 @@
 import {Account} from "@tonclient/appkit";
 import {memoize} from "lodash";
 
-import {FUNC_FAIL} from "../constants/runtimeErrors";
+import {FUNC_FAIL, PAIR_NULL} from "../constants/runtimeErrors";
 import {DEXRootContract} from "../extensions/contracts/DEXRoot";
 import Radiance from "../extensions/Radiance.json";
 import client from "../extensions/sdk_get/get";
@@ -33,9 +33,11 @@ const getAllPairs = memoize(async () => {
 });
 /**
  * @param {string} addrPair
- * @returns {Pair}
+ * @returns {Promise<Pair>}
  */
 export default async function getPair(addrPair) {
 	const pairs = await getAllPairs();
-	return pairs.find((p) => p.addrPair === addrPair);
+	const pair = pairs.find((p) => p.addrPair === addrPair);
+	if (!pair) throw new Error(PAIR_NULL);
+	return pair;
 }

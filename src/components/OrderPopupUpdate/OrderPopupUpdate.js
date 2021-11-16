@@ -28,7 +28,16 @@ import MainBlock from "../MainBlock/MainBlock";
 import classes from "./OrderPopupUpdate.module.scss";
 
 export default function OrderPopupUpdate({order, close}) {
-	const {fromSymbol, toSymbol, fromValue, toValue, price, id} = order;
+	const {
+		fromSymbol,
+		toSymbol,
+		fromValue,
+		toValue,
+		price,
+		addrOrder,
+		fromRootAddr,
+		toRootAddr,
+	} = order;
 
 	const dispatch = useDispatch();
 
@@ -77,7 +86,7 @@ export default function OrderPopupUpdate({order, close}) {
 		if (values.newPrice !== price) {
 			const {changePriceStatus} = await updateLimitOrderPrice(
 				{
-					id,
+					addrOrder: addrOrder,
 					newPrice: values.newPrice,
 				},
 				{
@@ -92,9 +101,9 @@ export default function OrderPopupUpdate({order, close}) {
 		if (values.newAddress !== clientData.address) {
 			const {transferLimitOrderStatus} = await transferLimitOrder(
 				{
-					id,
-					fromSymbol,
-					toSymbol,
+					addrOrder,
+					fromRootAddr,
+					toRootAddr,
 					newOwnerAddress: values.newAddress,
 				},
 				{

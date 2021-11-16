@@ -1,7 +1,7 @@
 import {Account} from "@tonclient/appkit";
 import {memoize} from "lodash";
 
-import {FUNC_FAIL} from "../constants/runtimeErrors";
+import {FUNC_FAIL, LIMIT_ORDER_ROUTER_NULL} from "../constants/runtimeErrors";
 import {LimitOrderRootContract} from "../extensions/contracts/LimitOrderRoot";
 import {LimitOrderRouterContract} from "../extensions/contracts/LimitOrderRouter";
 import Radiance from "../extensions/Radiance.json";
@@ -33,10 +33,12 @@ const getAllRouters = memoize(async () => {
 
 /**
  * Returns token's router (limit order router) address
- * @param {string} rootAddress
+ * @param {string} rootAddress Root address of token
  * @returns {Promise<string>} routerAddress
  */
 export default async function getTokenRouter(rootAddress) {
 	const allRouters = await getAllRouters();
-	return allRouters[rootAddress];
+	const routerAddress = allRouters[rootAddress];
+	if (!routerAddress) throw new Error(LIMIT_ORDER_ROUTER_NULL);
+	return routerAddress;
 }

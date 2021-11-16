@@ -1,6 +1,9 @@
 import "./index.scss";
 
 import {ApolloClient, ApolloProvider, InMemoryCache} from "@apollo/client";
+import {HttpLink, split} from "@apollo/client";
+import {WebSocketLink} from "@apollo/client/link/ws";
+import {getMainDefinition} from "@apollo/client/utilities";
 import {StyledEngineProvider} from "@mui/material/styles";
 import {SnackbarProvider} from "notistack";
 import React from "react";
@@ -15,9 +18,32 @@ import Alert from "./components/Alert/Alert";
 import Radiance from "./extensions/Radiance.json";
 import rootReducer from "./store/reducers";
 
+const httpLink = new HttpLink({
+	uri: Radiance.networks[2].graphqlUrl,
+});
+
+const wsLink = new WebSocketLink({
+	uri: Radiance.networks[2].graphqlUrlWs,
+	options: {
+		reconnect: true,
+	},
+});
+
+const splitLink = split(
+	({query}) => {
+		const definition = getMainDefinition(query);
+		return (
+			definition.kind === "OperationDefinition" &&
+			definition.operation === "subscription"
+		);
+	},
+	wsLink,
+	httpLink,
+);
+
 export const store = createStore(rootReducer, composeWithDevTools());
 export const client = new ApolloClient({
-	uri: Radiance.networks[2].limitOrderGraphqlUrl,
+	link: splitLink,
 	cache: new InMemoryCache(),
 });
 

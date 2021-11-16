@@ -16,7 +16,7 @@ import classes from "./AssetListOrderItem.module.scss";
 
 export default function AssetListOrderItem({limitOrder}) {
 	const {amount, price, directionPair, addrOrder, pair} = limitOrder;
-	let {aSymbol, bSymbol} = pair;
+	let {aSymbol, bSymbol, aRoot, bRoot} = pair;
 	if (directionPair === BA_DIRECTION) [aSymbol, bSymbol] = [bSymbol, aSymbol];
 
 	const dispatch = useDispatch();
@@ -27,12 +27,12 @@ export default function AssetListOrderItem({limitOrder}) {
 		dispatch(
 			openOrderCancelPopup({
 				order: {
+					addrOrder,
 					fromSymbol: aSymbol,
 					toSymbol: bSymbol,
 					fromValue: amount,
 					toValue: amount * price,
 					price,
-					id: addrOrder,
 				},
 			}),
 		);
@@ -43,12 +43,14 @@ export default function AssetListOrderItem({limitOrder}) {
 		dispatch(
 			openOrderUpdatePopup({
 				order: {
+					addrOrder,
 					fromSymbol: aSymbol,
 					toSymbol: bSymbol,
 					fromValue: amount,
 					toValue: amount * price,
+					fromRootAddr: aRoot,
+					toRootAddr: bRoot,
 					price,
-					id: addrOrder,
 				},
 			}),
 		);

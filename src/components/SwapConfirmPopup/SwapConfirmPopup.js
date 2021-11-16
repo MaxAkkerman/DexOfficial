@@ -1,11 +1,13 @@
 import "./SwapConfirmPopup.scss";
 
-import {gql, request} from "graphql-request";
+import {gql} from "@apollo/client";
 import {useSnackbar} from "notistack";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 
 import {PAIR_NULL, TOKEN_NULL} from "../../constants/runtimeErrors";
+import {AB_DIRECTION, BA_DIRECTION} from "../../constants/runtimeVariables";
+import Radiance from "../../extensions/Radiance.json";
 import {swapA, swapB} from "../../extensions/sdk_run/run";
 import {decrypt} from "../../extensions/tonUtils";
 import useKeyPair from "../../hooks/useKeyPair";
@@ -58,10 +60,8 @@ function SwapConfirmPopup(props) {
 		const pairBA = pairList.find(
 			(p) => fromToken.symbol === p.symbolB && toToken.symbol === p.symbolA,
 		);
-
 		if (!pairAB && !pairBA) throw new Error(PAIR_NULL);
-
-		const directionPair = pairAB ? "4" : "5";
+		const directionPair = pairAB ? AB_DIRECTION : BA_DIRECTION;
 
 		const query = gql`
 			query (
@@ -87,7 +87,7 @@ function SwapConfirmPopup(props) {
 				}
 			}
 		`;
-		const data = await request(process.env.LIMIT_ORDER_GRAPHQL_URL, query, {
+		const data = await fetch(Radiance.networks[2].limitOrderGraphqlUrl, query, {
 			addrPair: pairId,
 			directionPair,
 			amount: fromValue,
@@ -134,7 +134,7 @@ function SwapConfirmPopup(props) {
 		if (data.limitOrdersForSwap.leftoverSwap !== 0)
 			try {
 				let res = null;
-				if (directionPair === "4") {
+				if (directionPair === AB_DIRECTION) {
 					res = await swapA(
 						curExt,
 						pairId,
