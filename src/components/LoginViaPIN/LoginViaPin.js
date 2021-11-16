@@ -1,22 +1,25 @@
-import React, {useEffect, useState} from "react";
 import "./PinPopup.scss";
-import PinPopup from "./PinPopup";
-import WelcomePopup from "./WelcomePopup";
+
+import {numbers} from "@material/checkbox";
+import React, {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+
+import client, {getClientBalance} from "../../extensions/sdk_get/get";
+import {prepareClientDataForDeploy} from "../../extensions/sdk_run/run";
+import {encrypt, encryptPure} from "../../extensions/tonUtils";
+import {setTips} from "../../store/actions/app";
 import {
 	enterSeedPhraseSaveToLocalStorage,
 	showEnterSeedPhrase,
 } from "../../store/actions/enterSeedPhrase";
-import {useDispatch, useSelector} from "react-redux";
-import {setTips} from "../../store/actions/app";
 import {
 	setClientData,
 	setPin,
+	setSubscribeReceiveTokens,
 	setTransactionsList,
 } from "../../store/actions/wallet";
-import client, {getClientBalance} from "../../extensions/sdk_get/get";
-import {encrypt, encryptPure} from "../../extensions/tonUtils";
-import {prepareClientDataForDeploy} from "../../extensions/sdk_run/run";
-import {numbers} from "@material/checkbox";
+import PinPopup from "./PinPopup";
+import WelcomePopup from "./WelcomePopup";
 
 function LoginViaPin(props) {
 	const dispatch = useDispatch();
@@ -106,9 +109,15 @@ function LoginViaPin(props) {
 			makeNextStep.map((item) => {
 				item.weAreHere = item.name === "step1";
 			});
-			setStep(makeNextStep);
+			dispatch(setSubscribeReceiveTokens([]));
 
-			props.setloadingUserData(true);
+			dispatch(
+				setTips({
+					message: "All checks passed, welcome onboard!",
+					type: "success",
+				}),
+			);
+			props.setloadingUserData(false);
 			return;
 		}
 

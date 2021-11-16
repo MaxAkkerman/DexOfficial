@@ -1,17 +1,18 @@
-import React, {useState} from "react";
-import {useHistory} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
-import {connectWallet, setCurExt, showPopup} from "../../store/actions/app";
-import {getCurrentExtension} from "../../extensions/extensions/checkExtensions";
-import MainBlock from "../MainBlock/MainBlock";
 import "./ExtensionsList.scss";
 
-import EnterSeedPhrase from "../EnterSeedPhrase/EnterSeedPhrase";
+import React, {useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {useHistory} from "react-router-dom";
+
+import {getCurrentExtension} from "../../extensions/extensions/checkExtensions";
+import {connectWallet, setCurExt, showPopup} from "../../store/actions/app";
 import {
 	showEnterSeedPhrase,
 	showEnterSeedPhraseRegister,
 } from "../../store/actions/enterSeedPhrase";
+import EnterSeedPhrase from "../EnterSeedPhrase/EnterSeedPhrase";
 import LoginViaPin from "../LoginViaPIN/LoginViaPin";
+import MainBlock from "../MainBlock/MainBlock";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
 
 function ExtensionsList() {
@@ -25,6 +26,7 @@ function ExtensionsList() {
 	);
 
 	const [loadingUserData, setloadingUserData] = useState(false);
+	const [loginViaPinIsVisible, setloginViaPinIsVisible] = useState(false);
 
 	function handleClick(name) {
 		extensionsList.forEach(async (i) => {
@@ -95,11 +97,12 @@ function ExtensionsList() {
 								<button
 									style={{fontSize: "16px", width: "100%"}}
 									className="btn wallet-btn"
-									onClick={() => dispatch(showEnterSeedPhraseRegister())}
+									onClick={() => setloginViaPinIsVisible(true)}
 								>
 									Create a new Seed Phrase and Wallet
 								</button>
-								{enterSeedPhraseIsVisible === true && (
+								{enterSeedPhraseIsVisible && <EnterSeedPhrase />}
+								{loginViaPinIsVisible && (
 									<LoginViaPin
 										setloadingUserData={(bl) => setloadingUserData(bl)}
 									/>

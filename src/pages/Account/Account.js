@@ -1,11 +1,30 @@
+import "./Account.scss";
+
 import React, {useEffect, useState} from "react";
-import {useHistory} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
+import {useHistory} from "react-router-dom";
+
+import ExtensionsList from "../../components/ExtensionsList/ExtensionsList";
+import Loader from "../../components/Loader/Loader";
+import MainBlock from "../../components/MainBlock/MainBlock";
+import PasswordEnterPopup from "../../components/PasswordEnterPopup/PasswordEnterPopup";
+import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
+import {getClientBalance} from "../../extensions/sdk_get/get";
+import {deployClient} from "../../extensions/sdk_run/run";
+import {decrypt, decryptPure, encryptPure} from "../../extensions/tonUtils";
+import {store} from "../../index";
+import {copyToClipboard, InitializeClient} from "../../reactUtils/reactUtils";
 import {
 	setCurExt,
 	setTips,
 	setWalletIsConnected,
 } from "../../store/actions/app";
+import {
+	setNewSide,
+	setSeedPassword,
+	showEnterSeedPhrase,
+	wordOneEnterSeedPhrase,
+} from "../../store/actions/enterSeedPhrase";
 import {
 	setClientData,
 	setLiquidityList,
@@ -15,22 +34,6 @@ import {
 	setTransactionsList,
 	setWallet,
 } from "../../store/actions/wallet";
-import MainBlock from "../../components/MainBlock/MainBlock";
-import ExtensionsList from "../../components/ExtensionsList/ExtensionsList";
-import "./Account.scss";
-import {copyToClipboard, InitializeClient} from "../../reactUtils/reactUtils";
-import {
-	setNewSide,
-	setSeedPassword,
-	wordOneEnterSeedPhrase,
-} from "../../store/actions/enterSeedPhrase";
-import {getClientBalance} from "../../extensions/sdk_get/get";
-import {deployClient} from "../../extensions/sdk_run/run";
-import Loader from "../../components/Loader/Loader";
-import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
-import PasswordEnterPopup from "../../components/PasswordEnterPopup/PasswordEnterPopup";
-import {decrypt, decryptPure, encryptPure} from "../../extensions/tonUtils";
-import {store} from "../../index";
 
 function Account() {
 	const history = useHistory();
@@ -54,57 +57,32 @@ function Account() {
 		setTransArr(transListReceiveTokens);
 	}, []);
 
-	async function onPassEnter() {
-		const clientPrepData = JSON.parse(
-			localStorage.getItem("clientDataPreDeploy"),
+	function disconnectHandler() {
+		dispatch(setWallet({id: "", balance: 0}));
+		dispatch(setWalletIsConnected(false));
+		// dispatch(setCurExt({}));
+		// dispatch(setTokenList([]));
+		// dispatch(setLiquidityList([]));
+		// dispatch(setPairsList([]))
+		console.log("disaconnect");
+		dispatch(setSeedPassword(""));
+		// dispatch(enterSeedPhraseSaveToLocalStorage(""));
+		dispatch(
+			setClientData({
+				status: false,
+				dexclient: "",
+				balance: 0,
+				public: "",
+			}),
 		);
-		if (!clientPrepData) {
-			dispatch(
-				setTips({
-					message: `Something goes wrong, please re-generate client`,
-					type: "error",
-				}),
-			);
-			return;
-		}
-		const accBalance = await getClientBalance(clientPrepData.address);
-		setclientPrepData(clientPrepData);
-		if (accBalance > 0.5) {
-			setPasswordEnterPopup(true);
-		} else {
-			dispatch(
-				setTips({
-					message: `Not enough balance, need at least 0.5 TONs`,
-					type: "error",
-				}),
-			);
-		}
-	}
+		store.dispatch(setTokenList([]));
+		store.dispatch(setLiquidityList([]));
+		localStorage.removeItem("setSubscribeReceiveTokens");
+		dispatch(showEnterSeedPhrase(false));
 
-	async function deployHandler() {
-		const encClData = await decryptPure(
-			clientPrepData.secret,
-			seedPhrasePassword,
-		);
-		const encrData = JSON.parse(JSON.stringify(clientPrepData));
-		encrData.secret = encClData;
-		setPasswordEnterPopup(false);
-		setonDeploy(true);
-		const deployRes = await deployClient(encrData);
-
-		if (deployRes.code) {
-			setonDeploy(false);
-			dispatch(
-				setTips({
-					message: `Something goes wrong - error code ${deployRes.code}`,
-					type: "error",
-				}),
-			);
-		} else {
-			await InitializeClient(clientPrepData.public);
-			localStorage.removeItem("clientDataPreDeploy");
-			setonDeploy(false);
-		}
+		// localStorage.removeItem("esp");
+		// window.location.reload();
+		history.push("/account");
 	}
 
 	function disconnectHandler() {
@@ -254,6 +232,7 @@ function Account() {
 									href={`https://ton.live/accounts/accountDetails?id=${clientData.address}`}
 									target="_blank"
 									className="account-link"
+									rel="noreferrer"
 								>
 									Ton.live
 								</a>

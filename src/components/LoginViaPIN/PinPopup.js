@@ -1,12 +1,14 @@
-import React, {useEffect, useState} from "react";
-import MainBlock from "../MainBlock/MainBlock";
 import "./PinPopup.scss";
+
 import {Grid} from "@material-ui/core";
+import React, {useEffect, useState} from "react";
+
 import {numPadArr, pincodeArray} from "../../constants/defaultData";
-import PinKeyboard from "./PinKeyboard";
-import {NextBtn} from "./NextBtn";
-import Steppers from "./Steppers";
 import arrowBack from "../../images/arrowBack.png";
+import MainBlock from "../MainBlock/MainBlock";
+import {NextBtn} from "./NextBtn";
+import PinKeyboard from "./PinKeyboard";
+import Steppers from "./Steppers";
 
 const pattern = "[0-9]+";
 
@@ -58,6 +60,45 @@ function PinPopup(props) {
 		});
 		setPinArr(newPin);
 	}
+
+	// useEffect(() => {
+	//     window.addEventListener("keydown", keyDownHandler)
+	// }, [])
+	//
+	// function keyDownHandler(e) {
+	//
+	//     const fRefs = myRefs.filter(item => item)
+	//     if (e.key === "Meta") return
+	//     let newPin = JSON.parse(JSON.stringify(pinArr))
+	//     const curEmptyPin = newPin.filter(item => item.focused)
+	//     console.log("curEmptyPin", curEmptyPin)
+	//
+	//     if (!curEmptyPin.length) return
+	//     let nextId;
+	//     let ind;
+	//     newPin.map((item,i) => {
+	//
+	//         if (item.id === curEmptyPin[0].id) {
+	//             console.log("item.id",item.id)
+	//             item.value = e.key
+	//             item.focused = false
+	//             ind = i
+	//             nextId = +item.id + 1
+	//         }
+	//     })
+	//     // newPin.map(item => {
+	//     //     console.log("next one ocused")
+	//     //     if(item.id === nextId){
+	//     //         item.focused = true
+	//     //     }
+	//     // })
+	//     if (ind < fRefs.length) {
+	//         fRefs[nextId].focus();
+	//         newPin[nextId].focused = true;
+	//     }
+	//
+	//     setPinArr(newPin)
+	// }
 
 	function handleClickNum(e, i) {
 		let newPin = JSON.parse(JSON.stringify(pinArr));
