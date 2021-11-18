@@ -1,6 +1,6 @@
 import {gql} from "@apollo/client";
 
-export const LIMIT_ORDER_FIELDS = gql`
+export const LimitOrderFieldsFragment = gql`
 	fragment LimitOrderFields on LimitOrder {
 		addrOrder
 		amount

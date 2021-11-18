@@ -33,7 +33,6 @@
 		"freeton": "^0.6.0",
 		"fs": "0.0.1-security",
 		"graphql": "^16.0.1",
-		"graphql-request": "^3.6.1",
 		"hex2ascii": "0.0.3",
 		"lodash.clonedeep": "^4.5.0",
 		"lodash.memoize": "^4.1.2",

@@ -42,14 +42,14 @@ const splitLink = split(
 );
 
 export const store = createStore(rootReducer, composeWithDevTools());
-export const client = new ApolloClient({
+export const apolloClient = new ApolloClient({
 	link: splitLink,
 	cache: new InMemoryCache(),
 });
 
 ReactDOM.render(
 	<Provider store={store}>
-		<ApolloProvider client={client}>
+		<ApolloProvider client={apolloClient}>
 			<BrowserRouter>
 				<StyledEngineProvider injectFirst>
 					<SnackbarProvider
