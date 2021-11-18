@@ -1,6 +1,6 @@
 import "./Assets.scss";
 
-import {gql, useLazyQuery} from "@apollo/client";
+import {useLazyQuery} from "@apollo/client";
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
@@ -9,7 +9,7 @@ import AssetsList from "../../components/AssetsList/AssetsList";
 import MainBlock from "../../components/MainBlock/MainBlock";
 import WithDraw from "../../components/WithDraw/WithDraw";
 import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
-import {LIMIT_ORDER_FIELDS} from "../../graphql/fragments";
+import {LimitOrdersForOwnerQuery} from "../../graphql/queries";
 import useTokensList from "../../hooks/useAssetList";
 // import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 import goToExchange from "../../images/goToExchange.svg";
@@ -31,15 +31,7 @@ function Assets() {
 	const {assetList: tokensList} = useTokensList();
 	const pairList = useSelector((state) => state.walletReducer.pairsList);
 	const [getLimitOrders, {data: limitOrdersData}] = useLazyQuery(
-		gql`
-			${LIMIT_ORDER_FIELDS}
-			query LimitOrdersForOwner($addrOwner: String!) {
-				limitOrders: limitOrdersForOwner(addrOwner: $addrOwner) {
-					...LimitOrderFields
-				}
-			}
-		`,
-		{},
+		LimitOrdersForOwnerQuery,
 	);
 
 	const walletIsConnected = useSelector(

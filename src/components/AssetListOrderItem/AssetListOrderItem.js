@@ -3,7 +3,7 @@ import cls from "classnames";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
 
-import {BA_DIRECTION} from "../../constants/runtimeVariables";
+import {BA_DIRECTION_GRAPHQL} from "../../constants/runtimeVariables";
 import {iconGenerator} from "../../iconGenerator";
 import {
 	openOrderCancelPopup,
@@ -17,7 +17,8 @@ import classes from "./AssetListOrderItem.module.scss";
 export default function AssetListOrderItem({limitOrder}) {
 	const {amount, price, directionPair, addrOrder, pair} = limitOrder;
 	let {aSymbol, bSymbol, aRoot, bRoot} = pair;
-	if (directionPair === BA_DIRECTION) [aSymbol, bSymbol] = [bSymbol, aSymbol];
+	if (directionPair === BA_DIRECTION_GRAPHQL)
+		[aSymbol, bSymbol] = [bSymbol, aSymbol];
 
 	const dispatch = useDispatch();
 	const [fold, setFold] = useState(false);

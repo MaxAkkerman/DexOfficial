@@ -1,15 +1,20 @@
 import "./SwapConfirmPopup.scss";
 
-import {gql, request} from "graphql-request";
 import {useSnackbar} from "notistack";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
 
+import {apolloClient} from "../..";
 import {PAIR_NULL, TOKEN_NULL} from "../../constants/runtimeErrors";
-import {AB_DIRECTION, BA_DIRECTION} from "../../constants/runtimeVariables";
-import Radiance from "../../extensions/Radiance.json";
+import {
+	AB_DIRECTION,
+	AB_DIRECTION_GRAPHQL,
+	BA_DIRECTION,
+	BA_DIRECTION_GRAPHQL,
+} from "../../constants/runtimeVariables";
 import {swapA, swapB} from "../../extensions/sdk_run/run";
 import {decrypt} from "../../extensions/tonUtils";
+import {LimitOrdersForSwapQuery} from "../../graphql/queries";
 import useKeyPair from "../../hooks/useKeyPair";
 import {iconGenerator} from "../../iconGenerator";
 import miniSwap from "../../images/icons/mini-swap.png";
@@ -61,41 +66,21 @@ function SwapConfirmPopup(props) {
 			(p) => fromToken.symbol === p.symbolB && toToken.symbol === p.symbolA,
 		);
 		if (!pairAB && !pairBA) throw new Error(PAIR_NULL);
-		const directionPair = pairAB ? AB_DIRECTION : BA_DIRECTION;
+		const directionPair = pairAB ? BA_DIRECTION : AB_DIRECTION;
 
-		const data = await request(
-			Radiance.networks[2].graphqlUrl,
-			gql`
-				query LimitOrdersForSwap(
-					$addrPair: String!
-					$directionPair: DirectionPair!
-					$amount: Float!
-					$slippage: Float!
-				) {
-					limitOrdersForSwap(
-						addrPair: $addrPair
-						directionPair: $directionPair
-						amount: $amount
-						slippage: $slippage
-					) {
-						leftoverSwap
-						limitOrders {
-							addrOrder
-							amount
-							price
-							priceRaw
-							amountRaw
-						}
-					}
-				}
-			`,
-			{
+		const {data} = await apolloClient.query({
+			query: LimitOrdersForSwapQuery,
+			fetchPolicy: "no-cache",
+			variables: {
 				addrPair: pairId,
-				directionPair: directionPair === AB_DIRECTION ? "AB" : "BA",
-				amount: fromValue,
+				directionPair:
+					directionPair === AB_DIRECTION
+						? AB_DIRECTION_GRAPHQL
+						: BA_DIRECTION_GRAPHQL,
+				amount: toValue,
 				slippage: slippageValue || 0,
 			},
-		);
+		});
 		console.log("request->data", data);
 
 		const processing = [];
@@ -105,7 +90,7 @@ function SwapConfirmPopup(props) {
 					pairAddr: pairId,
 					orderAddr: limitOrder.addrOrder,
 					price: limitOrder.priceRaw,
-					qty: limitOrder.amountRaw,
+					qty: limitOrder.amountRaw * limitOrder.price,
 					directionPair,
 				},
 				{
@@ -117,9 +102,9 @@ function SwapConfirmPopup(props) {
 					enqueueSnackbar({
 						type: "info",
 						message: `Taking limit order ${truncateNum(limitOrder.amount, 2)} ${
-							fromToken.symbol
-						} - ${truncateNum(limitOrder.amount * limitOrder.price)} ${
 							toToken.symbol
+						} - ${truncateNum(limitOrder.amount * limitOrder.price, 2)} ${
+							fromToken.symbol
 						} ⏳`,
 					});
 				})
@@ -129,10 +114,10 @@ function SwapConfirmPopup(props) {
 						message: `Failed limit order take ${truncateNum(
 							limitOrder.amount,
 							2,
-						)} ${fromToken.symbol} - ${truncateNum(
+						)} ${toToken.symbol} - ${truncateNum(
 							limitOrder.amount * limitOrder.price,
 							2,
-						)} ${toToken.symbol} ⏳`,
+						)} ${fromToken.symbol} ⏳`,
 					});
 				});
 			processing.push(promise);

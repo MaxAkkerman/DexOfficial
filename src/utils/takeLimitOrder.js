@@ -1,6 +1,7 @@
 import {Account} from "@tonclient/appkit";
 import {signerKeys} from "@tonclient/core";
 
+import {AB_DIRECTION} from "../constants/runtimeVariables";
 import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
 import client from "../extensions/sdk_get/get";
 import getPair from "./getPair";
@@ -8,7 +9,7 @@ import getTokenRouter from "./getTokenRouter";
 
 export default async function takeLimitOrder(
 	{pairAddr, orderAddr, directionPair, qty, price},
-	{clientAddr, clientKeyPair},
+	{clientAddress, clientKeyPair},
 ) {
 	console.log(
 		"takeLimitOrder->params",
@@ -16,14 +17,14 @@ export default async function takeLimitOrder(
 	);
 
 	const clientAcc = new Account(DEXClientContract, {
-		address: clientAddr,
+		address: clientAddress,
 		client,
 		signer: signerKeys(clientKeyPair),
 	});
 
 	const pair = await getPair(pairAddr);
 	try {
-		if (directionPair === "4") {
+		if (directionPair === AB_DIRECTION) {
 			const routerAddr = await getTokenRouter(pair.rootB);
 			console.log("Router_address->B", routerAddr);
 			const res = await clientAcc.run("takeLimitOrderA", {
