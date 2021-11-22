@@ -84,7 +84,7 @@ function EnterPassword(props) {
 
                 setloadingUserDataIsWaiting(false);
                 dispatch(hideEnterSeedPhraseUnlock());
-                history.push("/wallet");
+                history.push("/swap");
                 return
 
             }
@@ -101,7 +101,7 @@ function EnterPassword(props) {
         }
         setloadingUserDataIsWaiting(false);
         dispatch(hideEnterSeedPhraseUnlock());
-        history.push("/wallet");
+        history.push("/swap");
     }
 
 

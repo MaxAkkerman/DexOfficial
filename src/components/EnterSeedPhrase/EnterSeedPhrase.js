@@ -426,7 +426,7 @@ function EnterSeedPhrase(props) {
             await InitializeClient(clientKeys.public)
             disSetTips("All checks passed, welcome onboard!", "success")
             setloadingUserDataIsWaitingSeed(false);
-            history.push("/wallet");
+            history.push("/swap");
         } else if(validSeedPhrase && validPassword && !existsClientOnRoot.status && notDeployedClientExists) {
             setloadingUserDataIsWaitingSeed(true);
             const dexClientAddress = clientDataPreDeployLS.address
@@ -449,7 +449,7 @@ function EnterSeedPhrase(props) {
             dispatch(showEnterSeedPhrase(false));
             setloadingUserDataIsWaitingSeed(false);
             disSetTips("All checks passed, welcome onboard!", "success")
-            history.push("/wallet");
+            history.push("/swap");
         }else{
             disSetTips("Some error, no such client on root, please use another seed or create new client", "error")
 

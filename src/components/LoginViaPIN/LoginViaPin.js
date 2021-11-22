@@ -106,6 +106,7 @@ function LoginViaPin(props) {
                 }),
             );
             props.setloadingUserData(false)
+            history.push("/swap")
             return
         }
 

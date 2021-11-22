@@ -217,7 +217,7 @@ function Assets() {
 										className={
 											walletIsConnected ? "onHover" : "onHover btn--disabled"
 										}
-										onClick={() => handlePushToExchange()}
+										onClick={walletIsConnected ? () => handlePushToExchange() : null}
 									>
 										<img
 											className="arrow_icons"

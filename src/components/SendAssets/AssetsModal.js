@@ -54,7 +54,7 @@ function AssetsModal() {
 
 	return (
 		<>
-			<div className="select-wrapper">
+			<div className="select-wrapper" onClick={() => handleClose()}>
 				<MainBlock
 					title={"Select a token"}
 					button={<CloseBtn func={() => handleClose()} />}
