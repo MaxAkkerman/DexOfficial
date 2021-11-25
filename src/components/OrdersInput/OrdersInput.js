@@ -1,21 +1,21 @@
-import React, {useEffect, useState} from "react";
-import {useSelector, useDispatch} from "react-redux";
-import {useLocation} from "react-router-dom";
-import {showPopup} from "../../store/actions/app";
-import {setSwapRate} from "../../store/actions/swap";
-import {setPoolRate} from "../../store/actions/pool";
-
-import Select from "../Select/Select";
 import "./OrdersInput.scss";
 
+import React, {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {useLocation} from "react-router-dom";
+
 import {iconGenerator} from "../../iconGenerator";
+import {showPopup} from "../../store/actions/app";
 import {
 	setOrdersFromInputValue,
 	setOrdersToInputValue,
 	showOrdersFromSelect,
 	showOrdersToSelect,
 } from "../../store/actions/limitOrders";
-import getTruncatedNum from "../../utils/getTruncatedNum";
+import {setPoolRate} from "../../store/actions/pool";
+import {setSwapRate} from "../../store/actions/swap";
+import truncateNum from "../../utils/truncateNum";
+import Select from "../Select/Select";
 
 function OrdersInput(props) {
 	const dispatch = useDispatch();
@@ -104,17 +104,13 @@ function OrdersInput(props) {
 	useEffect(() => {
 		if (props.type === "from")
 			// props.type === "from" just to make sure it was called only once
-			dispatch(
-				setOrdersToInputValue(getTruncatedNum(fromInputValue * swapRate)),
-			);
+			dispatch(setOrdersToInputValue(truncateNum(fromInputValue * swapRate)));
 	}, [swapRate]);
 
 	useEffect(() => {
 		if (props.type === "from")
 			// props.type === "from" just to make sure it was called only once
-			dispatch(
-				setOrdersToInputValue(getTruncatedNum(fromInputValue * swapRate)),
-			);
+			dispatch(setOrdersToInputValue(truncateNum(fromInputValue * swapRate)));
 
 		if (props.type === "from") setValue(fromInputValue);
 	}, [fromInputValue]);
@@ -150,10 +146,9 @@ function OrdersInput(props) {
 	function handleChange(event) {
 		const numValue = Number(event.target.value);
 
-		if (props.type === "from") {
+		if (props.type === "from" && props.type !== "to") {
 			setValue(numValue);
 			dispatch(setOrdersFromInputValue(numValue));
-		} else if (props.type === "to") {
 		} else {
 			throw new Error('OrdersInput type can only be "from" or "to"');
 		}
@@ -166,7 +161,7 @@ function OrdersInput(props) {
 		}
 	}
 
-	const [changer, setChanger] = useState(0);
+	const [changer] = useState(0);
 	useEffect(() => {
 		console.log(changer, "changer");
 		if (

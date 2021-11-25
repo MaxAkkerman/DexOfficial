@@ -10,9 +10,8 @@ const {Account} = require("@tonclient/appkit");
 
 require("pidcrypt/aes_cbc");
 
-
 export async function encryptPure(seedPhrase, pin) {
-	console.log("tonUtils",seedPhrase,"pin",pin)
+	console.log("tonUtils", seedPhrase, "pin", pin);
 	const aes = new pidCrypt.AES.CBC();
 	return aes.encryptText(seedPhrase, pin);
 }
@@ -22,11 +21,10 @@ export async function decryptPure(enc, pin) {
 	return aes.decryptText(enc, pin);
 }
 
-export async function verifySeed(seed){
+export async function verifySeed(seed) {
 	return await client.crypto.mnemonic_verify({
 		phrase: seed,
-	})
-
+	});
 }
 export async function encrypt(seedPhrase, pin) {
 	const aes = new pidCrypt.AES.CBC();
@@ -42,11 +40,11 @@ export async function encrypt(seedPhrase, pin) {
 export async function decrypt(enc, pin) {
 	const aes = new pidCrypt.AES.CBC();
 	const decrypted = aes.decryptText(enc, pin);
-	console.log("decrypted",decrypted)
+	console.log("decrypted", decrypted);
 	const mnemonicValid = await client.crypto.mnemonic_verify({
 		phrase: decrypted,
 	});
-	console.log("mnemonicValid",mnemonicValid)
+	console.log("mnemonicValid", mnemonicValid);
 	if (mnemonicValid.valid === false) return {valid: false, phrase: null};
 
 	return {valid: true, phrase: decrypted};

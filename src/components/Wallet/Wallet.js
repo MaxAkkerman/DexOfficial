@@ -8,7 +8,9 @@ function Wallet() {
 	const history = useHistory();
 
 	const clientData = useSelector((state) => state.walletReducer.clientData);
-	const updatedWallet = useSelector((state) => state.walletReducer.updatedWallet);
+	const updatedWallet = useSelector(
+		(state) => state.walletReducer.updatedWallet,
+	);
 
 	return (
 		<div className="wallet">

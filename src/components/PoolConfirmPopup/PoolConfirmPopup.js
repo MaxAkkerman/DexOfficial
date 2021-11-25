@@ -22,7 +22,6 @@ function PoolConfirmPopup(props) {
 
 	const pairId = useSelector((state) => state.poolReducer.pairId);
 
-
 	async function handleSuply() {
 		dispatch(setPoolAsyncIsWaiting(true));
 		props.hideConfirmPopup();
@@ -62,7 +61,6 @@ function PoolConfirmPopup(props) {
 			);
 		}
 	}
-
 
 	return (
 		<div className="popup-wrapper confirm-popup">

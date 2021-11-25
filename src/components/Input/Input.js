@@ -25,14 +25,24 @@ function Input(props) {
 	const dispatch = useDispatch();
 	const location = useLocation();
 
-	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
+	const walletIsConnected = useSelector(
+		(state) => state.appReducer.walletIsConnected,
+	);
 
-	const swapFromSelectIsVisible = useSelector((state) => state.swapReducer.swapFromSelectIsVisible);
-	const swapToSelectIsVisible = useSelector((state) => state.swapReducer.swapToSelectIsVisible);
+	const swapFromSelectIsVisible = useSelector(
+		(state) => state.swapReducer.swapFromSelectIsVisible,
+	);
+	const swapToSelectIsVisible = useSelector(
+		(state) => state.swapReducer.swapToSelectIsVisible,
+	);
 	const revertValue = useSelector((state) => state.swapReducer.revertValue);
 
-	const poolFromSelectIsVisible = useSelector((state) => state.poolReducer.poolFromSelectIsVisible);
-	const poolToSelectIsVisible = useSelector((state) => state.poolReducer.poolToSelectIsVisible);
+	const poolFromSelectIsVisible = useSelector(
+		(state) => state.poolReducer.poolFromSelectIsVisible,
+	);
+	const poolToSelectIsVisible = useSelector(
+		(state) => state.poolReducer.poolToSelectIsVisible,
+	);
 
 	const swapFromToken = useSelector((state) => state.swapReducer.fromToken);
 	const swapToToken = useSelector((state) => state.swapReducer.toToken);
@@ -50,7 +60,6 @@ function Input(props) {
 
 	const [tokenBalance, setTokenBalance] = useState(0);
 	const [incorrectValue, setIncorrect] = useState(false);
-
 
 	useEffect(async () => {
 		if (
@@ -98,7 +107,7 @@ function Input(props) {
 	}, [value, swapRate, poolRate]);
 
 	useEffect(() => {
-		console.log("changer",changer)
+		console.log("changer", changer);
 		if (
 			location.pathname.includes("swap") &&
 			swapFromToken.symbol &&
@@ -200,7 +209,6 @@ function Input(props) {
 			event.preventDefault();
 		}
 	}
-
 
 	return (
 		<>

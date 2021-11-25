@@ -1,42 +1,26 @@
-import React, {useEffect, useState} from "react";
-import {useHistory} from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux";
-import {showPopup} from "../../store/actions/app";
-import MainBlock from "./../../components/MainBlock/MainBlock";
-import SwapBtn from "../../components/SwapBtn/SwapBtn";
 import "./LimitOrder.scss";
+
+import {Stack} from "@mui/material";
+import React, {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {useHistory} from "react-router-dom";
+
+import OrdersInput from "../../components/OrdersInput/OrdersInput";
+import SwapBtn from "../../components/SwapBtn/SwapBtn";
 import {
 	connectToPair,
-	connectToPairDeployWallets,
 	connectToPairStep2DeployWallets,
 	getClientForConnect,
-	setCreator,
 } from "../../extensions/sdk_run/run";
-import {
-	checkClientPairExists,
-	getAllClientWallets,
-	getClientKeys,
-	subscribe,
-} from "../../extensions/sdk_get/get";
-import {
-	setSlippageValue,
-	setSwapAsyncIsWaiting,
-} from "../../store/actions/swap";
-import {decrypt} from "../../extensions/tonUtils";
-import {Box, Stack, TextField, Typography} from "@material-ui/core";
-import OrdersInput from "../../components/OrdersInput/OrdersInput";
-import {
-	hideOrdersConfirmPopup,
-	setOrdersAsyncIsWaiting,
-	setOrdersRate,
-	showOrdersConfirmPopup,
-} from "../../store/actions/limitOrders";
-import SwapConfirmPopup from "../../components/SwapConfirmPopup/SwapConfirmPopup";
-import OrdersConfirmPopup from "../../components/OrdersConfirmPopup/OrdersConfirmPopup";
-import {iconGenerator} from "../../iconGenerator";
-import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
-import useLimitOrderValidation from "../../hooks/useLimitOrderValidation";
 import useKeyPair from "../../hooks/useKeyPair";
+import {iconGenerator} from "../../iconGenerator";
+import {showPopup} from "../../store/actions/app";
+import {
+	openOrderDeployPopup,
+	setOrdersRate,
+} from "../../store/actions/limitOrders";
+import truncateNum from "../../utils/truncateNum";
+import MainBlock from "./../../components/MainBlock/MainBlock";
 
 function LimitOrder() {
 	const history = useHistory();
@@ -60,21 +44,12 @@ function LimitOrder() {
 		(state) => state.limitOrders.ordersAsyncIsWaiting,
 	);
 
-	const encryptedSeedPhrase = useSelector(
-		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
-	);
 	const clientData = useSelector((state) => state.walletReducer.clientData);
-	const seedPhrasePassword = useSelector(
-		(state) => state.enterSeedPhrase.seedPhrasePassword,
-	);
-	const ordersConfirmPopupIsVisible = useSelector(
-		(state) => state.limitOrders.ordersConfirmPopupVisible,
-	);
+
 	const [connectAsyncIsWaiting, setconnectAsyncIsWaiting] = useState(false);
 	const [curExist, setExistsPair] = useState(false);
-	const [slippage, setSlippage] = useState("");
 	const [notDeployedWallets, setNotDeployedWallets] = useState([]);
-	const [connectPairStatusText, setconnectPairStatusText] = useState("");
+	const [, setconnectPairStatusText] = useState("");
 	const [incorrectBalance, setincorrectBalance] = useState(false);
 
 	useEffect(() => {
@@ -108,7 +83,19 @@ function LimitOrder() {
 		}
 		if (fromToken.symbol && toToken.symbol && fromValue) {
 			console.log("3453453495834058dgjfjgfdjg");
-			dispatch(showOrdersConfirmPopup());
+
+			dispatch(
+				openOrderDeployPopup({
+					order: {
+						fromSymbol: fromToken.symbol,
+						toSymbol: toToken.symbol,
+						fromValue,
+						toValue,
+						price: rate,
+						pairId,
+					},
+				}),
+			);
 		} else {
 			dispatch(
 				showPopup({type: "error", message: "Fields should not be empty"}),
@@ -336,9 +323,12 @@ function LimitOrder() {
 								</div>
 
 								{walletIsConnected ? (
-									<button className="btn mainblock-btn btn--disabled" disabled>
+									/**
+									 * ! Used for blocking functionality
+									 * <button className="btn mainblock-btn btn--disabled" disabled>
 										Coming soon
-									</button> //TODO: getCurBtn()
+									</button>*/
+									getCurBtn()
 								) : (
 									<button
 										className="btn mainblock-btn"
@@ -353,8 +343,7 @@ function LimitOrder() {
 									<p className="swap-rate">
 										Price{" "}
 										<span>
-											{parseFloat(rate).toFixed(rate > 0.0001 ? 4 : 6)}{" "}
-											{toToken.symbol}
+											{truncateNum(rate)} {toToken.symbol}
 										</span>{" "}
 										per <span>1 {fromToken.symbol}</span>
 									</p>
@@ -362,14 +351,6 @@ function LimitOrder() {
 							</div>
 						</div>
 					}
-				/>
-			)}
-			{ordersConfirmPopupIsVisible && (
-				<OrdersConfirmPopup hideConfirmPopup={hideOrdersConfirmPopup} />
-			)}
-			{ordersAsyncIsWaiting && (
-				<WaitingPopup
-					text={`Creating limit order of ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`}
 				/>
 			)}
 		</div>

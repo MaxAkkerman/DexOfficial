@@ -5,6 +5,7 @@ export default function useSlippagePopper() {
 	const [slippage, setSlippage] = useState("");
 
 	const handleClick = (event) => {
+		console.log("anchorEl",anchorEl)
 		setAnchorEl(anchorEl ? null : event.currentTarget);
 	};
 

@@ -1,13 +1,28 @@
+import "./SwapConfirmPopup.scss";
+
+import {useSnackbar} from "notistack";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
+
+import {apolloClient} from "../..";
+import {PAIR_NULL, TOKEN_NULL} from "../../constants/runtimeErrors";
+import {
+	AB_DIRECTION,
+	AB_DIRECTION_GRAPHQL,
+	BA_DIRECTION,
+	BA_DIRECTION_GRAPHQL,
+} from "../../constants/runtimeVariables";
 import {swapA, swapB} from "../../extensions/sdk_run/run";
-import {setTips, showPopup} from "../../store/actions/app";
-import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
-import MainBlock from "../MainBlock/MainBlock";
+import {decrypt} from "../../extensions/tonUtils";
+import {LimitOrdersForSwapQuery} from "../../graphql/queries";
+import useKeyPair from "../../hooks/useKeyPair";
 import {iconGenerator} from "../../iconGenerator";
 import miniSwap from "../../images/icons/mini-swap.png";
-import "./SwapConfirmPopup.scss";
-import {decrypt} from "../../extensions/tonUtils";
+import {setTips, showPopup} from "../../store/actions/app";
+import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
+import takeLimitOrder from "../../utils/takeLimitOrder";
+import truncateNum from "../../utils/truncateNum";
+import MainBlock from "../MainBlock/MainBlock";
 
 function SwapConfirmPopup(props) {
 	const dispatch = useDispatch();
@@ -22,125 +37,177 @@ function SwapConfirmPopup(props) {
 	const toValue = useSelector((state) => state.swapReducer.toInputValue);
 
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
-	const pairsList = useSelector((state) => state.walletReducer.pairsList);
+	const pairList = useSelector((state) => state.walletReducer.pairsList);
 	const pairId = useSelector((state) => state.swapReducer.pairId);
 
-	const encryptedSeedPhrase = useSelector((state) => state.enterSeedPhrase.encryptedSeedPhrase);
-	const seedPhrasePassword = useSelector((state) => state.enterSeedPhrase.seedPhrasePassword);
+	const encryptedSeedPhrase = useSelector(
+		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
+	);
+	const seedPhrasePassword = useSelector(
+		(state) => state.enterSeedPhrase.seedPhrasePassword,
+	);
 	const slippageValue = useSelector((state) => state.swapReducer.slippageValue);
+
+	const {enqueueSnackbar} = useSnackbar();
+
+	const clientData = useSelector((state) => state.walletReducer.clientData);
+	const {keyPair} = useKeyPair();
 
 	async function handleSwap() {
 		dispatch(setSwapAsyncIsWaiting(true));
 		props.hideConfirmPopup();
+
 		let decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
-		try {
-			await pairsList.forEach(async (i) => {
-				if (fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
-					console.log("swap fromValue", fromValue);
 
-					let fromtokenData = tokenList.filter(
-						(item) => item.symbol === fromToken.symbol,
-					);
+		const pairAB = pairList.find(
+			(p) => fromToken.symbol === p.symbolA && toToken.symbol === p.symbolB,
+		);
+		const pairBA = pairList.find(
+			(p) => fromToken.symbol === p.symbolB && toToken.symbol === p.symbolA,
+		);
+		if (!pairAB && !pairBA) throw new Error(PAIR_NULL);
+		const directionPair = pairAB ? BA_DIRECTION : AB_DIRECTION;
 
-					let toTokenData = tokenList.filter(
-						(item) => item.symbol === toToken.symbol,
-					);
-					let res = await swapA(
+		const {data} = await apolloClient.query({
+			query: LimitOrdersForSwapQuery,
+			fetchPolicy: "no-cache",
+			variables: {
+				addrPair: pairId,
+				directionPair:
+					directionPair === AB_DIRECTION
+						? AB_DIRECTION_GRAPHQL
+						: BA_DIRECTION_GRAPHQL,
+				amount: toValue,
+				slippage: slippageValue || 0,
+			},
+		});
+		console.log("request->data", data);
+
+		const processing = [];
+		data.limitOrdersForSwap.limitOrders.forEach((limitOrder) => {
+			const promise = takeLimitOrder(
+				{
+					pairAddr: pairId,
+					orderAddr: limitOrder.addrOrder,
+					price: limitOrder.priceRaw,
+					qty: limitOrder.amountRaw * limitOrder.price,
+					directionPair,
+				},
+				{
+					clientAddress: clientData.address,
+					clientKeyPair: keyPair,
+				},
+			)
+				.then(() => {
+					enqueueSnackbar({
+						type: "info",
+						message: `Taking limit order ${truncateNum(limitOrder.amount, 2)} ${
+							toToken.symbol
+						} - ${truncateNum(limitOrder.amount * limitOrder.price, 2)} ${
+							fromToken.symbol
+						} ⏳`,
+					});
+				})
+				.catch(() => {
+					enqueueSnackbar({
+						type: "error",
+						message: `Failed limit order take ${truncateNum(
+							limitOrder.amount,
+							2,
+						)} ${toToken.symbol} - ${truncateNum(
+							limitOrder.amount * limitOrder.price,
+							2,
+						)} ${fromToken.symbol} ⏳`,
+					});
+				});
+			processing.push(promise);
+		});
+		await Promise.all(processing);
+
+		const fromTokenData = tokenList.find(
+			(item) => item.symbol === fromToken.symbol,
+		);
+		const toTokenData = tokenList.find(
+			(item) => item.symbol === toToken.symbol,
+		);
+		if (!fromTokenData || !toTokenData) throw new Error(TOKEN_NULL);
+
+		if (data.limitOrdersForSwap.leftoverSwap !== 0)
+			try {
+				let res = null;
+				if (directionPair === AB_DIRECTION) {
+					res = await swapA(
 						curExt,
 						pairId,
-						fromValue,
+						data.limitOrdersForSwap.leftoverSwap,
 						slippageValue,
 						decrypted.phrase,
-						toValue,
-						fromtokenData[0],
-						toTokenData[0],
+						data.limitOrdersForSwap.leftoverSwap * rate,
+						fromTokenData,
+						toTokenData,
 					);
-					dispatch(setSwapAsyncIsWaiting(false));
-					if (!res.code) {
-						dispatch(
-							setTips({
-								message: `Sended message to blockchain`,
-								type: "info",
-							}),
-						);
-					} else {
-						dispatch(
-							setTips({
-								message: `Something goes wrong - error code ${res.code}`,
-								type: "error",
-							}),
-						);
-					}
-				} else if (
-					fromToken.symbol === i.symbolB &&
-					toToken.symbol === i.symbolA
-				) {
-					let fromtokenData = tokenList.filter(
-						(item) => item.symbol === fromToken.symbol,
-					);
-
-					let toTokenData = tokenList.filter(
-						(item) => item.symbol === toToken.symbol,
-					);
-					let res = await swapB(
+				} else {
+					res = await swapB(
 						curExt,
 						pairId,
-						fromValue,
+						data.limitOrdersForSwap.leftoverSwap,
 						slippageValue,
 						decrypted.phrase,
-						toValue,
-						fromtokenData[0],
-						toTokenData[0],
+						data.limitOrdersForSwap.leftoverSwap * rate,
+						fromTokenData,
+						toTokenData,
 					);
-					dispatch(setSwapAsyncIsWaiting(false));
-					console.log("res", res);
-					if (!res.code) {
-						dispatch(
-							setTips({
-								message: `Sended message to blockchain`,
-								type: "info",
-							}),
-						);
-					} else {
-						dispatch(
-							setTips({
-								message: `Something goes wrong - error code ${res.code}`,
-								type: "error",
-							}),
-						);
-					}
 				}
-			});
-		} catch (e) {
-			switch (e.text) {
-				case "Canceled by user.":
-					dispatch(showPopup({type: "error", message: "Operation canceled."}));
-					break;
-				case "Rejected by user":
-					dispatch(showPopup({type: "error", message: "Operation canceled."}));
-					break;
-				default:
+				console.log("swap(A|B)->res", res);
+
+				if (!res.code)
 					dispatch(
-						showPopup({
-							type: "error",
-							message: "Oops, something went wrong. Please try again.",
+						setTips({
+							message: `Sended message to blockchain`,
+							type: "info",
 						}),
 					);
-					break;
+				else
+					dispatch(
+						setTips({
+							message: `Something goes wrong - error code ${res.code}`,
+							type: "error",
+						}),
+					);
+			} catch (e) {
+				switch (e.text) {
+					case "Canceled by user.":
+						dispatch(
+							showPopup({type: "error", message: "Operation canceled."}),
+						);
+						break;
+					case "Rejected by user":
+						dispatch(
+							showPopup({type: "error", message: "Operation canceled."}),
+						);
+						break;
+					default:
+						dispatch(
+							showPopup({
+								type: "error",
+								message: "Oops, something went wrong. Please try again.",
+							}),
+						);
+						break;
+				}
 			}
-			dispatch(setSwapAsyncIsWaiting(false));
-		}
-		// }
+
+		dispatch(setSwapAsyncIsWaiting(false));
 	}
 
 	function getAmountOut(amountIn) {
 		if (!amountIn) {
 			return 0;
 		}
-		let reserves = pairsList.filter((item) => item.pairAddress === pairId);
+		let reserves = pairList.filter((item) => item.pairAddress === pairId);
 		let rootIn = 0;
 		let rootOut = 0;
-		pairsList.forEach(async (i) => {
+		pairList.forEach(async (i) => {
 			if (fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
 				rootIn = reserves[0].reserveA;
 				rootOut = reserves[0].reservetB;

@@ -41,6 +41,6 @@ export function getDurationFromSeconds(seconds, convertUnit) {
  * @param {number} timestamp
  * @returns {string}
  */
-export function getFormattedDate(timestamp) {
+export function formatDate(timestamp) {
 	return dayjs(Number(timestamp) * 1000).format("DD.MM.YYYY HH:MM");
 }

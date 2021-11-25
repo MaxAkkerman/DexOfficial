@@ -5,9 +5,7 @@ import MainBlock from "../MainBlock/MainBlock";
 import "./StackingConfirmPopup.scss";
 import {decrypt} from "../../extensions/tonUtils";
 import TON from "../../images/tonCrystalDefault.svg";
-import {
-	setShowStakingWaitingPopup,
-} from "../../store/actions/staking";
+import {setShowStakingWaitingPopup} from "../../store/actions/staking";
 import {setTips} from "../../store/actions/app";
 
 function StackingConfirmPopup(props) {
@@ -15,12 +13,22 @@ function StackingConfirmPopup(props) {
 	const curExt = useSelector((state) => state.appReducer.curExt);
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
 
-	const encryptedSeedPhrase = useSelector((state) => state.enterSeedPhrase.encryptedSeedPhrase);
-	const seedPhrasePassword = useSelector((state) => state.enterSeedPhrase.seedPhrasePassword);
+	const encryptedSeedPhrase = useSelector(
+		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
+	);
+	const seedPhrasePassword = useSelector(
+		(state) => state.enterSeedPhrase.seedPhrasePassword,
+	);
 
-	const periodForStacking = useSelector((state) => state.stakingReducer.periodForStacking);
-	const amountForStacking = useSelector((state) => state.stakingReducer.amountForStacking);
-	const apyForLockStake = useSelector((state) => state.stakingReducer.apyForLockStake);
+	const periodForStacking = useSelector(
+		(state) => state.stakingReducer.periodForStacking,
+	);
+	const amountForStacking = useSelector(
+		(state) => state.stakingReducer.amountForStacking,
+	);
+	const apyForLockStake = useSelector(
+		(state) => state.stakingReducer.apyForLockStake,
+	);
 
 	async function handleStake() {
 		props.handleClose();

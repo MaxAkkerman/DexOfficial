@@ -2,16 +2,14 @@ import React, {useState} from "react";
 import {useSelector} from "react-redux";
 import {iconGenerator} from "../../iconGenerator";
 import "./Item.scss";
-import {
-	checkPubKey,
-	mintTokens,
-} from "../../extensions/sdk_get/get";
+import {checkPubKey, mintTokens} from "../../extensions/sdk_get/get";
 import {copyToClipboard, getFullName} from "../../reactUtils/reactUtils";
 
 function Item(props) {
-	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
+	const walletIsConnected = useSelector(
+		(state) => state.appReducer.walletIsConnected,
+	);
 	let curExt = useSelector((state) => state.appReducer.curExt);
-
 
 	const [isVisible, setVisible] = useState(false);
 	const [isVisibleFaucet, setVisibleFaucet] = useState(false);

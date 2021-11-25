@@ -20,7 +20,9 @@ function AssetsModal() {
 	const dispatch = useDispatch();
 	const NFTassets = useSelector((state) => state.walletSeedReducer.NFTassets);
 
-	const liquidityList = useSelector((state) => state.walletReducer.liquidityList);
+	const liquidityList = useSelector(
+		(state) => state.walletReducer.liquidityList,
+	);
 
 	const {assetList} = useAssetList();
 

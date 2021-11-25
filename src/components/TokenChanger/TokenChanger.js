@@ -10,8 +10,12 @@ function TokenChanger(props) {
 	const history = useHistory();
 	const dispatch = useDispatch();
 
-	const tokenForReceiveSetted = useSelector((state) => state.walletSeedReducer.tokenForReceiveSetted);
-	const currentTokenForReceive = useSelector((state) => state.walletSeedReducer.currentTokenForReceive);
+	const tokenForReceiveSetted = useSelector(
+		(state) => state.walletSeedReducer.tokenForReceiveSetted,
+	);
+	const currentTokenForReceive = useSelector(
+		(state) => state.walletSeedReducer.currentTokenForReceive,
+	);
 
 	function handleTouchTokenModal() {
 		history.push("/wallet/receive/receive-modal");

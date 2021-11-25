@@ -38,8 +38,12 @@ function WrapUnwrap(props) {
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 
-	const encryptedSeedPhrase = useSelector((state) => state.enterSeedPhrase.encryptedSeedPhrase);
-	const seedPhrasePassword = useSelector((state) => state.enterSeedPhrase.seedPhrasePassword);
+	const encryptedSeedPhrase = useSelector(
+		(state) => state.enterSeedPhrase.encryptedSeedPhrase,
+	);
+	const seedPhrasePassword = useSelector(
+		(state) => state.enterSeedPhrase.seedPhrasePassword,
+	);
 
 	const [wrapConfirmIsVisible, setWrapConfirmIsVisible] = useState(false);
 	const [noWtonWallet, setNoWtonWallet] = useState(true);
@@ -74,7 +78,6 @@ function WrapUnwrap(props) {
 			setNoWtonWallet(true);
 		}
 	}, [tokenList]);
-
 
 	async function handleDeployWtonWallet() {
 		if (clientData.balance < 4) {

@@ -184,6 +184,10 @@ input[type="number"] {
 	border-radius: 30px;
 	cursor: pointer;
 
+	&:hover {
+		background-color: var(--accent-hover);
+	}
+
 	&-error {
 		display: inline-block;
 		font-family: "Gilroy", sans-serif;
@@ -200,10 +204,6 @@ input[type="number"] {
 		&:hover {
 			background-color: var(--error-hover);
 		}
-	}
-
-	&:hover {
-		background-color: var(--accent-hover);
 	}
 
 	&--disabled {

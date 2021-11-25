@@ -6,6 +6,6 @@ import dayjs from "dayjs";
  * @param {number} timestamp
  * @returns {string}
  */
-export default function getFormattedDate(timestamp) {
+export default function formatDate(timestamp) {
 	return dayjs(timestamp).format("DD MMMM YYYY HH:MM");
 }
