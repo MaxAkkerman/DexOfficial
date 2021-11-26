@@ -5,15 +5,21 @@ import PercentageTextField from "../../components/PercentageTextField/Percentage
 import classNames from "./SlippagePopper.module.scss";
 import cls from "classnames";
 import "./SlippagePopper.scss";
+import {setSlippageValue} from "../../store/actions/swap";
+import {useDispatch, useSelector} from "react-redux";
 
 export default function SlippagePopper({slippageState, popperState}) {
+	const dispatch = useDispatch();
+
 	const {slippage, setSlippage} = slippageState;
+	const slippageValue = useSelector((state) => state.swapReducer.slippageValue);
 
 	const {id, open, anchorEl} = popperState;
 
 	function handleSetSlippage(e) {
 		const newValue = Number(e.target.value.replace("%", ""));
 		setSlippage(newValue);
+		dispatch(setSlippageValue(newValue));
 	}
 
 	return (
@@ -34,7 +40,7 @@ export default function SlippagePopper({slippageState, popperState}) {
 						</div>
 						<PercentageTextField
 							placeholder="2%"
-							value={slippage}
+							value={slippageValue}
 							onChange={handleSetSlippage}
 							sx={{maxWidth: "165px", maxHeight: "45px"}}
 						/>

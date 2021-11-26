@@ -127,6 +127,7 @@ function Swap() {
 	}, [toToken, tokenList, pairId]);
 
 	function handleConfirm() {
+		console.log("popperState",popperState)
 		if (!fromValue && !toValue) return;
 
 		if (fromValue > fromToken.balance) {
@@ -135,7 +136,7 @@ function Swap() {
 			return;
 		}
 		if (fromToken.symbol && toToken.symbol && fromValue) {
-			dispatch(setSlippageValue(slippageState.slippage));
+			// dispatch(setSlippageValue(slippageState.slippage));
 			setSwapConfirmPopupIsVisible(true);
 		} else {
 			dispatch(
@@ -472,7 +473,7 @@ function Swap() {
 			{swapConfirmPopupIsVisible && (
 				<SwapConfirmPopup
 					hideConfirmPopup={setSwapConfirmPopupIsVisible.bind(this, false)}
-					slippage={slippageState.slippage}
+					// slippage={slippageState.slippage}
 				/>
 			)}
 			{connectAsyncIsWaiting && (
