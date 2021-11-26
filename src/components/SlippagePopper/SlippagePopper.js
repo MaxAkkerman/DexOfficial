@@ -7,26 +7,32 @@ import cls from "classnames";
 import "./SlippagePopper.scss";
 import {setSlippageValue} from "../../store/actions/swap";
 import {useDispatch, useSelector} from "react-redux";
+import {useState} from "react";
 
-export default function SlippagePopper({slippageState, popperState}) {
+export default function SlippagePopper(props) {
 	const dispatch = useDispatch();
 
-	const {slippage, setSlippage} = slippageState;
+	// const {slippage, setSlippage} = slippageState;
 	const slippageValue = useSelector((state) => state.swapReducer.slippageValue);
 
-	const {id, open, anchorEl} = popperState;
+	// const {id, open, anchorEl} = popperState;
+	function handleClick(e){
+		e.stopPropagation();
 
+	}
 	function handleSetSlippage(e) {
+
 		const newValue = Number(e.target.value.replace("%", ""));
-		setSlippage(newValue);
+		// setSlippage(newValue);
 		dispatch(setSlippageValue(newValue));
 	}
 
 	return (
 		<Popper
-			id={id}
-			open={open}
-			anchorEl={anchorEl}
+			onClick={(e)=>handleClick(e)}
+			id={props.id}
+			open={props.open}
+			anchorEl={props.anchorEl}
 			placement="bottom-start"
 			style={{zIndex: 1}}
 		>

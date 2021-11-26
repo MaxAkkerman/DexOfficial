@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useHistory} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {setTips, showPopup} from "../../store/actions/app";
@@ -47,6 +47,7 @@ function Swap() {
 
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
+	const slippageValue = useSelector((state) => state.swapReducer.slippageValue);
 
 	const fromToken = useSelector((state) => state.swapReducer.fromToken);
 	const toToken = useSelector((state) => state.swapReducer.toToken);
@@ -70,7 +71,7 @@ function Swap() {
 	const [errors, setErrors] = useState({});
 	const [isError, setIsError] = useState(true);
 
-	const {slippageState, popperState} = useSlippagePopper();
+	// const {slippageState, popperState} = useSlippagePopper();
 	const {keyPair} = useKeyPair();
 	const {assetList} = useAssetList();
 
@@ -127,7 +128,6 @@ function Swap() {
 	}, [toToken, tokenList, pairId]);
 
 	function handleConfirm() {
-		console.log("popperState",popperState)
 		if (!fromValue && !toValue) return;
 
 		if (fromValue > fromToken.balance) {
@@ -315,13 +315,60 @@ function Swap() {
 			}
 		}
 	}
+	const[op,setop] = useState(false)
 
+	// const [slippage, setSlippage] = useState("2");
+
+	const [anchorEl, setAnchorEl] = useState(null);
+
+	function handleClickOpenPop(ev) {
+		// console.log("popper",ev.currentTarget.id)
+		// console.log("popper2",ev.target.id)
+		ev.stopPropagation();
+
+		if(ev.currentTarget.id !== "popBtn"){
+			console.log("popper",ev.currentTarget.id)
+			setop(false)
+		}else{
+
+			console.log("popper",ev.currentTarget.id, "op",op)
+
+			setop(!op)
+		}
+
+	}
+	const popper = useRef(null)
+
+	// const open = Boolean(anchorEl);
+	useEffect(()=>{
+		if(op){
+			// setOpenPop(true)
+			setAnchorEl(popper.current);
+			setIdPop("simple-popper")
+		}else{
+			// setOpenPop(false)
+			setAnchorEl(null);
+			setIdPop(undefined)
+
+		}
+
+
+
+	},[op])
+
+	// const [openPop,setOpenPop] = useState(false)
+	const [idPop,setIdPop] = useState(undefined)
+
+	// function handler(){
+	// 	console.log("ya")
+	// 	setop(!op)
+	// }
 	useEffect(() => {
 		if (fromToken && toToken) validate(fromValue, toValue, fromToken, toToken);
 	}, [fromValue, toValue, fromToken, toToken]);
 
 	return (
-		<div className="container" onClick={()=>popperState.handleClick}>
+		<div className="container" id={"cont"} onClick={(e)=>handleClickOpenPop(e)}>
 			{!swapAsyncIsWaiting && !connectAsyncIsWaiting && (
 				<MainBlock
 					style={{
@@ -342,9 +389,11 @@ function Swap() {
 
 								<div className={"settings_btn_container"}>
 									<button
-										aria-describedby={popperState.id}
+										id={"popBtn"}
+										aria-describedby={idPop}
+										ref={popper}
 										className="settings_btn"
-										onClick={popperState.handleClick}
+										onClick={(e)=>handleClickOpenPop(e)}
 									>
 										<img src={settingsBtn} alt={"settings"} />
 									</button>
@@ -406,8 +455,12 @@ function Swap() {
 									</FormHelperText>
 								)}
 								<SlippagePopper
-									slippageState={slippageState}
-									popperState={popperState}
+									// slippageState={slippageState}
+									// popperState={popperState}
+									id={idPop}
+									open={op}
+									anchorEl={anchorEl}
+									// op={op}
 								/>
 								{fromToken.symbol && toToken.symbol && (
 									<p className="swap-rate">
@@ -438,7 +491,7 @@ function Swap() {
 										{parseFloat(
 											(
 												toValue -
-												(toValue * slippageState.slippage) / 100
+												(toValue * slippageValue) / 100
 											).toFixed(4),
 										)}{" "}
 										{toToken.symbol}
