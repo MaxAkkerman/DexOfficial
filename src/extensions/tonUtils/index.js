@@ -17,8 +17,9 @@ export async function encryptPure(seedPhrase, pin) {
 }
 
 export async function decryptPure(enc, pin) {
+	console.log("decryptPure",enc, pin)
 	const aes = new pidCrypt.AES.CBC();
-	return aes.decryptText(enc, pin);
+	return aes.decryptText(enc, pin.toString());
 }
 
 export async function verifySeed(seed) {

@@ -113,6 +113,8 @@ function EnterSeedPhrase(props) {
     });
     useUnmount(() => {
         window.removeEventListener("paste", checkClipboardSeedPhrase);
+        // clearState()
+
     });
 
     const [seedPhraseString, setSeedPhraseString] = useState(``);
@@ -132,11 +134,11 @@ function EnterSeedPhrase(props) {
             let arr = []
             seedPhrase.map(item => arr.push(item.seed))
             seedString = arr.join(" ")
+            setSeedPhraseString(seedString);
             return seedString
         } else {
             return null
         }
-
     }
 
     function clearState() {
@@ -193,6 +195,7 @@ function EnterSeedPhrase(props) {
                 msg: `It remains to enter the Encryption password to complete the wallet setup.`
             });
             setseedGlobValid(true)
+
         }
         setSeedPhrase(newSeedArr)
     }
@@ -212,7 +215,6 @@ function EnterSeedPhrase(props) {
         }
 
         const verStatus = await verifySeed(seedPhraseString);
-
         if (!verStatus) {
             disSetTips(
                 "Some error, seed phrase or password not valid, please retry",
@@ -227,23 +229,26 @@ function EnterSeedPhrase(props) {
         let verifSeedFromLS;
         let notDeployedClientExists;
         if (clientDataPreDeployLS) {
+            console.log("verifSeedFromLS",verifSeedFromLS,"clientDataPreDeployLS.esp",clientDataPreDeployLS.esp,"seedPhrasePassword",seedPhrasePassword,"seedPhraseString",seedPhraseString)
             verifSeedFromLS = await decryptPure(
                 clientDataPreDeployLS.esp,
                 seedPhrasePassword,
             );
             notDeployedClientExists = verifSeedFromLS === seedPhraseString;
         }
-
+console.log("seedGlobValid",seedGlobValid,"validPassword",validPassword,"existsClientOnRoot.status",existsClientOnRoot.status,"notDeployedClientExists",notDeployedClientExists)
         if (seedGlobValid && validPassword && existsClientOnRoot.status) {
             // dispatch(showEnterSeedPhrase(false));
-            history.push("/swap");
             props.handleCLoseEntSeed(false)
             props.setloadingUserData(true);
-            clearState()
-            await handleSetEncription();
+            history.push("/swap");
+            await handleSetEncription(seedPhraseString,seedPhrasePassword);
             disSetTips("All checks passed, welcome onboard!", "success");
             await InitializeClient(clientKeys.public);
             props.setloadingUserData(false);
+            clearState()
+
+
         } else if (
             seedGlobValid &&
             validPassword &&
@@ -264,16 +269,15 @@ function EnterSeedPhrase(props) {
                 }),
             );
 
-            clearState()
             dispatch(setTransactionsList([]));
-            await handleSetEncription();
-
-
-
+            await handleSetEncription(seedPhraseString,seedPhrasePassword);
             disSetTips("All checks passed, welcome onboard!", "success");
 
             props.setloadingUserData(false);
             dispatch(setWalletIsConnected(false));
+
+            clearState()
+
             history.push("/swap");
         } else {
             disSetTips(
@@ -283,10 +287,14 @@ function EnterSeedPhrase(props) {
         }
     }
 
-    async function handleSetEncription() {
-        let encrypted = await encrypt(seedPhraseString, seedPhrasePassword);
-        dispatch(setSeedPassword(seedPhrasePassword));
+    async function handleSetEncription(seedPhraseString2,seedPhrasePassword2) {
+        let encrypted = await encrypt(seedPhraseString2, seedPhrasePassword2);
+        dispatch(setSeedPassword(seedPhrasePassword2));
         dispatch(enterSeedPhraseSaveToLocalStorage(encrypted));
+        localStorage.setItem("seedPhraseString2", seedPhraseString2);
+        localStorage.setItem("seedPhrasePassword2", seedPhrasePassword2);
+
+
     }
 
 
@@ -297,7 +305,6 @@ function EnterSeedPhrase(props) {
     }
 
     function passwordChange(event) {
-        console.log("seedGlobValid && validPassword", seedGlobValid, validPassword)
         let password = event.target.value;
 
         if (event.target.value === '' || onlyNums.test(password)) {
@@ -331,7 +338,7 @@ function EnterSeedPhrase(props) {
     }
 
     return (
-        <div className="select-wrapper">
+        <div className="select-wrapper" onClick={()=>console.log("seedPhrase",seedPhrase)}>
 
             <MainBlock
                 title={`Enter seed phrase`}

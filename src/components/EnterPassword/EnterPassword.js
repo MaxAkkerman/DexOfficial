@@ -43,6 +43,7 @@ function EnterPassword(props) {
 	async function login(e) {
 		let esp = localStorage.getItem("esp");
 		let clientDataLS = JSON.parse(localStorage.getItem("clientData"));
+		let clientDataPreDeploy = JSON.parse(localStorage.getItem("clientDataPreDeploy"));
 
 		let decrypted = await decrypt(esp, seedPhrasePassword);
 		const clientKeys = await getClientKeys(decrypted.phrase);
@@ -67,8 +68,8 @@ function EnterPassword(props) {
 				"clientDataLS.status",
 				clientDataLS.status,
 			);
-			if (!clientDataLS.status && clientDataLS.dexclient) {
-				const dexClientAddress = clientDataLS.dexclient;
+			if (!clientDataLS.status && clientDataPreDeploy.address) {
+				const dexClientAddress = clientDataPreDeploy.address;
 				const dexClientBalance = await getClientBalance(dexClientAddress);
 				console.log("i am here");
 				dispatch(

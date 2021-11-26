@@ -102,8 +102,10 @@ function LoginViaPin(props) {
 
 			dispatch(setTransactionsList([]));
 
-			const encClData = await encryptPure(clientPrepData.secret, pin);
-			const encClDataSeed = await encryptPure(phrase, pin);
+			const encClData = await encryptPure(clientPrepData.secret, pinString);
+			console.log("pinpin",phrase, pinString)
+
+			const encClDataSeed = await encryptPure(phrase, pinString);
 
 			const encrData = JSON.parse(JSON.stringify(clientPrepData));
 			encrData.secret = encClData;
