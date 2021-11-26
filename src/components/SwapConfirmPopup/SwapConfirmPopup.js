@@ -54,6 +54,7 @@ function SwapConfirmPopup(props) {
 	const {keyPair} = useKeyPair();
 
 	async function handleSwap() {
+		console.log("slippageValue",slippageValue)
 		dispatch(setSwapAsyncIsWaiting(true));
 		props.hideConfirmPopup();
 
@@ -328,7 +329,7 @@ function SwapConfirmPopup(props) {
 							least{" "}
 							<span>
 								{parseFloat(
-									(toValue - (toValue * props.slippage) / 100).toFixed(4),
+									(toValue - (toValue * slippageValue) / 100).toFixed(4),
 								)}{" "}
 								{toToken.symbol}
 							</span>{" "}

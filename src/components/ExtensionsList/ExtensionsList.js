@@ -21,9 +21,10 @@ function ExtensionsList() {
 	const extensionsList = useSelector(
 		(state) => state.appReducer.extensionsList,
 	);
-	const enterSeedPhraseIsVisible = useSelector(
-		(state) => state.enterSeedPhrase.enterSeedPhraseIsVisible,
-	);
+	// const enterSeedPhraseIsVisible = useSelector(
+	// 	(state) => state.enterSeedPhrase.enterSeedPhraseIsVisible,
+	// );
+	const [enterSeedPhraseIsVisible, setenterSeedPhraseIsVisible] = useState(false);
 
 	const [loadingUserData, setloadingUserData] = useState(false);
 	const [loginViaPinIsVisible, setloginViaPinIsVisible] = useState(false);
@@ -90,7 +91,7 @@ function ExtensionsList() {
 										marginBottom: "40px",
 									}}
 									className="btn wallet-btn"
-									onClick={() => dispatch(showEnterSeedPhrase(true))}
+									onClick={()=>setenterSeedPhraseIsVisible(true)}
 								>
 									Login using Seed Phrase
 								</button>
@@ -101,10 +102,15 @@ function ExtensionsList() {
 								>
 									Create a new Seed Phrase and Wallet
 								</button>
-								{enterSeedPhraseIsVisible && <EnterSeedPhrase />}
+								{enterSeedPhraseIsVisible &&
+								<EnterSeedPhrase
+									setloadingUserData={(bl) => setloadingUserData(bl)}
+									handleCLoseEntSeed={()=>setenterSeedPhraseIsVisible(false)}
+								/>}
 								{loginViaPinIsVisible && (
 									<LoginViaPin
 										setloadingUserData={(bl) => setloadingUserData(bl)}
+										handleCloseLogin={()=>setloginViaPinIsVisible(false)}
 									/>
 								)}
 								{loadingUserData ? (

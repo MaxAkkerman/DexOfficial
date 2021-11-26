@@ -33,7 +33,7 @@ const initialState = {
 	swapToSelectIsVisible: false,
 	swapAsyncIsWaiting: false,
 	revertValue: 0,
-	slippageValue: null,
+	slippageValue: 2,
 };
 
 const swapReducer = (state = initialState, {type, payload}) => {

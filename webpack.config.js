@@ -17,8 +17,9 @@ module.exports = {
 		historyApiFallback: true,
 		hot: true,
 	},
-	entry: ["babel-polyfill", path.join(__dirname, "./src/")],
+		entry: ["babel-polyfill", path.join(__dirname, "./src/")],
 	output: {
+		hashFunction: "sha256",
 		path: path.join(__dirname, "./build"),
 		filename: "main.js",
 	},

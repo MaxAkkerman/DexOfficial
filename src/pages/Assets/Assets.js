@@ -34,9 +34,7 @@ function Assets() {
 		LimitOrdersForOwnerQuery,
 	);
 
-	const walletIsConnected = useSelector(
-		(state) => state.appReducer.walletIsConnected,
-	);
+	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
 	const [showWrapMenu, setshowWrapMenu] = useState(false);
 	const [currentTokenForWrap, setcurrentTokenForWrap] = useState({});
 	const [viewData, setViewData] = useState({});
@@ -66,6 +64,7 @@ function Assets() {
 	}
 
 	function handleGoToSettings() {
+		console.log("clientData",clientData)
 		history.push("/wallet/settings");
 	}
 
@@ -169,12 +168,12 @@ function Assets() {
 										</button>
 										<button
 											className={
-												walletIsConnected
+												(clientData.address || walletIsConnected)
 													? "settings_btn"
 													: "settings_btn btn--disabled"
 											}
 											onClick={
-												walletIsConnected ? () => handleGoToSettings() : null
+												(clientData.address || walletIsConnected) ? () => handleGoToSettings() : null
 											}
 										>
 											<img src={settingsBtn} alt={"settings"} />
@@ -266,7 +265,8 @@ function Assets() {
 									>
 										Connect wallet
 									</button>
-								)}
+)}
+
 							</div>
 						}
 					/>

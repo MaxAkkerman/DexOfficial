@@ -153,7 +153,7 @@ function App() {
 	});
 
 	useEffect(async () => {
-		console.log("clientData", clientData);
+		console.log(" useeffect agregateQueryNFTassets")
 		const NFTassets = await agregateQueryNFTassets(clientData.address);
 		// setAssets(NFTassets)
 		dispatch(setNFTassets(NFTassets));
@@ -214,6 +214,7 @@ function App() {
 	);
 
 	useEffect(async () => {
+		console.log(" useeffect getLimitOrders")
 		if (clientData && clientData.address && !called)
 			getLimitOrders({variables: {addrOwner: clientData.address}});
 	}, [clientData]);
@@ -368,6 +369,12 @@ function App() {
 							path="/wallet/send/send-modal"
 							component={AssetsModal}
 						/>
+					</>
+				) : null}
+				{(!walletIsConnected && clientData.address && !clientData.status) ? (
+					<>
+						<Route exact path="/wallet/settings/keys" component={KeysBlock} />
+						<Route exact path="/wallet/settings" component={WalletSettings} />
 					</>
 				) : null}
 			</Switch>

@@ -49,17 +49,18 @@ function AssetsModal() {
 	function handleSearch(text) {
 		setFilter(text);
 	}
-	function handleClose() {
+	function handleClose(e) {
+		e.stopPropagation()
 		dispatch(setInputNFTDisabled(null));
 		history.push("/wallet/send");
 	}
 
 	return (
 		<>
-			<div className="select-wrapper">
+			<div className="select-wrapper" onClick={() => handleClose()}>
 				<MainBlock
 					title={"Select a token"}
-					button={<CloseBtn func={() => handleClose()} />}
+					button={<CloseBtn func={(e) => handleClose(e)} />}
 					content={
 						<>
 							<SearchInput func={(e) => handleSearch(e)} />

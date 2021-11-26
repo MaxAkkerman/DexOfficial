@@ -9,7 +9,7 @@ import {prepareClientDataForDeploy} from "../../extensions/sdk_run/run";
 import {encrypt, encryptPure} from "../../extensions/tonUtils";
 import {setTips} from "../../store/actions/app";
 import {
-	enterSeedPhraseSaveToLocalStorage,
+	enterSeedPhraseSaveToLocalStorage, setSeedPassword,
 	showEnterSeedPhrase,
 } from "../../store/actions/enterSeedPhrase";
 import {
@@ -20,8 +20,10 @@ import {
 } from "../../store/actions/wallet";
 import PinPopup from "./PinPopup";
 import WelcomePopup from "./WelcomePopup";
+import {useHistory} from "react-router-dom";
 
 function LoginViaPin(props) {
+	const history = useHistory();
 	const dispatch = useDispatch();
 
 	const pin = useSelector((state) => state.walletReducer.pin);
@@ -76,6 +78,8 @@ function LoginViaPin(props) {
 				pinString += item.value;
 			});
 			const pinNum = Number(pinString);
+			//TODO check pass
+			dispatch(setSeedPassword(pinNum));
 
 			let {phrase} = await client.crypto.mnemonic_from_random({
 				word_count: 12,
@@ -98,8 +102,10 @@ function LoginViaPin(props) {
 
 			dispatch(setTransactionsList([]));
 
-			const encClData = await encryptPure(clientPrepData.secret, pin);
-			const encClDataSeed = await encryptPure(phrase, pin);
+			const encClData = await encryptPure(clientPrepData.secret, pinString);
+			console.log("pinpin",phrase, pinString)
+
+			const encClDataSeed = await encryptPure(phrase, pinString);
 
 			const encrData = JSON.parse(JSON.stringify(clientPrepData));
 			encrData.secret = encClData;
@@ -118,6 +124,7 @@ function LoginViaPin(props) {
 				}),
 			);
 			props.setloadingUserData(false);
+			history.push("/swap")
 			return;
 		}
 
@@ -162,7 +169,7 @@ function LoginViaPin(props) {
 	}
 
 	function handleClose() {
-		dispatch(showEnterSeedPhrase(false));
+		props.handleCloseLogin()
 	}
 
 	function handleSignAgreement(bl) {
@@ -231,6 +238,7 @@ function LoginViaPin(props) {
 			) : null}
 		</>
 	);
+
 }
 
 export default LoginViaPin;

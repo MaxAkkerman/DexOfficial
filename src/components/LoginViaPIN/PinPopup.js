@@ -3,14 +3,13 @@ import "./PinPopup.scss";
 import {Grid} from "@material-ui/core";
 import React, {useEffect, useState} from "react";
 
-import {numPadArr, pincodeArray} from "../../constants/defaultData";
+import {numPadArr, onlyNums, pincodeArray} from "../../constants/defaultData";
 import arrowBack from "../../images/arrowBack.png";
 import MainBlock from "../MainBlock/MainBlock";
 import {NextBtn} from "./NextBtn";
 import PinKeyboard from "./PinKeyboard";
 import Steppers from "./Steppers";
 
-const pattern = "[0-9]+";
 
 function PinPopup(props) {
 	const [pinArr, setPinArr] = useState(pincodeArray);
@@ -121,7 +120,7 @@ function PinPopup(props) {
 			if (backIndex < fRefs.length) fRefs[backIndex].focus();
 			return;
 		}
-		if (!e.key.match(pattern)) return;
+		if (!e.key.match(onlyNums)) return;
 		newPin[i].value = e.key;
 		newPin[i].focused = false;
 		if (forwardIndex < fRefs.length) {
