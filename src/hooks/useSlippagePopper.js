@@ -2,7 +2,7 @@ import {useState} from "react";
 
 export default function useSlippagePopper() {
 	const [anchorEl, setAnchorEl] = useState(null);
-	const [slippage, setSlippage] = useState("");
+	const [slippage, setSlippage] = useState("2");
 
 	const handleClick = (event) => {
 		console.log("anchorEl",anchorEl)
