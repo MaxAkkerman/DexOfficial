@@ -1,17 +1,15 @@
-import "./index.scss";
-
+import PropTypes from "prop-types";
 import React from "react";
-import {useDispatch} from "react-redux";
 
-function CloseBtn(props) {
-	const dispatch = useDispatch();
+import classes from "./index.module.scss";
 
+export default function CloseBtn({height, onClick, width}) {
 	return (
 		<svg
-			onClick={() => dispatch(props.func())}
-			className="close"
-			width={props.width ? props.width : "26"}
-			height={props.height ? props.height : "26"}
+			onClick={onClick}
+			className={classes.close}
+			width={width}
+			height={height}
 			viewBox="0 0 26 26"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
@@ -25,4 +23,14 @@ function CloseBtn(props) {
 	);
 }
 
-export default CloseBtn;
+CloseBtn.propTypes = {
+	height: PropTypes.number,
+	onClick: PropTypes.func,
+	width: PropTypes.number,
+};
+
+CloseBtn.defaultProps = {
+	height: 26,
+	onClick: () => {},
+	width: 26,
+};
