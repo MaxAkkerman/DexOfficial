@@ -66,12 +66,3 @@
 		}
 	}
 }
-
-.select-item-wrapper2 {
-	&:hover {
-		.select-item-title,
-		.select-item-descr {
-			color: var(--accent);
-		}
-	}
-}
