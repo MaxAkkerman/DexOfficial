@@ -1,7 +1,7 @@
 {
 	"parser": "@babel/eslint-parser",
 	"extends": ["eslint:recommended", "plugin:react/recommended"],
-	"plugins": ["simple-import-sort"],
+	"plugins": ["simple-import-sort", "sort-destructure-keys"],
 	"env": {
 		"browser": true,
 		"node": true,
@@ -10,6 +10,8 @@
 	},
 	"rules": {
 		"simple-import-sort/imports": "error",
-		"simple-import-sort/exports": "error"
+		"simple-import-sort/exports": "error",
+		"sort-keys": "error",
+		"sort-destructure-keys/sort-destructure-keys": "error"
 	}
 }
