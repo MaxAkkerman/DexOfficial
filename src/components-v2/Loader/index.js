@@ -1,10 +1,10 @@
-import "./index.scss";
-
 import React from "react";
 
-function Loader() {
+import classes from "./index.module.scss";
+
+export default function Loader() {
 	return (
-		<div className="loader">
+		<div className={classes.loader}>
 			<div></div>
 			<div></div>
 			<div></div>
@@ -12,5 +12,3 @@ function Loader() {
 		</div>
 	);
 }
-
-export default Loader;
