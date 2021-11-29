@@ -1,63 +1,64 @@
 import "./index.scss";
 
+import {FormHelperText} from "@mui/material";
+import cls from "classnames";
 import PropTypes from "prop-types";
-import React, {useState} from "react";
+import React, {useMemo, useRef} from "react";
+import {useSelector} from "react-redux";
 
 import {iconGenerator} from "@/iconGenerator";
 import truncateNum from "@/utils/truncateNum";
 
-export default function Input(props) {
-	const [value, setValue] = useState(props.value);
-
-	const [incorrectValue, setIncorrect] = useState(false);
-
-	function handleKeyPress(event) {
-		if (event.key === "-" || event.key === "+") {
-			event.preventDefault();
-		}
-	}
+export default function Input({
+	autoFocus,
+	error,
+	helperText,
+	label,
+	name,
+	onSelectToken,
+	onValueChange,
+	readOnly,
+	value,
+	walletAddress,
+}) {
+	const tokenList = useSelector((state) => state.walletReducer.tokenList);
+	const currentToken = useMemo(
+		() => tokenList.find((t) => t.walletAddress === walletAddress),
+		[tokenList, walletAddress],
+	);
+	const inputRef = useRef(null);
 
 	return (
 		<>
 			<div
 				className="input"
 				style={{
-					borderColor: props.error
-						? "var(--error)"
-						: "var(--input-border-color)",
+					borderColor: error ? "var(--error)" : "var(--input-border-color)",
 				}}
 			>
 				<div className="input-wrapper">
-					<span className="input-title">{props.label}</span>
-					<span
-						className={
-							incorrectValue ? "input-balance incorBalance " : "input-balance"
-						}
-					>
-						{props.token && `Balance: ${truncateNum(props.token.balance)}`}
+					<span className="input-title">{label}</span>
+					<span className={cls("input-balance", {incorBalance: error})}>
+						{currentToken && `Balance: ${truncateNum(currentToken.balance)}`}
 					</span>
 				</div>
 				<div className="input-wrapper">
 					<input
 						type="number"
-						className={
-							props.value > 0 ? "input-field" : "input-field input-field--zero"
-						}
+						className="input-field"
+						name={name}
 						value={value}
 						onChange={(event) => {
-							const newValue = event.target.value;
-							setValue(newValue);
-							props.onValueChange(newValue);
+							onValueChange(event);
 						}}
-						onKeyPress={(event) => handleKeyPress(event)}
-						min={0}
-						autoFocus={props.autoFocus}
+						autoFocus={autoFocus}
 						placeholder="0"
-						readOnly={props.readOnly}
+						readOnly={readOnly}
+						ref={inputRef}
 					/>
 
-					{!props.token ? (
-						<button className="btn input-btn" onClick={props.onSelectToken}>
+					{!currentToken ? (
+						<button className="btn input-btn" onClick={onSelectToken}>
 							Select a token
 							<svg
 								width="16"
@@ -76,19 +77,21 @@ export default function Input(props) {
 						<>
 							<button
 								className="input-max"
-								onClick={() =>
-									setValue(parseFloat(props.token.balance).toFixed(4))
-								}
+								onClick={() => {
+									inputRef.current.value = currentToken.balance.toFixed(4);
+									const event = new Event("input", {bubbles: true});
+									inputRef.current.dispatchEvent(event);
+								}}
 							>
 								MAX
 							</button>
-							<button className="input-select" onClick={props.onSelectToken}>
+							<button className="input-select" onClick={onSelectToken}>
 								<img
-									src={iconGenerator(props.token.symbol)}
-									alt={props.token.symbol}
+									src={iconGenerator(currentToken.symbol)}
+									alt={currentToken.symbol}
 									className="input-token-img"
 								/>
-								<span>{props.token && props.token.symbol}</span>
+								<span>{currentToken && currentToken.symbol}</span>
 								<svg
 									width="16"
 									height="10"
@@ -106,29 +109,32 @@ export default function Input(props) {
 					)}
 				</div>
 			</div>
+			{helperText && (
+				<FormHelperText error={error} sx={{marginLeft: "27px"}}>
+					{helperText}
+				</FormHelperText>
+			)}
 		</>
 	);
 }
 
 Input.propTypes = {
-	label: PropTypes.string.isRequired,
-	readOnly: PropTypes.bool,
 	autoFocus: PropTypes.bool,
-	value: PropTypes.number.isRequired,
-	onValueChange: PropTypes.func.isRequired,
-	token: PropTypes.exact({
-		symbol: PropTypes.string.isRequired,
-		balance: PropTypes.number.isRequired,
-	}),
-	onSelectToken: PropTypes.func.isRequired,
 	error: PropTypes.bool,
 	helperText: PropTypes.string,
+	label: PropTypes.string.isRequired,
+	name: PropTypes.string.isRequired,
+	onSelectToken: PropTypes.func.isRequired,
+	onValueChange: PropTypes.func.isRequired,
+	readOnly: PropTypes.bool,
+	value: PropTypes.number.isRequired,
+	walletAddress: PropTypes.string,
 };
 
 Input.defaultProps = {
-	readOnly: false,
 	autoFocus: false,
-	token: null,
 	error: false,
-	helperText: "",
+	helperText: "Type numeric value",
+	readOnly: false,
+	walletAddress: null,
 };
