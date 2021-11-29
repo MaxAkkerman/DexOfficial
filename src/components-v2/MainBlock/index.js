@@ -1,59 +1,61 @@
 import "./index.scss";
 
+import cls from "classnames";
+import PropTypes from "prop-types";
 import React from "react";
 
-function MainBlock({
-	smallTitle,
-	normalTitle,
+export default function MainBlock({
+	button: Button,
 	class: className,
-	title,
-	button,
 	classHeader,
 	classTitle,
 	content,
 	footer,
+	normalTitle,
+	smallTitle,
+	title,
 	...rest
 }) {
-	function classGenerator() {
-		let str = "mainblock-title";
-
-		if (smallTitle) {
-			str += " mainblock-title--small";
-		}
-		if (normalTitle) {
-			str += " mainblock-title--normal";
-		}
-
-		return str;
-	}
-
 	return (
-		<div
-			className={className ? className + " mainblock" : "mainblock"}
-			{...rest}
-		>
-			{(title || button) && (
-				<div
-					className={
-						classHeader ? classHeader + " mainblock-header" : "mainblock-header"
-					}
-				>
+		<div className={cls("mainblock", className)} {...rest}>
+			{(title || Button) && (
+				<div className={cls("mainblock-header", classHeader)}>
 					<h2
-						className={
-							classTitle
-								? `${classTitle} ` + classGenerator()
-								: classGenerator()
-						}
+						className={cls("mainblock-title", classTitle, {
+							"mainblock-title--normal": normalTitle,
+							"mainblock-title--small": smallTitle,
+						})}
 					>
 						{title}
 					</h2>
-					{button && button}
+					<Button className="mainblock-btn" />
 				</div>
 			)}
 			{content}
-			{footer && footer}
+			{footer}
 		</div>
 	);
 }
 
-export default MainBlock;
+MainBlock.propTypes = {
+	button: PropTypes.element,
+	class: PropTypes.string,
+	classHeader: PropTypes.string,
+	classTitle: PropTypes.string,
+	content: PropTypes.element.isRequired,
+	footer: PropTypes.element,
+	normalTitle: PropTypes.string,
+	smallTitle: PropTypes.string,
+	title: PropTypes.string,
+};
+
+MainBlock.defaultProps = {
+	button: null,
+	class: null,
+	classHeader: null,
+	classTitle: null,
+	footer: null,
+	normalTitle: null,
+	smallTitle: null,
+	title: null,
+};
