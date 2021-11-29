@@ -10,21 +10,6 @@
 	width: 100%;
 	font-weight: 600;
 
-	&-wrapper {
-		position: relative;
-
-		svg {
-			position: absolute;
-			top: 50%;
-			left: 20px;
-			transform: translateY(-50%);
-
-			path {
-				fill: var(--search-icon-color);
-			}
-		}
-	}
-
 	&::placeholder {
 		color: var(--search-input-text-color);
 	}
@@ -32,10 +17,23 @@
 	&:focus {
 		outline: none;
 	}
+
+	@media screen and (max-width: 481px) {
+		padding: 10px 10px 10px 50px;
+	}
 }
 
-@media screen and (max-width: 481px) {
-	.search-input {
-		padding: 10px 10px 10px 50px;
+.search-input-wrapper {
+	position: relative;
+
+	svg {
+		position: absolute;
+		top: 50%;
+		left: 20px;
+		transform: translateY(-50%);
+
+		path {
+			fill: var(--search-icon-color);
+		}
 	}
 }

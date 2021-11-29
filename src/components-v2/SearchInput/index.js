@@ -1,10 +1,11 @@
-import "./index.scss";
-
+import PropTypes from "prop-types";
 import React from "react";
 
-function SearchInput(props) {
+import classes from "./index.module.scss";
+
+export default function SearchInput({onChange}) {
 	return (
-		<div className="search-input-wrapper">
+		<div className={classes["search-input-wrapper"]}>
 			<svg
 				width="21"
 				height="20"
@@ -25,12 +26,18 @@ function SearchInput(props) {
 			</svg>
 			<input
 				type="text"
-				className="search-input"
+				className={classes["search-input"]}
 				placeholder="Search name or paste address"
-				onChange={(event) => props.func(event.target.value)}
+				onChange={(event) => onChange(event)}
 			/>
 		</div>
 	);
 }
 
-export default SearchInput;
+SearchInput.propTypes = {
+	onChange: PropTypes.func,
+};
+
+SearchInput.defaultProps = {
+	onChange: () => {},
+};
