@@ -19,11 +19,6 @@ export default function SelectPopup({
 	tokens,
 }) {
 	const [searchWord, setSearchWord] = useState("");
-
-	function handleTokenSelect(e, t) {
-		onSelect(t);
-		onClose(e);
-	}
 	const filteredTokens = useMemo(
 		() =>
 			tokens
@@ -31,6 +26,11 @@ export default function SelectPopup({
 				.filter((t) => includesTextInToken(t, searchWord)),
 		[tokens, searchWord],
 	);
+
+	function handleTokenSelect(e, t) {
+		onSelect(e, t);
+		onClose(e);
+	}
 
 	if (!open) return null;
 
