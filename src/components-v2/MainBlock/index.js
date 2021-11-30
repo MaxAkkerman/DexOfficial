@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import React from "react";
 
 export default function MainBlock({
-	button: Button,
+	button,
 	class: className,
 	classHeader,
 	classTitle,
@@ -18,7 +18,7 @@ export default function MainBlock({
 }) {
 	return (
 		<div className={cls("mainblock", className)} {...rest}>
-			{(title || Button) && (
+			{(title || button) && (
 				<div className={cls("mainblock-header", classHeader)}>
 					<h2
 						className={cls("mainblock-title", classTitle, {
@@ -28,7 +28,7 @@ export default function MainBlock({
 					>
 						{title}
 					</h2>
-					<Button className="mainblock-btn" />
+					{button}
 				</div>
 			)}
 			{content}

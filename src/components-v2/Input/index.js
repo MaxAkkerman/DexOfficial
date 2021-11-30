@@ -3,8 +3,7 @@ import "./index.scss";
 import {FormHelperText} from "@mui/material";
 import cls from "classnames";
 import PropTypes from "prop-types";
-import React, {useMemo, useRef} from "react";
-import {useSelector} from "react-redux";
+import React, {useRef} from "react";
 
 import {iconGenerator} from "@/iconGenerator";
 import truncateNum from "@/utils/truncateNum";
@@ -15,17 +14,12 @@ export default function Input({
 	helperText,
 	label,
 	name,
-	onSelectToken,
+	onSelectClick,
 	onValueChange,
 	readOnly,
+	token,
 	value,
-	walletAddress,
 }) {
-	const tokenList = useSelector((state) => state.walletReducer.tokenList);
-	const currentToken = useMemo(
-		() => tokenList.find((t) => t.walletAddress === walletAddress),
-		[tokenList, walletAddress],
-	);
 	const inputRef = useRef(null);
 
 	return (
@@ -39,7 +33,7 @@ export default function Input({
 				<div className="input-wrapper">
 					<span className="input-title">{label}</span>
 					<span className={cls("input-balance", {incorBalance: error})}>
-						{currentToken && `Balance: ${truncateNum(currentToken.balance)}`}
+						{token && `Balance: ${truncateNum(token.balance)}`}
 					</span>
 				</div>
 				<div className="input-wrapper">
@@ -57,8 +51,12 @@ export default function Input({
 						ref={inputRef}
 					/>
 
-					{!currentToken ? (
-						<button className="btn input-btn" onClick={onSelectToken}>
+					{!token ? (
+						<button
+							className="btn input-btn"
+							onClick={onSelectClick}
+							type="button"
+						>
 							Select a token
 							<svg
 								width="16"
@@ -78,20 +76,24 @@ export default function Input({
 							<button
 								className="input-max"
 								onClick={() => {
-									inputRef.current.value = currentToken.balance.toFixed(4);
+									inputRef.current.value = token.balance.toFixed(4);
 									const event = new Event("input", {bubbles: true});
 									inputRef.current.dispatchEvent(event);
 								}}
 							>
 								MAX
 							</button>
-							<button className="input-select" onClick={onSelectToken}>
+							<button
+								className="input-select"
+								onClick={onSelectClick}
+								type="button"
+							>
 								<img
-									src={iconGenerator(currentToken.symbol)}
-									alt={currentToken.symbol}
+									src={iconGenerator(token.symbol)}
+									alt={token.symbol}
 									className="input-token-img"
 								/>
-								<span>{currentToken && currentToken.symbol}</span>
+								<span>{token && token.symbol}</span>
 								<svg
 									width="16"
 									height="10"
@@ -124,11 +126,21 @@ Input.propTypes = {
 	helperText: PropTypes.string,
 	label: PropTypes.string.isRequired,
 	name: PropTypes.string.isRequired,
-	onSelectToken: PropTypes.func.isRequired,
+	onSelectClick: PropTypes.func.isRequired,
 	onValueChange: PropTypes.func.isRequired,
 	readOnly: PropTypes.bool,
+	token: PropTypes.exact({
+		balance: PropTypes.number.isRequired,
+		decimals: PropTypes.string.isRequired,
+		icon: PropTypes.string.isRequired,
+		owner_address: PropTypes.string.isRequired,
+		rootAddress: PropTypes.string.isRequired,
+		symbol: PropTypes.string.isRequired,
+		tokenName: PropTypes.string.isRequired,
+		type: PropTypes.string.isRequired,
+		walletAddress: PropTypes.string.isRequired,
+	}),
 	value: PropTypes.number.isRequired,
-	walletAddress: PropTypes.string,
 };
 
 Input.defaultProps = {
@@ -136,5 +148,6 @@ Input.defaultProps = {
 	error: false,
 	helperText: "Type numeric value",
 	readOnly: false,
+	token: null,
 	walletAddress: null,
 };

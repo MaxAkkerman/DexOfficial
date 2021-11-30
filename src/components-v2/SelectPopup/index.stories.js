@@ -7,6 +7,7 @@ export default {
 	title: "Popup/Select tokens",
 };
 
+// eslint-disable-next-line react/prop-types
 const Template = (args) => <SelectPopup {...args} />;
 
 export const Empty = Template.bind({});
