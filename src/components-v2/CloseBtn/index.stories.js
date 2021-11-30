@@ -4,7 +4,7 @@ import CloseBtn from "@/components-v2/CloseBtn";
 
 export default {
 	component: CloseBtn,
-	title: "Components/Icon Button",
+	title: "Components/Icon button",
 };
 
 const Template = (args) => <CloseBtn {...args} />;

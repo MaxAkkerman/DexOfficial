@@ -4,7 +4,7 @@ import SearchInput from "@/components-v2/SearchInput";
 
 export default {
 	component: SearchInput,
-	title: "Components/Search Input",
+	title: "Components/Search input",
 };
 
 const Template = (args) => <SearchInput {...args} />;
