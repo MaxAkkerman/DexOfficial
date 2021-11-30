@@ -49,8 +49,8 @@ function PoolExplorerItem(props) {
                   1 {props.pair.symbolA} ={' '}
                   <b>
                     {props.pair.rateAB < 0.0001
-                      ? parseFloat(props.pair.rateAB).toFixed(9)
-                      : parseFloat(props.pair.rateAB).toFixed(4)}
+                      ? parseFloat(props.pair.rateAB.toString()).toFixed(9)
+                      : parseFloat(props.pair.rateAB.toString()).toFixed(4)}
                   </b>{' '}
                   {props.pair.symbolB}
                 </div>
@@ -62,8 +62,8 @@ function PoolExplorerItem(props) {
                   1 {props.pair.symbolB} ={' '}
                   <b>
                     {props.pair.rateBA < 0.0001
-                      ? parseFloat(props.pair.rateBA).toFixed(8)
-                      : parseFloat(props.pair.rateBA).toFixed(4)}
+                      ? parseFloat(props.pair.rateBA.toString()).toFixed(8)
+                      : parseFloat(props.pair.rateBA.toString()).toFixed(4)}
                   </b>{' '}
                   {props.pair.symbolA}
                 </div>
@@ -97,7 +97,7 @@ function PoolExplorerItem(props) {
                 alt={props.pair.symbolB}
               />
               {Number(
-                (parseFloat(props.pair.reservetB) / 1e9).toFixed(4),
+                (parseFloat(props.pair.reserveB) / 1e9).toFixed(4),
               ).toLocaleString('ru-RU')}
               <div className={'PoolExplorerItem_pair_margin_left'}>
                 {props.pair.symbolB}
