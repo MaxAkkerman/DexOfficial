@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import Loader from "@/components-v2/Loader";
+import Loader from '@/components-v2/Loader';
 
 export default {
-	component: Loader,
-	title: "Components/Loader",
+  component: Loader,
+  title: 'Components/Loader',
 };
 
 const Template = (args) => <Loader {...args} />;

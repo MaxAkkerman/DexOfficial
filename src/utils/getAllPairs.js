@@ -1,10 +1,10 @@
-import {Account} from "@tonclient/appkit";
-import {memoize} from "lodash";
+import { Account } from '@tonclient/appkit';
+import { memoize } from 'lodash';
 
-import {FUNC_FAIL} from "../constants/runtimeErrors";
-import {DEXRootContract} from "../extensions/contracts/DEXRoot";
-import Radiance from "../extensions/Radiance.json";
-import client from "../extensions/sdk_get/get";
+import { FUNC_FAIL } from '../constants/runtimeErrors';
+import { DEXRootContract } from '../extensions/contracts/DEXRoot';
+import Radiance from '../extensions/Radiance.json';
+import client from '../extensions/sdk_get/get';
 
 /**
  * @typedef {Object} Pair
@@ -16,22 +16,22 @@ import client from "../extensions/sdk_get/get";
  * @returns {Promise<Pair[]>} pairs
  */
 const getAllPairs = memoize(async () => {
-	const rootAcc = new Account(DEXRootContract, {
-		address: Radiance.networks[2].dexroot,
-		client,
-	});
+  const rootAcc = new Account(DEXRootContract, {
+    address: Radiance.networks[2].dexroot,
+    client,
+  });
 
-	const res = await rootAcc.runLocal("pairs", {});
-	if (!res.decoded) throw new Error(FUNC_FAIL);
-	const {pairs} = res.decoded.output;
-	console.log("DEXRoot->pairs", pairs);
+  const res = await rootAcc.runLocal('pairs', {});
+  if (!res.decoded) throw new Error(FUNC_FAIL);
+  const { pairs } = res.decoded.output;
+  console.log('DEXRoot->pairs', pairs);
 
-	const pairList = [];
-	Object.entries(pairs).forEach(([addrPair, {root0, root1}]) => {
-		pairList.push({addrPair, rootA: root0, rootB: root1});
-	});
+  const pairList = [];
+  Object.entries(pairs).forEach(([addrPair, { root0, root1 }]) => {
+    pairList.push({ addrPair, rootA: root0, rootB: root1 });
+  });
 
-	return pairList;
+  return pairList;
 });
 
 export default getAllPairs;

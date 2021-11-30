@@ -1,5 +1,5 @@
-import {PAIR_NULL} from "../constants/runtimeErrors";
-import getAllPairs from "./getAllPairs";
+import { PAIR_NULL } from '../constants/runtimeErrors';
+import getAllPairs from './getAllPairs';
 
 /**
  * @typedef {Object} Pair
@@ -12,8 +12,8 @@ import getAllPairs from "./getAllPairs";
  * @returns {Promise<Pair>}
  */
 export default async function getPair(addrPair) {
-	const pairs = await getAllPairs();
-	const pair = pairs.find((p) => p.addrPair === addrPair);
-	if (!pair) throw new Error(PAIR_NULL);
-	return pair;
+  const pairs = await getAllPairs();
+  const pair = pairs.find((p) => p.addrPair === addrPair);
+  if (!pair) throw new Error(PAIR_NULL);
+  return pair;
 }
