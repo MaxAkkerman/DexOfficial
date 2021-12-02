@@ -314,10 +314,10 @@ function SendAssets() {
 									</div>
 								</div>
 							</div>
-							{isInvalidAddress && addressToSend ? (
+							{addressToSend ? (
 								<FormHelperText
 									style={{marginLeft: "27px", marginTop: "4px"}}
-									error
+									error={isInvalidAddress ? `error`: null}
 									id="component-error-text"
 								>
 									{validationMsgForAddress}

@@ -33,6 +33,7 @@ function MainBlock({
 		>
 			{(title || button) && (
 				<div
+					id={"swapPopup"}
 					className={
 						classHeader ? classHeader + " mainblock-header" : "mainblock-header"
 					}

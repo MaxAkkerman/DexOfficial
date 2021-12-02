@@ -1,7 +1,7 @@
 import {Account} from "@tonclient/appkit";
 import {DEXRootContract} from "../contracts/DEXRoot.js";
 import {DataContract} from "../contracts/Data.js";
-import {DEXClientContract} from "../contracts/DEXClientMainNet.js";
+import {DEXClientContract} from "../contracts/DEXClient.js";
 import {WrappedTONVaultContract} from "../contracts/WrappedTONVault.js";
 import client, {
 	checkPubKey,
@@ -546,6 +546,7 @@ export async function swapA(
 	if (getClientAddressFromRoot.status === false) {
 		return getClientAddressFromRoot;
 	}
+	console.log("qtyA",qtyA,"qtyB",qtyB,"qtyANum",qtyANum,"qtBToNum",qtBToNum)
 
 	const acc = new Account(DEXClientContract, {
 		address: getClientAddressFromRoot.dexclient,
@@ -610,6 +611,7 @@ export async function swapB(
 
 	const {pubkey} = curExt._extLib;
 	let getClientAddressFromRoot = await checkPubKey(pubkey);
+	console.log("swapBBB qtyA",qtyA,"qtyB",qtyB,"qtyANum",qtAToNum,"qtBToNum",qtyBNum)
 
 	const keys = await getClientKeys(phrase);
 
