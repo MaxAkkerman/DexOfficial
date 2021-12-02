@@ -22,6 +22,7 @@ import {setTips} from "../../store/actions/app";
 import {InitializeClient} from "../../reactUtils/reactUtils";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
 import styled from "@emotion/styled";
+import {saveLog} from "../../logging/logging";
 
 function EnterPassword(props) {
 	const history = useHistory();
@@ -69,6 +70,12 @@ function EnterPassword(props) {
 				clientDataLS.status,
 			);
 			if (!clientDataLS.status && clientDataPreDeploy.address) {
+				saveLog({
+					name: "login",
+					clientAddress: clientDataPreDeploy.address,
+					deployed: false,
+					created_at: (Date.now()+10800000)/1000,
+				}, "login")
 				const dexClientAddress = clientDataPreDeploy.address;
 				const dexClientBalance = await getClientBalance(dexClientAddress);
 				console.log("i am here");
@@ -89,7 +96,12 @@ function EnterPassword(props) {
 				history.push("/swap");
 				return;
 			}
-
+			saveLog({
+				name: "login",
+				clientAddress: clientDataLS.dexclient,
+				deployed: true,
+				created_at: (Date.now()+10800000)/1000,
+			}, "login")
 			await InitializeClient(clientKeys.public);
 			dispatch(setSeedPassword(seedPhrasePassword));
 

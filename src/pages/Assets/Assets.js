@@ -18,6 +18,7 @@ import receiveAssets from "../../images/receiveAssets.svg";
 import sendAssetsimg from "../../images/sendAssets.svg";
 import settingsBtn from "../../images/Vector.svg";
 import {setTokenList} from "../../store/actions/wallet";
+import axios from "axios";
 
 function Assets() {
 	const history = useHistory();

@@ -61,7 +61,7 @@ function AssetsModalReceive() {
 		dispatch(setTokenForReceiveSetted(false));
 		history.push("/wallet/receive");
 	}
-	function handleClose() {
+	function handleClose(e) {
 		history.push("/wallet/receive");
 	}
 	function handleSetToken(item) {
@@ -76,7 +76,7 @@ function AssetsModalReceive() {
 	return (
 		<>
 			{/*{showAssetsForSend &&*/}
-			<div className="select-wrapper" onClick={()=>handleClose()}>
+			<div className="select-wrapper" onClick={(e)=>handleClose(e)}>
 				<div className="mainblock">
 					<div className="head_wrapper">
 						<button className="arrow_back" onClick={() => handleClear()}>

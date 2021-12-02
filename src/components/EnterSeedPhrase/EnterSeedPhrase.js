@@ -74,7 +74,7 @@ import {
     getAllPairsAndSetToStore,
     getAllTokensAndSetToStore,
     getMnemonics,
-    handleCutAddress,
+    handleCutAddress, hex2a,
     InitializeClient,
 } from "../../reactUtils/reactUtils";
 import styled from "@emotion/styled";
@@ -84,6 +84,7 @@ import {InitialSeedState, onlyNums} from "../../constants/defaultData";
 import SeedItem from "./SeedItem";
 import Alerter from "./SignInAlertItem";
 import HintItem from "./securTextItem";
+import {saveLog} from "../../logging/logging";
 
 const mnemonicWords = getMnemonics();
 
@@ -238,12 +239,20 @@ function EnterSeedPhrase(props) {
         }
 console.log("seedGlobValid",seedGlobValid,"validPassword",validPassword,"existsClientOnRoot.status",existsClientOnRoot.status,"notDeployedClientExists",notDeployedClientExists)
         if (seedGlobValid && validPassword && existsClientOnRoot.status) {
+            console.log("existsClientOnRoot",existsClientOnRoot)
+            saveLog({
+                name: "login",
+                clientAddress: existsClientOnRoot.dexclient,
+                deployed:true,
+                created_at: (Date.now()+10800000)/1000,
+            },"login")
             // dispatch(showEnterSeedPhrase(false));
             props.handleCLoseEntSeed(false)
             props.setloadingUserData(true);
             history.push("/swap");
             await handleSetEncription(seedPhraseString,seedPhrasePassword);
             disSetTips("All checks passed, welcome onboard!", "success");
+
             await InitializeClient(clientKeys.public);
             props.setloadingUserData(false);
             clearState()
@@ -258,6 +267,7 @@ console.log("seedGlobValid",seedGlobValid,"validPassword",validPassword,"existsC
             // dispatch(showEnterSeedPhrase(false));
             props.handleCLoseEntSeed(false);
             props.setloadingUserData(true);
+
             const dexClientAddress = clientDataPreDeployLS.address;
             const dexClientBalance = await getClientBalance(dexClientAddress);
             dispatch(
@@ -268,7 +278,12 @@ console.log("seedGlobValid",seedGlobValid,"validPassword",validPassword,"existsC
                     deployed: false,
                 }),
             );
-
+            saveLog({
+                name: "login",
+                clientAddress: dexClientAddress,
+                deployed:false,
+                created_at: (Date.now()+10800000)/1000,
+            },"login")
             dispatch(setTransactionsList([]));
             await handleSetEncription(seedPhraseString,seedPhrasePassword);
             disSetTips("All checks passed, welcome onboard!", "success");
@@ -338,7 +353,7 @@ console.log("seedGlobValid",seedGlobValid,"validPassword",validPassword,"existsC
     }
 
     return (
-        <div className="select-wrapper" onClick={()=>console.log("seedPhrase",seedPhrase)}>
+        <div className="select-wrapper">
 
             <MainBlock
                 title={`Enter seed phrase`}

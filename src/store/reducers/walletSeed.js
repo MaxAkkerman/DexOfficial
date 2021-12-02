@@ -15,7 +15,7 @@ import {assetstestArray} from "../../constants/defaultData";
 
 const initialState = {
 	amountToSend: "",
-	addressToSend: "",
+	addressToSend: null,
 	currentTokenForSend: assetstestArray[0],
 	showAssetsForSend: false,
 	tokenSetted: false,

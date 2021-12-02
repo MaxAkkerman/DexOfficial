@@ -26,6 +26,7 @@
 		"@tonclient/lib-node": "^1.16.0",
 		"@tonclient/lib-web": "^1.25.0",
 		"ascii-hex": "^1.0.1",
+		"axios": "^0.24.0",
 		"bignumber.js": "^9.0.1",
 		"classnames": "^2.3.1",
 		"core-js": "^3.12.1",

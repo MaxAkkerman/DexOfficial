@@ -79,7 +79,7 @@ export const decode = {
 				message: boc,
 			});
 		} catch (e) {
-			// console.log(e)
+			console.log("17 error",e)
 			return e.code;
 		}
 	},

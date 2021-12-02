@@ -34,6 +34,7 @@ import {
 	setTransactionsList,
 	setWallet,
 } from "../../store/actions/wallet";
+import {saveLog} from "../../logging/logging";
 
 function Account() {
 	const history = useHistory();
@@ -91,7 +92,7 @@ function Account() {
 		const deployRes = await deployClient(
 			encrData
 		);
-
+console.log("encrData",encrData)
 		if (deployRes.code) {
 			setonDeploy(false)
 			dispatch(
@@ -101,6 +102,12 @@ function Account() {
 				}),
 			);
 		} else {
+			saveLog({
+				name:"deployNewClient",
+				clientAddress: encrData.address,
+				// deployData: deployRes,
+				created_at: (Date.now()+10800000)/1000,
+			},"deployNewClient")
 			await InitializeClient(clientPrepData.public)
 			localStorage.removeItem("clientDataPreDeploy");
 			setonDeploy(false)
@@ -153,10 +160,15 @@ function Account() {
 				public: "",
 			}),
 		);
+
 		store.dispatch(setTokenList([]));
 		store.dispatch(setLiquidityList([]));
 		localStorage.removeItem("setSubscribeReceiveTokens");
-
+		saveLog({
+			name:"disconnect",
+			clientAddress: clientData.address,
+			created_at: (Date.now()+10800000)/1000,
+		},"disconnect")
 		// localStorage.removeItem("esp");
 		// window.location.reload();
 		// history.push("/account");
