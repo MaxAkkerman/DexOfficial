@@ -92,7 +92,7 @@ function Account() {
 		const deployRes = await deployClient(
 			encrData
 		);
-
+console.log("encrData",encrData)
 		if (deployRes.code) {
 			setonDeploy(false)
 			dispatch(
@@ -104,7 +104,8 @@ function Account() {
 		} else {
 			saveLog({
 				name:"deployNewClient",
-				deployData: deployRes,
+				clientAddress: encrData.address,
+				// deployData: deployRes,
 				created_at: (Date.now()+10800000)/1000,
 			},"deployNewClient")
 			await InitializeClient(clientPrepData.public)

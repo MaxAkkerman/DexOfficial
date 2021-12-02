@@ -7,7 +7,7 @@ import client, {
 	checkPubKey,
 	getAllDataPrep,
 	getClientAddrAtRootForShard,
-	getClientKeys,
+	getClientKeys, getDexClientCode,
 	getRootConnectorCode,
 	getRootCreators,
 	getShardConnectPairQUERY,
@@ -380,6 +380,10 @@ export async function prepareClientDataForDeploy(phrase) {
 
 export async function deployClient(clientSet) {
 	console.log("clientSet.data.clientSoArg", clientSet);
+	const {codeDEXclient} = await getDexClientCode()
+
+	console.log("codeDEXclient bool",codeDEXclient,DEXClientContract.code, codeDEXclient === DEXClientContract.code)
+
 	const connectorCode = await getRootConnectorCode();
 	console.log("connectorCode", connectorCode.codeDEXconnector);
 

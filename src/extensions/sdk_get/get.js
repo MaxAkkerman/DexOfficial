@@ -329,7 +329,14 @@ export async function getShardConnectPairQUERY(
 
 	return connectorSoArg0;
 }
-
+export async function getDexClientCode() {
+	const RootContract = new Account(DEXRootContract, {
+		address: Radiance.networks["2"].dexroot,
+		client,
+	});
+	const RootCreators = await RootContract.runLocal("codeDEXclient", {});
+	return RootCreators.decoded.output;
+}
 export async function getRootConnectorCode() {
 	const RootContract = new Account(DEXRootContract, {
 		address: Radiance.networks["2"].dexroot,
@@ -954,8 +961,10 @@ export async function subscribeClient(address) {
 						);
 						saveLog({
 							name: decoded.name,
-							created_at: +params.result.created_at+10800000 || "default",
-							tonLiveID: params.result.id || "default",
+							clientAddress: params.result.dst,
+
+// created_at: +checkedDuple.created_at,
+							created_at: (Date.now()+10800000)/1000,							tonLiveID: params.result.id || "default",
 							tokenName: hex2a(rootData.name) || "default",
 							tokenSymbol: hex2a(rootData.symbol) || "default",
 							rootAddress: decoded.value.root
@@ -985,8 +994,10 @@ export async function subscribeClient(address) {
 						);
 						saveLog({
 							name: decoded.name,
-							created_at: +params.result.created_at+10800000 || "default",
-							tonLiveID: params.result.id || "default",
+							clientAddress: params.result.dst,
+
+// created_at: +checkedDuple.created_at,
+							created_at: (Date.now()+10800000)/1000,							tonLiveID: params.result.id || "default",
 							dst: decoded.value.dest,
 							amount: decoded.value.value,
 						},"sendTransaction")
@@ -1029,8 +1040,8 @@ export async function subscribeClient(address) {
 							dst:callbackData.dst,
 							tokenSymbol:callbackData.token_symbol,
 							tokenName:callbackData.token_name,
-							created_at: +callbackData.created_at+10800000,
-							tonLiveID: callbackData.tonLiveID,
+// created_at: +checkedDuple.created_at,
+							created_at: (Date.now()+10800000)/1000,							tonLiveID: callbackData.tonLiveID,
 						},"sendTokens")
 					}
 
@@ -1126,8 +1137,8 @@ export async function subscribeClient(address) {
 							tokenABsymbolR: hex2a(rootABdetails.symbol),
 							tokenABnameR: hex2a(rootABdetails.name),
 							burnAB:Number(decoded.value.burnAB),
-							created_at: +checkedDuple.created_at+10800000,
-							tonLiveID: checkedDuple.tonLiveID,
+// created_at: +checkedDuple.created_at,
+							created_at: (Date.now()+10800000)/1000,							tonLiveID: checkedDuple.tonLiveID,
 						},"removeLiquidity")
 					}
 
@@ -1220,8 +1231,8 @@ export async function subscribeClient(address) {
 							// amountB:Number(decoded.value.amountB),
 							provideB:Number(decoded.value.provideB),
 							gotAB:Number(decoded.value.mintAB),
-							created_at: +checkedDuple.created_at+10800000,
-							tonLiveID: checkedDuple.tonLiveID,
+// created_at: +checkedDuple.created_at,
+							created_at: (Date.now()+10800000)/1000,							tonLiveID: checkedDuple.tonLiveID,
 						},"addLiquidity")
 					}
 
@@ -1325,13 +1336,18 @@ export async function subscribeClient(address) {
 							);
 							saveLog({
 								name: "swap",
+								clientAddress: params.result.dst,
+
 								swapAsymbol:transactionData.tokenAsymbol,
 								// tokenAname:transactionData.tokenAname,
 								amountAswap:transactionData.amountA,
 								swapBsymbol:transactionData.tokenBsymbol,
 								// tokenBname:transactionData.tokenBname,
 								amountBswap:transactionData.amountB,
-								created_at: +checkedDuple.created_at+10800000,
+								// created_at: +checkedDuple.created_at,
+								created_at: (Date.now()+10800000)/1000,
+
+
 								tonLiveID: checkedDuple.tonLiveID,
 							},"swap")
 						} else if (payloadFlag === 8) {
