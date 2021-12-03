@@ -84,6 +84,118 @@ export const WithThreePairs = Template.bind(
           symbolB: 'USDT',
           totalSupply: '10999999',
         },
+        {
+          exists: true,
+          pairAddress:
+            '0:50c00629f4a36672608b441c6e5bc3809be782e3bf1faad4e32e18ad0f4c0bdb',
+          rateAB: 0.007000000001909091,
+          rateBA: 142.8571428181818,
+          reserveA: 1571428571,
+          reserveB: 11000000,
+          rootA:
+            '0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37',
+          rootB:
+            '0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef',
+          symbolA: 'WBTC',
+          symbolB: 'WTON',
+          totalSupply: '10999999',
+        },
+        {
+          exists: true,
+          pairAddress:
+            '0:50c00629f4a36672608b441c6e5bc3809be782e3bf1faad4e32e18ad0f4c0bdb',
+          rateAB: 0.007000000001909091,
+          rateBA: 142.8571428181818,
+          reserveA: 1571428571,
+          reserveB: 11000000,
+          rootA:
+            '0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37',
+          rootB:
+            '0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef',
+          symbolA: 'DAI',
+          symbolB: 'WBTC',
+          totalSupply: '10999999',
+        },
+        {
+          exists: true,
+          pairAddress:
+            '0:50c00629f4a36672608b441c6e5bc3809be782e3bf1faad4e32e18ad0f4c0bdb',
+          rateAB: 0.007000000001909091,
+          rateBA: 142.8571428181818,
+          reserveA: 1571428571,
+          reserveB: 11000000,
+          rootA:
+            '0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37',
+          rootB:
+            '0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef',
+          symbolA: 'WBTC',
+          symbolB: 'USDT',
+          totalSupply: '10999999',
+        },
+        {
+          exists: true,
+          pairAddress:
+            '0:50c00629f4a36672608b441c6e5bc3809be782e3bf1faad4e32e18ad0f4c0bdb',
+          rateAB: 0.007000000001909091,
+          rateBA: 142.8571428181818,
+          reserveA: 1571428571,
+          reserveB: 11000000,
+          rootA:
+            '0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37',
+          rootB:
+            '0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef',
+          symbolA: 'USDT',
+          symbolB: 'USDC',
+          totalSupply: '10999999',
+        },
+        {
+          exists: true,
+          pairAddress:
+            '0:50c00629f4a36672608b441c6e5bc3809be782e3bf1faad4e32e18ad0f4c0bdb',
+          rateAB: 0.007000000001909091,
+          rateBA: 142.8571428181818,
+          reserveA: 1571428571,
+          reserveB: 11000000,
+          rootA:
+            '0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37',
+          rootB:
+            '0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef',
+          symbolA: 'WTON',
+          symbolB: 'WETH',
+          totalSupply: '10999999',
+        },
+        {
+          exists: true,
+          pairAddress:
+            '0:50c00629f4a36672608b441c6e5bc3809be782e3bf1faad4e32e18ad0f4c0bdb',
+          rateAB: 0.007000000001909091,
+          rateBA: 142.8571428181818,
+          reserveA: 1571428571,
+          reserveB: 11000000,
+          rootA:
+            '0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37',
+          rootB:
+            '0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef',
+          symbolA: 'WTON',
+          symbolB: 'BNB',
+          totalSupply: '10999999',
+        },
+        {
+          exists: true,
+          pairAddress:
+            '0:50c00629f4a36672608b441c6e5bc3809be782e3bf1faad4e32e18ad0f4c0bdb',
+          rateAB: 0.007000000001909091,
+          rateBA: 142.8571428181818,
+          reserveA: 1571428571,
+          reserveB: 11000000,
+          rootA:
+            '0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37',
+          rootB:
+            '0:95934aa6a66cb3eb211a80e99234dfbba6329cfa31600ce3c2b070d8d9677cef',
+          symbolA: 'WBTC',
+          symbolB: 'BNB',
+          totalSupply: '10999999',
+        },
       ],
     },
   }),

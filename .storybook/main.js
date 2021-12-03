@@ -2,7 +2,7 @@ const path = require("path");
 const {merge} = require("webpack-merge");
 
 module.exports = {
-	stories: ["../src/components-v2/**/*.stories.js", "../src/components/**/*.stories.js"],
+	stories: ["../src/components-v2/**/*.stories.js", "../src/components/**/*.stories.js", "../src/pages/**/*.stories.js"],
 	addons: [
 		"@storybook/addon-links",
 		"@storybook/addon-essentials",

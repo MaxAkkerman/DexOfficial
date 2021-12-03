@@ -68,6 +68,7 @@
 		"@types/jest": "^27.0.1",
 		"babel-loader": "^8.2.2",
 		"babel-polyfill": "^6.26.0",
+		"chromatic": "^6.1.0",
 		"copy-webpack-plugin": "^7.0.0",
 		"css-loader": "^5.2.4",
 		"dotenv-webpack": "^7.0.3",

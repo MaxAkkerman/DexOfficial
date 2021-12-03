@@ -1,43 +1,43 @@
-import "./index.scss";
+import './index.scss';
 
-import PropTypes from "prop-types";
-import React from "react";
+import PropTypes from 'prop-types';
+import React from 'react';
 
-import {iconGenerator} from "@/iconGenerator";
-import truncateNum from "@/utils/truncateNum";
+import { iconGenerator } from '@/iconGenerator';
+import truncateNum from '@/utils/truncateNum';
 
-export default function SelectItem({onClick, token}) {
-	return (
-		// <div className={props.isActive ? "select-item select-item--active" : "select-item"}
-		<div className={"select-item"} onClick={onClick}>
-			<div className="select-item-wrapper">
-				<img
-					style={{
-						height: "54px",
-						width: "54px",
-					}}
-					src={iconGenerator(token.symbol)}
-					alt={token.symbol}
-				/>
-				<div>
-					<p className="select-item-title">{token.symbol}</p>
-					<p className="select-item-descr">{token.tokenName}</p>
-				</div>
-			</div>
-			<span className="select-item-balance">{truncateNum(token.balance)}</span>
-		</div>
-	);
+export default function SelectItem({ onClick, token }) {
+  return (
+    // <div className={props.isActive ? "select-item select-item--active" : "select-item"}
+    <div className={'select-item'} onClick={onClick}>
+      <div className="select-item-wrapper">
+        <img
+          style={{
+            height: '54px',
+            width: '54px',
+          }}
+          src={iconGenerator(token.symbol)}
+          alt={token.symbol}
+        />
+        <div>
+          <p className="select-item-title">{token.symbol}</p>
+          <p className="select-item-descr">{token.tokenName}</p>
+        </div>
+      </div>
+      <span className="select-item-balance">{truncateNum(token.balance)}</span>
+    </div>
+  );
 }
 
 SelectItem.propTypes = {
-	onClick: PropTypes.func,
-	token: PropTypes.exact({
-		balance: PropTypes.number.isRequired,
-		symbol: PropTypes.string.isRequired,
-		tokenName: PropTypes.string.isRequired,
-	}).isRequired,
+  onClick: PropTypes.func,
+  token: PropTypes.exact({
+    balance: PropTypes.number.isRequired,
+    symbol: PropTypes.string.isRequired,
+    tokenName: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 SelectItem.defaultProps = {
-	onClick: () => {},
+  onClick: () => {},
 };
