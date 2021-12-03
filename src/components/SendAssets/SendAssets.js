@@ -270,7 +270,7 @@ function SendAssets() {
 	}
 
 	return (
-		<div className="container" style={{"flex-Direction": "column"}}>
+		<div className="container" style={{flexDirection: "column"}}>
 			{!showWaitingSendAssetPopup && (
 				<MainBlock
 					style={{

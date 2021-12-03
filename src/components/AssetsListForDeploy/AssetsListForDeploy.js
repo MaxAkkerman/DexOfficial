@@ -77,8 +77,8 @@ function AssetsListForDeploy() {
 			keyPair,
 		);
 		console.log("deployRes", deployRes);
-		setdeployWalletIsWaiting(true);
-		showConfirmAssetDeployPopup(false);
+		setdeployWalletIsWaiting(false);
+		// showConfirmAssetDeployPopup(false);
 	}
 
 	function handleClose() {
