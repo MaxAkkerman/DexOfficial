@@ -10,7 +10,9 @@
 	text-decoration: underline;
 	cursor: pointer;
 }
-
+//.fixMedia {
+//  font-size:30px;
+//}
 .welcomeTextWrapper {
 	width: 55%;
 	text-align: center;
@@ -39,8 +41,12 @@
 	margin-left: 20px;
 	text-align: left;
 }
-
-@media screen and (max-width: 390px) {
+@media screen and (max-width: 550px) {
+	.fixMedia {
+		font-size: 21px !important;
+	}
+}
+@media screen and (max-width: 400px) {
 	.welcomeTextWrapper {
 		width: 100%;
 		font-size: 16px;
@@ -52,9 +58,9 @@
 		width: 121.5%;
 		margin-left: -31px;
 	}
-	.fixMedia {
-		font-size: 21px;
-	}
+	//.fixMedia {
+	//  font-size: 21px !important;
+	//}
 	.numsInputContainer {
 		width: 90%;
 	}

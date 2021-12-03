@@ -1,0 +1,14 @@
+[
+  {
+    "address": "0:e6cd868e34a0558171483682b2dcbb19f0cc1ba8c13aef97c8c2c862b93d2094",
+    "keys": {
+      "type": "Keys",
+      "keys": {
+        "public": "35366f1aabb1186793eb827757b04d1ef8d881fcc15a2de5ff4cb0d28e3ffda1",
+        "secret": "78d396185f2a1961d67b614e684468599154543dd95e7d42d853261edbf5806f"
+      }
+    },
+    "clientSoArg": 5,
+    "seed": "family direct click curious waste dizzy cement flash whale shop glove office"
+  }
+]
