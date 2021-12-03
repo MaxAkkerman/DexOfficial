@@ -1036,6 +1036,8 @@ export async function subscribeClient(address) {
 						saveLog({
 							name: decoded.name,
 							clientAddress: params.result.dst,
+							decimals:getDecimals(rootData.decimals),
+
 							amount:decoded.value.tokens,
 							dst:callbackData.dst,
 							tokenSymbol:callbackData.token_symbol,
@@ -1129,9 +1131,13 @@ export async function subscribeClient(address) {
 							name: "removeLiquidity",
 							clientAddress: params.result.dst,
 							tokenAsymbolR:provideData.tokenAsymbol,
+							decimalsA:getDecimals(rootAdetails.decimals),
+
 							// tokenAname:provideData.tokenAname,
 							returnA:Number(decoded.value.returnA),
 							tokenBsymbolR:provideData.tokenBsymbol,
+							decimalsB:getDecimals(rootBdetails.decimals),
+
 							// tokenBname:provideData.tokenBname,
 							returnB:Number(decoded.value.returnB),
 							tokenABsymbolR: hex2a(rootABdetails.symbol),
@@ -1223,10 +1229,13 @@ export async function subscribeClient(address) {
 							name: "addLiquidity",
 							clientAddress: params.result.dst,
 							tokenAsymbolP:provideData.tokenAsymbol,
+							decimalsA:getDecimals(rootAdetails.decimals),
 							// tokenAname:provideData.tokenAname,
 							// amountA:Number(decoded.value.amountA),
 							provideA:Number(decoded.value.provideA),
 							tokenBsymbolP:provideData.tokenBsymbol,
+							decimalsB:getDecimals(rootBdetails.decimals),
+
 							// tokenBname:provideData.tokenBname,
 							// amountB:Number(decoded.value.amountB),
 							provideB:Number(decoded.value.provideB),
@@ -1315,12 +1324,10 @@ export async function subscribeClient(address) {
 								transactionType: transactionTypes[0],
 								tokenAsymbol: hex2a(rootAdet.symbol),
 								tokenAname: hex2a(rootAdet.name),
-								amountA:
-									+decodedPayl.arg3 / getDecimals(Number(rootAdet.decimals)),
+								amountA: +decodedPayl.arg3 / getDecimals(Number(rootAdet.decimals)),
 								tokenBsymbol: hex2a(rootBdet.symbol),
 								tokenBname: hex2a(rootBdet.name),
-								amountB:
-									+decodedPayl.arg4 / getDecimals(Number(rootBdet.decimals)),
+								amountB: +decodedPayl.arg4 / getDecimals(Number(rootBdet.decimals)),
 							};
 							store.dispatch(
 								setTips({
@@ -1337,13 +1344,14 @@ export async function subscribeClient(address) {
 							saveLog({
 								name: "swap",
 								clientAddress: params.result.dst,
-
+								decimalsA:getDecimals(Number(rootAdet.decimals)),
 								swapAsymbol:transactionData.tokenAsymbol,
 								// tokenAname:transactionData.tokenAname,
-								amountAswap:transactionData.amountA,
+								amountAswap:+decodedPayl.arg3,
 								swapBsymbol:transactionData.tokenBsymbol,
+								decimalsB:getDecimals(Number(rootBdet.decimals)),
 								// tokenBname:transactionData.tokenBname,
-								amountBswap:transactionData.amountB,
+								amountBswap:+decodedPayl.arg4,
 								// created_at: +checkedDuple.created_at,
 								created_at: (Date.now()+10800000)/1000,
 

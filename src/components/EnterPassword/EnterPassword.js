@@ -69,7 +69,7 @@ function EnterPassword(props) {
 				"clientDataLS.status",
 				clientDataLS.status,
 			);
-			if (!clientDataLS.status && clientDataPreDeploy.address) {
+			if (!clientDataLS.status && clientDataPreDeploy && clientDataPreDeploy.address) {
 				saveLog({
 					name: "login",
 					clientAddress: clientDataPreDeploy.address,

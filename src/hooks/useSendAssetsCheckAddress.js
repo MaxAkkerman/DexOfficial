@@ -122,7 +122,7 @@ export default function useSendAssetsCheckAddress() {
 			setState({
 				invalid: false,
 				loading: false,
-				validationMsg: UNKNOWN_ERROR,
+				validationMsg: VALIDATION_MSG_ROOTS_SUC,
 			});
 		}
 	}, [addressToSend]);

@@ -12,7 +12,10 @@
 			"depoolAddress": "0:127ae93241278304fff6b7e5b7b182fd382b6e95b200551061a7354e032e50bf",
 			"BroxusRootCodeHash": "3bae4a28a3491aa348ad9b4f21ca642828fcecb0a4945246c5ba7ad4f7f87d04",
 			"DappServer": "main.ton.dev",
-			"limitRootAddress": "0:7ae8e015a7e4aaab07e5ce1927daed815ee940b32290fe510614ef183cc20ec4",
+			"limitRootAddressOLD": "0:7ae8e015a7e4aaab07e5ce1927daed815ee940b32290fe510614ef183cc20ec4",
+			"limitRootAddress": "0:eb279f6b54c7259bc2291ab4611f2a984bd165ee583cd7651949a4689b12c0e8",
+
+
 			"graphqlUrl": "https://nameless-peak-60538.herokuapp.com/graphql",
 			"graphqlUrlWs": "wss://nameless-peak-60538.herokuapp.com/graphql"
 		}
