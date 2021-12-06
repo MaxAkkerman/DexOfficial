@@ -4,6 +4,11 @@ import "./HeaderMore.scss";
 function HeaderMore() {
 	const [isVisible, setVisible] = useState(false);
 
+	function handleOpen(e){
+		more-dropdown
+	}
+
+
 	function href(path) {
 		if (path === "docs") window.open("https://docs.defispace.com",'_blank');
 		if (path === "Github") window.open("https://github.com/radianceteam/dex3",'_blank');

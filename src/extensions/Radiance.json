@@ -14,7 +14,7 @@
 			"DappServer": "main.ton.dev",
 			"limitRootAddressOLD": "0:7ae8e015a7e4aaab07e5ce1927daed815ee940b32290fe510614ef183cc20ec4",
 			"limitRootAddress": "0:eb279f6b54c7259bc2291ab4611f2a984bd165ee583cd7651949a4689b12c0e8",
-
+			"limitOrderRouter": "0:e06d865d6a40f4a84ffe413cbb330fe7287cb39eeb3f5333fcd6bc31dd3ca01e",
 
 			"graphqlUrl": "https://nameless-peak-60538.herokuapp.com/graphql",
 			"graphqlUrlWs": "wss://nameless-peak-60538.herokuapp.com/graphql"
