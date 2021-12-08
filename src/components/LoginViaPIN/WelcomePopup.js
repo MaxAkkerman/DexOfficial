@@ -10,6 +10,9 @@ import Steppers from "./Steppers";
 import CloseBtn from "../CloseBtn/CloseBtn";
 import arrowBack from "../../images/arrowBack.png";
 import {Link} from "react-router-dom";
+// margin-top: 40px;
+// margin-right: 40px;
+
 
 function WelcomePopup(props) {
 	function href(path) {
@@ -25,13 +28,15 @@ function WelcomePopup(props) {
 						<CloseBtn func={() => props.handleClose()} width="20" height="20" />
 					) : null
 				}
-				classHeader={"fixFontSize"}
+				classHeader={props.showCloseBtn ? "fixPaddings" : ""}
+				classNameContainer={"removePad"}
+
 				classTitle={"fixFontSize"}
 				content={
 					<>
 						{!props.showCloseBtn ? (
 							<>
-								<div className="head_wrapper" style={{marginBottom: "40px"}}>
+								<div className="head_wrapper specForSuccess">
 									<button
 										className="arrow_back"
 										onClick={() => props.handleGetBack(props.prevStep)}
@@ -87,6 +92,7 @@ function WelcomePopup(props) {
 						</Grid>
 						<Steppers step={props.step} />
 						<NextBtn
+							marginBottom={"50px"}
 							btnText={props.btnText}
 							handleClickNext={() => props.handleClickNext(props.nextStep)}
 						/>

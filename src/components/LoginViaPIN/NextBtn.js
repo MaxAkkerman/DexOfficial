@@ -8,6 +8,7 @@ export function NextBtn(props) {
 				display: "flex",
 				justifyContent: "center",
 				marginTop: "40px",
+				marginBottom:props.marginBottom ? props.marginBottom : ""
 			}}
 		>
 			<Grid container className={"enterSPRegBox"} spacing={2}>

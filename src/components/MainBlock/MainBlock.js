@@ -10,6 +10,7 @@ function MainBlock({
 	classHeader,
 	classTitle,
 	content,
+   classNameContainer,
 	footer,
 	...rest
 }) {
@@ -28,8 +29,7 @@ function MainBlock({
 
 	return (
 		<div
-			className={className ? className + " mainblock" : "mainblock"}
-			{...rest}
+			className={classNameContainer ? `mainblock ${classNameContainer}` : "mainblock"}
 		>
 			{(title || button) && (
 				<div
