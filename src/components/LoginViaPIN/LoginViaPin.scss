@@ -1,4 +1,5 @@
 .welcomeWrapper {
+	color: var(--mainblock-title-color);
 	font-weight: bold;
 	margin: auto;
 	text-align: center;
@@ -20,6 +21,7 @@
 //  font-size:30px;
 //}
 .welcomeTextWrapper {
+	color: var(--mainblock-title-color);
 	width: 55%;
 	text-align: center;
 }

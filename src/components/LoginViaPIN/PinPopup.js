@@ -9,11 +9,13 @@ import MainBlock from "../MainBlock/MainBlock";
 import {NextBtn} from "./NextBtn";
 import PinKeyboard from "./PinKeyboard";
 import Steppers from "./Steppers";
+import {useSelector} from "react-redux";
 
 
 function PinPopup(props) {
 	const [pinArr, setPinArr] = useState(pincodeArray);
 	const [completed, setCompleted] = useState(false);
+	const appTheme = useSelector((state) => state.appReducer.appTheme);
 
 	let myRefs = [];
 	const saveThisRef = (element) => {
@@ -133,6 +135,7 @@ function PinPopup(props) {
 	return (
 		<div
 			className="select-wrapper"
+			style={{backdropFilter: appTheme ==="light" ? null : "blur(130px)"}}
 			onClick={() => console.log("pinArr", pinArr)}
 		>
 			<MainBlock
@@ -171,14 +174,14 @@ function PinPopup(props) {
 											borderBottomColor: completed
 												? !props.pinCorrect
 													? "red"
-													: "#3569f0"
+													: `var(--accent)`
 												: item.focused
-												? "#3569f0"
-												: null,
+													? `var(--mainblock-title-color)`
+													: null,
 											color: completed
 												? !props.pinCorrect
 													? "red"
-													: "#3569f0"
+													: `var(--accent)`
 												: null,
 										}}
 										className="pinInput"

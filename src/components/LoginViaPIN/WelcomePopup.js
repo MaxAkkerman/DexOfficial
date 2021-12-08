@@ -10,17 +10,23 @@ import Steppers from "./Steppers";
 import CloseBtn from "../CloseBtn/CloseBtn";
 import arrowBack from "../../images/arrowBack.png";
 import {Link} from "react-router-dom";
+import {useSelector} from "react-redux";
 // margin-top: 40px;
 // margin-right: 40px;
 
 
 function WelcomePopup(props) {
+	const appTheme = useSelector((state) => state.appReducer.appTheme);
+
 	function href(path) {
 		if (path === "gogle") window.open("https://google.com");
 	}
 
 	return (
-		<div className="select-wrapper">
+		<div className="select-wrapper"
+			 style={{backdropFilter: appTheme ==="light" ? null : "blur(130px)"}}
+
+		>
 			<MainBlock
 				title={props.title ? props.title : ""}
 				button={

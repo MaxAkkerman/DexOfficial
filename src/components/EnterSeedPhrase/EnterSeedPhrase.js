@@ -125,7 +125,7 @@ function EnterSeedPhrase(props) {
     const [validPassword, setValidPassword] = useState(false);
     const [seedPhrase, setSeedPhrase] = useState(InitialSeedState)
     const [noClientError, setNoClientError] = useState(false);
-    const [loadingUserDataIsWaitingSeed, setloadingUserDataIsWaitingSeed] = useState(false);
+    const [openedPopups, setopenedPopups] = useState(false);
 
 
 //Here i get seed string from seeds array to use it further
@@ -158,6 +158,7 @@ function EnterSeedPhrase(props) {
     }
 
     async function checkClipboardSeedPhrase(e) {
+        e.preventDefault();
         let sp = e.clipboardData.getData("text");
         let arr = sp.split(" ");
         if (arr.length !== 12) {
@@ -230,16 +231,13 @@ function EnterSeedPhrase(props) {
         let verifSeedFromLS;
         let notDeployedClientExists;
         if (clientDataPreDeployLS) {
-            console.log("verifSeedFromLS",verifSeedFromLS,"clientDataPreDeployLS.esp",clientDataPreDeployLS.esp,"seedPhrasePassword",seedPhrasePassword,"seedPhraseString",seedPhraseString)
             verifSeedFromLS = await decryptPure(
                 clientDataPreDeployLS.esp,
                 seedPhrasePassword,
             );
             notDeployedClientExists = verifSeedFromLS === seedPhraseString;
         }
-console.log("seedGlobValid",seedGlobValid,"validPassword",validPassword,"existsClientOnRoot.status",existsClientOnRoot.status,"notDeployedClientExists",notDeployedClientExists)
         if (seedGlobValid && validPassword && existsClientOnRoot.status) {
-            console.log("existsClientOnRoot",existsClientOnRoot)
             saveLog({
                 name: "login",
                 clientAddress: existsClientOnRoot.dexclient,
@@ -371,6 +369,7 @@ console.log("seedGlobValid",seedGlobValid,"validPassword",validPassword,"existsC
                             <SeedItem
                                 handleChangeSeed={(event, newValue) => handleChangeSeed(event, newValue)}
                                 seedPhrase={seedPhrase}
+                                openedPopups={openedPopups}
                             />
                         </Grid>
                         <Alerter

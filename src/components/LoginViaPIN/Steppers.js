@@ -8,6 +8,7 @@ function Steppers(props) {
 			sx={{
 				display: "flex",
 				justifyContent: "center",
+				color: `var(--mainblock-title-color)`,
 				marginTop:
 					`${
 					props.step === "1" ? "12vh" : (props.step === "4" ? "14.85vh" : "10vh")
