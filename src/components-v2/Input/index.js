@@ -15,6 +15,7 @@ export default function Input({
 	label,
 	name,
 	onSelectClick,
+	onValueBlur,
 	onValueChange,
 	readOnly,
 	token,
@@ -42,9 +43,8 @@ export default function Input({
 						className="input-field"
 						name={name}
 						value={value}
-						onChange={(event) => {
-							onValueChange(event);
-						}}
+						onChange={onValueChange}
+						onBlur={onValueBlur}
 						autoFocus={autoFocus}
 						placeholder="0"
 						readOnly={readOnly}
@@ -127,6 +127,7 @@ Input.propTypes = {
 	label: PropTypes.string.isRequired,
 	name: PropTypes.string.isRequired,
 	onSelectClick: PropTypes.func.isRequired,
+	onValueBlur: PropTypes.func.isRequired,
 	onValueChange: PropTypes.func.isRequired,
 	readOnly: PropTypes.bool,
 	token: PropTypes.exact({
