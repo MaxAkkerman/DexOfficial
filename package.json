@@ -14,7 +14,7 @@
 	"author": "",
 	"license": "",
 	"dependencies": {
-		"@apollo/client": "^3.4.17",
+		"@apollo/client": "^3.5.5",
 		"@emotion/babel-preset-css-prop": "^11.2.0",
 		"@emotion/react": "^11.4.1",
 		"@emotion/styled": "^11.6.0",
