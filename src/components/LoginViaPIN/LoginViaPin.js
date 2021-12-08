@@ -136,7 +136,8 @@ function LoginViaPin(props) {
 
 	function handleClickBack(bckStp) {
 		const makeNextStep = JSON.parse(JSON.stringify(steps));
-		if (bckStp === "step3") {
+		console.log("step3",bckStp)
+		if (bckStp === "step3" || bckStp === "step2") {
 			makeNextStep.map((item) => {
 				item.weAreHere = item.name === "step2";
 			});
