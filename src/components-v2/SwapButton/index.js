@@ -2,9 +2,9 @@ import cls from "classnames";
 import PropTypes from "prop-types";
 import React from "react";
 
-export default function SwapButton({onClick, className}) {
+export default function SwapButton({className, ...rest}) {
 	return (
-		<button className={cls("action-btn", className)} onClick={onClick}>
+		<button className={cls("action-btn", className)} {...rest}>
 			<svg
 				width="31"
 				height="30"
@@ -26,11 +26,9 @@ export default function SwapButton({onClick, className}) {
 }
 
 SwapButton.propTypes = {
-	onClick: PropTypes.func,
 	className: PropTypes.string,
 };
 
 SwapButton.defaultProps = {
-	onClick: () => {},
 	className: null,
 };
