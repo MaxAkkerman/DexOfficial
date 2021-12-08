@@ -3,7 +3,7 @@ import "./SearchInput.scss";
 
 function SearchInput(props) {
 	return (
-		<div className="search-input-wrapper">
+		<div id="searchBtn" className="search-input-wrapper">
 			<svg
 				width="21"
 				height="20"
@@ -23,6 +23,7 @@ function SearchInput(props) {
 				</g>
 			</svg>
 			<input
+				id="searchBtnInp"
 				type="text"
 				className="search-input"
 				placeholder="Search name or paste address"

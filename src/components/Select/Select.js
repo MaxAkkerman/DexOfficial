@@ -113,8 +113,8 @@ function Select(props) {
 	// });
 
 	function handleClose(e) {
-		console.log("eee",e.currentTarget.id)
-		if(e.target.id === "swapPopup")return
+		console.log("searchBtn swapPopup",e.target.id)
+		if(e.target.id === "swapPopup" || e.target.id === "searchBtn" || e.target.id === "searchBtnInp" || e.target.id === "mainBlock" || e.target.id === "mainBlockTitle")return
 
 		if (location.pathname.includes("swap")) {
 			return props.type === "from" ? dispatch(hideSwapFromSelect()) : dispatch(hideSwapToSelect());
