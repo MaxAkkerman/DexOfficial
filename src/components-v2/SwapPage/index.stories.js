@@ -9,7 +9,7 @@ import rootReducer from "@/store/reducers";
 export default {
 	component: SwapPage,
 	decorators: [(story) => <BrowserRouter>{story()}</BrowserRouter>],
-	title: "Pages/Swap Page",
+	title: "Pages/Swap",
 };
 
 // eslint-disable-next-line react/prop-types
