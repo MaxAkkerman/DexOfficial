@@ -52,6 +52,7 @@ export default function LimitOrder() {
 			),
 		[tokenList, values.fromToken, values.toToken],
 	);
+
 	// Find the pair
 	useEffect(() => {
 		const {fromToken, toToken} = values;
@@ -69,16 +70,17 @@ export default function LimitOrder() {
 				}),
 		);
 	}, [pairList, values.fromToken, values.toToken]);
+
 	const rate = useMemo(() => {
 		const {fromToken, pair, toToken} = values;
 		if (!pair || !fromToken || !toToken) return;
 
 		return fromToken.rootAddress === pair.rootA ? pair.rateAB : pair.rateBA;
 	}, [values.pair, values.fromToken, values.toToken]);
+
 	// Update "to" value
 	useEffect(() => {
-		if (!rate) return;
-		setFieldValue("toValue", rate);
+		if (rate) setFieldValue("toValue", rate);
 	}, [rate]);
 
 	const {fromPopup, toPopup} = useHandlePopups(setFieldValue);
@@ -88,20 +90,24 @@ export default function LimitOrder() {
 		 * Handle create limit order
 		 */
 	}
+
 	function handleConnectPair() {
 		/**
 		 * Handle pair connect
 		 */
 	}
+
 	function handleConnectWallet() {
 		/**
 		 * Handle wallet connect
 		 */
 	}
+
 	function handleTokensInvert() {
 		setFieldValue("fromToken", values.toToken);
 		setFieldValue("toToken", values.fromToken);
 	}
+
 	function handleSetToMarket() {
 		/**
 		 * Handle set to market
@@ -147,7 +153,7 @@ export default function LimitOrder() {
 			props.onClick = handleCreateLimitOrder;
 		}
 
-		return function CurrentButton({...p}) {
+		return function CurrentButton(p) {
 			return <Button {...props} {...p} />;
 		};
 	}, [walletConnected, values.pair, values.fromToken, values.toToken]);
@@ -200,56 +206,58 @@ export default function LimitOrder() {
 									}
 									readOnly
 								/>
-								<div className={"orders__price_box"}>
-									<Stack
-										direction={"column"}
-										spacing={1}
-										sx={{marginBottom: "3%"}}
-									>
-										<div>Limit order price</div>
-										<div className={"orders__icon_box"}>
-											<input
-												name="fromPrice"
-												type="number"
-												autoComplete="false"
-												className="orders__input"
-												placeholder="0"
-												onBlur={handleBlur}
-												onChange={handleChange}
-												value={values.fromPrice}
-												style={{
-													borderColor:
-														touched.fromPrice && errors.fromPrice
-															? "var(--error)"
-															: "var(--input-border-color)",
-												}}
-											/>
-											{values.toToken && (
-												<div className="input-select">
-													<img
-														src={iconGenerator(values.toToken.symbol)}
-														alt={values.toToken.symbol}
-														className="input-token-img"
-													/>
-													<span>{values.toToken.symbol}</span>
-												</div>
-											)}
-										</div>
-										<FormHelperText
-											error={touched.fromPrice && errors.fromPrice}
+								{walletConnected && (
+									<div className={"orders__price_box"}>
+										<Stack
+											direction={"column"}
+											spacing={1}
+											sx={{marginBottom: "3%"}}
 										>
-											{(touched.fromPrice && errors.fromPrice) ||
-												(!touched.fromPrice && "Type numeric value")}
-										</FormHelperText>
-									</Stack>
-									<button
-										className="btn orders btn--disabled"
-										disabled
-										onClick={handleSetToMarket}
-									>
-										Set to market
-									</button>
-								</div>
+											<div>Limit order price</div>
+											<div className={"orders__icon_box"}>
+												<input
+													name="fromPrice"
+													type="number"
+													autoComplete="false"
+													className="orders__input"
+													placeholder="0"
+													onBlur={handleBlur}
+													onChange={handleChange}
+													value={values.fromPrice}
+													style={{
+														borderColor:
+															touched.fromPrice && errors.fromPrice
+																? "var(--error)"
+																: "var(--input-border-color)",
+													}}
+												/>
+												{values.toToken && (
+													<div className="input-select">
+														<img
+															src={iconGenerator(values.toToken.symbol)}
+															alt={values.toToken.symbol}
+															className="input-token-img"
+														/>
+														<span>{values.toToken.symbol}</span>
+													</div>
+												)}
+											</div>
+											<FormHelperText
+												error={touched.fromPrice && errors.fromPrice}
+											>
+												{(touched.fromPrice && errors.fromPrice) ||
+													(!touched.fromPrice && "Type numeric value")}
+											</FormHelperText>
+										</Stack>
+										<button
+											className="btn orders btn--disabled"
+											disabled
+											onClick={handleSetToMarket}
+										>
+											Set to market
+										</button>
+									</div>
+								)}
 								<CurrentButton type="submit" />
 								{values.pair && (
 									<p className="swap-rate">
