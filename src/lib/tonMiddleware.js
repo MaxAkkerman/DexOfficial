@@ -15,22 +15,20 @@ import {
 
 export function createTonMiddleware(context) {
 	return (store) => (next) => (action) => {
-		const {tonFunctions} = store.getState();
-
 		switch (action.type) {
 			case FETCH_PAIRS:
 				store.dispatch(setPairsLoading());
 
-				tonFunctions
-					.fetchPairs(context)
+				context
+					.getPairs()
 					.then((p) => store.dispatch(setPairs(p)))
 					.catch((e) => store.dispatch(setPairsError(e)));
 				break;
 			case FETCH_TOKENS:
 				store.dispatch(setTokensLoading());
 
-				tonFunctions
-					.fetchTokens(context)
+				context
+					.getTokens()
 					.then((t) => store.dispatch(setTokens(t)))
 					.catch((e) => store.dispatch(setTokensError(e)));
 				break;
