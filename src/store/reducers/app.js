@@ -29,6 +29,7 @@ const initialState = {
 	accountIsVisible: false,
 	popup: {isVisible: false, type: "", message: "", link: ""},
 	tips: null,
+	waitingPopup: null,
 };
 
 const appReducer = (state = initialState, {type, payload}) => {

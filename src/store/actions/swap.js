@@ -1,21 +1,38 @@
 import {
-	SET_SWAP_FROM_INPUT_VALUE_CHANGE,
-	SET_SWAP_FROM_INPUT_VALUE,
-	SET_SWAP_TO_INPUT_VALUE,
-	SET_SWAP_FROM_TOKEN,
-	SET_SWAP_TO_TOKEN,
-	SET_SWAP_PAIR_ID,
-	SHOW_SWAP_FROM_SELECT,
 	HIDE_SWAP_FROM_SELECT,
-	SHOW_SWAP_TO_SELECT,
 	HIDE_SWAP_TO_SELECT,
-	SET_SWAP_ASYNC_IS_WAITING,
-	SET_SWAP_RATE,
+	RESET_SWAP_VALUES,
 	SET_SLIPPAGE,
+	SET_SWAP_ASYNC_IS_WAITING,
+	SET_SWAP_FROM_INPUT_VALUE,
+	SET_SWAP_FROM_INPUT_VALUE_CHANGE,
+	SET_SWAP_FROM_TOKEN,
+	SET_SWAP_PAIR_ID,
+	SET_SWAP_RATE,
+	SET_SWAP_TO_INPUT_VALUE,
+	SET_SWAP_TO_TOKEN,
+	SET_SWAP_VALUES,
+	SHOW_SWAP_FROM_SELECT,
+	SHOW_SWAP_TO_SELECT,
 } from "./types";
 
+export function setSwapValues(values) {
+	return {
+		payload: values,
+		type: SET_SWAP_VALUES,
+	};
+}
+
+export function resetSwapValues() {
+	return {
+		type: RESET_SWAP_VALUES,
+	};
+}
+
+export function closeSwapConfirmPopup() {}
+
 export function setSwapFromInputValue(payload) {
-	return {type: SET_SWAP_FROM_INPUT_VALUE, payload};
+	return {payload, type: SET_SWAP_FROM_INPUT_VALUE, payload};
 }
 export function setSlippageValue(payload) {
 	return {type: SET_SLIPPAGE, payload};

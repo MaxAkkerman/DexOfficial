@@ -7,12 +7,14 @@ import {
 	CONNECT_WALLET,
 	HIDE_POPUP,
 	HIDE_TIP,
+	HIDE_WAITING_POPUP,
 	SET_CUR_EXT,
 	SET_EXTENSIONS_LIST,
 	SET_TIPS,
 	SET_WALLET_IS_CONNECTED,
 	SHOW_POPUP,
 	SHOW_TIP,
+	SHOW_WAITING_POPUP,
 } from "./types";
 
 export function showTip() {
@@ -73,4 +75,12 @@ export function showPopup(payload) {
 
 export function hidePopup() {
 	return {type: HIDE_POPUP};
+}
+
+export function hideWaitingPopup() {
+	return {type: HIDE_WAITING_POPUP};
+}
+
+export function showWaitingPopup(payload) {
+	return {payload, type: SHOW_WAITING_POPUP};
 }
