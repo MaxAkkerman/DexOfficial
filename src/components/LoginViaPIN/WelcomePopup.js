@@ -98,7 +98,10 @@ function WelcomePopup(props) {
 						</Grid>
 						<Steppers step={props.step} />
 						<NextBtn
+							curBtnStyles={"curBtnStyles"}
+							btnsClass={"enterSPRegBox"}
 							marginBottom={"50px"}
+							errColor={null}
 							btnText={props.btnText}
 							handleClickNext={() => props.handleClickNext(props.nextStep)}
 						/>

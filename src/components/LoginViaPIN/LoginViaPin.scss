@@ -5,6 +5,25 @@
 	text-align: center;
 	font-size: 28px;
 }
+.LoginViaPinBtns{
+	justify-content: center;
+	//width: 320px;
+	//padding-left: 16px;
+}
+.curBtnStylesLogin{
+	height: 57px;
+	font-size: 20px;
+	//padding: 16px 20px;
+	border-radius: 18px;
+	width: 50%;
+}
+.curBtnStyles{
+	height: 57px;
+	font-size: 20px;
+	padding: 16px 20px;
+	border-radius: 18px;
+	width: 100%;
+}
 .removePad{
 	padding: unset;
 }

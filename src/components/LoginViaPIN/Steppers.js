@@ -11,11 +11,11 @@ function Steppers(props) {
 				color: `var(--mainblock-title-color)`,
 				marginTop:
 					`${
-					props.step === "1" ? "12vh" : (props.step === "4" ? "14.85vh" : "10vh")
-				}`,
+						props.step === "1" ? "12vh" : (props.step === "4" ? "14.85vh" : "10vh")
+					}`,
 			}}
 		>
-			Step {props.step}/4
+			{ props.step ? `Step ${props.step}/4` : ""}
 		</Box>
 	);
 }

@@ -8,20 +8,16 @@ export function NextBtn(props) {
 				display: "flex",
 				justifyContent: "center",
 				marginTop: "40px",
-				marginBottom:props.marginBottom ? props.marginBottom : ""
+				marginBottom:props.marginBottom ? props.marginBottom : "",
+				width:"100%"
 			}}
 		>
-			<Grid container className={"enterSPRegBox"} spacing={2}>
+			<Grid container className={props.btnsClass} spacing={2}>
 				<button
-					style={{
-						height: "57px",
-						fontSize: "20px",
-						padding: "16px 20px",
-						borderRadius: "18px",
-						width: "100%",
-					}}
+					// style={...props.curBtnStyles}
+
 					onClick={() => props.handleClickNext()}
-					className="btn wallet-btn"
+					className={props.errColor ? `btn-error btn wallet-btn ${props.curBtnStyles}` : `btn wallet-btn ${props.curBtnStyles}`}
 				>
 					{props.btnText}
 				</button>
