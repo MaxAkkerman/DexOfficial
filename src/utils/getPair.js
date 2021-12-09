@@ -6,8 +6,7 @@ import getAllPairs from "./getAllPairs";
  * @property {string} addrPair
  * @property {string} rootA
  * @property {string} rootB
- */
-/**
+ *
  * @param {string} addrPair
  * @returns {Promise<Pair>}
  */
