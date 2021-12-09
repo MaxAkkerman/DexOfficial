@@ -86,7 +86,7 @@ export default function SwapPage() {
 		return directionPair === AB_DIRECTION ? pair.rateAB : pair.rateBA;
 	}, [directionPair, values.pair]);
 
-	// Calculate To value
+	// Calculate "to" value
 	useEffect(() => {
 		const {fromValue} = values;
 		if (!fromValue || !rate) return;

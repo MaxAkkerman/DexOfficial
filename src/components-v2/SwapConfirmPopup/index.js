@@ -2,7 +2,6 @@ import "./index.scss";
 
 import {useApolloClient} from "@apollo/client";
 import {useSnackbar} from "notistack";
-import PropTypes from "prop-types";
 import React, {useMemo} from "react";
 import {useDispatch, useSelector} from "react-redux";
 
@@ -26,13 +25,13 @@ export default function SwapConfirmPopup() {
 
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
 	const values = useSelector((state) => state.swapReducer.values);
-	const fn = useSelector((state) => state.tonFunctions.functions);
+	const fn = useSelector((state) => state.tonFunctions);
 
 	const directionPair = useMemo(() => {
 		const {fromToken, pair} = values;
-		if (pair)
-			fromToken.rootAddress === pair.rootA ? AB_DIRECTION : BA_DIRECTION;
-	}, [values.pair]);
+		if (fromToken && pair)
+			return fromToken.rootAddress === pair.rootA ? AB_DIRECTION : BA_DIRECTION;
+	}, [values.fromToken, values.pair]);
 
 	const rate = useMemo(() => {
 		const {pair} = values;
@@ -102,7 +101,7 @@ export default function SwapConfirmPopup() {
 					directionPair,
 					pairAddr: values.pair.pairAddress,
 					qtyFrom: values.fromValue,
-					qtyTo: values.toValues,
+					qtyTo: values.toValue,
 					slippage: values.slippage,
 				});
 				console.log("swap(A|B)->res", res);
@@ -294,13 +293,3 @@ export default function SwapConfirmPopup() {
 		</div>
 	);
 }
-
-SwapConfirmPopup.propTypes = {
-	fromToken: PropTypes.object.isRequired,
-	fromValue: PropTypes.number.isRequired,
-	pair: PropTypes.object.isRequired,
-	rate: PropTypes.number.isRequired,
-	slippage: PropTypes.number.isRequired,
-	toToken: PropTypes.object.isRequired,
-	toValue: PropTypes.number.isRequired,
-};

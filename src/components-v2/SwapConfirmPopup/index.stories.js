@@ -1,8 +1,10 @@
 import {MockedProvider} from "@apollo/client/testing";
+import {SnackbarProvider} from "notistack";
 import React from "react";
 import {Provider} from "react-redux";
 import {createStore} from "redux";
 
+import Alert from "@/components-v2/Alert";
 import SwapConfirmPopup from "@/components-v2/SwapConfirmPopup";
 import rootReducer from "@/store/reducers";
 
@@ -16,9 +18,21 @@ const Template = (store, args) => {
 
 	return (
 		<Provider store={store}>
-			<MockedProvider>
-				{state.swapReducer.values && <SwapConfirmPopup {...args} />}
-			</MockedProvider>
+			<SnackbarProvider
+				maxSnack={3}
+				autoHideDuration={10000}
+				anchorOrigin={{
+					horizontal: "right",
+					vertical: "bottom",
+				}}
+				content={(key, {message, type}) => (
+					<Alert id={key} message={message} type={type} />
+				)}
+			>
+				<MockedProvider>
+					{state.swapReducer.values && <SwapConfirmPopup {...args} />}
+				</MockedProvider>
+			</SnackbarProvider>
 		</Provider>
 	);
 };
@@ -34,7 +48,6 @@ export const WithoutValues = Template.bind(
 
 export const WithValues = Template.bind(
 	{},
-
 	createStore(rootReducer, {
 		swapReducer: {
 			values: {
@@ -69,6 +82,7 @@ export const WithValues = Template.bind(
 					symbolB: "DAI",
 					totalSupply: "10999999",
 				},
+				slippage: 0,
 				toToken: {
 					balance: 0.289999999989,
 					decimals: "18",
@@ -83,7 +97,7 @@ export const WithValues = Template.bind(
 					walletAddress:
 						"0:51b5475f23d185f860d21b91fad2b885d410e90f903ab0866576500ef9c0ad7b",
 				},
-				toValue: 15,
+				toValue: 0.09800000002672728,
 			},
 		},
 	}),
