@@ -244,6 +244,7 @@ function EnterSeedPhrase(props) {
             const clientKeys = await getClientKeys(seedPhraseString);
             const existsClientOnRoot = await checkPubKey(clientKeys.public);
 
+
             let verifSeedFromLS;
             let notDeployedClientExists;
 
@@ -254,8 +255,19 @@ function EnterSeedPhrase(props) {
                 );
                 notDeployedClientExists = verifSeedFromLS === seedPhraseString;
             }
-            setPreInitData({clientDataPreDeployLS:{...clientDataPreDeployLS},clientKeys: {...clientKeys},notDeployedClientExists: notDeployedClientExists,existsClientOnRoot:{...existsClientOnRoot}})
-            setOnPin(ev)
+
+            if(!notDeployedClientExists && !existsClientOnRoot.status){
+                disSetTips(
+                    "Some error, no such client on root, please use another seed or create new client",
+                    "error",
+                );
+                return
+            }
+                setPreInitData({clientDataPreDeployLS:{...clientDataPreDeployLS},clientKeys: {...clientKeys},notDeployedClientExists: notDeployedClientExists,existsClientOnRoot:{...existsClientOnRoot}})
+                setOnPin(ev)
+
+
+
         }else{
             clearState()
             setOnPin(ev)
