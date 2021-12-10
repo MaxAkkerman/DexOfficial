@@ -47,6 +47,7 @@ function EnterPassword(props) {
         if (!pin) return;
         const curEmptyPin = pin.filter((item) => !item.value.length);
         if (!curEmptyPin.length) {
+
             let seedPhrasePassword = "";
             pin.map(item => {
                 seedPhrasePassword += item.value.toString()
@@ -68,6 +69,7 @@ function EnterPassword(props) {
                 );
             }
             if (decrypted.valid === true) {
+
                 setloadingUserDataIsWaiting(true);
                 setDecryptResult(true);
                 if (!clientDataLS.status && clientDataPreDeploy && clientDataPreDeploy.address) {
@@ -181,7 +183,7 @@ function EnterPassword(props) {
                         handleClickBack={null}
                         handleClose={null}
                         handleClickNext={(pin) => handleLogIn(pin)}
-                        handleCheckPin={(pin, step) => handleCheckPin(pin, step)}
+                        handleCheckPin={(pin, step, completed) => handleCheckPin(pin, step,completed)}
                     />
                 </div>
             )

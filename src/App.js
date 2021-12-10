@@ -52,7 +52,7 @@ import {
 	getAllPairsAndSetToStore,
 	getAllTokensAndSetToStore,
 } from "./reactUtils/reactUtils";
-import {changeTheme, hideTip, showPopup} from "./store/actions/app";
+import {changeTheme, handleOpenEnterSeed, hideTip, showPopup} from "./store/actions/app";
 import {
 	enterSeedPhraseEmptyStorage,
 	setEncryptedSeedPhrase,
@@ -64,10 +64,13 @@ import {
 	setSubscribeReceiveTokens,
 } from "./store/actions/wallet";
 import {setNFTassets} from "./store/actions/walletSeed";
+import EnterSeedPhrase from "./components/EnterSeedPhrase/EnterSeedPhrase";
 
 function App() {
 	const dispatch = useDispatch();
 	const location = useLocation();
+
+	const openEnterSeed = useSelector((state) => state.appReducer.openEnterSeed);
 
 	const popup = useSelector((state) => state.appReducer.popup);
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
@@ -325,6 +328,11 @@ function App() {
 
 	return (
 		<>
+			{openEnterSeed &&
+			<EnterSeedPhrase
+				// setloadingUserData={(bl) => setloadingUserData(bl)}
+				handleCLoseEntSeed={()=>dispatch(handleOpenEnterSeed(false))}
+			/>}
 			{visibleEnterSeedPhraseUnlock === true &&
 				emptyStorage === false &&
 				!onloading && <EnterPassword />}

@@ -34,7 +34,7 @@ function PinPopup(props) {
     }, [pinArr]);
 
     useEffect(() => {
-        props.handleCheckPin(pinArr, props.step);
+        props.handleCheckPin(pinArr, props.step,completed);
     }, [pinArr]);
 
     function handleClickNumKeyboard(e) {
@@ -145,7 +145,7 @@ function PinPopup(props) {
                 content={
                     <>
                         <div className="head_wrapper" style={{marginBottom: "20px"}}>
-                            {props.step ? <button
+                            {props.showTwoBtns ? <button
                                 className="arrow_back"
                                 onClick={() => props.handleClickBack(props.prevStep)}
                             >
@@ -201,7 +201,7 @@ function PinPopup(props) {
                         />
 
                         <Steppers step={props.step}/>
-                        {!props.step ?
+                        {!props.showTwoBtns ?
                             <div style={{"display":"flex", "width":"100%"}}>
                                 <NextBtn
                                     curBtnStyles={"curBtnStylesLogin"}
@@ -229,7 +229,7 @@ function PinPopup(props) {
                                 btnText={props.btnText}
 								errColor={null}
 								handleClickNext={() =>
-									props.handleClickNext(props.nextStep, completed)
+									props.handleClickNext(pinArr,props.nextStep, completed)
 								}
 							/>
                         }

@@ -39,6 +39,7 @@ export async function encrypt(seedPhrase, pin) {
 }
 
 export async function decrypt(enc, pin) {
+	console.log("enc, pin",enc, pin)
 	const aes = new pidCrypt.AES.CBC();
 	const decrypted = aes.decryptText(enc, pin);
 	console.log("decrypted", decrypted);

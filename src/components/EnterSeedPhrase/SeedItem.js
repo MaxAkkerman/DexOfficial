@@ -17,7 +17,6 @@ import styled from "@emotion/styled";
 const mnemonicWordsA = ()=>getMnemonics();
 
 function SeedItem(props) {
-console.log("SeedItem rerendered blyat")
     const mnemonicWords = useMemo(() => mnemonicWordsA(), []);
 
     const CssTextField = React.memo(styled(TextField)({
