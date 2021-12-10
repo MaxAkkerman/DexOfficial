@@ -7,6 +7,7 @@ import differenceBy from "lodash/differenceBy";
 import find from "lodash/find";
 import React, {useEffect, useMemo, useState} from "react";
 import {useSelector} from "react-redux";
+import {useHistory} from "react-router-dom";
 
 import Button from "@/components-v2/Button";
 import Input from "@/components-v2/Input";
@@ -17,6 +18,8 @@ import {iconGenerator} from "@/iconGenerator";
 import truncateNum from "@/utils/truncateNum";
 
 export default function LimitOrder() {
+	const history = useHistory();
+
 	const walletConnected = useSelector(
 		(state) => state.appReducer.walletIsConnected,
 	);
@@ -98,9 +101,7 @@ export default function LimitOrder() {
 	}
 
 	function handleConnectWallet() {
-		/**
-		 * Handle wallet connect
-		 */
+		history.push("/account");
 	}
 
 	function handleTokensInvert() {
@@ -143,12 +144,15 @@ export default function LimitOrder() {
 		};
 
 		if (!walletConnected) {
+			props.type = "button";
 			props.children = "Connect wallet";
 			props.onClick = handleConnectWallet;
 		} else if (values.fromToken && values.toToken && !values.pair) {
+			props.type = "button";
 			props.children = "Connect pair";
 			props.onClick = handleConnectPair;
 		} else {
+			props.type = "submit";
 			props.children = "Create limit order";
 			props.onClick = handleCreateLimitOrder;
 		}
@@ -258,7 +262,7 @@ export default function LimitOrder() {
 										</button>
 									</div>
 								)}
-								<CurrentButton type="submit" />
+								<CurrentButton />
 								{values.pair && (
 									<p className="swap-rate">
 										Price{" "}
