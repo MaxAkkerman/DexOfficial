@@ -4,20 +4,23 @@ import cls from "classnames";
 import PropTypes from "prop-types";
 import React from "react";
 
-export default function MainBlock({
-	button,
-	class: className,
-	classHeader,
-	classTitle,
-	content,
-	footer,
-	normalTitle,
-	smallTitle,
-	title,
-	...rest
-}) {
+function MainBlock(
+	{
+		button,
+		class: className,
+		classHeader,
+		classTitle,
+		content,
+		footer,
+		normalTitle,
+		smallTitle,
+		title,
+		...rest
+	},
+	ref,
+) {
 	return (
-		<div className={cls("mainblock", className)} {...rest}>
+		<div className={cls("mainblock", className)} ref={ref} {...rest}>
 			{(title || button) && (
 				<div className={cls("mainblock-header", classHeader)}>
 					<h2
@@ -59,3 +62,5 @@ MainBlock.defaultProps = {
 	smallTitle: null,
 	title: null,
 };
+
+export default React.forwardRef(MainBlock);

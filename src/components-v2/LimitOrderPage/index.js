@@ -273,7 +273,7 @@ export default function LimitOrder() {
 					}
 				/>
 			</div>
-			{fromPopup && (
+			{fromPopup.state && (
 				<SelectPopup
 					tokens={leftTokens}
 					open={fromPopup.state}
@@ -281,7 +281,7 @@ export default function LimitOrder() {
 					onSelect={fromPopup.select}
 				/>
 			)}
-			{toPopup && (
+			{toPopup.state && (
 				<SelectPopup
 					tokens={leftTokens}
 					open={toPopup.state}

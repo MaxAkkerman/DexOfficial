@@ -244,18 +244,16 @@ export default function SwapPage() {
 					}
 				/>
 			</div>
-			{fromSelectPopup && (
+			{fromSelectPopup.state && (
 				<SelectPopup
 					tokens={leftTokens}
-					open={fromSelectPopup.state}
 					onClose={fromSelectPopup.close}
 					onSelect={fromSelectPopup.select}
 				/>
 			)}
-			{toSelectPopup && (
+			{toSelectPopup.state && (
 				<SelectPopup
 					tokens={leftTokens}
-					open={toSelectPopup.state}
 					onClose={toSelectPopup.close}
 					onSelect={toSelectPopup.select}
 				/>

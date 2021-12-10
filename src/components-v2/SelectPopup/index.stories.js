@@ -13,19 +13,14 @@ export default {
 const Template = (args) => <SelectPopup {...args} />;
 
 export const Empty = Template.bind({});
-Empty.args = {
-	open: true,
-};
 
 export const Loading = Template.bind({});
 Loading.args = {
 	loading: true,
-	open: true,
 };
 
 export const WithTokens = Template.bind({});
 WithTokens.args = {
 	loading: false,
-	open: true,
 	tokens: values(tokens),
 };
