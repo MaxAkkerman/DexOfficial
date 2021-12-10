@@ -3,6 +3,9 @@ import "./PinPopup.scss";
 import Button from "@material-ui/core/Button";
 import {Grid} from "@material-ui/core";
 
+
+//`var(--accent)`
+// `var(--mainblock-title-color)`
 function PinKeyboard(props) {
 	return (
 		<Grid className="gridContainer" sx={{justifyContent: "center"}}>

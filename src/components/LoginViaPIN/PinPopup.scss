@@ -14,8 +14,11 @@
 	border-radius: 50%;
 	margin: auto;
 	font-size: 25px;
-	color: #333333;
-	border: 0.5px solid #285bdb;
+	color: var(--mainblock-title-color);
+	border: 0.5px solid var(--mainblock-title-color);
+	&:hover {
+		color: var(--accent);
+	}
 }
 
 .numsInputContainer {

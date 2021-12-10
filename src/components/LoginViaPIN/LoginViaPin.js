@@ -136,7 +136,8 @@ function LoginViaPin(props) {
 
 	function handleClickBack(bckStp) {
 		const makeNextStep = JSON.parse(JSON.stringify(steps));
-		if (bckStp === "step3") {
+		console.log("step3",bckStp)
+		if (bckStp === "step3" || bckStp === "step2") {
 			makeNextStep.map((item) => {
 				item.weAreHere = item.name === "step2";
 			});
@@ -196,6 +197,7 @@ function LoginViaPin(props) {
 				<PinPopup
 					title={"Set PIN for quick login"}
 					step={"2"}
+					handleLogOut={null}
 					nextStep={"step3"}
 					prevStep={"step1"}
 					btnText={"Next"}
@@ -214,6 +216,7 @@ function LoginViaPin(props) {
 					nextStep={"step4"}
 					prevStep={"step2"}
 					btnText={"Next"}
+					handleLogOut={null}
 					pinCorrect={pinsConfirmed}
 					handleClickBack={(bckStp) => handleClickBack(bckStp)}
 					handleClickNext={(nxtStp, completed) =>

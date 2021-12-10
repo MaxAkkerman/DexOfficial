@@ -113,8 +113,8 @@ function Select(props) {
 	// });
 
 	function handleClose(e) {
-		console.log("eee",e.currentTarget.id)
-		if(e.target.id === "swapPopup")return
+		console.log("fromArr, toArr",fromArr, toArr)
+		if(e.target.id === "swapPopup" || e.target.id === "searchBtn" || e.target.id === "searchBtnInp" || e.target.id === "mainBlock" || e.target.id === "mainBlockTitle")return
 
 		if (location.pathname.includes("swap")) {
 			return props.type === "from" ? dispatch(hideSwapFromSelect()) : dispatch(hideSwapToSelect());
@@ -141,6 +141,7 @@ function Select(props) {
 									fromArr
 										.sort((a, b) => b.balance - a.balance)
 										.filter((t) => includesTextInToken(t, filter))
+										.filter((it) => it.balance !== 0)
 										.map((item) => (
 											<SelectItem
 												type={props.type}
@@ -158,6 +159,7 @@ function Select(props) {
 										.filter((item) =>
 											item.symbol.toLowerCase().includes(filter.toLowerCase()),
 										)
+										.filter((it) => it.balance !== 0)
 										.map((item) => (
 											<SelectItem
 												type={props.type}

@@ -13,10 +13,12 @@ import {
 	SET_WALLET_IS_CONNECTED,
 	SHOW_POPUP,
 	SHOW_TIP,
+	OPEN_ENTER_SEED
 } from "../actions/types";
 
 const initialState = {
 	appTheme: null,
+	openEnterSeed:false,
 	extensionsList: [],
 	extensionIsSelected: false,
 	curExt: {},
@@ -33,6 +35,11 @@ const initialState = {
 
 const appReducer = (state = initialState, {type, payload}) => {
 	switch (type) {
+		case OPEN_ENTER_SEED:
+			return {
+				...state,
+				openEnterSeed: payload,
+			};
 		case SET_TIPS:
 			return {
 				...state,

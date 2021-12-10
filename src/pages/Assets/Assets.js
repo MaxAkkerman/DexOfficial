@@ -19,6 +19,7 @@ import sendAssetsimg from "../../images/sendAssets.svg";
 import settingsBtn from "../../images/Vector.svg";
 import {setTokenList} from "../../store/actions/wallet";
 import axios from "axios";
+import {getShardLimit} from "../../extensions/sdk_get/get";
 
 function Assets() {
 	const history = useHistory();
@@ -122,7 +123,10 @@ function Assets() {
 		setCurNFTForWithdraw(item);
 		console.log("item", item);
 	}
-
+	async function trt(){
+		const sounitV = await getShardLimit()
+console.log("sounitV",sounitV)
+	}
 	return (
 		<>
 			{showWrapMenu && !showWithdrawMenu && (
@@ -146,7 +150,7 @@ function Assets() {
 				/>
 			)}
 			{!showWrapMenu && !showWithdrawMenu && (
-				<div className="container">
+				<div className="container" onClick={()=>trt()}>
 					<MainBlock
 						smallTitle={false}
 						// title={'Assets'}

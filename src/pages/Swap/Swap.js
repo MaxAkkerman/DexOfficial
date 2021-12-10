@@ -16,7 +16,6 @@ import {
 } from "../../extensions/sdk_run/run";
 
 import {
-	setSlippageValue,
 	setSwapAsyncIsWaiting,
 	setSwapFromToken,
 	setSwapToToken,
@@ -24,7 +23,6 @@ import {
 
 import settingsBtn from "../../images/Vector.svg";
 import SlippagePopper from "../../components/SlippagePopper/SlippagePopper";
-import useSlippagePopper from "../../hooks/useSlippagePopper";
 import useKeyPair from "../../hooks/useKeyPair";
 import {
 	NOT_ENOUGH,
@@ -41,9 +39,7 @@ function Swap() {
 	const history = useHistory();
 	const dispatch = useDispatch();
 
-	const walletIsConnected = useSelector(
-		(state) => state.appReducer.walletIsConnected,
-	);
+	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
 
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
@@ -55,14 +51,11 @@ function Swap() {
 	const toValue = useSelector((state) => state.swapReducer.toInputValue);
 	const rate = useSelector((state) => state.swapReducer.rate);
 	const pairId = useSelector((state) => state.swapReducer.pairId);
-	const swapAsyncIsWaiting = useSelector(
-		(state) => state.swapReducer.swapAsyncIsWaiting,
-	);
+	const swapAsyncIsWaiting = useSelector((state) => state.swapReducer.swapAsyncIsWaiting);
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 	const tips = useSelector((state) => state.appReducer.tips);
 
-	const [swapConfirmPopupIsVisible, setSwapConfirmPopupIsVisible] =
-		useState(false);
+	const [swapConfirmPopupIsVisible, setSwapConfirmPopupIsVisible] = useState(false);
 	const [connectAsyncIsWaiting, setconnectAsyncIsWaiting] = useState(false);
 	const [curExist, setExistsPair] = useState(false);
 	const [notDeployedWallets, setNotDeployedWallets] = useState([]);
@@ -71,9 +64,35 @@ function Swap() {
 	const [errors, setErrors] = useState({});
 	const [isError, setIsError] = useState(true);
 
-	// const {slippageState, popperState} = useSlippagePopper();
+	const [op,setop] = useState(false)
+	const [anchorEl, setAnchorEl] = useState(null);
+	const [idPop,setIdPop] = useState(undefined)
+
 	const {keyPair} = useKeyPair();
 	const {assetList} = useAssetList();
+	const popper = useRef(null)
+
+
+	useEffect(() => {
+		if (Object.keys(errors).length === 0) setIsError(false);
+		else setIsError(true);
+	}, [errors]);
+
+	useEffect(()=>{
+		if(op){
+			// setOpenPop(true)
+			setAnchorEl(popper.current);
+			setIdPop("simple-popper")
+		}else{
+			// setOpenPop(false)
+			setAnchorEl(null);
+			setIdPop(undefined)
+		}
+	},[op])
+
+	useEffect(() => {
+		if (fromToken && toToken) validate(fromValue, toValue, fromToken, toToken);
+	}, [fromValue, toValue, fromToken, toToken]);
 
 	useEffect(() => {
 		if (!pairsList.length || !pairId) {
@@ -144,7 +163,10 @@ function Swap() {
 			);
 		}
 	}
+	function handleCloseConnect(){
+		setconnectAsyncIsWaiting(false);
 
+	}
 	async function handleConnectPair() {
 		if (clientData.balance < 12) {
 			dispatch(
@@ -175,14 +197,13 @@ function Swap() {
 					type: "error",
 				}),
 			);
-			return;
+			// return;
 		} else {
 			setconnectPairStatusText("preparing client data.");
 			let getClientForConnectStatus = await getClientForConnect(
 				connectRes,
 				clientData.address,
 			);
-			console.log("getClientForConnectStatus", getClientForConnectStatus);
 			if (getClientForConnectStatus.code) {
 				setconnectAsyncIsWaiting(false);
 				dispatch(
@@ -191,7 +212,7 @@ function Swap() {
 						type: "error",
 					}),
 				);
-				return;
+				// return;
 			} else {
 				setconnectPairStatusText(
 					"computing the best shard for your wallets and deploying.",
@@ -200,7 +221,6 @@ function Swap() {
 					getClientForConnectStatus,
 					keyPair,
 				);
-				console.log("connectToRootsStatus", connectToRootsStatus);
 				if (connectToRootsStatus.code) {
 					setconnectAsyncIsWaiting(false);
 					dispatch(
@@ -209,18 +229,17 @@ function Swap() {
 							type: "error",
 						}),
 					);
-					return;
+					// return;
 				} else {
 					setNotDeployedWallets([]);
+					setconnectPairStatusText("finishing");
+					setconnectAsyncIsWaiting(false);
+					setExistsPair(true);
 					// dispatch(setSwapFromInputValue(""));
 					// dispatch(setSwapToInputValue(""));
 				}
 			}
 		}
-
-		setconnectPairStatusText("finishing");
-		setconnectAsyncIsWaiting(false);
-		setExistsPair(true);
 	}
 
 	function getCurBtn() {
@@ -282,13 +301,7 @@ function Swap() {
 		dispatch(setSwapAsyncIsWaiting(false));
 	}
 
-	useEffect(() => {
-		if (Object.keys(errors).length === 0) setIsError(false);
-		else setIsError(true);
-	}, [errors]);
-
 	function validate(fromValue, toValue, fromToken, toToken) {
-		console.log(fromToken, toToken);
 		if (
 			fromToken.symbol &&
 			toToken.symbol &&
@@ -315,11 +328,7 @@ function Swap() {
 			}
 		}
 	}
-	const[op,setop] = useState(false)
 
-	// const [slippage, setSlippage] = useState("2");
-
-	const [anchorEl, setAnchorEl] = useState(null);
 
 	function handleClickOpenPop(ev) {
 		// console.log("popper",ev.currentTarget.id)
@@ -327,45 +336,12 @@ function Swap() {
 		ev.stopPropagation();
 
 		if(ev.currentTarget.id !== "popBtn"){
-			console.log("popper",ev.currentTarget.id)
 			setop(false)
 		}else{
-
-			console.log("popper",ev.currentTarget.id, "op",op)
-
 			setop(!op)
 		}
 
 	}
-	const popper = useRef(null)
-
-	// const open = Boolean(anchorEl);
-	useEffect(()=>{
-		if(op){
-			// setOpenPop(true)
-			setAnchorEl(popper.current);
-			setIdPop("simple-popper")
-		}else{
-			// setOpenPop(false)
-			setAnchorEl(null);
-			setIdPop(undefined)
-
-		}
-
-
-
-	},[op])
-
-	// const [openPop,setOpenPop] = useState(false)
-	const [idPop,setIdPop] = useState(undefined)
-
-	// function handler(){
-	// 	console.log("ya")
-	// 	setop(!op)
-	// }
-	useEffect(() => {
-		if (fromToken && toToken) validate(fromValue, toValue, fromToken, toToken);
-	}, [fromValue, toValue, fromToken, toToken]);
 
 	return (
 		<div className="container" id={"cont"} onClick={(e)=>handleClickOpenPop(e)}>
@@ -532,6 +508,7 @@ function Swap() {
 			{connectAsyncIsWaiting && (
 				<WaitingPopupConnect
 					text={`Connecting to ${fromToken.symbol}/${toToken.symbol} pair, ${connectPairStatusText}`}
+					handleClose={() => handleCloseConnect()}
 				/>
 			)}
 			{swapAsyncIsWaiting && (

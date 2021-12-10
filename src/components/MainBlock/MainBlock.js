@@ -1,5 +1,8 @@
 import "./MainBlock.scss";
 import React from "react";
+import {hideSwapFromSelect, hideSwapToSelect} from "../../store/actions/swap";
+import {hidePoolFromSelect, hidePoolToSelect} from "../../store/actions/pool";
+import {hideOrdersFromSelect, hideOrdersToSelect} from "../../store/actions/limitOrders";
 
 function MainBlock({
 	smallTitle,
@@ -10,6 +13,7 @@ function MainBlock({
 	classHeader,
 	classTitle,
 	content,
+   classNameContainer,
 	footer,
 	...rest
 }) {
@@ -25,11 +29,19 @@ function MainBlock({
 
 		return str;
 	}
-
+	// function handleCloseCurPopup(e) {
+	// 	console.log("searchBtn swapPopup",e.target.id)
+	// 	if(e.target.id === "swapPopup" || e.target.id === "searchBtn" || e.target.id === "searchBtnInp" || e.target.id === "mainBlock" || e.target.id === "mainBlockTitle") {
+	// 		return
+	// 	}else{
+	//
+	// 	}
+	//
+	// }
 	return (
-		<div
-			className={className ? className + " mainblock" : "mainblock"}
-			{...rest}
+		<div id="mainBlock"
+			className={classNameContainer ? `mainblock ${classNameContainer}` : "mainblock"}
+			 // onClick={(e)=>handleCloseCurPopup(e)}
 		>
 			{(title || button) && (
 				<div
@@ -39,6 +51,7 @@ function MainBlock({
 					}
 				>
 					<h2
+						id="mainBlockTitle"
 						className={
 							classTitle
 								? `${classTitle} ` + classGenerator()

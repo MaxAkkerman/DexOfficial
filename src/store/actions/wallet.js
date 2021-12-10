@@ -19,7 +19,6 @@ export function setUpdatedBalance(payload) {
 	return {type: SET_UPDATED_BALANCE, payload};
 }
 export function setPin(payload) {
-	console.log("setPIN dispatch", payload);
 	return {type: SET_PIN, payload};
 }
 export function openStackingConfirmPopup(payload) {
