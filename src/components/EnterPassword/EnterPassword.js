@@ -57,9 +57,8 @@ function EnterPassword(props) {
             let clientDataPreDeploy = JSON.parse(localStorage.getItem("clientDataPreDeploy"));
 
             let decrypted = await decrypt(esp, seedPhrasePassword);
-            const clientKeys = await getClientKeys(decrypted.phrase);
 
-            if (decrypted.valid === false) {
+            if (!decrypted.valid) {
                 setDecryptResult(false);
                 dispatch(
                     setTips({
@@ -67,12 +66,14 @@ function EnterPassword(props) {
                         type: "error",
                     }),
                 );
-            }
-            if (decrypted.valid === true) {
+                return
+            }else{
+                const clientKeys = await getClientKeys(decrypted.phrase);
 
                 setloadingUserDataIsWaiting(true);
                 setDecryptResult(true);
-                if (!clientDataLS.status && clientDataPreDeploy && clientDataPreDeploy.address) {
+
+                if (!clientDataLS && clientDataPreDeploy && clientDataPreDeploy.address) {
                     saveLog({
                         name: "login",
                         clientAddress: clientDataPreDeploy.address,
@@ -97,24 +98,31 @@ function EnterPassword(props) {
                     dispatch(hideEnterSeedPhraseUnlock());
                     history.push("/swap");
                     return;
-                }
-                saveLog({
-                    name: "login",
-                    clientAddress: clientDataLS.dexclient,
-                    deployed: true,
-                    created_at: (Date.now() + 10800000) / 1000,
-                }, "login")
-                await InitializeClient(clientKeys.public);
-                dispatch(setSeedPassword(seedPhrasePassword));
+                }else if(clientDataLS && clientDataLS.dexclient){
+                    saveLog({
+                        name: "login",
+                        clientAddress: clientDataLS.dexclient,
+                        deployed: true,
+                        created_at: (Date.now() + 10800000) / 1000,
+                    }, "login")
+                    await InitializeClient(clientKeys.public);
+                    dispatch(setSeedPassword(seedPhrasePassword));
 
-                const receiveTokensData = JSON.parse(
-                    localStorage.getItem("setSubscribeReceiveTokens"),
-                );
-                if (receiveTokensData) {
-                    dispatch(setSubscribeReceiveTokens(receiveTokensData));
-                }
+                    const receiveTokensData = JSON.parse(
+                        localStorage.getItem("setSubscribeReceiveTokens"),
+                    );
+                    if (receiveTokensData) {
+                        dispatch(setSubscribeReceiveTokens(receiveTokensData));
+                    }
 
-                // setSeedPhraseString("");
+                }else{
+                    dispatch(
+                        setTips({
+                            message: `Something goes wrong, please deploy new client or enter using seed phrase`,
+                            type: "error",
+                        }),
+                    );
+                }
             }
             setloadingUserDataIsWaiting(false);
             dispatch(hideEnterSeedPhraseUnlock());
@@ -158,7 +166,7 @@ function EnterPassword(props) {
     const [pinsConfirmed, setPinsConfirmed] = useState(true);
 
     function handleCheckPin(pinArr, step) {
-        console.log("pinArr", pinArr)
+        // console.log("pinArr", pinArr)
         dispatch(setPin(pinArr));
 
     }
