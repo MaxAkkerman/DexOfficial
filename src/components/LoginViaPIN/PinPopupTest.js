@@ -65,10 +65,11 @@ function PinPopup(props) {
 
     useEffect(() => {
         window.addEventListener("keydown", keyDownHandler)
-    }, [pinArr])
+    }, [])
 
     function keyDownHandler(e) {
-        console.log(!e.key.match(onlyNums),e.key === "Meta",!e.key.match("Backspace"),!e.key.match("Delete"))
+        // console.log(!e.key.match(onlyNums),e.key === "Meta",!e.key.match("Backspace"),!e.key.match("Delete"))
+        console.log(e.key)
 
         if (e.key === "Meta") return;
 
