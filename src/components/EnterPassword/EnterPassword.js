@@ -44,10 +44,8 @@ function EnterPassword(props) {
     }
 
     async function handleLogIn(pin, step) {
-        console.log("pin,step", pin, step)
         if (!pin) return;
         const curEmptyPin = pin.filter((item) => !item.value.length);
-        console.log("curEmptyPin",curEmptyPin)
         if (curEmptyPin.length) {
             dispatch(
                 setTips({
@@ -65,42 +63,17 @@ function EnterPassword(props) {
         let esp = localStorage.getItem("esp");
         let clientDataLS = JSON.parse(localStorage.getItem("clientData"));
         let clientDataPreDeploy = JSON.parse(localStorage.getItem("clientDataPreDeploy"));
-        console.log("esp, seedPhrasePassword", esp, seedPhrasePassword)
+
         let decrypted = await decrypt(esp, seedPhrasePassword);
-
         const clientKeys = await getClientKeys(decrypted.phrase);
-
         let clientStatus = await checkPubKey(clientKeys.public);
 
         let clientExists = clientStatus.status && decrypted.valid && (clientStatus.dexclient !== "0:0000000000000000000000000000000000000000000000000000000000000000")
-        console.log("clientExists",clientStatus.status , decrypted.valid , clientStatus.dexclient )
         let preDeployedClientExists = clientDataPreDeploy && clientDataPreDeploy.address && clientDataPreDeploy.esp
-        console.log("preDeployedClientExists",clientDataPreDeploy)
-
-        //
-        // if (!decrypted.valid) {
-        //     setDecryptResult(false);
-        //     // dispatch(
-        //     //     setTips({
-        //     //         message: `Something goes wrong - invalid password`,
-        //     //         type: "error",
-        //     //     }),
-        //     // );
-        //     // return
-        // }
-
-
-        // setloadingUserDataIsWaiting(true);
-        // setDecryptResult(true);
-        // console.log("clientDataLS",clientDataLS,clientDataPreDeploy,clientDataPreDeploy.address)
-
-
-
 
         if (clientExists) {
             setloadingUserDataIsWaiting(true);
             setDecryptResult(true);
-            console.log("clientDataLS exists", clientDataLS, "clientKeys", clientKeys)
             saveLog({
                 name: "login",
                 clientAddress: clientStatus.dexclient,
@@ -109,7 +82,6 @@ function EnterPassword(props) {
             }, "login")
             await InitializeClient(clientKeys.public);
             dispatch(setSeedPassword(seedPhrasePassword));
-            console.log("i am after init client")
             const receiveTokensData = JSON.parse(
                 localStorage.getItem("setSubscribeReceiveTokens"),
             );
@@ -121,7 +93,6 @@ function EnterPassword(props) {
             history.push("/swap");
 
         } else if (!clientExists && preDeployedClientExists) {
-            console.log("clientDataPreDeploy exists", clientDataLS)
             setloadingUserDataIsWaiting(true);
             setDecryptResult(true);
             saveLog({
@@ -147,8 +118,6 @@ function EnterPassword(props) {
             setloadingUserDataIsWaiting(false);
             dispatch(hideEnterSeedPhraseUnlock());
             history.push("/swap");
-
-
         } else {
             dispatch(
                 setTips({
@@ -157,9 +126,6 @@ function EnterPassword(props) {
                 }),
             );
         }
-
-
-
 }
 
 function passwordChange(event) {
