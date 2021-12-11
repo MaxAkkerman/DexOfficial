@@ -218,7 +218,7 @@ function PinPopup(props) {
                                     btnText={props.btnText}
 									errColor={null}
 									handleClickNext={() =>
-										props.handleClickNext(pinArr)
+										props.handleClickNext(pinArr,props.nextStep, completed)
 									}
 								/>
                             </div>

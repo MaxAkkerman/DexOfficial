@@ -242,8 +242,9 @@ function EnterSeedPhrase(props) {
             }
 
             const clientKeys = await getClientKeys(seedPhraseString);
+            console.log("clientKeys.public",clientKeys.public)
             const existsClientOnRoot = await checkPubKey(clientKeys.public);
-
+console.log("existsClientOnRoot",existsClientOnRoot)
 
             let verifSeedFromLS;
             let notDeployedClientExists;

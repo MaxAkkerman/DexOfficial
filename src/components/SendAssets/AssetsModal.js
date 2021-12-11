@@ -37,7 +37,7 @@ function AssetsModal() {
 	}
 
 	function handleSetToken(item) {
-		dispatch(setAmountForSend(""));
+		// dispatch(setAmountForSend(""));
 		dispatch(setInputNFTDisabled(null));
 		dispatch(setCurrentTokenForSend(item));
 		dispatch(setTokenSetted(true));

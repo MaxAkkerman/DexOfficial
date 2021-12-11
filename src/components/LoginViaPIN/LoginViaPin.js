@@ -39,7 +39,10 @@ function LoginViaPin(props) {
 		{name: "step4", weAreHere: false},
 	]);
 
-	async function handleClickNext(nxtStp, completed) {
+	async function handleClickNext(arr,nxtStp,completed) {
+		console.log("nxtStp, completed",)
+		console.log("pinsConfirmed && agreementSigned", pinsConfirmed, agreementSigned)
+
 		const makeNextStep = JSON.parse(JSON.stringify(steps));
 		if (nxtStp === "step2" && !agreementSigned) {
 			dispatch(
@@ -71,6 +74,7 @@ function LoginViaPin(props) {
 			setPinsConfirmed(true);
 		}
 		if (nxtStp === "goInToApp" && pinsConfirmed && agreementSigned) {
+			console.log("am i here?")
 			dispatch(showEnterSeedPhrase(false));
 			props.setloadingUserData(true);
 			let pinString = "";
@@ -131,6 +135,8 @@ function LoginViaPin(props) {
 		makeNextStep.map((item) => {
 			item.weAreHere = item.name === nxtStp;
 		});
+
+		console.log("makeNextStep",makeNextStep)
 		setStep(makeNextStep);
 	}
 
@@ -184,12 +190,13 @@ function LoginViaPin(props) {
 					nextStep={"step2"}
 					step={"1"}
 					showCloseBtn={true}
+					showTwoBtns={false}
 					btnText={"Next"}
 					handleGetBack={(bckStp) => handleClickBack(bckStp)}
 					agreementSigned={agreementSigned}
 					handleSignAgreement={(bl) => handleSignAgreement(bl)}
 					handleClose={() => handleClose()}
-					handleClickNext={(nxtStp) => handleClickNext(nxtStp)}
+					handleClickNext={(nxtStp) => handleClickNext(1, nxtStp)}
 				/>
 			) : null}
 
@@ -198,13 +205,14 @@ function LoginViaPin(props) {
 					title={"Set PIN for quick login"}
 					step={"2"}
 					handleLogOut={null}
+					showTwoBtns={true}
 					nextStep={"step3"}
 					prevStep={"step1"}
 					btnText={"Next"}
 					pinCorrect={pinsConfirmed}
 					handleClickBack={(bckStp) => handleClickBack(bckStp)}
-					handleClickNext={(nxtStp, completed) =>
-						handleClickNext(nxtStp, completed)
+					handleClickNext={(nxtStp, a,completed) =>
+						handleClickNext(nxtStp, a,completed)
 					}
 					handleCheckPin={(pin, step) => handleCheckPin(pin, step)}
 				/>
@@ -215,12 +223,13 @@ function LoginViaPin(props) {
 					step={"3"}
 					nextStep={"step4"}
 					prevStep={"step2"}
+					showTwoBtns={true}
 					btnText={"Next"}
 					handleLogOut={null}
 					pinCorrect={pinsConfirmed}
 					handleClickBack={(bckStp) => handleClickBack(bckStp)}
-					handleClickNext={(nxtStp, completed) =>
-						handleClickNext(nxtStp, completed)
+					handleClickNext={(nxtStp, a,completed) =>
+						handleClickNext(nxtStp,a, completed)
 					}
 					handleCheckPin={(pin, step) => handleCheckPin(pin, step)}
 				/>
@@ -236,7 +245,7 @@ function LoginViaPin(props) {
 					handleGetBack={(bckStp) => handleClickBack(bckStp)}
 					handleSignAgreement={(bl) => handleSignAgreement(bl)}
 					handleClose={() => handleClose()}
-					handleClickNext={(nxtStp) => handleClickNext(nxtStp)}
+					handleClickNext={(nxtStp) => handleClickNext(1,nxtStp)}
 				/>
 			) : null}
 		</>

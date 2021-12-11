@@ -164,6 +164,10 @@ console.log("encrData",encrData)
 		store.dispatch(setTokenList([]));
 		store.dispatch(setLiquidityList([]));
 		localStorage.removeItem("setSubscribeReceiveTokens");
+		localStorage.removeItem("esp");
+		localStorage.removeItem("clientDataPreDeploy");
+		localStorage.removeItem("clientData");
+
 		saveLog({
 			name:"disconnect",
 			clientAddress: clientData.address,
