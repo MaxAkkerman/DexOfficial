@@ -1,3 +1,4 @@
+import values from "lodash/values";
 import React from "react";
 import {Provider} from "react-redux";
 import {BrowserRouter} from "react-router-dom";
@@ -38,8 +39,8 @@ export const WithPairsAndTokens = Template.bind(
 	createStore(rootReducer, {
 		appReducer: {walletIsConnected: true},
 		walletReducer: {
-			pairsList: pairs,
-			tokenList: tokens,
+			pairsList: values(pairs),
+			tokenList: values(tokens),
 		},
 	}),
 );

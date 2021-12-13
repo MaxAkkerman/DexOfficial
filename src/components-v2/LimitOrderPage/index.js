@@ -1,7 +1,5 @@
 import "./index.scss";
 
-import {Stack} from "@mui/material";
-import {FormHelperText} from "@mui/material";
 import {useFormik} from "formik";
 import differenceBy from "lodash/differenceBy";
 import find from "lodash/find";
@@ -13,8 +11,9 @@ import Button from "@/components-v2/Button";
 import Input from "@/components-v2/Input";
 import MainBlock from "@/components-v2/MainBlock";
 import SelectPopup from "@/components-v2/SelectPopup";
+import SmallInput from "@/components-v2/SmallInput";
 import SwapBtn from "@/components-v2/SwapButton";
-import {iconGenerator} from "@/iconGenerator";
+import {AB_DIRECTION, BA_DIRECTION} from "@/constants/runtimeVariables";
 import truncateNum from "@/utils/truncateNum";
 
 export default function LimitOrder() {
@@ -31,6 +30,7 @@ export default function LimitOrder() {
 		handleBlur,
 		handleChange,
 		handleSubmit,
+		setFieldError,
 		setFieldValue,
 		touched,
 		values,
@@ -74,12 +74,17 @@ export default function LimitOrder() {
 		);
 	}, [pairList, values.fromToken, values.toToken]);
 
-	const rate = useMemo(() => {
-		const {fromToken, pair, toToken} = values;
-		if (!pair || !fromToken || !toToken) return;
+	const directionPair = useMemo(() => {
+		const {fromToken, pair} = values;
+		if (fromToken && pair)
+			return fromToken.rootAddress === pair.rootA ? AB_DIRECTION : BA_DIRECTION;
+	}, [values.fromToken, values.pair]);
 
-		return fromToken.rootAddress === pair.rootA ? pair.rateAB : pair.rateBA;
-	}, [values.pair, values.fromToken, values.toToken]);
+	const rate = useMemo(() => {
+		const {pair} = values;
+		if (directionPair)
+			return directionPair === AB_DIRECTION ? pair.rateAB : pair.rateBA;
+	}, [directionPair, values.pair]);
 
 	// Update "to" value
 	useEffect(() => {
@@ -100,6 +105,10 @@ export default function LimitOrder() {
 		 */
 	}
 
+	function handleMaxClick() {
+		setFieldValue("from", values.fromToken.balance);
+	}
+
 	function handleConnectWallet() {
 		history.push("/account");
 	}
@@ -110,32 +119,8 @@ export default function LimitOrder() {
 	}
 
 	function handleSetToMarket() {
-		/**
-		 * Handle set to market
-		 */
-	}
-
-	function validate(values) {
-		const errors = {};
-
-		const MUST_BE_NUMBER = "Input value must be a number";
-		errors.fromValue = isNaN(+values.fromValue) && MUST_BE_NUMBER;
-		errors.fromPrice = isNaN(+values.fromPrice) && MUST_BE_NUMBER;
-
-		const POSITIVE_NUMBER = "Use positive number";
-		errors.fromValue =
-			errors.fromValue || (values.fromValue <= 0 && POSITIVE_NUMBER);
-		errors.fromPrice =
-			errors.fromPrice || (values.fromPrice <= 0 && POSITIVE_NUMBER);
-
-		const SELECT_TOKEN = "You must select token";
-		errors.fromToken = !values.fromToken && SELECT_TOKEN;
-		errors.toToken = !values.toToken && SELECT_TOKEN;
-
-		const NO_PAIR = "Selected pair doesn't exist";
-		errors.pair = values.fromToken && values.toToken && !values.pair && NO_PAIR;
-
-		return errors;
+		if (!rate) setFieldError("fromPrice", "First select tokens");
+		else setFieldValue("fromPrice", rate);
 	}
 
 	const CurrentButton = useMemo(() => {
@@ -186,6 +171,7 @@ export default function LimitOrder() {
 									onValueBlur={handleBlur}
 									onValueChange={handleChange}
 									onSelectClick={fromPopup.open}
+									onMaxClick={handleMaxClick}
 									token={values.fromToken}
 									error={
 										touched.fromValue && (errors.fromValue || errors.fromToken)
@@ -211,55 +197,16 @@ export default function LimitOrder() {
 									readOnly
 								/>
 								{walletConnected && (
-									<div className={"orders__price_box"}>
-										<Stack
-											direction={"column"}
-											spacing={1}
-											sx={{marginBottom: "3%"}}
-										>
-											<div>Limit order price</div>
-											<div className={"orders__icon_box"}>
-												<input
-													name="fromPrice"
-													type="number"
-													autoComplete="false"
-													className="orders__input"
-													placeholder="0"
-													onBlur={handleBlur}
-													onChange={handleChange}
-													value={values.fromPrice}
-													style={{
-														borderColor:
-															touched.fromPrice && errors.fromPrice
-																? "var(--error)"
-																: "var(--input-border-color)",
-													}}
-												/>
-												{values.toToken && (
-													<div className="input-select">
-														<img
-															src={iconGenerator(values.toToken.symbol)}
-															alt={values.toToken.symbol}
-															className="input-token-img"
-														/>
-														<span>{values.toToken.symbol}</span>
-													</div>
-												)}
-											</div>
-											<FormHelperText
-												error={touched.fromPrice && errors.fromPrice}
-											>
-												{(touched.fromPrice && errors.fromPrice) ||
-													(!touched.fromPrice && "Type numeric value")}
-											</FormHelperText>
-										</Stack>
-										<button
-											className="btn orders btn--disabled"
-											disabled
-											onClick={handleSetToMarket}
-										>
-											Set to market
-										</button>
+									<div className="orders__price_box">
+										<SmallInput
+											name="fromPrice"
+											label="Limit order price"
+											onBlur={handleBlur}
+											onChange={handleChange}
+											onSetToMarket={handleSetToMarket}
+											touched={touched.fromPrice}
+											value={values.fromPrice}
+										/>
 									</div>
 								)}
 								<CurrentButton />
@@ -337,4 +284,27 @@ function useHandlePopups(setFieldValue) {
 			state: toPopupOpen,
 		},
 	};
+}
+
+function validate(values) {
+	const errors = {};
+
+	const MUST_BE_NUMBER = "Input value must be a number";
+	errors.fromValue = isNaN(+values.fromValue) && MUST_BE_NUMBER;
+	errors.fromPrice = isNaN(+values.fromPrice) && MUST_BE_NUMBER;
+
+	const POSITIVE_NUMBER = "Use positive number";
+	errors.fromValue =
+		errors.fromValue || (values.fromValue <= 0 && POSITIVE_NUMBER);
+	errors.fromPrice =
+		errors.fromPrice || (values.fromPrice <= 0 && POSITIVE_NUMBER);
+
+	const SELECT_TOKEN = "You must select token";
+	errors.fromToken = !values.fromToken && SELECT_TOKEN;
+	errors.toToken = !values.toToken && SELECT_TOKEN;
+
+	const NO_PAIR = "Selected pair doesn't exist";
+	errors.pair = values.fromToken && values.toToken && !values.pair && NO_PAIR;
+
+	return errors;
 }
