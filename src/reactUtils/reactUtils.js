@@ -27,7 +27,10 @@ const {getAllClientWallets} = require("../extensions/sdk_get/get");
 
 export async function InitializeClient(clientPubKey) {
 	let clientStatus = await checkPubKey(clientPubKey);
+	console.log("clientStatus clientStatus", clientStatus);
+
 	if (clientStatus.status) {
+		console.log("clientStatus init", clientStatus);
 		const dexClientAddress = clientStatus.dexclient;
 		const dexClientStatus = clientStatus.status;
 		const dexClientBalance = await getClientBalance(dexClientAddress);
@@ -38,6 +41,20 @@ export async function InitializeClient(clientPubKey) {
 				balance: dexClientBalance,
 				public: clientPubKey,
 			}),
+		);
+		console.log(
+			"{\n" +
+				"\t\t\t\tstatus: dexClientStatus,\n" +
+				"\t\t\t\tdexclient: dexClientAddress,\n" +
+				"\t\t\t\tbalance: dexClientBalance,\n" +
+				"\t\t\t\tpublic: clientPubKey,\n" +
+				"\t\t\t}",
+			{
+				status: dexClientStatus,
+				dexclient: dexClientAddress,
+				balance: dexClientBalance,
+				public: clientPubKey,
+			},
 		);
 
 		const extensionWallet = await getWalletExt(dexClientAddress, clientPubKey);

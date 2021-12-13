@@ -2,7 +2,7 @@ import "./Select.scss";
 
 import React, {useState} from "react";
 import ReactDOM from "react-dom";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useLocation} from "react-router-dom";
 
 import {
@@ -20,7 +20,7 @@ import SelectItem from "../SelectItem/SelectItem";
 
 function Select(props) {
 	const location = useLocation();
-
+	const dispatch = useDispatch();
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
 
@@ -112,21 +112,37 @@ function Select(props) {
 	// if(toTokenList.length || fromTokenList.length) { setIsLoading(false); }
 	// });
 
-	function handleClose() {
+	function handleClose(e) {
+		console.log("fromArr, toArr", fromArr, toArr);
+		if (
+			e.target.id === "swapPopup" ||
+			e.target.id === "searchBtn" ||
+			e.target.id === "searchBtnInp" ||
+			e.target.id === "mainBlock" ||
+			e.target.id === "mainBlockTitle"
+		)
+			return;
+
 		if (location.pathname.includes("swap")) {
-			return props.type === "from" ? hideSwapFromSelect : hideSwapToSelect;
+			return props.type === "from"
+				? dispatch(hideSwapFromSelect())
+				: dispatch(hideSwapToSelect());
 		} else if (location.pathname.includes("add-liquidity")) {
-			return props.type === "from" ? hidePoolFromSelect : hidePoolToSelect;
+			return props.type === "from"
+				? dispatch(hidePoolFromSelect())
+				: dispatch(hidePoolToSelect());
 		} else if (location.pathname.includes("orders")) {
-			return props.type === "from" ? hideOrdersFromSelect : hideOrdersToSelect;
+			return props.type === "from"
+				? dispatch(hideOrdersFromSelect())
+				: dispatch(hideOrdersToSelect());
 		}
 	}
 
 	return ReactDOM.createPortal(
-		<div className="select-wrapper">
+		<div className="select-wrapper" onClick={(e) => handleClose(e)}>
 			<MainBlock
 				title={"Select a token"}
-				button={<CloseBtn func={handleClose()} />}
+				button={<CloseBtn func={() => handleClose()} />}
 				content={
 					!pairsList.length ? (
 						<Loader />
@@ -138,6 +154,7 @@ function Select(props) {
 									fromArr
 										.sort((a, b) => b.balance - a.balance)
 										.filter((t) => includesTextInToken(t, filter))
+										.filter((it) => it.balance !== 0)
 										.map((item) => (
 											<SelectItem
 												type={props.type}
@@ -155,6 +172,7 @@ function Select(props) {
 										.filter((item) =>
 											item.symbol.toLowerCase().includes(filter.toLowerCase()),
 										)
+										.filter((it) => it.balance !== 0)
 										.map((item) => (
 											<SelectItem
 												type={props.type}

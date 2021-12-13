@@ -18,6 +18,8 @@ import receiveAssets from "../../images/receiveAssets.svg";
 import sendAssetsimg from "../../images/sendAssets.svg";
 import settingsBtn from "../../images/Vector.svg";
 import {setTokenList} from "../../store/actions/wallet";
+import axios from "axios";
+import {getShardLimit} from "../../extensions/sdk_get/get";
 
 function Assets() {
 	const history = useHistory();
@@ -66,6 +68,7 @@ function Assets() {
 	}
 
 	function handleGoToSettings() {
+		console.log("clientData", clientData);
 		history.push("/wallet/settings");
 	}
 
@@ -122,7 +125,10 @@ function Assets() {
 		setCurNFTForWithdraw(item);
 		console.log("item", item);
 	}
-
+	async function trt() {
+		const sounitV = await getShardLimit();
+		console.log("sounitV", sounitV);
+	}
 	return (
 		<>
 			{showWrapMenu && !showWithdrawMenu && (
@@ -146,7 +152,7 @@ function Assets() {
 				/>
 			)}
 			{!showWrapMenu && !showWithdrawMenu && (
-				<div className="container">
+				<div className="container" onClick={() => trt()}>
 					<MainBlock
 						smallTitle={false}
 						// title={'Assets'}
@@ -169,12 +175,14 @@ function Assets() {
 										</button>
 										<button
 											className={
-												walletIsConnected
+												clientData.address || walletIsConnected
 													? "settings_btn"
 													: "settings_btn btn--disabled"
 											}
 											onClick={
-												walletIsConnected ? () => handleGoToSettings() : null
+												clientData.address || walletIsConnected
+													? () => handleGoToSettings()
+													: null
 											}
 										>
 											<img src={settingsBtn} alt={"settings"} />

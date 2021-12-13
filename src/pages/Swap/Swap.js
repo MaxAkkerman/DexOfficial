@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useHistory} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {setTips, showPopup} from "../../store/actions/app";
@@ -16,7 +16,6 @@ import {
 } from "../../extensions/sdk_run/run";
 
 import {
-	setSlippageValue,
 	setSwapAsyncIsWaiting,
 	setSwapFromToken,
 	setSwapToToken,
@@ -24,7 +23,6 @@ import {
 
 import settingsBtn from "../../images/Vector.svg";
 import SlippagePopper from "../../components/SlippagePopper/SlippagePopper";
-import useSlippagePopper from "../../hooks/useSlippagePopper";
 import useKeyPair from "../../hooks/useKeyPair";
 import {
 	NOT_ENOUGH,
@@ -47,6 +45,7 @@ function Swap() {
 
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
+	const slippageValue = useSelector((state) => state.swapReducer.slippageValue);
 
 	const fromToken = useSelector((state) => state.swapReducer.fromToken);
 	const toToken = useSelector((state) => state.swapReducer.toToken);
@@ -70,9 +69,34 @@ function Swap() {
 	const [errors, setErrors] = useState({});
 	const [isError, setIsError] = useState(true);
 
-	const {slippageState, popperState} = useSlippagePopper();
+	const [op, setop] = useState(false);
+	const [anchorEl, setAnchorEl] = useState(null);
+	const [idPop, setIdPop] = useState(undefined);
+
 	const {keyPair} = useKeyPair();
 	const {assetList} = useAssetList();
+	const popper = useRef(null);
+
+	useEffect(() => {
+		if (Object.keys(errors).length === 0) setIsError(false);
+		else setIsError(true);
+	}, [errors]);
+
+	useEffect(() => {
+		if (op) {
+			// setOpenPop(true)
+			setAnchorEl(popper.current);
+			setIdPop("simple-popper");
+		} else {
+			// setOpenPop(false)
+			setAnchorEl(null);
+			setIdPop(undefined);
+		}
+	}, [op]);
+
+	useEffect(() => {
+		if (fromToken && toToken) validate(fromValue, toValue, fromToken, toToken);
+	}, [fromValue, toValue, fromToken, toToken]);
 
 	useEffect(() => {
 		if (!pairsList.length || !pairId) {
@@ -135,7 +159,7 @@ function Swap() {
 			return;
 		}
 		if (fromToken.symbol && toToken.symbol && fromValue) {
-			dispatch(setSlippageValue(slippageState.slippage));
+			// dispatch(setSlippageValue(slippageState.slippage));
 			setSwapConfirmPopupIsVisible(true);
 		} else {
 			dispatch(
@@ -143,7 +167,9 @@ function Swap() {
 			);
 		}
 	}
-
+	function handleCloseConnect() {
+		setconnectAsyncIsWaiting(false);
+	}
 	async function handleConnectPair() {
 		if (clientData.balance < 12) {
 			dispatch(
@@ -174,14 +200,13 @@ function Swap() {
 					type: "error",
 				}),
 			);
-			return;
+			// return;
 		} else {
 			setconnectPairStatusText("preparing client data.");
 			let getClientForConnectStatus = await getClientForConnect(
 				connectRes,
 				clientData.address,
 			);
-			console.log("getClientForConnectStatus", getClientForConnectStatus);
 			if (getClientForConnectStatus.code) {
 				setconnectAsyncIsWaiting(false);
 				dispatch(
@@ -190,7 +215,7 @@ function Swap() {
 						type: "error",
 					}),
 				);
-				return;
+				// return;
 			} else {
 				setconnectPairStatusText(
 					"computing the best shard for your wallets and deploying.",
@@ -199,7 +224,6 @@ function Swap() {
 					getClientForConnectStatus,
 					keyPair,
 				);
-				console.log("connectToRootsStatus", connectToRootsStatus);
 				if (connectToRootsStatus.code) {
 					setconnectAsyncIsWaiting(false);
 					dispatch(
@@ -208,18 +232,17 @@ function Swap() {
 							type: "error",
 						}),
 					);
-					return;
+					// return;
 				} else {
 					setNotDeployedWallets([]);
+					setconnectPairStatusText("finishing");
+					setconnectAsyncIsWaiting(false);
+					setExistsPair(true);
 					// dispatch(setSwapFromInputValue(""));
 					// dispatch(setSwapToInputValue(""));
 				}
 			}
 		}
-
-		setconnectPairStatusText("finishing");
-		setconnectAsyncIsWaiting(false);
-		setExistsPair(true);
 	}
 
 	function getCurBtn() {
@@ -281,13 +304,7 @@ function Swap() {
 		dispatch(setSwapAsyncIsWaiting(false));
 	}
 
-	useEffect(() => {
-		if (Object.keys(errors).length === 0) setIsError(false);
-		else setIsError(true);
-	}, [errors]);
-
 	function validate(fromValue, toValue, fromToken, toToken) {
-		console.log(fromToken, toToken);
 		if (
 			fromToken.symbol &&
 			toToken.symbol &&
@@ -315,12 +332,24 @@ function Swap() {
 		}
 	}
 
-	useEffect(() => {
-		if (fromToken && toToken) validate(fromValue, toValue, fromToken, toToken);
-	}, [fromValue, toValue, fromToken, toToken]);
+	function handleClickOpenPop(ev) {
+		// console.log("popper",ev.currentTarget.id)
+		// console.log("popper2",ev.target.id)
+		ev.stopPropagation();
+
+		if (ev.currentTarget.id !== "popBtn") {
+			setop(false);
+		} else {
+			setop(!op);
+		}
+	}
 
 	return (
-		<div className="container">
+		<div
+			className="container"
+			id={"cont"}
+			onClick={(e) => handleClickOpenPop(e)}
+		>
 			{!swapAsyncIsWaiting && !connectAsyncIsWaiting && (
 				<MainBlock
 					style={{
@@ -341,9 +370,11 @@ function Swap() {
 
 								<div className={"settings_btn_container"}>
 									<button
-										aria-describedby={popperState.id}
+										id={"popBtn"}
+										aria-describedby={idPop}
+										ref={popper}
 										className="settings_btn"
-										onClick={popperState.handleClick}
+										onClick={(e) => handleClickOpenPop(e)}
 									>
 										<img src={settingsBtn} alt={"settings"} />
 									</button>
@@ -405,8 +436,12 @@ function Swap() {
 									</FormHelperText>
 								)}
 								<SlippagePopper
-									slippageState={slippageState}
-									popperState={popperState}
+									// slippageState={slippageState}
+									// popperState={popperState}
+									id={idPop}
+									open={op}
+									anchorEl={anchorEl}
+									// op={op}
 								/>
 								{fromToken.symbol && toToken.symbol && (
 									<p className="swap-rate">
@@ -435,10 +470,7 @@ function Swap() {
 								<div className="swap-confirm-wrap">
 									<p className="mainblock-footer-value">
 										{parseFloat(
-											(
-												toValue -
-												(toValue * slippageState.slippage) / 100
-											).toFixed(4),
+											(toValue - (toValue * slippageValue) / 100).toFixed(4),
 										)}{" "}
 										{toToken.symbol}
 									</p>
@@ -472,12 +504,13 @@ function Swap() {
 			{swapConfirmPopupIsVisible && (
 				<SwapConfirmPopup
 					hideConfirmPopup={setSwapConfirmPopupIsVisible.bind(this, false)}
-					slippage={slippageState.slippage}
+					// slippage={slippageState.slippage}
 				/>
 			)}
 			{connectAsyncIsWaiting && (
 				<WaitingPopupConnect
 					text={`Connecting to ${fromToken.symbol}/${toToken.symbol} pair, ${connectPairStatusText}`}
+					handleClose={() => handleCloseConnect()}
 				/>
 			)}
 			{swapAsyncIsWaiting && (

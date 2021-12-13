@@ -5,12 +5,13 @@ import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
 
 import {getCurrentExtension} from "../../extensions/extensions/checkExtensions";
-import {connectWallet, setCurExt, showPopup} from "../../store/actions/app";
 import {
-	showEnterSeedPhrase,
-	showEnterSeedPhraseRegister,
-} from "../../store/actions/enterSeedPhrase";
-import EnterSeedPhrase from "../EnterSeedPhrase/EnterSeedPhrase";
+	connectWallet,
+	handleOpenEnterSeed,
+	setCurExt,
+	showPopup,
+} from "../../store/actions/app";
+
 import LoginViaPin from "../LoginViaPIN/LoginViaPin";
 import MainBlock from "../MainBlock/MainBlock";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
@@ -21,9 +22,11 @@ function ExtensionsList() {
 	const extensionsList = useSelector(
 		(state) => state.appReducer.extensionsList,
 	);
-	const enterSeedPhraseIsVisible = useSelector(
-		(state) => state.enterSeedPhrase.enterSeedPhraseIsVisible,
-	);
+	// const enterSeedPhraseIsVisible = useSelector(
+	// 	(state) => state.enterSeedPhrase.enterSeedPhraseIsVisible,
+	// );
+	const [enterSeedPhraseIsVisible, setenterSeedPhraseIsVisible] =
+		useState(false);
 
 	const [loadingUserData, setloadingUserData] = useState(false);
 	const [loginViaPinIsVisible, setloginViaPinIsVisible] = useState(false);
@@ -90,7 +93,7 @@ function ExtensionsList() {
 										marginBottom: "40px",
 									}}
 									className="btn wallet-btn"
-									onClick={() => dispatch(showEnterSeedPhrase(true))}
+									onClick={() => dispatch(handleOpenEnterSeed(true))}
 								>
 									Login using Seed Phrase
 								</button>
@@ -101,10 +104,15 @@ function ExtensionsList() {
 								>
 									Create a new Seed Phrase and Wallet
 								</button>
-								{enterSeedPhraseIsVisible && <EnterSeedPhrase />}
+								{/*{enterSeedPhraseIsVisible &&*/}
+								{/*<EnterSeedPhrase*/}
+								{/*	setloadingUserData={(bl) => setloadingUserData(bl)}*/}
+								{/*	handleCLoseEntSeed={()=>setenterSeedPhraseIsVisible(false)}*/}
+								{/*/>}*/}
 								{loginViaPinIsVisible && (
 									<LoginViaPin
 										setloadingUserData={(bl) => setloadingUserData(bl)}
+										handleCloseLogin={() => setloginViaPinIsVisible(false)}
 									/>
 								)}
 								{loadingUserData ? (

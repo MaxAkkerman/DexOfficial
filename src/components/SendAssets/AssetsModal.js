@@ -37,7 +37,7 @@ function AssetsModal() {
 	}
 
 	function handleSetToken(item) {
-		dispatch(setAmountForSend(""));
+		// dispatch(setAmountForSend(""));
 		dispatch(setInputNFTDisabled(null));
 		dispatch(setCurrentTokenForSend(item));
 		dispatch(setTokenSetted(true));
@@ -49,17 +49,27 @@ function AssetsModal() {
 	function handleSearch(text) {
 		setFilter(text);
 	}
-	function handleClose() {
+	function handleClose(e) {
+		e.stopPropagation();
+		if (
+			e.target.id === "swapPopup" ||
+			e.target.id === "searchBtn" ||
+			e.target.id === "searchBtnInp" ||
+			e.target.id === "mainBlock" ||
+			e.target.id === "mainBlockTitle"
+		)
+			return;
+
 		dispatch(setInputNFTDisabled(null));
 		history.push("/wallet/send");
 	}
 
 	return (
 		<>
-			<div className="select-wrapper">
+			<div className="select-wrapper" onClick={(e) => handleClose(e)}>
 				<MainBlock
 					title={"Select a token"}
-					button={<CloseBtn func={() => handleClose()} />}
+					button={<CloseBtn func={(e) => handleClose(e)} />}
 					content={
 						<>
 							<SearchInput func={(e) => handleSearch(e)} />
@@ -67,7 +77,10 @@ function AssetsModal() {
 							<AssetsList
 								handleClickNFT={(item) => handleSetNFT(item)}
 								handleClickToken={(item) => handleSetToken(item)}
-								TokenAssetsArray={[...assetList, ...liquidityList]}
+								TokenAssetsArray={[...assetList, ...liquidityList].filter(
+									(item) =>
+										item.symbol.toLowerCase().includes(filter.toLowerCase()),
+								)}
 								NFTassetsArray={NFTassets}
 								orderAssetsArray={null}
 								showItBeShown={false}

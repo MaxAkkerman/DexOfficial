@@ -3,18 +3,19 @@ import "./PinPopup.scss";
 import {Grid} from "@material-ui/core";
 import React, {useEffect, useState} from "react";
 
-import {numPadArr, pincodeArray} from "../../constants/defaultData";
+import {numPadArr, onlyNums, pincodeArray} from "../../constants/defaultData";
 import arrowBack from "../../images/arrowBack.png";
 import MainBlock from "../MainBlock/MainBlock";
 import {NextBtn} from "./NextBtn";
 import PinKeyboard from "./PinKeyboard";
 import Steppers from "./Steppers";
-
-const pattern = "[0-9]+";
+import {useSelector} from "react-redux";
+import CloseBtn from "../CloseBtn/CloseBtn";
 
 function PinPopup(props) {
 	const [pinArr, setPinArr] = useState(pincodeArray);
 	const [completed, setCompleted] = useState(false);
+	const appTheme = useSelector((state) => state.appReducer.appTheme);
 
 	let myRefs = [];
 	const saveThisRef = (element) => {
@@ -32,7 +33,7 @@ function PinPopup(props) {
 	}, [pinArr]);
 
 	useEffect(() => {
-		props.handleCheckPin(pinArr, props.step);
+		props.handleCheckPin(pinArr, props.step, completed);
 	}, [pinArr]);
 
 	function handleClickNumKeyboard(e) {
@@ -45,7 +46,6 @@ function PinPopup(props) {
 				item.focused = false;
 			}
 			if (!curEmptyPin[1]) {
-				console.log("last one");
 			} else if (item.id === curEmptyPin[1].id) {
 				item.focused = true;
 			}
@@ -121,7 +121,7 @@ function PinPopup(props) {
 			if (backIndex < fRefs.length) fRefs[backIndex].focus();
 			return;
 		}
-		if (!e.key.match(pattern)) return;
+		if (!e.key.match(onlyNums)) return;
 		newPin[i].value = e.key;
 		newPin[i].focused = false;
 		if (forwardIndex < fRefs.length) {
@@ -134,6 +134,7 @@ function PinPopup(props) {
 	return (
 		<div
 			className="select-wrapper"
+			style={{backdropFilter: appTheme === "light" ? null : "blur(130px)"}}
 			onClick={() => console.log("pinArr", pinArr)}
 		>
 			<MainBlock
@@ -143,12 +144,14 @@ function PinPopup(props) {
 				content={
 					<>
 						<div className="head_wrapper" style={{marginBottom: "20px"}}>
-							<button
-								className="arrow_back"
-								onClick={() => props.handleClickBack(props.prevStep)}
-							>
-								<img src={arrowBack} alt={"arrow"} />
-							</button>
+							{props.showTwoBtns ? (
+								<button
+									className="arrow_back"
+									onClick={() => props.handleClickBack(props.prevStep)}
+								>
+									<img src={arrowBack} alt={"arrow"} />
+								</button>
+							) : null}
 							<div className="left_block boldFont fixMedia">{props.title}</div>
 						</div>
 
@@ -172,14 +175,14 @@ function PinPopup(props) {
 											borderBottomColor: completed
 												? !props.pinCorrect
 													? "red"
-													: "#3569f0"
+													: `var(--accent)`
 												: item.focused
-												? "#3569f0"
+												? `var(--mainblock-title-color)`
 												: null,
 											color: completed
 												? !props.pinCorrect
 													? "red"
-													: "#3569f0"
+													: `var(--accent)`
 												: null,
 										}}
 										className="pinInput"
@@ -199,12 +202,36 @@ function PinPopup(props) {
 						/>
 
 						<Steppers step={props.step} />
-						<NextBtn
-							btnText={props.btnText}
-							handleClickNext={() =>
-								props.handleClickNext(props.nextStep, completed)
-							}
-						/>
+						{!props.showTwoBtns ? (
+							<div style={{display: "flex", width: "100%"}}>
+								<NextBtn
+									curBtnStyles={"curBtnStylesLogin"}
+									btnsClass={"LoginViaPinBtns"}
+									btnText={"Log out"}
+									errColor={true}
+									handleClickNext={() => props.handleLogOut()}
+								/>
+								<NextBtn
+									curBtnStyles={"curBtnStylesLogin"}
+									btnsClass={"LoginViaPinBtns"}
+									btnText={props.btnText}
+									errColor={null}
+									handleClickNext={() =>
+										props.handleClickNext(pinArr, props.nextStep, completed)
+									}
+								/>
+							</div>
+						) : (
+							<NextBtn
+								curBtnStyles={"curBtnStyles"}
+								btnsClass={"enterSPRegBox"}
+								btnText={props.btnText}
+								errColor={null}
+								handleClickNext={() =>
+									props.handleClickNext(pinArr, props.nextStep, completed)
+								}
+							/>
+						)}
 					</>
 				}
 			/>

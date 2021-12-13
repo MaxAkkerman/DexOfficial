@@ -54,6 +54,7 @@ function SwapConfirmPopup(props) {
 	const {keyPair} = useKeyPair();
 
 	async function handleSwap() {
+		console.log("slippageValue", slippageValue);
 		dispatch(setSwapAsyncIsWaiting(true));
 		props.hideConfirmPopup();
 
@@ -66,64 +67,28 @@ function SwapConfirmPopup(props) {
 			(p) => fromToken.symbol === p.symbolB && toToken.symbol === p.symbolA,
 		);
 		if (!pairAB && !pairBA) throw new Error(PAIR_NULL);
-		const directionPair = pairAB ? BA_DIRECTION : AB_DIRECTION;
+		const directionPair = pairAB ? AB_DIRECTION : BA_DIRECTION;
 
-		const {data} = await apolloClient.query({
-			query: LimitOrdersForSwapQuery,
-			fetchPolicy: "no-cache",
-			variables: {
-				addrPair: pairId,
-				directionPair:
-					directionPair === AB_DIRECTION
-						? AB_DIRECTION_GRAPHQL
-						: BA_DIRECTION_GRAPHQL,
-				amount: toValue,
-				slippage: slippageValue || 0,
-			},
-		});
-		console.log("request->data", data);
-
-		const processing = [];
-		data.limitOrdersForSwap.limitOrders.forEach((limitOrder) => {
-			const promise = takeLimitOrder(
-				{
-					pairAddr: pairId,
-					orderAddr: limitOrder.addrOrder,
-					price: limitOrder.priceRaw,
-					qty: limitOrder.amountRaw * limitOrder.price,
-					directionPair,
-				},
-				{
-					clientAddress: clientData.address,
-					clientKeyPair: keyPair,
-				},
-			)
-				.then(() => {
-					enqueueSnackbar({
-						type: "info",
-						message: `Taking limit order ${truncateNum(limitOrder.amount, 2)} ${
-							toToken.symbol
-						} - ${truncateNum(limitOrder.amount * limitOrder.price, 2)} ${
-							fromToken.symbol
-						} ⏳`,
-					});
-				})
-				.catch(() => {
-					enqueueSnackbar({
-						type: "error",
-						message: `Failed limit order take ${truncateNum(
-							limitOrder.amount,
-							2,
-						)} ${toToken.symbol} - ${truncateNum(
-							limitOrder.amount * limitOrder.price,
-							2,
-						)} ${fromToken.symbol} ⏳`,
-					});
+		const {data} = await function () {
+			try {
+				return apolloClient.query({
+					query: LimitOrdersForSwapQuery,
+					fetchPolicy: "no-cache",
+					variables: {
+						addrPair: pairId,
+						directionPair:
+							directionPair === AB_DIRECTION
+								? AB_DIRECTION_GRAPHQL
+								: BA_DIRECTION_GRAPHQL,
+						amount: toValue,
+						slippage: slippageValue || 0,
+					},
 				});
-			processing.push(promise);
-		});
-		await Promise.all(processing);
-
+			} catch (e) {
+				console.log("eee", e);
+				return e;
+			}
+		};
 		const fromTokenData = tokenList.find(
 			(item) => item.symbol === fromToken.symbol,
 		);
@@ -131,29 +96,99 @@ function SwapConfirmPopup(props) {
 			(item) => item.symbol === toToken.symbol,
 		);
 		if (!fromTokenData || !toTokenData) throw new Error(TOKEN_NULL);
+		console.log("request->data", data);
+		if (data) {
+			const processing = [];
+			data.limitOrdersForSwap.limitOrders.forEach((limitOrder) => {
+				const promise = takeLimitOrder(
+					{
+						pairAddr: pairId,
+						orderAddr: limitOrder.addrOrder,
+						price: limitOrder.priceRaw,
+						qty: limitOrder.amountRaw * limitOrder.price,
+						directionPair,
+					},
+					{
+						clientAddress: clientData.address,
+						clientKeyPair: keyPair,
+					},
+				)
+					.then(() => {
+						enqueueSnackbar({
+							type: "info",
+							message: `Taking limit order ${truncateNum(
+								limitOrder.amount,
+								2,
+							)} ${toToken.symbol} - ${truncateNum(
+								limitOrder.amount * limitOrder.price,
+								2,
+							)} ${fromToken.symbol} ⏳`,
+						});
+					})
+					.catch(() => {
+						enqueueSnackbar({
+							type: "error",
+							message: `Failed limit order take ${truncateNum(
+								limitOrder.amount,
+								2,
+							)} ${toToken.symbol} - ${truncateNum(
+								limitOrder.amount * limitOrder.price,
+								2,
+							)} ${fromToken.symbol} ⏳`,
+						});
+					});
+				processing.push(promise);
+			});
+			await Promise.all(processing);
+		} else {
+			// todo data.limitOrdersForSwap.leftoverSwap !== 0 ||
 
-		if (data.limitOrdersForSwap.leftoverSwap !== 0)
+			console.log("data", data);
 			try {
 				let res = null;
 				if (directionPair === AB_DIRECTION) {
+					console.log(
+						"directionPair",
+						directionPair,
+						curExt,
+						pairId,
+						fromValue,
+						slippageValue,
+						decrypted.phrase,
+						toValue,
+						fromTokenData,
+						toTokenData,
+					);
 					res = await swapA(
 						curExt,
 						pairId,
-						data.limitOrdersForSwap.leftoverSwap,
+						fromValue,
 						slippageValue,
 						decrypted.phrase,
-						data.limitOrdersForSwap.leftoverSwap * rate,
+						toValue,
 						fromTokenData,
 						toTokenData,
 					);
 				} else {
+					console.log(
+						"directionPair",
+						directionPair,
+						curExt,
+						pairId,
+						fromValue,
+						slippageValue,
+						decrypted.phrase,
+						toValue,
+						fromTokenData,
+						toTokenData,
+					);
 					res = await swapB(
 						curExt,
 						pairId,
-						data.limitOrdersForSwap.leftoverSwap,
+						fromValue,
 						slippageValue,
 						decrypted.phrase,
-						data.limitOrdersForSwap.leftoverSwap * rate,
+						toValue,
 						fromTokenData,
 						toTokenData,
 					);
@@ -187,6 +222,7 @@ function SwapConfirmPopup(props) {
 						);
 						break;
 					default:
+						console.log("somee", e);
 						dispatch(
 							showPopup({
 								type: "error",
@@ -196,6 +232,7 @@ function SwapConfirmPopup(props) {
 						break;
 				}
 			}
+		}
 
 		dispatch(setSwapAsyncIsWaiting(false));
 	}
@@ -328,7 +365,7 @@ function SwapConfirmPopup(props) {
 							least{" "}
 							<span>
 								{parseFloat(
-									(toValue - (toValue * props.slippage) / 100).toFixed(4),
+									(toValue - (toValue * slippageValue) / 100).toFixed(4),
 								)}{" "}
 								{toToken.symbol}
 							</span>{" "}

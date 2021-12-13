@@ -4,9 +4,14 @@ import "./HeaderMore.scss";
 function HeaderMore() {
 	const [isVisible, setVisible] = useState(false);
 
+	function handleOpen(e) {
+		more - dropdown;
+	}
+
 	function href(path) {
-		if (path === "docs") window.open("https://docs.defispace.com");
-		if (path === "Github") window.open("https://github.com/radianceteam/dex3");
+		if (path === "docs") window.open("https://docs.defispace.com", "_blank");
+		if (path === "Github")
+			window.open("https://github.com/radianceteam/dex3", "_blank");
 	}
 
 	return (
@@ -27,7 +32,11 @@ function HeaderMore() {
 			</svg>
 			{isVisible ? (
 				<div className="more-dropdown">
-					<a href={"https://docs.defispace.com"} className="more-link">
+					<a
+						href={"https://docs.defispace.com"}
+						className="more-link"
+						target="_blank"
+					>
 						<svg
 							width="17"
 							height="16"

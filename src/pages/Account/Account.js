@@ -34,6 +34,7 @@ import {
 	setTransactionsList,
 	setWallet,
 } from "../../store/actions/wallet";
+import {saveLog} from "../../logging/logging";
 
 function Account() {
 	const history = useHistory();
@@ -56,35 +57,95 @@ function Account() {
 	useEffect(() => {
 		setTransArr(transListReceiveTokens);
 	}, []);
-
-	function disconnectHandler() {
-		dispatch(setWallet({id: "", balance: 0}));
-		dispatch(setWalletIsConnected(false));
-		// dispatch(setCurExt({}));
-		// dispatch(setTokenList([]));
-		// dispatch(setLiquidityList([]));
-		// dispatch(setPairsList([]))
-		console.log("disaconnect");
-		dispatch(setSeedPassword(""));
-		// dispatch(enterSeedPhraseSaveToLocalStorage(""));
-		dispatch(
-			setClientData({
-				status: false,
-				dexclient: "",
-				balance: 0,
-				public: "",
-			}),
+	async function onPassEnter() {
+		const clientPrepData = JSON.parse(
+			localStorage.getItem("clientDataPreDeploy"),
 		);
-		store.dispatch(setTokenList([]));
-		store.dispatch(setLiquidityList([]));
-		localStorage.removeItem("setSubscribeReceiveTokens");
-		dispatch(showEnterSeedPhrase(false));
-
-		// localStorage.removeItem("esp");
-		// window.location.reload();
-		history.push("/account");
+		if (!clientPrepData) {
+			dispatch(
+				setTips({
+					message: `Something goes wrong, please re-generate client`,
+					type: "error",
+				}),
+			);
+			return;
+		}
+		const accBalance = await getClientBalance(clientPrepData.address);
+		setclientPrepData(clientPrepData);
+		if (accBalance > 0.5) {
+			setPasswordEnterPopup(true);
+		} else {
+			dispatch(
+				setTips({
+					message: `Not enough balance, need at least 0.5 TONs`,
+					type: "error",
+				}),
+			);
+		}
 	}
 
+	async function deployHandler() {
+		const encClData = await decryptPure(
+			clientPrepData.secret,
+			seedPhrasePassword,
+		);
+		const encrData = JSON.parse(JSON.stringify(clientPrepData));
+		encrData.secret = encClData;
+		setPasswordEnterPopup(false);
+		setonDeploy(true);
+		const deployRes = await deployClient(encrData);
+		console.log("encrData", encrData);
+		if (deployRes.code) {
+			setonDeploy(false);
+			dispatch(
+				setTips({
+					message: `Something goes wrong - error code ${deployRes.code}`,
+					type: "error",
+				}),
+			);
+		} else {
+			saveLog(
+				{
+					name: "deployNewClient",
+					clientAddress: encrData.address,
+					// deployData: deployRes,
+					created_at: (Date.now() + 10800000) / 1000,
+				},
+				"deployNewClient",
+			);
+			await InitializeClient(clientPrepData.public);
+			localStorage.removeItem("clientDataPreDeploy");
+			setonDeploy(false);
+		}
+	}
+	// function disconnectHandler() {
+	// 	dispatch(setWallet({id: "", balance: 0}));
+	// 	dispatch(setWalletIsConnected(false));
+	// 	// dispatch(setCurExt({}));
+	// 	// dispatch(setTokenList([]));
+	// 	// dispatch(setLiquidityList([]));
+	// 	// dispatch(setPairsList([]))
+	// 	console.log("disaconnect");
+	// 	dispatch(setSeedPassword(""));
+	// 	// dispatch(enterSeedPhraseSaveToLocalStorage(""));
+	// 	dispatch(
+	// 		setClientData({
+	// 			status: false,
+	// 			dexclient: "",
+	// 			balance: 0,
+	// 			public: "",
+	// 		}),
+	// 	);
+	// 	store.dispatch(setTokenList([]));
+	// 	store.dispatch(setLiquidityList([]));
+	// 	localStorage.removeItem("setSubscribeReceiveTokens");
+	// 	dispatch(showEnterSeedPhrase(false));
+	//
+	// 	// localStorage.removeItem("esp");
+	// 	// window.location.reload();
+	// 	history.push("/account");
+	// }
+
 	function disconnectHandler() {
 		dispatch(setWallet({id: "", balance: 0}));
 		dispatch(setWalletIsConnected(false));
@@ -103,10 +164,22 @@ function Account() {
 				public: "",
 			}),
 		);
+
 		store.dispatch(setTokenList([]));
 		store.dispatch(setLiquidityList([]));
 		localStorage.removeItem("setSubscribeReceiveTokens");
+		localStorage.removeItem("esp");
+		localStorage.removeItem("clientDataPreDeploy");
+		localStorage.removeItem("clientData");
 
+		saveLog(
+			{
+				name: "disconnect",
+				clientAddress: clientData.address,
+				created_at: (Date.now() + 10800000) / 1000,
+			},
+			"disconnect",
+		);
 		// localStorage.removeItem("esp");
 		// window.location.reload();
 		// history.push("/account");

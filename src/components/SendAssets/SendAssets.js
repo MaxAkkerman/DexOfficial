@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import cls from "classnames";
 import MainBlock from "../../components/MainBlock/MainBlock";
@@ -119,18 +119,25 @@ function SendAssets() {
 		//todo set block border red case error
 		setsendConfirmPopupIsVisible(false);
 	}
-
 	function handleChangeAddress(e) {
 		setaddressToSendView(e.currentTarget.value);
 		dispatch(setAddressForSend(e.currentTarget.value));
 	}
-
+	useEffect(() => {
+		if (!addressToSend) return;
+		handleSetView();
+		console.log("addressToSendView", addressToSendView);
+	}, [addressToSend]);
 	function handleSetView() {
-		let spliced = addressToSend.slice(0, 7);
-		let splicedpart2 = addressToSend.slice(59);
-		let view = spliced + "..." + splicedpart2;
-		console.log("addressTo", addressToSend);
-		setaddressToSendView(view);
+		if (addressToSend.length === 66) {
+			let spliced = addressToSend.slice(0, 7);
+			let splicedpart2 = addressToSend.slice(59);
+			let view = spliced + "..." + splicedpart2;
+			console.log("addressTo", addressToSend);
+			setaddressToSendView(view);
+		} else {
+			setaddressToSendView(addressToSend);
+		}
 	}
 
 	async function handleSendAsset() {
@@ -262,6 +269,7 @@ function SendAssets() {
 	}
 
 	function handleBack() {
+		dispatch(setAmountForSend(""));
 		dispatch(setAddressForSend(""));
 		history.push("/wallet");
 	}
@@ -270,7 +278,7 @@ function SendAssets() {
 	}
 
 	return (
-		<div className="container" style={{"flex-Direction": "column"}}>
+		<div className="container" style={{flexDirection: "column"}}>
 			{!showWaitingSendAssetPopup && (
 				<MainBlock
 					style={{
@@ -314,10 +322,10 @@ function SendAssets() {
 									</div>
 								</div>
 							</div>
-							{isInvalidAddress && addressToSend ? (
+							{addressToSend ? (
 								<FormHelperText
 									style={{marginLeft: "27px", marginTop: "4px"}}
-									error
+									error={isInvalidAddress ? `error` : null}
 									id="component-error-text"
 								>
 									{validationMsgForAddress}

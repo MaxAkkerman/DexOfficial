@@ -12,13 +12,14 @@ module.exports = {
 	devServer: {
 		contentBase: path.join(__dirname, "./"),
 		compress: true,
-		port: process.env.WEBPACK_DEV_SERVER_PORT || 3005,
+		port: process.env.WEBPACK_DEV_SERVER_PORT || 3006,
 		disableHostCheck: true,
 		historyApiFallback: true,
 		hot: true,
 	},
 	entry: ["babel-polyfill", path.join(__dirname, "./src/")],
 	output: {
+		hashFunction: "sha256",
 		path: path.join(__dirname, "./build"),
 		filename: "main.js",
 	},

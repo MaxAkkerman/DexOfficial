@@ -1,7 +1,7 @@
 import {
 	CHANGE_THEME,
 	CHANGE_TIP_DURATION,
-	CHANGE_TIP_SEVERITY,
+	OPEN_ENTER_SEED,
 	CHANGE_TIP_TEXT,
 	CLOSE_CONNECTING,
 	CONNECT_WALLET,
@@ -25,8 +25,8 @@ export function setTips(payload) {
 	return {type: SET_TIPS, payload};
 }
 
-export function changeTipSeverity(payload) {
-	return {type: CHANGE_TIP_SEVERITY, payload};
+export function handleOpenEnterSeed(payload) {
+	return {type: OPEN_ENTER_SEED, payload};
 }
 
 export function changeTipDuration(payload) {

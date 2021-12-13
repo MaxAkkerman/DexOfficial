@@ -14,6 +14,9 @@ function Pool() {
 	const liquidityList = useSelector(
 		(state) => state.walletReducer.liquidityList,
 	);
+	function handleClickCreatePair() {
+		history.push("/create-pair");
+	}
 
 	return (
 		<div className="container">
@@ -22,8 +25,10 @@ function Pool() {
 				title={"Your liquidity"}
 				button={
 					<Link
-						to="/create-pair"
-						className="btn liquidity-btn"
+						onClick={walletIsConnected ? () => handleClickCreatePair() : null}
+						className={`btn liquidity-btn ${
+							walletIsConnected ? null : "btn--disabled"
+						}`}
 						style={{fontSize: "20px", borderRadius: "12px"}}
 					>
 						Create Pair

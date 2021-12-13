@@ -9,6 +9,9 @@ import {TONTokenWalletContract} from "../extensions/contracts/TONTokenWallet";
 
 const DEFAULT_VALIDATION_MSG = "Incorrect address";
 const VALIDATION_MSG_ROOTS_ERROR = "Incorrect wallet owner address";
+const VALIDATION_MSG_NOT_DEPLOYED_ERROR =
+	"Recipient address have not wallet, sending tokens you will pay deploy fee";
+
 const VALIDATION_MSG_ROOTS_SUC = "Complete";
 const INCORRECT_LENGTH = "Incorrect address length";
 const NOT_TON_VALID_ADDRESS = "Incorrect TON blockchain address";
@@ -111,16 +114,16 @@ export default function useSendAssetsCheckAddress() {
 				});
 			} else {
 				setState({
-					invalid: true,
+					invalid: false,
 					loading: false,
-					validationMsg: VALIDATION_MSG_ROOTS_ERROR,
+					validationMsg: VALIDATION_MSG_NOT_DEPLOYED_ERROR,
 				});
 			}
 		} else {
 			setState({
 				invalid: false,
 				loading: false,
-				validationMsg: UNKNOWN_ERROR,
+				validationMsg: VALIDATION_MSG_ROOTS_SUC,
 			});
 		}
 	}, [addressToSend]);

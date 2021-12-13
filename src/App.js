@@ -52,7 +52,12 @@ import {
 	getAllPairsAndSetToStore,
 	getAllTokensAndSetToStore,
 } from "./reactUtils/reactUtils";
-import {changeTheme, hideTip, showPopup} from "./store/actions/app";
+import {
+	changeTheme,
+	handleOpenEnterSeed,
+	hideTip,
+	showPopup,
+} from "./store/actions/app";
 import {
 	enterSeedPhraseEmptyStorage,
 	setEncryptedSeedPhrase,
@@ -64,10 +69,14 @@ import {
 	setSubscribeReceiveTokens,
 } from "./store/actions/wallet";
 import {setNFTassets} from "./store/actions/walletSeed";
+import EnterSeedPhrase from "./components/EnterSeedPhrase/EnterSeedPhrase";
+import Bridge from "./pages/Bridge/Bridge";
 
 function App() {
 	const dispatch = useDispatch();
 	const location = useLocation();
+
+	const openEnterSeed = useSelector((state) => state.appReducer.openEnterSeed);
 
 	const popup = useSelector((state) => state.appReducer.popup);
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
@@ -153,7 +162,7 @@ function App() {
 	});
 
 	useEffect(async () => {
-		console.log("clientData", clientData);
+		console.log(" useeffect agregateQueryNFTassets");
 		const NFTassets = await agregateQueryNFTassets(clientData.address);
 		// setAssets(NFTassets)
 		dispatch(setNFTassets(NFTassets));
@@ -214,6 +223,7 @@ function App() {
 	);
 
 	useEffect(async () => {
+		console.log(" useeffect getLimitOrders");
 		if (clientData && clientData.address && !called)
 			getLimitOrders({variables: {addrOwner: clientData.address}});
 	}, [clientData]);
@@ -324,6 +334,12 @@ function App() {
 
 	return (
 		<>
+			{openEnterSeed && (
+				<EnterSeedPhrase
+					// setloadingUserData={(bl) => setloadingUserData(bl)}
+					handleCLoseEntSeed={() => dispatch(handleOpenEnterSeed(false))}
+				/>
+			)}
 			{visibleEnterSeedPhraseUnlock === true &&
 				emptyStorage === false &&
 				!onloading && <EnterPassword />}
@@ -341,6 +357,7 @@ function App() {
 				<Route exact path="/add-liquidity" component={AddLiquidity} />
 				<Route exact path="/create-pair" component={CreatePair} />
 				<Route exact path="/staking" component={Stacking} />
+				<Route exact path="/bridge" component={Bridge} />
 				<Route exact path="/wallet" component={Assets} />
 				<Route exact path="/orders" component={LimitOrder} />
 				<Route exact path="/">
@@ -368,6 +385,12 @@ function App() {
 							path="/wallet/send/send-modal"
 							component={AssetsModal}
 						/>
+					</>
+				) : null}
+				{!walletIsConnected && clientData.address && !clientData.status ? (
+					<>
+						<Route exact path="/wallet/settings/keys" component={KeysBlock} />
+						<Route exact path="/wallet/settings" component={WalletSettings} />
 					</>
 				) : null}
 			</Switch>

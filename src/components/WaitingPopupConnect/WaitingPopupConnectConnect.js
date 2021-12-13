@@ -19,10 +19,7 @@ function WaitingPopupConnect(props) {
 							{props.text}
 						</p>
 					)}
-					<button
-						className="btn popup-btn"
-						onClick={() => dispatch(setSwapAsyncIsWaiting(false))}
-					>
+					<button className="btn popup-btn" onClick={() => props.handleClose()}>
 						Hide
 					</button>
 				</div>

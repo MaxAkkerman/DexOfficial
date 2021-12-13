@@ -14,19 +14,29 @@ module.exports = {
 					name: "expectedWalletAddressCallback",
 					inputs: [
 						{name: "wallet", type: "address"},
-						{name: "wallet_public_key", type: "uint256"},
+						{
+							name: "wallet_public_key",
+							type: "uint256",
+						},
 						{name: "owner_address", type: "address"},
 					],
 					outputs: [],
 				},
 				{name: "setTransferCallback", inputs: [], outputs: []},
-				{name: "setBouncedCallback", inputs: [], outputs: []},
+				{
+					name: "setBouncedCallback",
+					inputs: [],
+					outputs: [],
+				},
 				{
 					name: "transfer",
 					inputs: [
 						{name: "to", type: "address"},
 						{name: "tokens", type: "uint128"},
-						{name: "payload", type: "cell"},
+						{
+							name: "payload",
+							type: "cell",
+						},
 					],
 					outputs: [],
 				},
@@ -34,7 +44,10 @@ module.exports = {
 					name: "burn",
 					inputs: [
 						{name: "tokens", type: "uint128"},
-						{name: "callback_address", type: "address"},
+						{
+							name: "callback_address",
+							type: "address",
+						},
 						{name: "callback_payload", type: "cell"},
 					],
 					outputs: [],
@@ -72,7 +85,11 @@ module.exports = {
 			],
 			data: [
 				{key: 1, name: "soUINT", type: "uint256"},
-				{key: 2, name: "dexclient", type: "address"},
+				{
+					key: 2,
+					name: "dexclient",
+					type: "address",
+				},
 			],
 			events: [],
 		},

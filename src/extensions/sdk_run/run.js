@@ -1,13 +1,14 @@
 import {Account} from "@tonclient/appkit";
 import {DEXRootContract} from "../contracts/DEXRoot.js";
 import {DataContract} from "../contracts/Data.js";
-import {DEXClientContract} from "../contracts/DEXClientMainNet.js";
+import {DEXClientContract} from "../contracts/DEXClient.js";
 import {WrappedTONVaultContract} from "../contracts/WrappedTONVault.js";
 import client, {
 	checkPubKey,
 	getAllDataPrep,
 	getClientAddrAtRootForShard,
 	getClientKeys,
+	getDexClientCode,
 	getRootConnectorCode,
 	getRootCreators,
 	getShardConnectPairQUERY,
@@ -380,6 +381,15 @@ export async function prepareClientDataForDeploy(phrase) {
 
 export async function deployClient(clientSet) {
 	console.log("clientSet.data.clientSoArg", clientSet);
+	const {codeDEXclient} = await getDexClientCode();
+
+	console.log(
+		"codeDEXclient bool",
+		codeDEXclient,
+		DEXClientContract.code,
+		codeDEXclient === DEXClientContract.code,
+	);
+
 	const connectorCode = await getRootConnectorCode();
 	console.log("connectorCode", connectorCode.codeDEXconnector);
 
@@ -546,6 +556,16 @@ export async function swapA(
 	if (getClientAddressFromRoot.status === false) {
 		return getClientAddressFromRoot;
 	}
+	console.log(
+		"qtyA",
+		qtyA,
+		"qtyB",
+		qtyB,
+		"qtyANum",
+		qtyANum,
+		"qtBToNum",
+		qtBToNum,
+	);
 
 	const acc = new Account(DEXClientContract, {
 		address: getClientAddressFromRoot.dexclient,
@@ -610,6 +630,16 @@ export async function swapB(
 
 	const {pubkey} = curExt._extLib;
 	let getClientAddressFromRoot = await checkPubKey(pubkey);
+	console.log(
+		"swapBBB qtyA",
+		qtyA,
+		"qtyB",
+		qtyB,
+		"qtyANum",
+		qtAToNum,
+		"qtBToNum",
+		qtyBNum,
+	);
 
 	const keys = await getClientKeys(phrase);
 

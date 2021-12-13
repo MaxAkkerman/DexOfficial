@@ -7,7 +7,7 @@ function CloseBtn(props) {
 
 	return (
 		<svg
-			onClick={() => dispatch(props.func())}
+			onClick={() => props.func()}
 			className="close"
 			width={props.width ? props.width : "26"}
 			height={props.height ? props.height : "26"}

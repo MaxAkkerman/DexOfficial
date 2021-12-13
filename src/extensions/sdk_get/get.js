@@ -2,6 +2,9 @@
     DEX contracts
 */
 import {DEXRootContract} from "../contracts/DEXRoot.js";
+import {LimitOrderRootContract} from "../contracts/LimitOrderRoot.js";
+import {LimitOrderRouterContract} from "../contracts/LimitOrderRouter.js";
+
 import {DEXClientContract} from "../contracts/DEXClientMainNet.js";
 import {GContract} from "../contracts/GContract.js";
 import {TONTokenWalletContract} from "../contracts/TONTokenWallet.js";
@@ -29,7 +32,12 @@ import {
 	hex2a,
 	toHex,
 } from "../../reactUtils/reactUtils";
-import {checkMessagesAmountClient, decode, getShardThis} from "../tonUtils";
+import {
+	checkMessagesAmountClient,
+	decode,
+	decodePayload,
+	getShardThis,
+} from "../tonUtils";
 
 const {ResponseType} = require("@tonclient/core/dist/bin");
 const {TonClient} = require("@tonclient/core");
@@ -42,11 +50,47 @@ const rootAddrNFT = Radiance.networks["2"].rootAddrNFT;
 const BroxusRootCodeHash = Radiance.networks["2"].BroxusRootCodeHash;
 
 const DappServer = Radiance.networks["2"].DappServer;
+const limitRootAddress = Radiance.networks["2"].limitRootAddress;
+const limitOrderRouter = Radiance.networks["2"].limitOrderRouter;
 
 const client = new TonClient({network: {endpoints: [DappServer]}});
 export default client;
 
 import memoize from "lodash.memoize";
+import {saveLog} from "../../logging/logging";
+
+export async function getShardLimit() {
+	let response;
+	let targetShard = getShardThis(dexroot);
+	const rootAcc = new Account(LimitOrderRootContract, {
+		address: limitRootAddress,
+		client,
+	});
+	const rootRouterAcc = new Account(LimitOrderRouterContract, {
+		address: limitOrderRouter,
+		client,
+	});
+	console.log("rootRouterAcc", rootRouterAcc);
+
+	const souintInitial = await rootRouterAcc.runLocal("soUINT", {});
+	console.log("souintInitial", souintInitial);
+
+	let souint = Number(souintInitial);
+	console.log("souint", souint);
+
+	// let souint = 0;
+	let curShard = null;
+
+	while (curShard !== targetShard) {
+		response = await rootAcc.runLocal("resolveOrder", {id: souint});
+		console.log("shards", targetShard, curShard);
+
+		curShard = response.decoded.output.addrOrder[2];
+		console.log("shards", targetShard, curShard);
+		souint++;
+	}
+	return souint;
+}
 
 export async function getWalletAddress(clientPubkey, pairAddress, rootAddress) {
 	const rootAcc = new Account(DEXRootContract, {
@@ -327,6 +371,15 @@ export async function getShardConnectPairQUERY(
 	}
 
 	return connectorSoArg0;
+}
+
+export async function getDexClientCode() {
+	const RootContract = new Account(DEXRootContract, {
+		address: Radiance.networks["2"].dexroot,
+		client,
+	});
+	const RootCreators = await RootContract.runLocal("codeDEXclient", {});
+	return RootCreators.decoded.output;
 }
 
 export async function getRootConnectorCode() {
@@ -768,6 +821,7 @@ export async function getDetailsFromTONtokenWallet2(address) {
 }
 
 export async function getDetailsFromTONtokenWallet(address) {
+	console.log("rrrr", address);
 	const tokenWalletAcc = new Account(TONTokenWalletContract, {
 		address: address,
 		client,
@@ -780,6 +834,7 @@ export async function getDetailsFromTONtokenWallet(address) {
 		if (!tokenWalletDetails.decoded.output.value0.root_address) {
 			return undefined;
 		}
+		console.log("tokenWalletDetails.decoded", tokenWalletDetails.decoded);
 		return tokenWalletDetails.decoded.output.value0.root_address;
 	} catch (e) {
 		console.log("eee", e);
@@ -798,7 +853,7 @@ export async function subscribeClientBalance(address) {
 				result: "balance",
 			},
 			async (params, responseType) => {
-				if (!params.result.balance) return;
+				if (!params.result) return;
 				// if(!checkMessagesAmountClient({tonLiveID:params.result.id}))return
 
 				store.dispatch(
@@ -949,6 +1004,20 @@ export async function subscribeClient(address) {
 								...transactionData,
 							}),
 						);
+						saveLog(
+							{
+								name: decoded.name,
+								clientAddress: params.result.dst,
+
+								// created_at: +checkedDuple.created_at,
+								created_at: (Date.now() + 10800000) / 1000,
+								tonLiveID: params.result.id || "default",
+								tokenName: hex2a(rootData.name) || "default",
+								tokenSymbol: hex2a(rootData.symbol) || "default",
+								rootAddress: decoded.value.root,
+							},
+							"connectRoot",
+						);
 					}
 					if (decoded.name === "sendTransaction") {
 						if (!checkMessagesAmountClient({tonLiveID: params.result.id}))
@@ -971,6 +1040,19 @@ export async function subscribeClient(address) {
 								...checkedDuple,
 								...transactionData,
 							}),
+						);
+						saveLog(
+							{
+								name: decoded.name,
+								clientAddress: params.result.dst,
+
+								// created_at: +checkedDuple.created_at,
+								created_at: (Date.now() + 10800000) / 1000,
+								tonLiveID: params.result.id || "default",
+								dst: decoded.value.dest,
+								amount: decoded.value.value,
+							},
+							"sendTransaction",
 						);
 					}
 
@@ -1003,6 +1085,22 @@ export async function subscribeClient(address) {
 								type: "info",
 								...callbackData,
 							}),
+						);
+						saveLog(
+							{
+								name: decoded.name,
+								clientAddress: params.result.dst,
+								decimals: getDecimals(rootData.decimals),
+
+								amount: decoded.value.tokens,
+								dst: callbackData.dst,
+								tokenSymbol: callbackData.token_symbol,
+								tokenName: callbackData.token_name,
+								// created_at: +checkedDuple.created_at,
+								created_at: (Date.now() + 10800000) / 1000,
+								tonLiveID: callbackData.tonLiveID,
+							},
+							"sendTokens",
 						);
 					}
 
@@ -1085,6 +1183,29 @@ export async function subscribeClient(address) {
 								...provideData,
 							}),
 						);
+						saveLog(
+							{
+								name: "removeLiquidity",
+								clientAddress: params.result.dst,
+								tokenAsymbolR: provideData.tokenAsymbol,
+								decimalsA: getDecimals(rootAdetails.decimals),
+
+								// tokenAname:provideData.tokenAname,
+								returnA: Number(decoded.value.returnA),
+								tokenBsymbolR: provideData.tokenBsymbol,
+								decimalsB: getDecimals(rootBdetails.decimals),
+
+								// tokenBname:provideData.tokenBname,
+								returnB: Number(decoded.value.returnB),
+								tokenABsymbolR: hex2a(rootABdetails.symbol),
+								tokenABnameR: hex2a(rootABdetails.name),
+								burnAB: Number(decoded.value.burnAB),
+								// created_at: +checkedDuple.created_at,
+								created_at: (Date.now() + 10800000) / 1000,
+								tonLiveID: checkedDuple.tonLiveID,
+							},
+							"removeLiquidity",
+						);
 					}
 
 					if (decoded.name === "processLiquidityCallback") {
@@ -1164,6 +1285,28 @@ export async function subscribeClient(address) {
 								...provideData,
 							}),
 						);
+						saveLog(
+							{
+								name: "addLiquidity",
+								clientAddress: params.result.dst,
+								tokenAsymbolP: provideData.tokenAsymbol,
+								decimalsA: getDecimals(rootAdetails.decimals),
+								// tokenAname:provideData.tokenAname,
+								// amountA:Number(decoded.value.amountA),
+								provideA: Number(decoded.value.provideA),
+								tokenBsymbolP: provideData.tokenBsymbol,
+								decimalsB: getDecimals(rootBdetails.decimals),
+
+								// tokenBname:provideData.tokenBname,
+								// amountB:Number(decoded.value.amountB),
+								provideB: Number(decoded.value.provideB),
+								gotAB: Number(decoded.value.mintAB),
+								// created_at: +checkedDuple.created_at,
+								created_at: (Date.now() + 10800000) / 1000,
+								tonLiveID: checkedDuple.tonLiveID,
+							},
+							"addLiquidity",
+						);
 					}
 
 					if (decoded.name === "transferOwnershipCallback") {
@@ -1207,7 +1350,7 @@ export async function subscribeClient(address) {
 						const decodedPayl = await decodePayload(decoded.value.payload);
 
 						const payloadFlag = Number(decodedPayl.arg0);
-						console.log("fkn payload", decodedPayl.arg0);
+						// console.log("fkn payload", decodedPayl.arg0);
 						if (!checkMessagesAmountClient({tonLiveID: params.result.id}))
 							return;
 						const rootD = await getDetailsFromTokenRoot(
@@ -1264,6 +1407,25 @@ export async function subscribeClient(address) {
 									...checkedDuple,
 									...transactionData,
 								}),
+							);
+							saveLog(
+								{
+									name: "swap",
+									clientAddress: params.result.dst,
+									decimalsA: getDecimals(Number(rootAdet.decimals)),
+									swapAsymbol: transactionData.tokenAsymbol,
+									// tokenAname:transactionData.tokenAname,
+									amountAswap: +decodedPayl.arg3,
+									swapBsymbol: transactionData.tokenBsymbol,
+									decimalsB: getDecimals(Number(rootBdet.decimals)),
+									// tokenBname:transactionData.tokenBname,
+									amountBswap: +decodedPayl.arg4,
+									// created_at: +checkedDuple.created_at,
+									created_at: (Date.now() + 10800000) / 1000,
+
+									tonLiveID: checkedDuple.tonLiveID,
+								},
+								"swap",
 							);
 						} else if (payloadFlag === 8) {
 							store.dispatch(
@@ -1816,6 +1978,9 @@ export async function getCodeHashFromNFTRoot() {
 
 export async function agregateQueryNFTassets(addrClient) {
 	const codeHash = await getCodeHashFromNFTRoot();
+	if (codeHash.code) {
+		return [];
+	}
 	const nftTokenItemAddress = await queryByCode(codeHash);
 	console.log("nftTokenItemAddress", nftTokenItemAddress);
 	if (!nftTokenItemAddress || !nftTokenItemAddress.length) return;
