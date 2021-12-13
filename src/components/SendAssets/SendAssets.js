@@ -123,11 +123,11 @@ function SendAssets() {
 		setaddressToSendView(e.currentTarget.value);
 		dispatch(setAddressForSend(e.currentTarget.value));
 	}
-// useEffect(()=>{
-// 	if(!addressToSendView)return
-// 	handleSetView()
-// 	console.log("addressToSendView",addressToSendView)
-// },[addressToSendView])
+useEffect(()=>{
+	if(!addressToSend)return
+	handleSetView()
+	console.log("addressToSendView",addressToSendView)
+},[addressToSend])
 	function handleSetView() {
 		if(addressToSend.length === 66){
 			let spliced = addressToSend.slice(0, 7);
