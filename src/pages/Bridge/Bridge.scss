@@ -1,0 +1,20 @@
+.netContainer {
+	display: flex;
+	width: 75vh;
+	margin-top: 60px;
+	justify-content: space-between;
+}
+.addToMain{
+	height: fit-content;
+	min-height: 300px;
+	width:41%;
+}
+.arrowRightSt {
+  margin: auto;
+  width: 60px;
+  height: fit-content;
+}
+.bridge_title_wrapper{
+	display: flex;
+	flex-direction: column;
+}
