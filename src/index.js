@@ -7,18 +7,14 @@ import React from "react";
 import ReactDOM from "react-dom";
 import {Provider} from "react-redux";
 import {BrowserRouter} from "react-router-dom";
-import {createStore} from "redux";
-import {composeWithDevTools} from "redux-devtools-extension";
 
 import App from "./App";
 import Alert from "./components/Alert/Alert";
 import {apolloClient} from "./lib/apollo";
-import rootReducer from "./store/reducers";
-
-export const store = createStore(rootReducer, composeWithDevTools());
+import {reduxStore} from "./lib/redux";
 
 ReactDOM.render(
-	<Provider store={store}>
+	<Provider store={reduxStore}>
 		<ApolloProvider client={apolloClient}>
 			<BrowserRouter>
 				<StyledEngineProvider injectFirst>

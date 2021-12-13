@@ -27,6 +27,6 @@ function* fetchPairs() {
 	}
 }
 
-export default function* mySaga() {
+export default function* fetchPairsSaga() {
 	yield takeEvery(PAIRS_FETCH_REQUESTED, fetchPairs);
 }

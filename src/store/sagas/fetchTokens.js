@@ -29,6 +29,6 @@ function* fetchTokens() {
 	}
 }
 
-export default function* mySaga() {
+export default function* fetchTokensSaga() {
 	yield takeEvery(TOKENS_FETCH_REQUESTED, fetchTokens);
 }

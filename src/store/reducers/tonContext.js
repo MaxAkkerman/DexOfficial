@@ -28,47 +28,13 @@ const initialState = {
  * 	and also context in context property, which equals to this.context
  */
 
-export default function tonFunctions(state = initialState, {payload, type}) {
+export default function tonContext(state = initialState, {payload, type}) {
 	switch (type) {
 		case INIT_TON_CONTEXT: {
-			return {
-				functions: reduce(
-					state.functions,
-					(r, v, k) => {
-						r[k] = v.bind({
-							context: state.values,
-							helperFunctions: reduce(
-								state.helperFunctions,
-								(r, v, k) => {
-									r[k] = v.bind(state.context);
-									return r;
-								},
-								{},
-							),
-						});
-						return r;
-					},
-					{},
-				),
-				helperFunctions: reduce(
-					state.helperFunctions,
-					(r, v, k) => {
-						r[k] = v.bind(state.values);
-						return r;
-					},
-					{},
-				),
-				values: state.values,
-			};
-		}
-		case UPDATE_TON_CONTEXT: {
-			const {name, value} = payload;
-
-			const newValuesContext = reduce(
-				state.values,
+			const helperFunctions = reduce(
+				state.helperFunctions,
 				(r, v, k) => {
-					if (k === name) r[name] = value;
-					else r[k] = v;
+					r[k] = v.bind(state.context);
 					return r;
 				},
 				{},
@@ -79,29 +45,53 @@ export default function tonFunctions(state = initialState, {payload, type}) {
 					state.functions,
 					(r, v, k) => {
 						r[k] = v.bind({
-							helperFunctions: reduce(
-								state.helperFunctions,
-								(r, v, k) => {
-									r[k] = v.bind(state.context);
-									return r;
-								},
-								{},
-							),
-							values: newValuesContext,
+							context: state.context,
+							helperFunctions,
 						});
 						return r;
 					},
 					{},
 				),
-				helperFunctions: reduce(
-					state.helperFunctions,
+				helperFunctions,
+				values: state.context,
+			};
+		}
+		case UPDATE_TON_CONTEXT: {
+			const {name, value} = payload;
+
+			const newValuesContext = reduce(
+				state.context,
+				(r, v, k) => {
+					if (k === name) r[name] = value;
+					else r[k] = v;
+					return r;
+				},
+				{},
+			);
+
+			const helperFunctions = reduce(
+				state.helperFunctions,
+				(r, v, k) => {
+					r[k] = v.bind(newValuesContext);
+					return r;
+				},
+				{},
+			);
+
+			return {
+				context: newValuesContext,
+				functions: reduce(
+					state.functions,
 					(r, v, k) => {
-						r[k] = v.bind(newValuesContext);
+						r[k] = v.bind({
+							context: newValuesContext,
+							helperFunctions,
+						});
 						return r;
 					},
 					{},
 				),
-				values: newValuesContext,
+				helperFunctions,
 			};
 		}
 	}

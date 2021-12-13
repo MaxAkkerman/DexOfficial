@@ -28,7 +28,7 @@ const initialState = {
 	...tokensInitialState,
 };
 
-const tonData = (state = initialState, {payload, type}) => {
+export default function tonData(state = initialState, {payload, type}) {
 	switch (type) {
 		case PAIRS_FETCH_SUCCEEDED:
 			return produce(state, (draft) => {
@@ -75,6 +75,4 @@ const tonData = (state = initialState, {payload, type}) => {
 		default:
 			return state;
 	}
-};
-
-export default tonData;
+}
