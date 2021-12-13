@@ -10,7 +10,7 @@ import {DEXRootContract} from "@/extensions/contracts/DEXRoot";
  *	rootB: string,
  * }[]>} pairs
  */
-export default async function getMyPairs() {
+export default async function getAllPairs() {
 	if (!this.context.dexRootAddress || !this.context.tonClient)
 		throw new Error(NO_CONTEXT);
 

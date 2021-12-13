@@ -75,4 +75,9 @@ module.exports = {
 		}),
 		new Dotenv(),
 	],
+	resolve: {
+		alias: {
+			"@": path.resolve(__dirname, "./src/"),
+		},
+	},
 };
