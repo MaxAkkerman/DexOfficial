@@ -1,68 +1,25 @@
 import {
-	FETCH_PAIRS,
-	FUNCTIONS_CONTEXT,
-	FUNCTIONS_CONTEXT_INIT,
-	PAIRS_ERROR,
-	PAIRS_LOADED,
-	PAIRS_LOADING,
-	TOKENS_ERROR,
-	TOKENS_LOADED,
-	TOKENS_LOADING,
-} from "./types";
+	INIT_TON_CONTEXT,
+	PAIRS_FETCH_REQUESTED,
+	TOKENS_FETCH_REQUESTED,
+	UPDATE_TON_CONTEXT,
+} from "@/store/actions/types";
 
-export function fetchPairs() {
-	return {type: FETCH_PAIRS};
+export function requestTokensFetch() {
+	return {type: TOKENS_FETCH_REQUESTED};
 }
 
-export function setPairs(pairs) {
+export function requestPairsFetch() {
+	return {type: PAIRS_FETCH_REQUESTED};
+}
+
+export function initTonContext() {
+	return {type: INIT_TON_CONTEXT};
+}
+
+export function updateTonContext(name, newValue) {
 	return {
-		payload: pairs,
-		type: PAIRS_LOADED,
-	};
-}
-
-export function setPairsLoading() {
-	return {type: PAIRS_LOADING};
-}
-
-export function setPairsError(error) {
-	return {
-		payload: error,
-		type: PAIRS_ERROR,
-	};
-}
-
-export function fetchTokens() {
-	return {type: FETCH_PAIRS};
-}
-
-export function setTokens(tokens) {
-	return {
-		payload: tokens,
-		type: TOKENS_LOADED,
-	};
-}
-
-export function setTokensLoading() {
-	return {type: TOKENS_LOADING};
-}
-
-export function setTokensError(error) {
-	return {
-		payload: error,
-		type: TOKENS_ERROR,
-	};
-}
-
-export function initFunctionsContext() {
-	return {
-		type: FUNCTIONS_CONTEXT_INIT,
-	};
-}
-
-export function setFunctionsContext(context) {
-	return {
-		payload: context,
-		type: FUNCTIONS_CONTEXT,
+		payload: {name, value: newValue},
+		type: UPDATE_TON_CONTEXT,
 	};
 }

@@ -1,26 +1,37 @@
 import {Account} from "@tonclient/appkit";
 import {signerKeys} from "@tonclient/core";
 
-import {AB_DIRECTION} from "../constants/runtimeVariables";
-import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
+import {NO_CONTEXT} from "@/constants/runtimeErrors";
+import {AB_DIRECTION} from "@/constants/runtimeVariables";
+import {DEXClientContract} from "@/extensions/contracts/DEXClientMainNet";
 
-export default async function swap(
-	{directionPair, pairAddr, qtyFrom, qtyTo, slippage},
-	{getClientAddress, getClientKeyPair, getPair, getTokenInfo, getTonClient},
-) {
-	const clientAddress = await getClientAddress();
-	const clientKeyPair = await getClientKeyPair();
-	const tonClient = await getTonClient();
+export default async function swap({
+	directionPair,
+	pairAddr,
+	qtyFrom,
+	qtyTo,
+	slippage,
+}) {
+	if (
+		!this.context ||
+		!this.context.dexClientAddress ||
+		!this.context.dexClientKeyPair ||
+		!this.context.tonClient ||
+		!this.helperFunctions ||
+		!this.helperFunctions.getPair ||
+		!this.helperFunctions.getTokenInfo
+	)
+		throw new Error(NO_CONTEXT);
 
 	const clientAcc = new Account(DEXClientContract, {
-		address: clientAddress,
-		client: tonClient,
-		signer: signerKeys(clientKeyPair),
+		address: this.context.dexClientAddress,
+		client: this.context.tonClient,
+		signer: signerKeys(this.context.dexClientKeyPair),
 	});
 
-	const pair = await getPair(pairAddr);
-	const tokenA = await getTokenInfo(pair.rootA);
-	const tokenB = await getTokenInfo(pair.rootB);
+	const pair = await this.helperFunctions.getPair(pairAddr);
+	const tokenA = await this.helperFunctions.getTokenInfo(pair.rootA);
+	const tokenB = await this.helperFunctions.getTokenInfo(pair.rootB);
 
 	const minTo = qtyTo - qtyTo * slippage;
 	const maxTo = qtyTo + qtyTo * slippage;

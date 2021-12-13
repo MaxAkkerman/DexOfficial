@@ -1,11 +1,13 @@
+import produce from "immer";
+
 import {
-	PAIRS_ERROR,
-	PAIRS_LOADED,
-	PAIRS_LOADING,
-	TOKENS_ERROR,
-	TOKENS_LOADED,
-	TOKENS_LOADING,
-} from "../actions/types";
+	PAIRS_FETCH_FAILED,
+	PAIRS_FETCH_LOADING,
+	PAIRS_FETCH_SUCCEEDED,
+	TOKENS_FETCH_FAILED,
+	TOKENS_FETCH_LOADING,
+	TOKENS_FETCH_SUCCEEDED,
+} from "@/store/actions/types";
 
 const pairsInitialState = {
 	pairs: [],
@@ -28,44 +30,48 @@ const initialState = {
 
 const tonData = (state = initialState, {payload, type}) => {
 	switch (type) {
-		case PAIRS_LOADED:
-			return {
-				...state,
-				...pairsInitialState,
-				pairs: payload,
-				pairsFetched: true,
-			};
-		case PAIRS_LOADING:
-			return {
-				...state,
-				...pairsInitialState,
-				pairsLoading: true,
-			};
-		case PAIRS_ERROR:
-			return {
-				...state,
-				...pairsInitialState,
-				pairsError: payload,
-			};
-		case TOKENS_LOADED:
-			return {
-				...state,
-				...tokensInitialState,
-				tokens: payload,
-				tokensFetched: true,
-			};
-		case TOKENS_LOADING:
-			return {
-				...state,
-				...tokensInitialState,
-				tokensLoading: true,
-			};
-		case TOKENS_ERROR:
-			return {
-				...state,
-				...tokensInitialState,
-				tokensError: payload,
-			};
+		case PAIRS_FETCH_SUCCEEDED:
+			return produce(state, (draft) => {
+				draft.pairs = payload;
+				draft.pairsError = null;
+				draft.pairsFetched = true;
+				draft.pairsLoading = false;
+			});
+		case PAIRS_FETCH_LOADING:
+			return produce(state, (draft) => {
+				draft.pairs = [];
+				draft.pairsError = null;
+				draft.pairsFetched = false;
+				draft.pairsLoading = true;
+			});
+		case PAIRS_FETCH_FAILED:
+			return produce(state, (draft) => {
+				draft.pairs = [];
+				draft.pairsError = payload;
+				draft.pairsFetched = true;
+				draft.pairsLoading = false;
+			});
+		case TOKENS_FETCH_SUCCEEDED:
+			return produce(state, (draft) => {
+				draft.tokens = payload;
+				draft.tokensError = null;
+				draft.tokensFetched = true;
+				draft.tokensLoading = false;
+			});
+		case TOKENS_FETCH_LOADING:
+			return produce(state, (draft) => {
+				draft.tokens = [];
+				draft.tokensError = null;
+				draft.tokensFetched = false;
+				draft.tokensLoading = true;
+			});
+		case TOKENS_FETCH_FAILED:
+			return produce(state, (draft) => {
+				draft.tokens = [];
+				draft.tokensError = payload;
+				draft.tokensFetched = true;
+				draft.tokensLoading = false;
+			});
 		default:
 			return state;
 	}
