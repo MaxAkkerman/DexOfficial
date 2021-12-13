@@ -33,9 +33,9 @@ function PinPopup(props) {
         }
     }, [pinArr]);
 
-    useEffect(() => {
-        props.handleCheckPin(pinArr, props.step,completed);
-    }, [pinArr]);
+    // useEffect(() => {
+    //     props.handleCheckPin(pinArr, props.step,completed);
+    // }, [pinArr]);
 
     function handleClickNumKeyboard(e) {
         let newPin = JSON.parse(JSON.stringify(pinArr));
@@ -59,78 +59,153 @@ function PinPopup(props) {
         newPin.map((item) => {
             item.focused = item.id.toString() === e.target.id;
         });
+        // console.log("newPinnewPin",newPin)
         setPinArr(newPin);
     }
 
-    // useEffect(() => {
-    //     window.addEventListener("keydown", keyDownHandler)
-    // }, [])
-    //
-    // function keyDownHandler(e) {
-    //
-    //     const fRefs = myRefs.filter(item => item)
-    //     if (e.key === "Meta") return
-    //     let newPin = JSON.parse(JSON.stringify(pinArr))
-    //     const curEmptyPin = newPin.filter(item => item.focused)
-    //     console.log("curEmptyPin", curEmptyPin)
-    //
-    //     if (!curEmptyPin.length) return
-    //     let nextId;
-    //     let ind;
-    //     newPin.map((item,i) => {
-    //
-    //         if (item.id === curEmptyPin[0].id) {
-    //             console.log("item.id",item.id)
-    //             item.value = e.key
-    //             item.focused = false
-    //             ind = i
-    //             nextId = +item.id + 1
-    //         }
-    //     })
-    //     // newPin.map(item => {
-    //     //     console.log("next one ocused")
-    //     //     if(item.id === nextId){
-    //     //         item.focused = true
-    //     //     }
-    //     // })
-    //     if (ind < fRefs.length) {
-    //         fRefs[nextId].focus();
-    //         newPin[nextId].focused = true;
-    //     }
-    //
-    //     setPinArr(newPin)
-    // }
+    useEffect(() => {
+        window.addEventListener("keydown", keyDownHandler)
+    }, [])
 
-    function handleClickNum(e, i) {
-        let newPin = JSON.parse(JSON.stringify(pinArr));
-        const fRefs = myRefs.filter((item) => item);
-        const forwardIndex = i + 1;
-        const backIndex = i - 1;
+    function keyDownHandler(e) {
+        // console.log(!e.key.match(onlyNums),e.key === "Meta",!e.key.match("Backspace"),!e.key.match("Delete"))
+        console.log(e.key)
+
         if (e.key === "Meta") return;
 
+        let newPin = JSON.parse(JSON.stringify(pinArr));
+        console.log(e.key)
+
         if (e.key === "Backspace" || e.key === "Delete") {
-            if (backIndex === -1) {
-                newPin[i].value = "";
-                newPin[i].focused = true;
+            let focusedItem = newPin.filter(item => item.focused)
+
+            if (focusedItem.length) {
+                console.log("focusedItem",focusedItem)
+                let backID = +focusedItem[0].id - 1 === -1 ? 0 : +focusedItem[0].id - 1
+                console.log("backID",backID)
+
+                if (!backID) return
+                newPin.map(it => {
+                    if (it.id === backID) {
+                        it.focused = true;
+
+                    }
+                    if (it.id === focusedItem[0].id) {
+                        it.value = "";
+                        it.focused = false;
+                    }
+                })
+                console.log("newPin",newPin)
+
                 setPinArr(newPin);
-                return;
+                return
             }
-            newPin[i].value = "";
-            newPin[i].focused = false;
-            newPin[backIndex].focused = true;
-            setPinArr(newPin);
-            if (backIndex < fRefs.length) fRefs[backIndex].focus();
-            return;
+            // else {
+            //     // if (!e.key.match(onlyNums)) return;
+            //
+            //     let lastFilledArr = newPin.filter(item => item.value.length)
+            //     console.log("lastFilledArr",lastFilledArr)
+            //
+            //     if (!lastFilledArr.length) return
+            //
+            //     let lastFilledItem = lastFilledArr[lastFilledArr.length - 1]
+            //     let preLastFilledItem = lastFilledArr[lastFilledArr.length - 2]
+            //     console.log("lastFilledItem",lastFilledItem)
+            //     console.log("preLastFilledItem",preLastFilledItem)
+            //
+            //     // if (!preLastFilledItem) return
+            //
+            //     newPin.map(it => {
+            //         if(it.id === lastFilledItem.id && lastFilledItem.id === 0){
+            //             it.value = "";
+            //             it.focused = true;
+            //         }else if(it.id === lastFilledItem.id && lastFilledItem.id !== 0) {
+            //             it.value = "";
+            //             it.focused = false;
+            //         }
+            //         if (preLastFilledItem && (it.id === preLastFilledItem)) {
+            //             it.focused = true;
+            //
+            //         }
+            //     })
+            //
+            //     setPinArr(newPin);
+            //
+            // }
+            return
         }
+        console.log("1",1)
         if (!e.key.match(onlyNums)) return;
-        newPin[i].value = e.key;
-        newPin[i].focused = false;
-        if (forwardIndex < fRefs.length) {
-            fRefs[forwardIndex].focus();
-            newPin[forwardIndex].focused = true;
+
+        const curEmptyPin = newPin.filter((item) => !item.value.length);
+        console.log("curEmptyPin",curEmptyPin)
+
+        if (!curEmptyPin.length) return;
+
+        if(!curEmptyPin[1]) {
+            if(!newPin[3].value){
+                newPin[3].value = e.key;
+            }
+
+            newPin[3].focused = true
+            setPinArr(newPin);
+
+            return
         }
+
+        newPin.map((item) => {
+            if (item.focused) {
+                item.value = e.key;
+                item.focused = false;
+            }
+            if (!curEmptyPin[1]) {
+
+            } else if (item.id === curEmptyPin[1].id) {
+                item.focused = true;
+            }
+        });
+        console.log("newPin",newPin)
+
         setPinArr(newPin);
     }
+
+    // useEffect(()=>{
+    //     const fRefs = myRefs.filter((item) => item);
+    //     fRefs[0].focus()
+    //
+    // },[])
+    // function handleClickNum(e, i) {
+    //     // if (e.key === "Meta") return;
+    //     if (e.key.match(onlyNums) || !e.key.match("Backspace") || !e.key.match("Delete")|| e.key === "Meta") return;
+    //
+    //     let newPin = JSON.parse(JSON.stringify(pinArr));
+    //     const fRefs = myRefs.filter((item) => item);
+    //     const forwardIndex = i + 1;
+    //     const backIndex = i - 1;
+    //     // if (!e.key.match(onlyNums)) return;
+    //
+    //     if (e.key === "Backspace" || e.key === "Delete") {
+    //         if (backIndex === -1) {
+    //             newPin[i].value = "";
+    //             newPin[i].focused = true;
+    //             setPinArr(newPin);
+    //             return;
+    //         }
+    //         newPin[i].value = "";
+    //         newPin[i].focused = false;
+    //         newPin[backIndex].focused = true;
+    //         setPinArr(newPin);
+    //         if (backIndex < fRefs.length) fRefs[backIndex].focus();
+    //         return;
+    //     }
+    //     newPin[i].value = e.key;
+    //     newPin[i].focused = false;
+    //     if (forwardIndex < fRefs.length) {
+    //         fRefs[forwardIndex].focus();
+    //         newPin[forwardIndex].focused = true;
+    //     }
+    //     setPinArr(newPin);
+    // }
 
     return (
         <div
@@ -190,7 +265,7 @@ function PinPopup(props) {
                                         onClick={(e) => handleClickNumInp(e)}
                                         maxLength={1}
                                         value={item.value}
-                                        onKeyDown={(e) => handleClickNum(e, i)}
+                                        // onKeyDown={(e) => handleClickNum(e, i)}
                                     />
                                 );
                             })}
@@ -202,7 +277,7 @@ function PinPopup(props) {
 
                         <Steppers step={props.step}/>
                         {!props.showTwoBtns ?
-                            <div style={{"display":"flex", "width":"100%"}}>
+                            <div style={{"display": "flex", "width": "100%"}}>
                                 <NextBtn
                                     curBtnStyles={"curBtnStylesLogin"}
                                     btnsClass={"LoginViaPinBtns"}
@@ -212,26 +287,26 @@ function PinPopup(props) {
                                         props.handleLogOut()
                                     }
                                 />
-								<NextBtn
+                                <NextBtn
                                     curBtnStyles={"curBtnStylesLogin"}
                                     btnsClass={"LoginViaPinBtns"}
                                     btnText={props.btnText}
-									errColor={null}
-									handleClickNext={() =>
-										props.handleClickNext(pinArr,props.nextStep, completed)
-									}
-								/>
+                                    errColor={null}
+                                    handleClickNext={() =>
+                                        props.handleClickNext(pinArr)
+                                    }
+                                />
                             </div>
-							:
-							<NextBtn
+                            :
+                            <NextBtn
                                 curBtnStyles={"curBtnStyles"}
                                 btnsClass={"enterSPRegBox"}
                                 btnText={props.btnText}
-								errColor={null}
-								handleClickNext={() =>
-									props.handleClickNext(pinArr,props.nextStep, completed)
-								}
-							/>
+                                errColor={null}
+                                handleClickNext={() =>
+                                    props.handleClickNext(pinArr, props.nextStep, completed)
+                                }
+                            />
                         }
 
 

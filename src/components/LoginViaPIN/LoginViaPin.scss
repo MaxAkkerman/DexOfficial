@@ -1,10 +1,36 @@
 .welcomeWrapper {
+	color: var(--mainblock-title-color);
 	font-weight: bold;
 	margin: auto;
 	text-align: center;
 	font-size: 28px;
 }
-
+.LoginViaPinBtns{
+	justify-content: center;
+	//width: 320px;
+	//padding-left: 16px;
+}
+.curBtnStylesLogin{
+	height: 57px;
+	font-size: 20px;
+	//padding: 16px 20px;
+	border-radius: 18px;
+	width: 50%;
+}
+.curBtnStyles{
+	height: 57px;
+	font-size: 20px;
+	padding: 16px 20px;
+	border-radius: 18px;
+	width: 100%;
+}
+.removePad{
+	padding: unset;
+}
+.fixPaddings{
+	margin-top: 50px;
+	margin-right: 50px;
+}
 .linkedText {
 	color: #3569f0;
 	text-decoration: underline;
@@ -14,8 +40,14 @@
 //  font-size:30px;
 //}
 .welcomeTextWrapper {
+	color: var(--mainblock-title-color);
 	width: 55%;
 	text-align: center;
+}
+.specForSuccess{
+	margin-top: 40px;
+	padding-left: 50px;
+	padding-right: 50px;
 }
 
 .agreementCheckBox {
@@ -25,19 +57,16 @@
 
 .welcomeAgreementContainer {
 	display: flex;
-	width: 118.5%;
-	margin-left: -50px;
 	text-align: center;
-	height: 200px;
+	height: 20vh;
 	background: silver;
 	align-items: center;
 	justify-content: center;
-	margin-top: 50px;
-	//margin-bottom: 247px;
+	margin-top: 5vh;
 }
 
 .agreementText {
-	width: 31%;
+	width: 39%;
 	margin-left: 20px;
 	text-align: left;
 }
@@ -54,10 +83,10 @@
 	.welcomeWrapper {
 		font-size: 26px;
 	}
-	.welcomeAgreementContainer {
-		width: 121.5%;
-		margin-left: -31px;
-	}
+	//.welcomeAgreementContainer {
+	//	width: 121.5%;
+	//	margin-left: -31px;
+	//}
 	//.fixMedia {
 	//  font-size: 21px !important;
 	//}
