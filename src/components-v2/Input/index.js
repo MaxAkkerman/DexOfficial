@@ -14,6 +14,7 @@ export default function Input({
 	helperText,
 	label,
 	name,
+	onMaxClick,
 	onSelectClick,
 	onValueBlur,
 	onValueChange,
@@ -73,16 +74,11 @@ export default function Input({
 						</button>
 					) : (
 						<>
-							<button
-								className="input-max"
-								onClick={() => {
-									inputRef.current.value = token.balance.toFixed(4);
-									const event = new Event("input", {bubbles: true});
-									inputRef.current.dispatchEvent(event);
-								}}
-							>
-								MAX
-							</button>
+							{onMaxClick && (
+								<button className="input-max" onClick={onMaxClick}>
+									MAX
+								</button>
+							)}
 							<button
 								className="input-select"
 								onClick={onSelectClick}
@@ -93,7 +89,7 @@ export default function Input({
 									alt={token.symbol}
 									className="input-token-img"
 								/>
-								<span>{token && token.symbol}</span>
+								<span>{token.symbol}</span>
 								<svg
 									width="16"
 									height="10"
@@ -126,6 +122,7 @@ Input.propTypes = {
 	helperText: PropTypes.string,
 	label: PropTypes.string.isRequired,
 	name: PropTypes.string.isRequired,
+	onMaxClick: PropTypes.func,
 	onSelectClick: PropTypes.func.isRequired,
 	onValueBlur: PropTypes.func.isRequired,
 	onValueChange: PropTypes.func.isRequired,
@@ -141,6 +138,7 @@ Input.propTypes = {
 		type: PropTypes.string.isRequired,
 		walletAddress: PropTypes.string.isRequired,
 	}),
+	touched: PropTypes.bool,
 	value: PropTypes.number.isRequired,
 };
 
@@ -148,7 +146,9 @@ Input.defaultProps = {
 	autoFocus: false,
 	error: false,
 	helperText: "Type numeric value",
+	onMaxClick: null,
 	readOnly: false,
 	token: null,
+	touched: false,
 	walletAddress: null,
 };

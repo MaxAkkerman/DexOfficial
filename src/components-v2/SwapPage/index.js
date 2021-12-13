@@ -82,14 +82,13 @@ export default function SwapPage() {
 
 	const rate = useMemo(() => {
 		const {pair} = values;
-		if (!directionPair || !pair) return;
-		return directionPair === AB_DIRECTION ? pair.rateAB : pair.rateBA;
+		if (directionPair)
+			return directionPair === AB_DIRECTION ? pair.rateAB : pair.rateBA;
 	}, [directionPair, values.pair]);
 
 	// Calculate "to" value
 	useEffect(() => {
-		const {fromValue} = values;
-		if (!fromValue || !rate) return;
+		if (!rate) return;
 		setFieldValue("toValue", values.fromValue * rate);
 	}, [values.fromValue, rate]);
 
@@ -112,6 +111,10 @@ export default function SwapPage() {
 	function handleTokensInvert() {
 		setFieldValue("fromToken", values.toToken);
 		setFieldValue("toToken", values.fromToken);
+	}
+
+	function handleMaxClick() {
+		setFieldValue("fromValue", values.fromToken.balance);
 	}
 
 	const CurrentButton = useMemo(() => {
@@ -161,6 +164,7 @@ export default function SwapPage() {
 									label="From"
 									name="fromValue"
 									value={values.fromValue}
+									onMaxClick={handleMaxClick}
 									onValueChange={handleChange}
 									onValueBlur={handleBlur}
 									onSelectClick={fromSelectPopup.open}
@@ -215,11 +219,9 @@ export default function SwapPage() {
 								>
 									<div className="swap-confirm-wrap">
 										<p className="mainblock-footer-value">
-											{parseFloat(
-												(
-													values.toValue -
-													(values.toValue * values.slippageTolerance) / 100
-												).toFixed(4),
+											{truncateNum(
+												values.toValue -
+													(values.toValue * values.slippage) / 100,
 											)}{" "}
 											{values.toToken.symbol}
 										</p>
@@ -229,8 +231,8 @@ export default function SwapPage() {
 									</div>
 									<div className="swap-confirm-wrap">
 										<p className="mainblock-footer-value">
-											{values.fromValue && values.fromValue !== 0
-												? ((values.fromValue * 0.3) / 100).toFixed(4)
+											{values.pair
+												? truncateNum((values.fromValue * 0.3) / 100)
 												: 0.0}{" "}
 											{values.fromToken.symbol}
 										</p>

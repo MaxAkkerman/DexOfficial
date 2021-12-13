@@ -25,7 +25,10 @@ export default function SwapConfirmPopup() {
 
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
 	const values = useSelector((state) => state.swapReducer.values);
-	const fn = useSelector((state) => state.tonFunctions);
+	const swap = useSelector((state) => state.tonContext.functions.swap);
+	const takeLimitOrder = useSelector(
+		(state) => state.tonContext.functions.takeLimitOrder,
+	);
 
 	const directionPair = useMemo(() => {
 		const {fromToken, pair} = values;
@@ -35,9 +38,9 @@ export default function SwapConfirmPopup() {
 
 	const rate = useMemo(() => {
 		const {pair} = values;
-		if (!pair || !directionPair) return;
-		return directionPair === AB_DIRECTION ? pair.rateAB : pair.rateBA;
-	}, [values.pair, values.fromToken, values.toToken]);
+		if (directionPair)
+			return directionPair === AB_DIRECTION ? pair.rateAB : pair.rateBA;
+	}, [directionPair, values.pair]);
 
 	const {enqueueSnackbar} = useSnackbar();
 
@@ -60,14 +63,13 @@ export default function SwapConfirmPopup() {
 		const processing = [];
 
 		data.limitOrdersForSwap.limitOrders.forEach((limitOrder) => {
-			const promise = fn
-				.takeLimitOrder({
-					directionPair,
-					orderAddr: limitOrder.addrOrder,
-					pairAddr: values.pair.pairAddress,
-					price: limitOrder.priceRaw,
-					qty: limitOrder.amountRaw * limitOrder.price,
-				})
+			const promise = takeLimitOrder({
+				directionPair,
+				orderAddr: limitOrder.addrOrder,
+				pairAddr: values.pair.pairAddress,
+				price: limitOrder.priceRaw,
+				qty: limitOrder.amountRaw * limitOrder.price,
+			})
 				.then(() => {
 					enqueueSnackbar({
 						message: `Taking limit order ${truncateNum(limitOrder.amount, 2)} ${
@@ -97,7 +99,7 @@ export default function SwapConfirmPopup() {
 
 		if (data.limitOrdersForSwap.leftoverSwap !== 0)
 			try {
-				const res = fn.swap({
+				const res = swap({
 					directionPair,
 					pairAddr: values.pair.pairAddress,
 					qtyFrom: values.fromValue,
