@@ -67,7 +67,8 @@
 				rgba(0, 0, 0, 0.0198) 0%,
 				rgba(0, 0, 0, 0) 109.76%
 			);
-			backdrop-filter: blur(100px);
+			-webkit-backdrop-filter: blur(100px);
+            backdrop-filter: blur(100px);
 			border-radius: 24px;
 		}
 

@@ -1,7 +1,8 @@
 .search-input {
 	background: rgba(255, 255, 255, 0.06);
 	border: 1px solid var(--search-input-border-color);
-	//backdrop-filter: blur(100px); //TODO: ???
+	-webkit-backdrop-filter: blur(100px);
+    backdrop-filter: blur(100px); //TODO: ???
 	border-radius: 24px;
 	font-family: "Gilroy", sans-serif;
 	font-size: 20px;
