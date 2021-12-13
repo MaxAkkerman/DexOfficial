@@ -30,7 +30,7 @@ function Header() {
 
   return (
     <header className="header">
-      <div className="header-wrap">
+      <div className="header-wrap first">
         <NavLink
           to="/swap"
           className="header-link"
