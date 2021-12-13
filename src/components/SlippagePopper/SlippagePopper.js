@@ -36,7 +36,11 @@ export default function SlippagePopper(props) {
       placement="bottom-start"
       style={{ zIndex: 1 }}
     >
-      <Paper variant="outlined" classes={{ root: classNames.container }}>
+      <Paper
+        variant="outlined"
+        classes={{ root: classNames.container }}
+        style={{ animation: 'showPopper .4s forwards' }}
+      >
         <div className={'SlippagePopper_container'}>
           <div className={'SlippagePopper_slippage_container'}>
             <div

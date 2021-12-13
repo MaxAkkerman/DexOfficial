@@ -30,6 +30,7 @@ input:focus {
 :root {
 	--text-color: #333333;
 	--arrow-back: invert(0);
+	--invert: invert(1);
 	--bg-color: #ffffff;
 	--primary-color: #626262;
 	--accent: #3569f0;
@@ -77,6 +78,7 @@ input:focus {
 html[data-theme="dark"] {
 	--text-color: #ffffff;
 	--arrow-back: invert(1);
+	--invert: invert(0);
 	--bg-color: #2d2f35;
 	--primary-color: #bbbbbb;
 	--accent: #3569f0;

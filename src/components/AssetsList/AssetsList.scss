@@ -46,6 +46,33 @@
 	right: 0;
 }
 
+.settings_btn {
+	background: var(--accent);
+	border-radius: 12px;
+	max-height: 35px;
+	min-width: 35px;
+	min-height: 35px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	img {
+		width: 23px;
+		filter: var(--arrow-back);
+	}
+
+}
+
+@keyframes showPopper {
+	0% {
+		opacity: 0;
+		transform: scale(.9);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
 .left_block {
 	display: flex;
 	align-items: center;

@@ -360,7 +360,10 @@ function Swap() {
           smallTitle={false}
           content={
             <div style={{ display: 'contents' }}>
-              <div className="head_wrapper" style={{ marginBottom: '40px' }}>
+              <div
+                className="head_wrapper"
+                style={{ marginBottom: '40px', alignItems: 'center' }}
+              >
                 <div
                   className="left_block"
                   style={{ color: 'var(--mainblock-title-color)' }}
