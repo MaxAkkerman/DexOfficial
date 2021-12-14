@@ -1,20 +1,41 @@
 .netContainer {
-	display: flex;
-	width: 75vh;
-	margin-top: 60px;
-	justify-content: space-between;
+  display: flex;
+  width: 75vh;
+  margin-top: 60px;
+  justify-content: space-between;
 }
-.addToMain{
-	height: fit-content;
-	min-height: 300px;
-	width:41%;
+
+.addToMain {
+  height: fit-content;
+  min-height: 300px;
+  width: 41%;
 }
+
 .arrowRightSt {
   margin: auto;
-  width: 60px;
-  height: fit-content;
+  width: 54px;
+  height: 54px;
 }
-.bridge_title_wrapper{
-	display: flex;
-	flex-direction: column;
+
+.bridge_title_wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.bridge_text_wrap {
+  align-self: center;
+  margin-left: 15px;
+}
+.bridge_net_item{
+	display:flex;
+  margin-top:20px;
+}
+.bridge_netSelector_wrapper{
+  align-items: center;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 40px;
+}
+.bridge_netItems_container{
+  margin-top:20px;
 }
