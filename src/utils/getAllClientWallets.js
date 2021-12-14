@@ -7,6 +7,19 @@ import {TONTokenWalletContract} from "@/extensions/contracts/TONTokenWallet";
 import {iconGenerator} from "@/iconGenerator";
 import {getDecimals, getFullName, hex2a} from "@/reactUtils/reactUtils";
 
+/**
+ * @returns {Promise<{
+ * walletAddress: string
+ * symbol: string
+ * tokenName: string
+ * type: string
+ * owner_address: string
+ * decimals: number
+ * icon: string
+ * rootAddress: string
+ * balance: number
+ * }[]>} tokens
+ */
 export default async function getAllClientWallets() {
 	if (
 		!this ||
@@ -53,7 +66,7 @@ export default async function getAllClientWallets() {
 			itemData.type = "PureToken";
 			itemData.owner_address =
 				curWalletData.decoded.output.value0.owner_address;
-			itemData.decimals = curRootData.decoded.output.value0.decimals;
+			itemData.decimals = +curRootData.decoded.output.value0.decimals;
 			itemData.icon = iconGenerator(itemData.symbol);
 			itemData.rootAddress = curWalletData.decoded.output.value0.root_address;
 			itemData.balance =
