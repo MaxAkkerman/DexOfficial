@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {Redirect, Route, Switch, useLocation} from "react-router-dom";
 import {useMount} from "react-use";
 
+import SwapConfirmPopup from "@/components-v2/SwapConfirmPopup";
 import SwapPage from "@/components-v2/SwapPage";
 import {requestPairsFetch, requestTokensFetch} from "@/store/actions/ton";
 
@@ -110,6 +111,8 @@ function App() {
 	const transListReceiveTokens = useSelector(
 		(state) => state.walletReducer.transListReceiveTokens,
 	);
+
+	const swapValues = useSelector((state) => state.swapReducer.values);
 
 	const {enqueueSnackbar} = useSnackbar();
 
@@ -238,7 +241,7 @@ function App() {
 				updateQuery(prev, {subscriptionData}) {
 					if (!subscriptionData.data) return prev;
 
-					const {status, limitOrder} = subscriptionData.data.updateLimitOrder;
+					const {limitOrder, status} = subscriptionData.data.updateLimitOrder;
 
 					let {aSymbol, bSymbol} = limitOrder.pair;
 					if (limitOrder.directionPair === BA_DIRECTION)
@@ -409,6 +412,7 @@ function App() {
 				<Popup type={popup.type} message={popup.message} link={popup.link} />
 			) : null}
 			{revealSeedPhraseIsVisible ? <RevealSeedPhrase /> : null}
+			{swapValues && <SwapConfirmPopup />}
 		</>
 	);
 }

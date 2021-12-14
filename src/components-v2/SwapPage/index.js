@@ -43,6 +43,7 @@ export default function SwapPage() {
 			toToken: null,
 			toValue: "",
 		},
+		onSubmit: handleSwap,
 		validate,
 	});
 
@@ -127,12 +128,16 @@ export default function SwapPage() {
 		if (!walletConnected) {
 			props.children = "Connect wallet";
 			props.onClick = handleConnectWallet;
+			props.type = "button";
 		} else if (values.fromToken && values.toToken && !values.pair) {
 			props.children = "Connect pair";
-			props.onClick = handleConnectPair;
+			props.type = "submit";
 		} else {
 			props.children = "Swap";
-			props.onClick = handleSwap;
+			props.onClick = () => {
+				console.log("@liketurbo", "click");
+			};
+			props.type = "submit";
 		}
 
 		return function CurrentButton(p) {
@@ -198,7 +203,7 @@ export default function SwapPage() {
 									}
 									readOnly
 								/>
-								<CurrentButton type="submit" />
+								<CurrentButton />
 								{rate && (
 									<p className="swap-rate">
 										Price{" "}
@@ -312,20 +317,20 @@ function validate(values) {
 	const errors = {};
 
 	const MUST_BE_NUMBER = "Input value must be a number";
-	errors.fromValue = isNaN(+values.fromValue) && MUST_BE_NUMBER;
-	errors.toValue = isNaN(+values.toValue) && MUST_BE_NUMBER;
-
 	const POSITIVE_NUMBER = "Use positive number";
-	errors.fromValue =
-		errors.fromValue || (values.fromValue <= 0 && POSITIVE_NUMBER);
-	errors.toValue = errors.toValue || (values.toValue <= 0 && POSITIVE_NUMBER);
-
 	const SELECT_TOKEN = "You must select token";
-	errors.fromToken = !values.fromToken && SELECT_TOKEN;
-	errors.toToken = !values.toToken && SELECT_TOKEN;
-
 	const NO_PAIR = "Selected pair doesn't exist";
-	errors.pair = values.fromToken && values.toToken && !values.pair && NO_PAIR;
+
+	if (isNaN(+values.fromValue)) errors.fromValue = MUST_BE_NUMBER;
+	else if (values.fromValue <= 0) errors.fromValue = POSITIVE_NUMBER;
+
+	if (isNaN(+values.toValue)) errors.toValue = MUST_BE_NUMBER;
+	else if (values.toValue <= 0) errors.toValue = POSITIVE_NUMBER;
+
+	if (!values.fromToken) errors.fromToken = SELECT_TOKEN;
+	if (!values.toToken) errors.toToken = SELECT_TOKEN;
+
+	if (values.fromToken && values.toToken && !values.pair) errors.pair = NO_PAIR;
 
 	return errors;
 }
