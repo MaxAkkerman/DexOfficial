@@ -11,11 +11,13 @@ const initialState = {
 		tonClient: null,
 	},
 	functions: {
+		getAllPairsWithoutProvider() {},
 		swap() {},
 		takeLimitOrder() {},
 	},
 	helperFunctions: {
 		getPair() {},
+		getPairsTotalSupply() {},
 		getTokenInfo() {},
 		getTokenRouter() {},
 	},
@@ -41,6 +43,7 @@ export default function tonContext(state = initialState, {payload, type}) {
 			);
 
 			return {
+				context: state.context,
 				functions: reduce(
 					state.functions,
 					(r, v, k) => {
@@ -53,7 +56,6 @@ export default function tonContext(state = initialState, {payload, type}) {
 					{},
 				),
 				helperFunctions,
-				values: state.context,
 			};
 		}
 		case UPDATE_TON_CONTEXT: {
@@ -94,7 +96,7 @@ export default function tonContext(state = initialState, {payload, type}) {
 				helperFunctions,
 			};
 		}
+		default:
+			return state;
 	}
-
-	return initialState;
 }

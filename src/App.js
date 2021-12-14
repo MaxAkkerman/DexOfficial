@@ -5,8 +5,12 @@ import {useDispatch, useSelector} from "react-redux";
 import {Redirect, Route, Switch, useLocation} from "react-router-dom";
 import {useMount} from "react-use";
 
+import SwapPage from "@/components-v2/SwapPage";
+import {requestPairsFetch} from "@/store/actions/ton";
+
 import AssetsListForDeploy from "./components/AssetsListForDeploy/AssetsListForDeploy";
 import EnterPassword from "./components/EnterPassword/EnterPassword";
+import EnterSeedPhrase from "./components/EnterSeedPhrase/EnterSeedPhrase";
 import Header from "./components/Header/Header";
 import NativeLogin from "./components/NativeLogin/NativeLogin";
 import PoolExplorer from "./components/PoolExplorer/PoolExplorer";
@@ -42,12 +46,12 @@ import {LimitOrderUpdateSubscription} from "./graphql/subscriptions";
 import Account from "./pages/Account/Account";
 import AddLiquidity from "./pages/AddLiquidity/AddLiquidity";
 import Assets from "./pages/Assets/Assets";
+import Bridge from "./pages/Bridge/Bridge";
 import CreatePair from "./pages/CreatePair/CreatePair";
 import LimitOrder from "./pages/LimitOrder/LimitOrder";
 import Manage from "./pages/Manage/Manage";
 import Pool from "./pages/Pool/Pool";
 import Stacking from "./pages/Stacking/Stacking";
-import Swap from "./pages/Swap/Swap";
 import {
 	getAllPairsAndSetToStore,
 	getAllTokensAndSetToStore,
@@ -69,8 +73,6 @@ import {
 	setSubscribeReceiveTokens,
 } from "./store/actions/wallet";
 import {setNFTassets} from "./store/actions/walletSeed";
-import EnterSeedPhrase from "./components/EnterSeedPhrase/EnterSeedPhrase";
-import Bridge from "./pages/Bridge/Bridge";
 
 function App() {
 	const dispatch = useDispatch();
@@ -218,7 +220,7 @@ function App() {
 		dispatch(setAssetsFromGraphQL(addrArray));
 	}, []);
 
-	const [getLimitOrders, {subscribeToMore, called}] = useLazyQuery(
+	const [getLimitOrders, {called, subscribeToMore}] = useLazyQuery(
 		LimitOrdersForOwnerQuery,
 	);
 
@@ -332,6 +334,10 @@ function App() {
 			});
 	}, [subscribeToMore]);
 
+	useEffect(async () => {
+		dispatch(requestPairsFetch());
+	}, []);
+
 	return (
 		<>
 			{openEnterSeed && (
@@ -352,7 +358,7 @@ function App() {
 				<Route exact path="/pool-explorer" component={PoolExplorer} />
 				<Route exact path="/pool" component={Pool} />
 				<Route exact path="/account" component={Account} />
-				<Route exact path="/swap" component={Swap} />
+				<Route exact path="/swap" component={SwapPage} />
 				<Route exact path="/manage" component={Manage} />
 				<Route exact path="/add-liquidity" component={AddLiquidity} />
 				<Route exact path="/create-pair" component={CreatePair} />

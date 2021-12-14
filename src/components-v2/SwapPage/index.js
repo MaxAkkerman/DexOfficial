@@ -23,8 +23,8 @@ export default function SwapPage() {
 	const walletConnected = useSelector(
 		(state) => state.appReducer.walletIsConnected,
 	);
-	const tokenList = useSelector((state) => state.walletReducer.tokenList);
-	const pairList = useSelector((state) => state.walletReducer.pairsList);
+	const tokens = useSelector((state) => state.tonData.tokens);
+	const pairs = useSelector((state) => state.tonData.pairs);
 
 	const {
 		errors,
@@ -49,30 +49,30 @@ export default function SwapPage() {
 	const leftTokens = useMemo(
 		() =>
 			differenceBy(
-				tokenList,
+				tokens,
 				[values.fromToken, values.toToken],
 				(t) => t && t.rootAddress,
 			),
-		[tokenList, values.fromToken, values.toToken],
+		[tokens, values.fromToken, values.toToken],
 	);
 
 	// Calculate pair
 	useEffect(() => {
 		const {fromToken, toToken} = values;
-		if (!pairList.length || !fromToken || !toToken) return;
+		if (!pairs.length || !fromToken || !toToken) return;
 
 		setFieldValue(
 			"pair",
-			find(pairList, {
+			find(pairs, {
 				rootA: fromToken.rootAddress,
 				rootB: toToken.rootAddress,
 			}) ||
-				find(pairList, {
+				find(pairs, {
 					rootA: toToken.rootAddress,
 					rootB: fromToken.rootAddress,
 				}),
 		);
-	}, [pairList, values.fromToken, values.toToken]);
+	}, [pairs, values.fromToken, values.toToken]);
 
 	const directionPair = useMemo(() => {
 		const {fromToken, pair} = values;
@@ -86,7 +86,7 @@ export default function SwapPage() {
 			return directionPair === AB_DIRECTION ? pair.rateAB : pair.rateBA;
 	}, [directionPair, values.pair]);
 
-	// Calculate "to" value
+	// Calculate "To" value
 	useEffect(() => {
 		if (!rate) return;
 		setFieldValue("toValue", values.fromValue * rate);

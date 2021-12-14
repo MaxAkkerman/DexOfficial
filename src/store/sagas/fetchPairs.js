@@ -11,10 +11,10 @@ function* fetchPairs() {
 	yield put({type: PAIRS_FETCH_LOADING});
 
 	try {
-		const getMyPairs = yield select(
-			(state) => state.tonContext.functions.getMyPairs,
+		const getAllPairsWithoutProvider = yield select(
+			(state) => state.tonContext.functions.getAllPairsWithoutProvider,
 		);
-		const pairs = yield call(getMyPairs);
+		const pairs = yield call(getAllPairsWithoutProvider);
 		yield put({
 			payload: pairs,
 			type: PAIRS_FETCH_SUCCEEDED,
