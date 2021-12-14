@@ -111,6 +111,8 @@ export default function SwapPage() {
 	function handleTokensInvert() {
 		setFieldValue("fromToken", values.toToken);
 		setFieldValue("toToken", values.fromToken);
+		setFieldValue("fromValue", values.toValue);
+		setFieldValue("toValue", values.fromValue);
 	}
 
 	function handleMaxClick() {

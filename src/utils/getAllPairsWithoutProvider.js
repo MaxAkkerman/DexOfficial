@@ -124,8 +124,8 @@ export default async function getAllPairsWithoutProvider() {
 		// if(wrongPairID){
 		// 	normlizeWallets.splice(wrongPairID,1)
 		// }
-		itemData.aRoot = root0;
-		itemData.bRoot = root1;
+		itemData.rootA = root0;
+		itemData.rootB = root1;
 
 		console.log("normlizeWallets!!normlizeWallets", normlizeWallets);
 	}

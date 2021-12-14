@@ -6,7 +6,7 @@ import {Redirect, Route, Switch, useLocation} from "react-router-dom";
 import {useMount} from "react-use";
 
 import SwapPage from "@/components-v2/SwapPage";
-import {requestPairsFetch} from "@/store/actions/ton";
+import {requestPairsFetch, requestTokensFetch} from "@/store/actions/ton";
 
 import AssetsListForDeploy from "./components/AssetsListForDeploy/AssetsListForDeploy";
 import EnterPassword from "./components/EnterPassword/EnterPassword";
@@ -334,8 +334,9 @@ function App() {
 			});
 	}, [subscribeToMore]);
 
-	useEffect(async () => {
+	useEffect(() => {
 		dispatch(requestPairsFetch());
+		dispatch(requestTokensFetch());
 	}, []);
 
 	return (

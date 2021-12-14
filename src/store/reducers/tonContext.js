@@ -11,6 +11,7 @@ const initialState = {
 		tonClient: null,
 	},
 	functions: {
+		getAllClientWallets() {},
 		getAllPairsWithoutProvider() {},
 		swap() {},
 		takeLimitOrder() {},

@@ -8,6 +8,7 @@ import Radiance from "@/extensions/Radiance.json";
 import {initTonContext} from "@/store/actions/ton";
 import rootReducer from "@/store/reducers";
 import rootSaga from "@/store/sagas";
+import getAllClientWallets from "@/utils/getAllClientWallets";
 import getAllPairsWithoutProvider from "@/utils/getAllPairsWithoutProvider";
 import getPairsTotalSupply from "@/utils/getPairsTotalSupply";
 
@@ -20,6 +21,9 @@ export const reduxStore = createStore(
 	{
 		tonContext: {
 			context: {
+				dexClientAddress:
+					localStorage.getItem("clientData") &&
+					JSON.parse(localStorage.getItem("clientData")).dexclient,
 				dexRootAddress: Radiance.networks["2"].dexroot,
 				limitRootAddress: Radiance.networks["2"].limitRootAddress,
 				tonClient: new TonClient({
@@ -27,6 +31,7 @@ export const reduxStore = createStore(
 				}),
 			},
 			functions: {
+				getAllClientWallets,
 				getAllPairsWithoutProvider,
 			},
 			helperFunctions: {
