@@ -5,7 +5,7 @@ import {
 } from "@/store/actions/types";
 
 const initialState = {
-	slippage: 2,
+	slippage: 5,
 	values: null,
 };
 

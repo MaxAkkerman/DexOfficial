@@ -143,7 +143,8 @@ export default function SwapPage() {
 
 	// Store slippage globally
 	useEffect(() => {
-		setSlippageValue(values.slippage);
+		if (values.slippage !== slippage)
+			dispatch(setSlippageValue(values.slippage));
 	}, [values.slippage]);
 
 	// Update selected token data on callback
