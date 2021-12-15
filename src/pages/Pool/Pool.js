@@ -25,11 +25,14 @@ function Pool() {
 				title={"Your liquidity"}
 				button={
 					<Link
+
+
 						onClick={walletIsConnected ? () => handleClickCreatePair() : null}
 						className={`btn liquidity-btn ${
 							walletIsConnected ? null : "btn--disabled"
 						}`}
-						style={{fontSize: "20px", borderRadius: "12px"}}
+						// style={{fontSize: "20px", borderRadius: "12px"}}
+
 					>
 						Create Pair
 					</Link>

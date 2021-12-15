@@ -1,24 +1,33 @@
 .swap {
-	&-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 68px;
-		height: 68px;
-		border-radius: 13px;
-		margin: 30px auto;
-		position: relative;
-		z-index: 1;
-	}
+  &-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 68px;
+    height: 68px;
+    border-radius: 13px;
+    margin: 30px auto;
+    position: relative;
+    z-index: 1;
+  }
 
-	&-rate {
-		text-align: center;
-		margin: 40px 0 0;
-		color: var(--popup-title-color);
+  &-rate {
+    text-align: center;
+    margin: 40px 0 0;
+    color: var(--popup-title-color);
 
-		span {
-			font-weight: 700;
-			color: var(--icons-color);
-		}
-	}
+    span {
+      font-weight: 700;
+      color: var(--icons-color);
+    }
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .swap {
+    &-btn {
+      margin: 8px auto 30px auto;
+
+    }
+  }
 }

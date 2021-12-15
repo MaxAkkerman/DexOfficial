@@ -6,31 +6,21 @@ import {useHistory} from "react-router-dom";
 
 function RightBlockBottom(props) {
 	const history = useHistory();
-	const dispatch = useDispatch();
-	const tokenSetted = useSelector(
-		(state) => state.walletSeedReducer.tokenSetted,
-	);
-	const currentTokenForSend = useSelector(
-		(state) => state.walletSeedReducer.currentTokenForSend,
-	);
-	const inputNFTdisabled = useSelector(
-		(state) => state.walletSeedReducer.inputNFTdisabled,
-	);
+	const tokenSetted = useSelector((state) => state.walletSeedReducer.tokenSetted);
+	const currentTokenForSend = useSelector((state) => state.walletSeedReducer.currentTokenForSend);
+	const inputNFTdisabled = useSelector((state) => state.walletSeedReducer.inputNFTdisabled);
 
 	function handleTouchTokenModal() {
-		// dispatch(setTokenSetted(true))
-		// dispatch(setShowAssetsForSend(true))
 		history.push("/wallet/send/send-modal");
 	}
 
 	function handleTouchTokenModal2() {
-		// dispatch(setTokenSetted(true))
 		history.push("/wallet/send/send-modal");
 	}
 
 	return (
 		<>
-			{tokenSetted ? (
+			{(props.tokenSetted ? props.tokenSetted : tokenSetted) ? (
 				<>
 					<div className="send_set_token_wrap column">
 						{inputNFTdisabled === "disabled" ? (
@@ -39,16 +29,16 @@ function RightBlockBottom(props) {
 							props.enableMax
 						)}
 						<SetTokenBlock
-							handleTouchTokenModal={props.showAssetsList ? props.showAssetsList() : () => handleTouchTokenModal()}
+							handleTouchTokenModal={props.showAssetsList ? ()=>props.showAssetsList() : () => handleTouchTokenModal()}
 							// img={TON}
-							currentToken={currentTokenForSend}
+							currentToken={props.curAsset ? props.curAsset : currentTokenForSend}
 						/>
 					</div>
 				</>
 			) : (
 				<div className="send_select_wrap">
 					<SelectTokenMenu
-						handleTouchTokenModal2={props.showAssetsList ? props.showAssetsList() : () => handleTouchTokenModal2()}
+						handleTouchTokenModal2={props.showAssetsList ? ()=>props.showAssetsList() : () => handleTouchTokenModal2()}
 					/>
 				</div>
 			)}

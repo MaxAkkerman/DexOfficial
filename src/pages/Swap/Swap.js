@@ -13,7 +13,7 @@ import {
 	connectToPair,
 	connectToPairStep2DeployWallets,
 	getClientForConnect,
-} from "../../extensions/sdk_run/run";
+} from "@/extensions/sdk_run/run";
 
 import {
 	setSwapAsyncIsWaiting,
@@ -30,10 +30,10 @@ import {
 	NOT_ENOUGH_CAUSE_COMMISSION as NOT_ENOUGH_CAUSE_COMMISSION_MSG,
 	NOT_TOUCHED,
 } from "../../constants/validationMessages";
-import {SWAP_COMMISSION} from "../../constants/commissions";
+import {SWAP_COMMISSION} from "@/constants/commissions";
 import useAssetList from "../../hooks/useAssetList";
 import {FormHelperText} from "@mui/material";
-import {checkDecimals} from "../../reactUtils/reactUtils";
+import {checkDecimals} from "@/reactUtils/reactUtils";
 
 function Swap() {
 	const history = useHistory();
@@ -360,7 +360,7 @@ function Swap() {
 					smallTitle={false}
 					content={
 						<div style={{display: "contents"}}>
-							<div className="head_wrapper" style={{marginBottom: "40px"}}>
+							<div className="head_wrapper">
 								<div
 									className="left_block"
 									style={{color: "var(--mainblock-title-color)"}}

@@ -27,85 +27,86 @@ function Header() {
 		history.push("/account");
 	}
 
-	return (
-		<header className="header">
-			<div className="header-wrap">
-				<NavLink
-					to="/swap"
-					className="header-link"
-					activeClassName="header-link--active"
-				>
-					Swap
-				</NavLink>
-				<NavLink
-					to="/orders"
-					className="header-link"
-					activeClassName="header-link--active"
-				>
-					Limit orders
-				</NavLink>
-				<NavLink
-					to="/pool"
-					className={
-						linkIsActive("/pool")
-							? "header-link header-link--active"
-							: "header-link"
-					}
-				>
-					Provide Liquidity
-				</NavLink>
-				<NavLink
-					to="/pool-explorer"
-					className={
-						linkIsActive("/pool-explorer")
-							? "header-link header-link--active"
-							: "header-link"
-					}
-				>
-					Pool Explorer
-				</NavLink>
-				<NavLink
-					to="/wallet"
-					className={
-						linkIsActive("/wallet")
-							? "header-link header-link--active"
-							: "header-link"
-					}
-				>
-					Assets
-				</NavLink>
-				<NavLink
-					to="/staking"
-					className={
-						linkIsActive("/staking")
-							? "header-link header-link--active"
-							: "header-link"
-					}
-				>
-					Staking
-				</NavLink>
-				<NavLink
-					to="/bridge"
-					className={
-						linkIsActive("/bridge")
-							? "header-link header-link--active"
-							: "header-link"
-					}
-				>
-					Bridge
-				</NavLink>
-			</div>
-			<div className="header-wrap">
-				{/*<NativeLogin/>*/}
-				{clientData.status ? (
-					<Wallet />
-				) : !clientData.address ? (
-					<button className="btn wallet-btn" onClick={handlePushToLogin}>
-						Connect wallet
-					</button>
-				) : (
-					<Wallet />
-				)}
+
+    return (
+        <header className="header">
+            <div className="header-wrap">
+                <NavLink
+                    to="/swap"
+                    className="header-link"
+                    activeClassName="header-link--active"
+                >
+                    Swap
+                </NavLink>
+                <NavLink
+                    to="/orders"
+                    className="header-link"
+                    activeClassName="header-link--active"
+                >
+                    Limit orders
+                </NavLink>
+                <NavLink
+                    to="/pool"
+                    className={
+                        linkIsActive("/pool")
+                            ? "header-link header-link--active"
+                            : "header-link"
+                    }
+                >
+                    Provide Liquidity
+                </NavLink>
+                <NavLink
+                    to="/pool-explorer"
+                    className={
+                        linkIsActive("/pool-explorer")
+                            ? "header-link header-link--active"
+                            : "header-link"
+                    }
+                >
+                    Pool Explorer
+                </NavLink>
+                <NavLink
+                    to="/wallet"
+                    className={
+                        linkIsActive("/wallet")
+                            ? "header-link header-link--active"
+                            : "header-link"
+                    }
+                >
+                    Assets
+                </NavLink>
+                <NavLink
+                    to="/staking"
+                    className={
+                        linkIsActive("/staking")
+                            ? "header-link header-link--active"
+                            : "header-link"
+                    }
+                >
+                    Staking
+                </NavLink>
+                <NavLink
+                    to="/bridge"
+                    className={
+                        linkIsActive("/bridge")
+                            ? "header-link header-link--active"
+                            : "header-link"
+                    }
+                >
+                    Bridge
+                </NavLink>
+            </div>
+            <div className="header_wrap_set">
+                {/*<NativeLogin/>*/}
+                {clientData.status ? (
+                    <Wallet/>
+                ) : (
+                    !clientData.address ? <button className="btn wallet-btn" onClick={handlePushToLogin}>
+                            Connect wallet
+                        </button>
+                        :
+                        <Wallet/>
+                )}
 
 				{/*<Wallet />*/}
 				{/*<WalletButton />*/}

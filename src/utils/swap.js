@@ -12,6 +12,7 @@ export default async function swap({
 	qtyTo,
 	slippage,
 }) {
+
 	if (
 		!this ||
 		!this.context ||
@@ -36,22 +37,22 @@ export default async function swap({
 	const tokenA = await this.helperFunctions.getClientWallet(pair.rootA);
 	const tokenB = await this.helperFunctions.getClientWallet(pair.rootB);
 
-	const minTo = Math.round(qtyTo - (qtyTo * slippage) / 100);
-	const maxTo = Math.round(qtyTo + (qtyTo * slippage) / 100);
+	const minTo = (qtyTo - (qtyTo * slippage) / 100);
+	const maxTo = (qtyTo + (qtyTo * slippage) / 100);
 
 	try {
 		let res = null;
 		if (directionPair === AB_DIRECTION)
 			res = await clientAcc.run("processSwapA", {
-				maxQtyB: maxTo * 10 ** tokenB.decimals,
-				minQtyB: minTo * 10 ** tokenB.decimals,
+				maxQtyB: Math.round(maxTo * 10 ** tokenB.decimals),
+				minQtyB: Math.round(minTo * 10 ** tokenB.decimals),
 				pairAddr: pairAddr,
 				qtyA: qtyFrom * 10 ** tokenA.decimals,
 			});
 		else
 			res = await clientAcc.run("processSwapB", {
-				maxQtyA: maxTo * 10 ** tokenA.decimals,
-				minQtyA: minTo * 10 ** tokenA.decimals,
+				maxQtyA: Math.round(maxTo * 10 ** tokenA.decimals),
+				minQtyA: Math.round(minTo * 10 ** tokenA.decimals),
 				pairAddr: pairAddr,
 				qtyB: qtyFrom * 10 ** tokenB.decimals,
 			});

@@ -64,7 +64,7 @@ export default function SwapConfirmPopup() {
 
 	async function handleSwap() {
 		const {fromToken, fromValue, pair, slippage, toToken, toValue} = values;
-
+		console.log("swap(A|B)->res", {fromToken, fromValue, pair, slippage, toToken, toValue});
 		dispatch(
 			setWaitingPopupValues({
 				hidable: true,
