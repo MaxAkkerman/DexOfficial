@@ -22,3 +22,14 @@
 		}
 	}
 }
+
+
+
+@media screen and (max-width: 1025px) {
+	.mainblock-footer-wrap {
+		&.swap {
+			flex-direction: column;
+			text-align: center;
+		}
+	}
+}

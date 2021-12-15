@@ -2,6 +2,7 @@ import './PinPopup.scss';
 
 import { numbers } from '@material/checkbox';
 import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
@@ -188,7 +189,7 @@ function LoginViaPin(props) {
     if (bl) setAgreementSigned(bl);
   }
 
-  return (
+  return ReactDOM.createPortal(
     <>
       {steps[0].weAreHere ? (
         <WelcomePopup
@@ -245,7 +246,7 @@ function LoginViaPin(props) {
           prevStep={'step3'}
           step={'4'}
           closeBtn={false}
-          btnText={'Greate!'}
+          btnText={'Great!'}
           agreementSigned={agreementSigned}
           handleGetBack={(bckStp) => handleClickBack(bckStp)}
           handleSignAgreement={(bl) => handleSignAgreement(bl)}
@@ -253,7 +254,8 @@ function LoginViaPin(props) {
           handleClickNext={(nxtStp) => handleClickNext(1, nxtStp)}
         />
       ) : null}
-    </>
+    </>,
+    document.querySelector('body'),
   );
 }
 

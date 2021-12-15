@@ -467,7 +467,7 @@ function Swap() {
           footer={
             <div className="mainblock-footer">
               <div
-                className="mainblock-footer-wrap"
+                className="mainblock-footer-wrap swap"
                 style={{ justifyContent: 'space-around' }}
               >
                 <div className="swap-confirm-wrap">

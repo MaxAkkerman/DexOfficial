@@ -100,6 +100,7 @@ function AssetsList(props) {
                   {/*<div className={"settings_btn_container"}>*/}
                   <button
                     className="settings_btn wrapUnwrap"
+                    style={{ marginRight: '5px' }}
                     onClick={props.wrapTons ? () => props.wrapTons() : null}
                   >
                     Wrap
