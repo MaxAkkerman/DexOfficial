@@ -1,4 +1,4 @@
-import "@/ind	ex.scss";
+import "@/index.scss";
 
 import {ApolloProvider} from "@apollo/client";
 import {StyledEngineProvider} from "@mui/material/styles";

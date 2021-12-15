@@ -538,6 +538,7 @@ export async function swapA(
 	fromtokenData,
 	toTokenData,
 ) {
+
 	//fix types
 	if (slippage === 0 || !slippage) {
 		slippage = 2;
@@ -547,15 +548,6 @@ export async function swapA(
 	const minQtyB = Math.round(qtBToNum - slippageValueofTokenB);
 	const maxQtyB = Math.round(qtBToNum + slippageValueofTokenB);
 	const qtyANum = Number(qtyA) * getDecimals(fromtokenData.decimals);
-
-	const {pubkey} = curExt._extLib;
-
-	const keys = await getClientKeys(phrase);
-	let getClientAddressFromRoot = await checkPubKey(pubkey);
-
-	if (getClientAddressFromRoot.status === false) {
-		return getClientAddressFromRoot;
-	}
 	console.log(
 		"qtyA",
 		qtyA,
@@ -566,23 +558,32 @@ export async function swapA(
 		"qtBToNum",
 		qtBToNum,
 	);
+	const {pubkey} = curExt._extLib;
 
-	const acc = new Account(DEXClientContract, {
-		address: getClientAddressFromRoot.dexclient,
-		client,
-		signer: signerKeys(keys),
-	});
-	try {
-		return await acc.run("processSwapA", {
-			pairAddr: pairAddr,
-			qtyA: qtyANum,
-			minQtyB: minQtyB,
-			maxQtyB: maxQtyB,
-		});
-	} catch (e) {
-		console.log("catch E", e);
-		return e;
+	const keys = await getClientKeys(phrase);
+	let getClientAddressFromRoot = await checkPubKey(pubkey);
+
+	if (getClientAddressFromRoot.status === false) {
+		return getClientAddressFromRoot;
 	}
+
+
+	// const acc = new Account(DEXClientContract, {
+	// 	address: getClientAddressFromRoot.dexclient,
+	// 	client,
+	// 	signer: signerKeys(keys),
+	// });
+	// try {
+	// 	return await acc.run("processSwapA", {
+	// 		pairAddr: pairAddr,
+	// 		qtyA: qtyANum,
+	// 		minQtyB: minQtyB,
+	// 		maxQtyB: maxQtyB,
+	// 	});
+	// } catch (e) {
+	// 	console.log("catch E", e);
+	// 	return e;
+	// }
 }
 
 /**
