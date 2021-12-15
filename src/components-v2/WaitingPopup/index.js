@@ -5,17 +5,20 @@ import {useDispatch, useSelector} from "react-redux";
 
 import Loader from "@/components-v2/Loader";
 import MainBlock from "@/components-v2/MainBlock";
-import {hideWaitingPopup} from "@/store/actions/app";
+import {resetWaitingPopupValues} from "@/store/actions/waitingPopup";
 
 export default function WaitingPopup() {
 	const dispatch = useDispatch();
-	const popup = useSelector((s) => s.appReducer.waitingPopup);
+
+	const values = useSelector((state) => state.waitingPopup.values);
 
 	function onClose() {
-		dispatch(hideWaitingPopup());
+		dispatch(resetWaitingPopupValues());
 	}
 
-	const {hidable, text, title} = popup;
+	if (!values) return null;
+
+	const {hidable, text, title} = values;
 
 	return (
 		<div className="popup-wrapper">

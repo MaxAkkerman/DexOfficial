@@ -31,7 +31,7 @@ export default function SlippagePopup({
 							<PercentageTextField
 								placeholder="2%"
 								value={value}
-								onChange={onChange}
+								onValueChange={onChange}
 								sx={{
 									maxHeight: "45px",
 									maxWidth: "165px",
@@ -73,7 +73,9 @@ function PercentageTextField(props) {
 			decimalScale={2}
 			decimalSeparator="."
 			fixedDecimalScale
-			isAllowed={({floatValue}) => floatValue >= 0 && floatValue <= 100}
+			displayType="input"
+			type="text"
+			isAllowed={({floatValue}) => floatValue <= 100}
 			suffix="%"
 			{...props}
 		/>

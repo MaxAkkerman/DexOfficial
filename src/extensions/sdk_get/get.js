@@ -1,30 +1,14 @@
 /*
     DEX contracts
 */
-import {DEXRootContract} from "../contracts/DEXRoot.js";
-import {LimitOrderRootContract} from "../contracts/LimitOrderRoot.js";
-import {LimitOrderRouterContract} from "../contracts/LimitOrderRouter.js";
-
-import {DEXClientContract} from "../contracts/DEXClientMainNet.js";
-import {GContract} from "../contracts/GContract.js";
-import {TONTokenWalletContract} from "../contracts/TONTokenWallet.js";
-import {RootTokenContract} from "../contracts/RootTokenContract.js";
-import {SafeMultisigWallet} from "../contracts/SafeMultisigWallet.js";
-import {DEXPairContract} from "../contracts/DEXPair.js";
-import {DEXConnectorContract} from "../contracts/DEXConnector.js";
 import {signerKeys, signerNone} from "@tonclient/core";
-import {iconGenerator} from "../../iconGenerator";
-/*
-    NFT contracts
-*/
-import {DataContract} from "../contracts/Data.js";
-import {NftRootContract} from "../contracts/NftRoot.js";
-import {LockStakeSafeContract} from "../contracts/LockStakeSafe.js";
-import salary from "../../images/salary.svg";
 import {libWeb} from "@tonclient/lib-web";
-import {store} from "../../index";
-import {setTips} from "../../store/actions/app";
-import {setUpdatedBalance} from "../../store/actions/wallet";
+
+// import {reduxStore} from "../../index";
+import {reduxStore} from "@/lib/redux";
+
+import {iconGenerator} from "../../iconGenerator";
+import salary from "../../images/salary.svg";
 import {
 	getDecimals,
 	getFixedNums,
@@ -32,6 +16,24 @@ import {
 	hex2a,
 	toHex,
 } from "../../reactUtils/reactUtils";
+import {setTips} from "../../store/actions/app";
+import {setUpdatedBalance} from "../../store/actions/wallet";
+/*
+    NFT contracts
+*/
+import {DataContract} from "../contracts/Data.js";
+import {DEXClientContract} from "../contracts/DEXClientMainNet.js";
+import {DEXConnectorContract} from "../contracts/DEXConnector.js";
+import {DEXPairContract} from "../contracts/DEXPair.js";
+import {DEXRootContract} from "../contracts/DEXRoot.js";
+import {GContract} from "../contracts/GContract.js";
+import {LimitOrderRootContract} from "../contracts/LimitOrderRoot.js";
+import {LimitOrderRouterContract} from "../contracts/LimitOrderRouter.js";
+import {LockStakeSafeContract} from "../contracts/LockStakeSafe.js";
+import {NftRootContract} from "../contracts/NftRoot.js";
+import {RootTokenContract} from "../contracts/RootTokenContract.js";
+import {SafeMultisigWallet} from "../contracts/SafeMultisigWallet.js";
+import {TONTokenWalletContract} from "../contracts/TONTokenWallet.js";
 import {
 	checkMessagesAmountClient,
 	decode,
@@ -57,6 +59,7 @@ const client = new TonClient({network: {endpoints: [DappServer]}});
 export default client;
 
 import memoize from "lodash.memoize";
+
 import {saveLog} from "../../logging/logging";
 
 export async function getShardLimit() {
@@ -856,7 +859,7 @@ export async function subscribeClientBalance(address) {
 				if (!params.result) return;
 				// if(!checkMessagesAmountClient({tonLiveID:params.result.id}))return
 
-				store.dispatch(
+				reduxStore.dispatch(
 					setUpdatedBalance(Number(params.result.balance) / 1000000000),
 				);
 
@@ -870,7 +873,7 @@ export async function subscribeClientBalance(address) {
 					amount: Number(params.result.value) || "default",
 					src: params.result.src || "default",
 				};
-				store.dispatch(
+				reduxStore.dispatch(
 					setTips({
 						message: `Your balance updated ${
 							Number(params.result.balance) / 1000000000
@@ -996,7 +999,7 @@ export async function subscribeClient(address) {
 							token_name: hex2a(rootData.name) || "default",
 							token_symbol: hex2a(rootData.symbol) || "default",
 						};
-						store.dispatch(
+						reduxStore.dispatch(
 							setTips({
 								message: `You deployed ${transactionData.token_name} wallet`,
 								type: "info",
@@ -1031,7 +1034,7 @@ export async function subscribeClient(address) {
 							dest: decoded.value.dest,
 							value: decoded.value.value,
 						};
-						store.dispatch(
+						reduxStore.dispatch(
 							setTips({
 								message: `You send ${
 									Number(transactionData.value) / 1000000000
@@ -1077,7 +1080,7 @@ export async function subscribeClient(address) {
 						};
 
 						console.log("send callbackData", callbackData);
-						store.dispatch(
+						reduxStore.dispatch(
 							setTips({
 								message: `You send ${callbackData.amount.toFixed(4)} ${
 									callbackData.token_name
@@ -1119,7 +1122,7 @@ export async function subscribeClient(address) {
 							// token_name: hex2a(rootD.name) || "default",
 							// token_symbol: hex2a(rootD.symbol) || "default"
 						};
-						store.dispatch(
+						reduxStore.dispatch(
 							setTips({
 								message: `You stake to dePool ${
 									Number(checkedDuple.amount) / 1000000000
@@ -1169,7 +1172,7 @@ export async function subscribeClient(address) {
 							tokenABsymbol: hex2a(rootABdetails.symbol),
 							tokenABname: hex2a(rootABdetails.name),
 						};
-						store.dispatch(
+						reduxStore.dispatch(
 							setTips({
 								message: `You return ${provideData.returnA.toFixed(4)} ${
 									provideData.tokenAname || "def"
@@ -1271,7 +1274,7 @@ export async function subscribeClient(address) {
 							tokenABsymbol: hex2a(rootABdetails.symbol),
 							tokenABname: hex2a(rootABdetails.name),
 						};
-						store.dispatch(
+						reduxStore.dispatch(
 							setTips({
 								message: `You provided ${provideData.amountA.toFixed(4)} ${
 									provideData.tokenAname || "def"
@@ -1319,7 +1322,7 @@ export async function subscribeClient(address) {
 							params.result.src,
 						);
 						if (lockStakeData.addrOwner === address) {
-							store.dispatch(
+							reduxStore.dispatch(
 								setTips({
 									message: `You get lock stake ${
 										+lockStakeData.amountLockStake / 1000000000
@@ -1332,7 +1335,7 @@ export async function subscribeClient(address) {
 						}
 
 						if (lockStakeData.addrOwner !== address) {
-							store.dispatch(
+							reduxStore.dispatch(
 								setTips({
 									message: `You send lock stake ${
 										+lockStakeData.amountLockStake / 1000000000
@@ -1396,7 +1399,7 @@ export async function subscribeClient(address) {
 								amountB:
 									+decodedPayl.arg4 / getDecimals(Number(rootBdet.decimals)),
 							};
-							store.dispatch(
+							reduxStore.dispatch(
 								setTips({
 									message: `You swapped ${transactionData.amountA.toFixed(4)} ${
 										transactionData.tokenAname
@@ -1428,7 +1431,7 @@ export async function subscribeClient(address) {
 								"swap",
 							);
 						} else if (payloadFlag === 8) {
-							store.dispatch(
+							reduxStore.dispatch(
 								setTips({
 									message: `Something went wrong, swap failed`,
 									type: "error",
@@ -1438,7 +1441,7 @@ export async function subscribeClient(address) {
 						} else if (payloadFlag === 1) {
 							console.log("decodedPayl.arg0 === 1");
 
-							store.dispatch(
+							reduxStore.dispatch(
 								setTips({
 									message: `Someone send y ${checkedDuple.amount} ${hex2a(
 										rootD.name,
@@ -1450,7 +1453,7 @@ export async function subscribeClient(address) {
 						} else if (payloadFlag === 2) {
 							console.log("decodedPayl.arg0 === 2");
 
-							store.dispatch(
+							reduxStore.dispatch(
 								setTips({
 									message: `This one was your change ${
 										checkedDuple.amount
@@ -1475,7 +1478,7 @@ export async function subscribeClient(address) {
 						else if (payloadFlag === 9) {
 							console.log("decodedPayl.arg0 === 3");
 
-							store.dispatch(
+							reduxStore.dispatch(
 								setTips({
 									message: `Provide liquidity was unsuccessful`,
 									type: "info",
@@ -1498,7 +1501,7 @@ export async function subscribeClient(address) {
 						else if (payloadFlag === 4) {
 							console.log("decodedPayl.arg0 === 3");
 
-							store.dispatch(
+							reduxStore.dispatch(
 								setTips({
 									message: `You receive ${checkedDuple.amount.toFixed(
 										4,
@@ -1657,7 +1660,7 @@ export async function subscribe(address) {
 						// store.dispatch(setAcceptedPairTokens(dataFromStorage))
 
 						console.log("acceptedPairTokens", acceptedPairTokens);
-						store.dispatch(
+						reduxStore.dispatch(
 							setTips({
 								message: `You get ${acceptedPairTokens.amount.toFixed(
 									4,

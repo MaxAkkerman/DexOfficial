@@ -1,50 +1,81 @@
 import "./index.scss";
 
+import {useSnackbar} from "notistack";
+/*
 import {useApolloClient} from "@apollo/client";
 import {useSnackbar} from "notistack";
+*/
 import React, {useMemo} from "react";
 import {useDispatch, useSelector} from "react-redux";
 
 import MainBlock from "@/components-v2/MainBlock";
 import {
 	AB_DIRECTION,
-	AB_DIRECTION_GRAPHQL,
 	BA_DIRECTION,
+	/*
+	AB_DIRECTION_GRAPHQL,
 	BA_DIRECTION_GRAPHQL,
+	*/
 } from "@/constants/runtimeVariables";
+/*
 import {LimitOrdersForSwapQuery} from "@/graphql/queries";
+*/
 import {iconGenerator} from "@/iconGenerator";
 import miniSwap from "@/images/icons/mini-swap.png";
-import {setTips, showPopup} from "@/store/actions/app";
-import {resetSwapValues} from "@/store/actions/swap";
+import {resetSwapPopupValues} from "@/store/actions/swap";
+import {
+	resetWaitingPopupValues,
+	setWaitingPopupValues,
+} from "@/store/actions/waitingPopup";
 import truncateNum from "@/utils/truncateNum";
 
 export default function SwapConfirmPopup() {
 	const dispatch = useDispatch();
+	/*
 	const apolloClient = useApolloClient();
+	*/
 
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
 	const values = useSelector((state) => state.swapReducer.values);
 	const swap = useSelector((state) => state.tonContext.functions.swap);
+	/*
 	const takeLimitOrder = useSelector(
 		(state) => state.tonContext.functions.takeLimitOrder,
 	);
+	*/
 
 	const directionPair = useMemo(() => {
+		if (!values) return;
+
 		const {fromToken, pair} = values;
 		if (fromToken && pair)
 			return fromToken.rootAddress === pair.rootA ? AB_DIRECTION : BA_DIRECTION;
-	}, [values.fromToken, values.pair]);
+	}, [values]);
 
 	const rate = useMemo(() => {
+		if (!values) return;
+
 		const {pair} = values;
 		if (directionPair)
 			return directionPair === AB_DIRECTION ? pair.rateAB : pair.rateBA;
-	}, [directionPair, values.pair]);
+	}, [directionPair, values]);
 
 	const {enqueueSnackbar} = useSnackbar();
 
 	async function handleSwap() {
+		const {fromToken, fromValue, pair, slippage, toToken, toValue} = values;
+
+		dispatch(
+			setWaitingPopupValues({
+				hidable: true,
+				text: `Swapping ${truncateNum(fromValue)} ${
+					fromToken.symbol
+				} for ${truncateNum(toValue)} ${toToken.symbol}`,
+				title: "Sending message to blockchain",
+			}),
+		);
+
+		/*
 		const {data} = await apolloClient.query({
 			fetchPolicy: "no-cache",
 			query: LimitOrdersForSwapQuery,
@@ -98,63 +129,57 @@ export default function SwapConfirmPopup() {
 		await Promise.all(processing);
 
 		if (data.limitOrdersForSwap.leftoverSwap !== 0)
-			try {
-				const res = swap({
-					directionPair,
-					pairAddr: values.pair.pairAddress,
-					qtyFrom: values.fromValue,
-					qtyTo: values.toValue,
-					slippage: values.slippage,
-				});
-				console.log("swap(A|B)->res", res);
+		*/
 
-				if (!res.code)
-					dispatch(
-						setTips({
-							message: `Sended message to blockchain`,
-							type: "info",
-						}),
-					);
-				else
-					dispatch(
-						setTips({
-							message: `Something goes wrong - error code ${res.code}`,
-							type: "error",
-						}),
-					);
-			} catch (e) {
-				switch (e.text) {
-					case "Canceled by user.":
-						dispatch(
-							showPopup({
-								message: "Operation canceled.",
-								type: "error",
-							}),
-						);
-						break;
-					case "Rejected by user":
-						dispatch(
-							showPopup({
-								message: "Operation canceled.",
-								type: "error",
-							}),
-						);
-						break;
-					default:
-						dispatch(
-							showPopup({
-								message: "Oops, something went wrong. Please try again.",
-								type: "error",
-							}),
-						);
-						break;
-				}
+		try {
+			const res = await swap({
+				directionPair,
+				pairAddr: pair.pairAddress,
+				qtyFrom: fromValue,
+				qtyTo: toValue,
+				slippage: slippage,
+			});
+			console.log("swap(A|B)->res", res);
+
+			if (!res.code)
+				enqueueSnackbar({
+					message: `Sended message to blockchain`,
+					type: "info",
+				});
+			else
+				enqueueSnackbar({
+					message: `Something goes wrong - error code ${res.code}`,
+					type: "error",
+				});
+		} catch (e) {
+			console.log("swap->error", e);
+
+			switch (e.text) {
+				case "Canceled by user.":
+				case "Rejected by user":
+					enqueueSnackbar({
+						message: "Operation canceled.",
+						type: "error",
+					});
+					break;
+				default:
+					enqueueSnackbar({
+						message: "Oops, something went wrong. Please try again.",
+						type: "error",
+					});
+					break;
 			}
+		}
+
+		dispatch(resetSwapPopupValues());
+		dispatch(resetWaitingPopupValues());
 	}
 
 	function handleClose() {
-		dispatch(resetSwapValues());
+		dispatch(resetSwapPopupValues());
 	}
+
+	if (!values) return null;
 
 	return (
 		<div className="popup-wrapper">

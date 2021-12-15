@@ -36,8 +36,8 @@ export default async function swap({
 	const tokenA = await this.helperFunctions.getClientWallet(pair.rootA);
 	const tokenB = await this.helperFunctions.getClientWallet(pair.rootB);
 
-	const minTo = qtyTo - qtyTo * slippage;
-	const maxTo = qtyTo + qtyTo * slippage;
+	const minTo = Math.round(qtyTo - (qtyTo * slippage) / 100);
+	const maxTo = Math.round(qtyTo + (qtyTo * slippage) / 100);
 
 	try {
 		let res = null;

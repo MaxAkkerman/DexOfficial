@@ -4,17 +4,17 @@ import {useFormik} from "formik";
 import differenceBy from "lodash/differenceBy";
 import find from "lodash/find";
 import React, {useEffect, useMemo, useState} from "react";
-import {useSelector} from "react-redux";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 
 import Button from "@/components-v2/Button";
 import Input from "@/components-v2/Input";
 import MainBlock from "@/components-v2/MainBlock";
 import SelectPopup from "@/components-v2/SelectPopup";
 import SettingsButton from "@/components-v2/SettingsButton";
+import SlippagePopup from "@/components-v2/SlippagePopup";
 import SwapButton from "@/components-v2/SwapButton";
 import {AB_DIRECTION, BA_DIRECTION} from "@/constants/runtimeVariables";
-import {setSwapValues} from "@/store/actions/swap";
+import {setSlippageValue, setSwapPopupValues} from "@/store/actions/swap";
 import truncateNum from "@/utils/truncateNum";
 
 export default function SwapPage() {
@@ -25,6 +25,7 @@ export default function SwapPage() {
 	);
 	const tokens = useSelector((state) => state.tonData.tokens);
 	const pairs = useSelector((state) => state.tonData.pairs);
+	const slippage = useSelector((state) => state.swapReducer.slippage);
 
 	const {
 		errors,
@@ -39,7 +40,7 @@ export default function SwapPage() {
 			fromToken: null,
 			fromValue: "",
 			pair: null,
-			slippage: 0,
+			slippage,
 			toToken: null,
 			toValue: "",
 		},
@@ -93,10 +94,8 @@ export default function SwapPage() {
 		setFieldValue("toValue", values.fromValue * rate);
 	}, [values.fromValue, rate]);
 
-	const {fromSelectPopup, toSelectPopup} = useSelectPopups(setFieldValue);
-
 	function handleSwap(values) {
-		dispatch(setSwapValues(values));
+		dispatch(setSwapPopupValues(values));
 	}
 
 	function handleConnectPair() {
@@ -134,9 +133,6 @@ export default function SwapPage() {
 			props.type = "submit";
 		} else {
 			props.children = "Swap";
-			props.onClick = () => {
-				console.log("@liketurbo", "click");
-			};
 			props.type = "submit";
 		}
 
@@ -144,6 +140,38 @@ export default function SwapPage() {
 			return <Button {...props} {...p} />;
 		};
 	}, [walletConnected, values.pair, values.fromToken, values.toToken]);
+
+	// Store slippage globally
+	useEffect(() => {
+		setSlippageValue(values.slippage);
+	}, [values.slippage]);
+
+	// Update selected token data on callback
+	useEffect(() => {
+		if (values.fromToken)
+			setFieldValue(
+				"fromToken",
+				find(tokens, {rootAddress: values.fromToken.rootAddress}),
+			);
+		if (values.toToken)
+			setFieldValue(
+				"toToken",
+				find(tokens, {rootAddress: values.toToken.rootAddress}),
+			);
+	}, [tokens]);
+
+	// Update selected pair on callback
+	useEffect(() => {
+		if (values.pair)
+			setFieldValue(
+				"fromToken",
+				find(pairs, {pairAddress: values.pair.pairAddress}),
+			);
+	}, [pairs]);
+
+	const slippagePopup = useSlippagePopup((v) => setFieldValue("slippage", v));
+	const selectFromPopup = useSelectPopup((t) => setFieldValue("fromToken", t));
+	const selectToPopup = useSelectPopup((t) => setFieldValue("toToken", t));
 
 	return (
 		<>
@@ -161,8 +189,8 @@ export default function SwapPage() {
 								</div>
 								<div className="settings_btn_container">
 									<SettingsButton
-										aria-describedby={"popperState.id"}
-										onClick={"popperState.handleClick"}
+										aria-describedby={slippagePopup.id}
+										onClick={slippagePopup.handleClick}
 									/>
 								</div>
 							</div>
@@ -174,7 +202,7 @@ export default function SwapPage() {
 									onMaxClick={handleMaxClick}
 									onValueChange={handleChange}
 									onValueBlur={handleBlur}
-									onSelectClick={fromSelectPopup.open}
+									onSelectClick={selectFromPopup.handleOpen}
 									token={values.fromToken}
 									error={
 										touched.fromValue && (errors.fromValue || errors.fromToken)
@@ -194,7 +222,7 @@ export default function SwapPage() {
 									value={values.toValue}
 									onValueChange={handleChange}
 									onValueBlur={handleBlur}
-									onSelectClick={toSelectPopup.open}
+									onSelectClick={selectToPopup.handleOpen}
 									token={values.toToken}
 									error={touched.toToken && errors.toToken}
 									helperText={
@@ -253,63 +281,78 @@ export default function SwapPage() {
 					}
 				/>
 			</div>
-			{fromSelectPopup.state && (
+			{selectFromPopup.open && (
 				<SelectPopup
 					tokens={leftTokens}
-					onClose={fromSelectPopup.close}
-					onSelect={fromSelectPopup.select}
+					onClose={selectFromPopup.handleClose}
+					onSelect={selectFromPopup.handleSelect}
 				/>
 			)}
-			{toSelectPopup.state && (
+			{selectToPopup.open && (
 				<SelectPopup
 					tokens={leftTokens}
-					onClose={toSelectPopup.close}
-					onSelect={toSelectPopup.select}
+					onClose={selectToPopup.handleClose}
+					onSelect={selectToPopup.handleSelect}
+				/>
+			)}
+			{slippagePopup.open && (
+				<SlippagePopup
+					id={slippagePopup.id}
+					open={slippagePopup.open}
+					anchorEl={slippagePopup.anchorEl}
+					onClose={slippagePopup.handleClick}
+					value={values.slippage}
+					onChange={slippagePopup.handleChange}
 				/>
 			)}
 		</>
 	);
 }
 
-function useSelectPopups(setFieldValue) {
-	const [fromPopupOpen, setFromPopupOpen] = useState(false);
-	const [toPopupOpen, setToPopupOpen] = useState(false);
+function useSlippagePopup(setValue) {
+	const [anchorEl, setAnchorEl] = useState(null);
 
-	function selectFromToken(e, t) {
-		setFieldValue("fromToken", t);
-		setFromPopupOpen(false);
-	}
-	function openFromTokenPopup() {
-		setFromPopupOpen(true);
-	}
-	function closeFromTokenPopup() {
-		setFromPopupOpen(false);
+	function handleClick(event) {
+		setAnchorEl(anchorEl ? null : event.currentTarget);
 	}
 
-	function selectToToken(e, t) {
-		setFieldValue("toToken", t);
-		setToPopupOpen(false);
+	function handleChange(values) {
+		setValue(values.floatValue);
 	}
-	function openToTokenPopup() {
-		setToPopupOpen(true);
+
+	const open = Boolean(anchorEl);
+	const id = open ? "simple-popper" : undefined;
+
+	return {
+		anchorEl,
+		handleChange,
+		handleClick,
+		id,
+		open,
+	};
+}
+
+function useSelectPopup(setToken) {
+	const [open, setOpen] = useState(false);
+
+	function handleSelect(e, t) {
+		setToken(t);
+		setOpen(false);
 	}
-	function closeToTokenPopup() {
-		setToPopupOpen(false);
+
+	function handleOpen() {
+		setOpen(true);
+	}
+
+	function handleClose() {
+		setOpen(false);
 	}
 
 	return {
-		fromSelectPopup: {
-			close: closeFromTokenPopup,
-			open: openFromTokenPopup,
-			select: selectFromToken,
-			state: fromPopupOpen,
-		},
-		toSelectPopup: {
-			close: closeToTokenPopup,
-			open: openToTokenPopup,
-			select: selectToToken,
-			state: toPopupOpen,
-		},
+		handleClose,
+		handleOpen,
+		handleSelect,
+		open,
 	};
 }
 
@@ -319,6 +362,7 @@ function validate(values) {
 	const MUST_BE_NUMBER = "Input value must be a number";
 	const POSITIVE_NUMBER = "Use positive number";
 	const SELECT_TOKEN = "You must select token";
+	const BALANCE_EXCEEDS = "Input value exceeds balance";
 	const NO_PAIR = "Selected pair doesn't exist";
 
 	if (isNaN(+values.fromValue)) errors.fromValue = MUST_BE_NUMBER;
@@ -328,6 +372,9 @@ function validate(values) {
 	else if (values.toValue <= 0) errors.toValue = POSITIVE_NUMBER;
 
 	if (!values.fromToken) errors.fromToken = SELECT_TOKEN;
+	else if (values.fromValue > values.fromToken.balance)
+		errors.fromToken = BALANCE_EXCEEDS;
+
 	if (!values.toToken) errors.toToken = SELECT_TOKEN;
 
 	if (values.fromToken && values.toToken && !values.pair) errors.pair = NO_PAIR;

@@ -39,14 +39,12 @@ export default function tonData(state = initialState, {payload, type}) {
 			});
 		case PAIRS_FETCH_LOADING:
 			return produce(state, (draft) => {
-				draft.pairs = [];
 				draft.pairsError = null;
 				draft.pairsFetched = false;
 				draft.pairsLoading = true;
 			});
 		case PAIRS_FETCH_FAILED:
 			return produce(state, (draft) => {
-				draft.pairs = [];
 				draft.pairsError = payload;
 				draft.pairsFetched = true;
 				draft.pairsLoading = false;
@@ -60,14 +58,12 @@ export default function tonData(state = initialState, {payload, type}) {
 			});
 		case TOKENS_FETCH_LOADING:
 			return produce(state, (draft) => {
-				draft.tokens = [];
 				draft.tokensError = null;
 				draft.tokensFetched = false;
 				draft.tokensLoading = true;
 			});
 		case TOKENS_FETCH_FAILED:
 			return produce(state, (draft) => {
-				draft.tokens = [];
 				draft.tokensError = payload;
 				draft.tokensFetched = true;
 				draft.tokensLoading = false;

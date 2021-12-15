@@ -7,6 +7,7 @@ import {useMount} from "react-use";
 
 import SwapConfirmPopup from "@/components-v2/SwapConfirmPopup";
 import SwapPage from "@/components-v2/SwapPage";
+import WaitingPopup from "@/components-v2/WaitingPopup";
 import {requestPairsFetch, requestTokensFetch} from "@/store/actions/ton";
 
 import AssetsListForDeploy from "./components/AssetsListForDeploy/AssetsListForDeploy";
@@ -112,8 +113,6 @@ function App() {
 		(state) => state.walletReducer.transListReceiveTokens,
 	);
 
-	const swapValues = useSelector((state) => state.swapReducer.values);
-
 	const {enqueueSnackbar} = useSnackbar();
 
 	const [onloading, setonloading] = useState(false);
@@ -208,6 +207,8 @@ function App() {
 		) {
 			console.log("i was here", tips);
 			await getAllTokensAndSetToStore(clientData.address);
+			dispatch(requestPairsFetch());
+			dispatch(requestTokensFetch());
 		}
 		enqueueSnackbar({type: tips.type, message: tips.message});
 		newTransList.push(tips);
@@ -412,7 +413,8 @@ function App() {
 				<Popup type={popup.type} message={popup.message} link={popup.link} />
 			) : null}
 			{revealSeedPhraseIsVisible ? <RevealSeedPhrase /> : null}
-			{swapValues && <SwapConfirmPopup />}
+			<SwapConfirmPopup />
+			<WaitingPopup />
 		</>
 	);
 }

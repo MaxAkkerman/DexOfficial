@@ -27,9 +27,9 @@ export const WithoutPairs = Template.bind(
 	{},
 	createStore(rootReducer, {
 		appReducer: {walletIsConnected: true},
-		walletReducer: {
-			pairsList: [],
-			tokenList: values(tokens),
+		tonData: {
+			pairs: [],
+			tokens: values(tokens),
 		},
 	}),
 );
@@ -38,9 +38,9 @@ export const WithPairsAndTokens = Template.bind(
 	{},
 	createStore(rootReducer, {
 		appReducer: {walletIsConnected: true},
-		walletReducer: {
-			pairsList: values(pairs),
-			tokenList: values(tokens),
+		tonData: {
+			pairs: values(pairs),
+			tokens: values(tokens),
 		},
 	}),
 );

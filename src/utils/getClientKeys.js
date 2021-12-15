@@ -18,15 +18,12 @@ export default async function getClientKeys() {
 
 	const {encryptedSeedPhrase, seedPhrasePassword} = state.enterSeedPhrase;
 
-	const decryptedPhrase = await decrypt(
-		encryptedSeedPhrase,
-		seedPhrasePassword,
-	);
+	const decrypted = await decrypt(encryptedSeedPhrase, seedPhrasePassword);
 
 	const keys = await this.context.tonClient.crypto.mnemonic_derive_sign_keys({
 		dictionary: SEED_PHRASE_DICTIONARY_ENGLISH,
 		path: HD_PATH,
-		phrase: decryptedPhrase,
+		phrase: decrypted.phrase,
 		word_count: SEED_PHRASE_WORD_COUNT,
 	});
 
