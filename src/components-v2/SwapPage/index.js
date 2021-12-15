@@ -164,7 +164,7 @@ export default function SwapPage() {
 	useEffect(() => {
 		if (values.pair)
 			setFieldValue(
-				"fromToken",
+				"pair",
 				find(pairs, {pairAddress: values.pair.pairAddress}),
 			);
 	}, [pairs]);
