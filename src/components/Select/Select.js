@@ -113,23 +113,36 @@ function Select(props) {
 	// });
 
 	function handleClose(e) {
-		console.log("fromArr, toArr",fromArr, toArr)
-		if(e.target.id === "swapPopup" || e.target.id === "searchBtn" || e.target.id === "searchBtnInp" || e.target.id === "mainBlock" || e.target.id === "mainBlockTitle")return
+		console.log("fromArr, toArr", fromArr, toArr);
+		if (
+			e.target.id === "swapPopup" ||
+			e.target.id === "searchBtn" ||
+			e.target.id === "searchBtnInp" ||
+			e.target.id === "mainBlock" ||
+			e.target.id === "mainBlockTitle"
+		)
+			return;
 
 		if (location.pathname.includes("swap")) {
-			return props.type === "from" ? dispatch(hideSwapFromSelect()) : dispatch(hideSwapToSelect());
+			return props.type === "from"
+				? dispatch(hideSwapFromSelect())
+				: dispatch(hideSwapToSelect());
 		} else if (location.pathname.includes("add-liquidity")) {
-			return props.type === "from" ? dispatch(hidePoolFromSelect()) : dispatch(hidePoolToSelect());
+			return props.type === "from"
+				? dispatch(hidePoolFromSelect())
+				: dispatch(hidePoolToSelect());
 		} else if (location.pathname.includes("orders")) {
-			return props.type === "from" ? dispatch(hideOrdersFromSelect()) : dispatch(hideOrdersToSelect());
+			return props.type === "from"
+				? dispatch(hideOrdersFromSelect())
+				: dispatch(hideOrdersToSelect());
 		}
 	}
 
 	return ReactDOM.createPortal(
-		<div className="select-wrapper" onClick={(e)=>handleClose(e)}>
+		<div className="select-wrapper" onClick={(e) => handleClose(e)}>
 			<MainBlock
 				title={"Select a token"}
-				button={<CloseBtn func={()=>handleClose()} />}
+				button={<CloseBtn func={() => handleClose()} />}
 				content={
 					!pairsList.length ? (
 						<Loader />

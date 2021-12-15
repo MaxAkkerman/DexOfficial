@@ -8,7 +8,7 @@ import {
 import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
 import client, {getShardLimit} from "../extensions/sdk_get/get";
 import getPair from "./getPair";
-import getTokenInfo from "./getTokenInfo";
+import getTokenInfo from "./getClientWallet";
 import getTokenRouter from "./getTokenRouter";
 
 export default async function makeLimitOrder(
@@ -21,9 +21,8 @@ export default async function makeLimitOrder(
 		signer: signerKeys(clientKeyPair),
 	});
 
-
-	const sounitV = await getShardLimit()
-	console.log("sounitV",sounitV)
+	const sounitV = await getShardLimit();
+	console.log("sounitV", sounitV);
 	const pair = await getPair(pairAddr);
 	let response = null;
 	try {
@@ -35,8 +34,7 @@ export default async function makeLimitOrder(
 				pairAddr,
 				qtyA: qty * 10 ** token.decimals,
 				priceA: price * LIMIT_ORDER_PRICE_DENOMINATOR,
-				souint:sounitV
-
+				souint: sounitV,
 			});
 		} else {
 			const router = await getTokenRouter(pair.rootB);
@@ -46,7 +44,7 @@ export default async function makeLimitOrder(
 				pairAddr,
 				qtyB: qty * 10 ** token.decimals,
 				priceB: price * LIMIT_ORDER_PRICE_DENOMINATOR,
-				souint:souint
+				souint: souint,
 			});
 		}
 

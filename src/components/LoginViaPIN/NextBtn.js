@@ -8,8 +8,8 @@ export function NextBtn(props) {
 				display: "flex",
 				justifyContent: "center",
 				marginTop: "40px",
-				marginBottom:props.marginBottom ? props.marginBottom : "",
-				width:"100%"
+				marginBottom: props.marginBottom ? props.marginBottom : "",
+				width: "100%",
 			}}
 		>
 			<Grid container className={props.btnsClass} spacing={2}>
@@ -17,7 +17,11 @@ export function NextBtn(props) {
 					// style={...props.curBtnStyles}
 
 					onClick={() => props.handleClickNext()}
-					className={props.errColor ? `btn-error btn wallet-btn ${props.curBtnStyles}` : `btn wallet-btn ${props.curBtnStyles}`}
+					className={
+						props.errColor
+							? `btn-error btn wallet-btn ${props.curBtnStyles}`
+							: `btn wallet-btn ${props.curBtnStyles}`
+					}
 				>
 					{props.btnText}
 				</button>

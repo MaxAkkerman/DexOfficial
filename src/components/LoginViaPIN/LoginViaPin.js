@@ -9,7 +9,8 @@ import {prepareClientDataForDeploy} from "../../extensions/sdk_run/run";
 import {encrypt, encryptPure} from "../../extensions/tonUtils";
 import {setTips} from "../../store/actions/app";
 import {
-	enterSeedPhraseSaveToLocalStorage, setSeedPassword,
+	enterSeedPhraseSaveToLocalStorage,
+	setSeedPassword,
 	showEnterSeedPhrase,
 } from "../../store/actions/enterSeedPhrase";
 import {
@@ -39,9 +40,13 @@ function LoginViaPin(props) {
 		{name: "step4", weAreHere: false},
 	]);
 
-	async function handleClickNext(arr,nxtStp,completed) {
-		console.log("nxtStp, completed",)
-		console.log("pinsConfirmed && agreementSigned", pinsConfirmed, agreementSigned)
+	async function handleClickNext(arr, nxtStp, completed) {
+		console.log("nxtStp, completed");
+		console.log(
+			"pinsConfirmed && agreementSigned",
+			pinsConfirmed,
+			agreementSigned,
+		);
 
 		const makeNextStep = JSON.parse(JSON.stringify(steps));
 		if (nxtStp === "step2" && !agreementSigned) {
@@ -74,7 +79,7 @@ function LoginViaPin(props) {
 			setPinsConfirmed(true);
 		}
 		if (nxtStp === "goInToApp" && pinsConfirmed && agreementSigned) {
-			console.log("am i here?")
+			console.log("am i here?");
 			dispatch(showEnterSeedPhrase(false));
 			props.setloadingUserData(true);
 			let pinString = "";
@@ -107,7 +112,7 @@ function LoginViaPin(props) {
 			dispatch(setTransactionsList([]));
 
 			const encClData = await encryptPure(clientPrepData.secret, pinString);
-			console.log("pinpin",phrase, pinString)
+			console.log("pinpin", phrase, pinString);
 
 			const encClDataSeed = await encryptPure(phrase, pinString);
 
@@ -128,7 +133,7 @@ function LoginViaPin(props) {
 				}),
 			);
 			props.setloadingUserData(false);
-			history.push("/swap")
+			history.push("/swap");
 			return;
 		}
 
@@ -136,13 +141,13 @@ function LoginViaPin(props) {
 			item.weAreHere = item.name === nxtStp;
 		});
 
-		console.log("makeNextStep",makeNextStep)
+		console.log("makeNextStep", makeNextStep);
 		setStep(makeNextStep);
 	}
 
 	function handleClickBack(bckStp) {
 		const makeNextStep = JSON.parse(JSON.stringify(steps));
-		console.log("step3",bckStp)
+		console.log("step3", bckStp);
 		if (bckStp === "step3" || bckStp === "step2") {
 			makeNextStep.map((item) => {
 				item.weAreHere = item.name === "step2";
@@ -176,7 +181,7 @@ function LoginViaPin(props) {
 	}
 
 	function handleClose() {
-		props.handleCloseLogin()
+		props.handleCloseLogin();
 	}
 
 	function handleSignAgreement(bl) {
@@ -211,8 +216,8 @@ function LoginViaPin(props) {
 					btnText={"Next"}
 					pinCorrect={pinsConfirmed}
 					handleClickBack={(bckStp) => handleClickBack(bckStp)}
-					handleClickNext={(nxtStp, a,completed) =>
-						handleClickNext(nxtStp, a,completed)
+					handleClickNext={(nxtStp, a, completed) =>
+						handleClickNext(nxtStp, a, completed)
 					}
 					handleCheckPin={(pin, step) => handleCheckPin(pin, step)}
 				/>
@@ -228,8 +233,8 @@ function LoginViaPin(props) {
 					handleLogOut={null}
 					pinCorrect={pinsConfirmed}
 					handleClickBack={(bckStp) => handleClickBack(bckStp)}
-					handleClickNext={(nxtStp, a,completed) =>
-						handleClickNext(nxtStp,a, completed)
+					handleClickNext={(nxtStp, a, completed) =>
+						handleClickNext(nxtStp, a, completed)
 					}
 					handleCheckPin={(pin, step) => handleCheckPin(pin, step)}
 				/>
@@ -245,12 +250,11 @@ function LoginViaPin(props) {
 					handleGetBack={(bckStp) => handleClickBack(bckStp)}
 					handleSignAgreement={(bl) => handleSignAgreement(bl)}
 					handleClose={() => handleClose()}
-					handleClickNext={(nxtStp) => handleClickNext(1,nxtStp)}
+					handleClickNext={(nxtStp) => handleClickNext(1, nxtStp)}
 				/>
 			) : null}
 		</>
 	);
-
 }
 
 export default LoginViaPin;

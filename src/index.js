@@ -1,54 +1,20 @@
 import "./index.scss";
 
-import {ApolloClient, ApolloProvider, InMemoryCache} from "@apollo/client";
-import {HttpLink, split} from "@apollo/client";
-import {WebSocketLink} from "@apollo/client/link/ws";
-import {getMainDefinition} from "@apollo/client/utilities";
+import {ApolloProvider} from "@apollo/client";
 import {StyledEngineProvider} from "@mui/material/styles";
 import {SnackbarProvider} from "notistack";
 import React from "react";
 import ReactDOM from "react-dom";
 import {Provider} from "react-redux";
 import {BrowserRouter} from "react-router-dom";
-import {createStore} from "redux";
-import {composeWithDevTools} from "redux-devtools-extension";
 
 import App from "./App";
 import Alert from "./components/Alert/Alert";
-import Radiance from "./extensions/Radiance.json";
-import rootReducer from "./store/reducers";
-
-const httpLink = new HttpLink({
-	uri: Radiance.networks[2].graphqlUrl,
-});
-
-const wsLink = new WebSocketLink({
-	uri: Radiance.networks[2].graphqlUrlWs,
-	options: {
-		reconnect: true,
-	},
-});
-
-const splitLink = split(
-	({query}) => {
-		const definition = getMainDefinition(query);
-		return (
-			definition.kind === "OperationDefinition" &&
-			definition.operation === "subscription"
-		);
-	},
-	wsLink,
-	httpLink,
-);
-
-export const store = createStore(rootReducer, composeWithDevTools());
-export const apolloClient = new ApolloClient({
-	link: splitLink,
-	cache: new InMemoryCache(),
-});
+import {apolloClient} from "./lib/apollo";
+import {reduxStore} from "./lib/redux";
 
 ReactDOM.render(
-	<Provider store={store}>
+	<Provider store={reduxStore}>
 		<ApolloProvider client={apolloClient}>
 			<BrowserRouter>
 				<StyledEngineProvider injectFirst>
@@ -56,8 +22,8 @@ ReactDOM.render(
 						maxSnack={3}
 						autoHideDuration={10000}
 						anchorOrigin={{
-							vertical: "bottom",
 							horizontal: "right",
+							vertical: "bottom",
 						}}
 						content={(key, {message, type}) => (
 							<Alert id={key} message={message} type={type} />

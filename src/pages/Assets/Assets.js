@@ -36,7 +36,9 @@ function Assets() {
 		LimitOrdersForOwnerQuery,
 	);
 
-	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
+	const walletIsConnected = useSelector(
+		(state) => state.appReducer.walletIsConnected,
+	);
 	const [showWrapMenu, setshowWrapMenu] = useState(false);
 	const [currentTokenForWrap, setcurrentTokenForWrap] = useState({});
 	const [viewData, setViewData] = useState({});
@@ -66,7 +68,7 @@ function Assets() {
 	}
 
 	function handleGoToSettings() {
-		console.log("clientData",clientData)
+		console.log("clientData", clientData);
 		history.push("/wallet/settings");
 	}
 
@@ -123,9 +125,9 @@ function Assets() {
 		setCurNFTForWithdraw(item);
 		console.log("item", item);
 	}
-	async function trt(){
-		const sounitV = await getShardLimit()
-console.log("sounitV",sounitV)
+	async function trt() {
+		const sounitV = await getShardLimit();
+		console.log("sounitV", sounitV);
 	}
 	return (
 		<>
@@ -150,7 +152,7 @@ console.log("sounitV",sounitV)
 				/>
 			)}
 			{!showWrapMenu && !showWithdrawMenu && (
-				<div className="container" onClick={()=>trt()}>
+				<div className="container" onClick={() => trt()}>
 					<MainBlock
 						smallTitle={false}
 						// title={'Assets'}
@@ -173,12 +175,14 @@ console.log("sounitV",sounitV)
 										</button>
 										<button
 											className={
-												(clientData.address || walletIsConnected)
+												clientData.address || walletIsConnected
 													? "settings_btn"
 													: "settings_btn btn--disabled"
 											}
 											onClick={
-												(clientData.address || walletIsConnected) ? () => handleGoToSettings() : null
+												clientData.address || walletIsConnected
+													? () => handleGoToSettings()
+													: null
 											}
 										>
 											<img src={settingsBtn} alt={"settings"} />
@@ -270,8 +274,7 @@ console.log("sounitV",sounitV)
 									>
 										Connect wallet
 									</button>
-)}
-
+								)}
 							</div>
 						}
 					/>

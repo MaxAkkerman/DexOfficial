@@ -2,7 +2,10 @@ import "./MainBlock.scss";
 import React from "react";
 import {hideSwapFromSelect, hideSwapToSelect} from "../../store/actions/swap";
 import {hidePoolFromSelect, hidePoolToSelect} from "../../store/actions/pool";
-import {hideOrdersFromSelect, hideOrdersToSelect} from "../../store/actions/limitOrders";
+import {
+	hideOrdersFromSelect,
+	hideOrdersToSelect,
+} from "../../store/actions/limitOrders";
 
 function MainBlock({
 	smallTitle,
@@ -13,7 +16,7 @@ function MainBlock({
 	classHeader,
 	classTitle,
 	content,
-   classNameContainer,
+	classNameContainer,
 	footer,
 	...rest
 }) {
@@ -39,9 +42,12 @@ function MainBlock({
 	//
 	// }
 	return (
-		<div id="mainBlock"
-			className={classNameContainer ? `mainblock ${classNameContainer}` : "mainblock"}
-			 // onClick={(e)=>handleCloseCurPopup(e)}
+		<div
+			id="mainBlock"
+			className={
+				classNameContainer ? `mainblock ${classNameContainer}` : "mainblock"
+			}
+			// onClick={(e)=>handleCloseCurPopup(e)}
 		>
 			{(title || button) && (
 				<div

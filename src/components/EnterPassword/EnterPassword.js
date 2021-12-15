@@ -4,29 +4,31 @@ import {useDispatch, useSelector} from "react-redux";
 import MainBlock from "../MainBlock/MainBlock";
 import "./EnterPassword.scss";
 import client, {
-    checkPubKey,
-    getClientBalance,
-    getClientKeys,
+	checkPubKey,
+	getClientBalance,
+	getClientKeys,
 } from "../../extensions/sdk_get/get";
-import {decrypt} from "../../extensions/tonUtils";
+import {decrypt} from "@/extensions/tonUtils";
 import {
-    hideEnterSeedPhraseUnlock,
-    setSeedPassword,
-} from "../../store/actions/enterSeedPhrase";
+	hideEnterSeedPhraseUnlock,
+	setSeedPassword,
+} from "@/store/actions/enterSeedPhrase";
 import {Alert, AlertTitle, Box, TextField} from "@material-ui/core";
 import {
-    setClientData, setPin,
-    setSubscribeReceiveTokens,
-    setTransactionsList,
-} from "../../store/actions/wallet";
-import {setTips} from "../../store/actions/app";
-import {InitializeClient} from "../../reactUtils/reactUtils";
+	setClientData,
+	setPin,
+	setSubscribeReceiveTokens,
+	setTransactionsList,
+} from "@/store/actions/wallet";
+import {setTips} from "@/store/actions/app";
+import {InitializeClient} from "@/reactUtils/reactUtils";
 import WaitingPopup from "../WaitingPopup/WaitingPopup";
 import styled from "@emotion/styled";
-import {saveLog} from "../../logging/logging";
+import {saveLog} from "@/logging/logging";
 import PinPopup from "../LoginViaPIN/PinPopup";
 
 function EnterPassword(props) {
+
     const history = useHistory();
     const dispatch = useDispatch();
 
@@ -190,6 +192,7 @@ return (
 
     </>
 )
+
 }
 
 export default EnterPassword;

@@ -13,12 +13,12 @@ import {
 	SET_WALLET_IS_CONNECTED,
 	SHOW_POPUP,
 	SHOW_TIP,
-	OPEN_ENTER_SEED
+	OPEN_ENTER_SEED,
 } from "../actions/types";
 
 const initialState = {
 	appTheme: null,
-	openEnterSeed:false,
+	openEnterSeed: false,
 	extensionsList: [],
 	extensionIsSelected: false,
 	curExt: {},
@@ -31,6 +31,7 @@ const initialState = {
 	accountIsVisible: false,
 	popup: {isVisible: false, type: "", message: "", link: ""},
 	tips: null,
+	waitingPopup: null,
 };
 
 const appReducer = (state = initialState, {type, payload}) => {

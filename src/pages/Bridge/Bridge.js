@@ -57,8 +57,8 @@ const assetsBridge = [{
 //
 // export default Bridge;
 
-
 function Bridge() {
+
     const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
     const [amountTo, setAmountTo] = useState(null)
     const [amountFrom, setAmountFrom] = useState(null)
@@ -260,6 +260,7 @@ function Bridge() {
         }
         </>
     );
+
 }
 
 export default Bridge;

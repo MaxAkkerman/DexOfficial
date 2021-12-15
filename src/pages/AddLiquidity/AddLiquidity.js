@@ -62,7 +62,6 @@ function AddLiquidity() {
 	const [rateBA, setRateBA] = useState(0);
 	const [rateType, setRateType] = useState("AB");
 
-
 	const [fromTokenSymbol, setFromTokenSymbol] = useState("");
 	const [toTokenSymbol, setTotTokenSymbol] = useState("");
 	const [ratesData, setRatesData] = useState({});
@@ -152,15 +151,14 @@ function AddLiquidity() {
 				if (i.symbolA === fromToken.symbol && i.symbolB === toToken.symbol) {
 					setRateAB(i.rateAB);
 					setRateBA(i.rateBA);
-					setRateType("AB")
+					setRateType("AB");
 				} else if (
 					i.symbolB === fromToken.symbol &&
 					i.symbolA === toToken.symbol
 				) {
 					setRateAB(i.rateAB);
 					setRateBA(i.rateBA);
-					setRateType("BA")
-
+					setRateType("BA");
 				}
 			});
 
@@ -463,12 +461,20 @@ function AddLiquidity() {
 												</div>
 
 												<div>
-													<span>{rateType === "AB" ? getNumType(rateBA) : getNumType(rateAB)} </span>
+													<span>
+														{rateType === "AB"
+															? getNumType(rateBA)
+															: getNumType(rateAB)}{" "}
+													</span>
 													{fromTokenSymbol} per 1 {toTokenSymbol}
 												</div>
 
 												<div>
-													<span>{rateType === "AB" ? getNumType(rateAB) : getNumType(rateBA)}</span>
+													<span>
+														{rateType === "AB"
+															? getNumType(rateAB)
+															: getNumType(rateBA)}
+													</span>
 													{toTokenSymbol} per 1 {fromTokenSymbol}
 												</div>
 											</div>

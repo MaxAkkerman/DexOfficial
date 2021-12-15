@@ -17,7 +17,7 @@ export async function encryptPure(seedPhrase, pin) {
 }
 
 export async function decryptPure(enc, pin) {
-	console.log("decryptPure",enc, pin)
+	console.log("decryptPure", enc, pin);
 	const aes = new pidCrypt.AES.CBC();
 	return aes.decryptText(enc, pin.toString());
 }
@@ -39,7 +39,7 @@ export async function encrypt(seedPhrase, pin) {
 }
 
 export async function decrypt(enc, pin) {
-	console.log("enc, pin",enc, pin)
+	console.log("enc, pin", enc, pin);
 	const aes = new pidCrypt.AES.CBC();
 	const decrypted = aes.decryptText(enc, pin);
 	console.log("decrypted", decrypted);
@@ -80,7 +80,7 @@ export const decode = {
 				message: boc,
 			});
 		} catch (e) {
-			console.log("17 error",e)
+			console.log("17 error", e);
 			return e.code;
 		}
 	},

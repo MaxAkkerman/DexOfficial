@@ -123,21 +123,20 @@ function SendAssets() {
 		setaddressToSendView(e.currentTarget.value);
 		dispatch(setAddressForSend(e.currentTarget.value));
 	}
-useEffect(()=>{
-	if(!addressToSend)return
-	handleSetView()
-	console.log("addressToSendView",addressToSendView)
-},[addressToSend])
+	useEffect(() => {
+		if (!addressToSend) return;
+		handleSetView();
+		console.log("addressToSendView", addressToSendView);
+	}, [addressToSend]);
 	function handleSetView() {
-		if(addressToSend.length === 66){
+		if (addressToSend.length === 66) {
 			let spliced = addressToSend.slice(0, 7);
 			let splicedpart2 = addressToSend.slice(59);
 			let view = spliced + "..." + splicedpart2;
 			console.log("addressTo", addressToSend);
 			setaddressToSendView(view);
-		}else{
+		} else {
 			setaddressToSendView(addressToSend);
-
 		}
 	}
 
@@ -326,7 +325,7 @@ useEffect(()=>{
 							{addressToSend ? (
 								<FormHelperText
 									style={{marginLeft: "27px", marginTop: "4px"}}
-									error={isInvalidAddress ? `error`: null}
+									error={isInvalidAddress ? `error` : null}
 									id="component-error-text"
 								>
 									{validationMsgForAddress}

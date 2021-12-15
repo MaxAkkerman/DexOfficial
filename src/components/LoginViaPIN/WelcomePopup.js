@@ -14,7 +14,6 @@ import {useSelector} from "react-redux";
 // margin-top: 40px;
 // margin-right: 40px;
 
-
 function WelcomePopup(props) {
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
 
@@ -23,9 +22,9 @@ function WelcomePopup(props) {
 	}
 
 	return (
-		<div className="select-wrapper"
-			 style={{backdropFilter: appTheme ==="light" ? null : "blur(130px)"}}
-
+		<div
+			className="select-wrapper"
+			style={{backdropFilter: appTheme === "light" ? null : "blur(130px)"}}
 		>
 			<MainBlock
 				title={props.title ? props.title : ""}
@@ -36,7 +35,6 @@ function WelcomePopup(props) {
 				}
 				classHeader={props.showCloseBtn ? "fixPaddings" : ""}
 				classNameContainer={"removePad"}
-
 				classTitle={"fixFontSize"}
 				content={
 					<>

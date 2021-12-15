@@ -58,7 +58,9 @@ function Account() {
 		setTransArr(transListReceiveTokens);
 	}, []);
 	async function onPassEnter() {
-		const clientPrepData = JSON.parse(localStorage.getItem("clientDataPreDeploy"))
+		const clientPrepData = JSON.parse(
+			localStorage.getItem("clientDataPreDeploy"),
+		);
 		if (!clientPrepData) {
 			dispatch(
 				setTips({
@@ -66,12 +68,12 @@ function Account() {
 					type: "error",
 				}),
 			);
-			return
+			return;
 		}
 		const accBalance = await getClientBalance(clientPrepData.address);
-		setclientPrepData(clientPrepData)
+		setclientPrepData(clientPrepData);
 		if (accBalance > 0.5) {
-			setPasswordEnterPopup(true)
+			setPasswordEnterPopup(true);
 		} else {
 			dispatch(
 				setTips({
@@ -83,18 +85,18 @@ function Account() {
 	}
 
 	async function deployHandler() {
-
-		const encClData = await decryptPure(clientPrepData.secret, seedPhrasePassword)
-		const encrData = JSON.parse(JSON.stringify(clientPrepData))
-		encrData.secret = encClData
-		setPasswordEnterPopup(false)
-		setonDeploy(true)
-		const deployRes = await deployClient(
-			encrData
+		const encClData = await decryptPure(
+			clientPrepData.secret,
+			seedPhrasePassword,
 		);
-console.log("encrData",encrData)
+		const encrData = JSON.parse(JSON.stringify(clientPrepData));
+		encrData.secret = encClData;
+		setPasswordEnterPopup(false);
+		setonDeploy(true);
+		const deployRes = await deployClient(encrData);
+		console.log("encrData", encrData);
 		if (deployRes.code) {
-			setonDeploy(false)
+			setonDeploy(false);
 			dispatch(
 				setTips({
 					message: `Something goes wrong - error code ${deployRes.code}`,
@@ -102,17 +104,19 @@ console.log("encrData",encrData)
 				}),
 			);
 		} else {
-			saveLog({
-				name:"deployNewClient",
-				clientAddress: encrData.address,
-				// deployData: deployRes,
-				created_at: (Date.now()+10800000)/1000,
-			},"deployNewClient")
-			await InitializeClient(clientPrepData.public)
+			saveLog(
+				{
+					name: "deployNewClient",
+					clientAddress: encrData.address,
+					// deployData: deployRes,
+					created_at: (Date.now() + 10800000) / 1000,
+				},
+				"deployNewClient",
+			);
+			await InitializeClient(clientPrepData.public);
 			localStorage.removeItem("clientDataPreDeploy");
-			setonDeploy(false)
+			setonDeploy(false);
 		}
-
 	}
 	// function disconnectHandler() {
 	// 	dispatch(setWallet({id: "", balance: 0}));
@@ -168,11 +172,14 @@ console.log("encrData",encrData)
 		localStorage.removeItem("clientDataPreDeploy");
 		localStorage.removeItem("clientData");
 
-		saveLog({
-			name:"disconnect",
-			clientAddress: clientData.address,
-			created_at: (Date.now()+10800000)/1000,
-		},"disconnect")
+		saveLog(
+			{
+				name: "disconnect",
+				clientAddress: clientData.address,
+				created_at: (Date.now() + 10800000) / 1000,
+			},
+			"disconnect",
+		);
 		// localStorage.removeItem("esp");
 		// window.location.reload();
 		// history.push("/account");
@@ -220,8 +227,7 @@ console.log("encrData",encrData)
 					handleClose={() => setonDeploy(false)}
 				/>
 			) : !clientData.status && !clientData.address ? (
-				<ExtensionsList
-				/>
+				<ExtensionsList />
 			) : (
 				<MainBlock
 					class="account"

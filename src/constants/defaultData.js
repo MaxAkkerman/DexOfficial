@@ -204,18 +204,18 @@ export const numPadArr = [
 	},
 ];
 export const InitialSeedState = [
-	{id:0,label:"Word 1",seed: "", onSeedError: true},
-	{id:1,label:"Word 2",seed: "", onSeedError: true},
-	{id:2,label:"Word 3",seed: "", onSeedError: true},
-	{id:3,label:"Word 4",seed: "", onSeedError: true},
-	{id:4,label:"Word 5",seed: "", onSeedError: true},
-	{id:5,label:"Word 6",seed: "", onSeedError: true},
-	{id:6,label:"Word 7",seed: "", onSeedError: true},
-	{id:7,label:"Word 8",seed: "", onSeedError: true},
-	{id:8,label:"Word 9",seed: "", onSeedError: true},
-	{id:9,label:"Word 10",seed: "", onSeedError: true},
-	{id:10,label:"Word 11",seed: "", onSeedError: true},
-	{id:11,label:"Word 12",seed: "", onSeedError: true}
-]
+	{id: 0, label: "Word 1", seed: "", onSeedError: true},
+	{id: 1, label: "Word 2", seed: "", onSeedError: true},
+	{id: 2, label: "Word 3", seed: "", onSeedError: true},
+	{id: 3, label: "Word 4", seed: "", onSeedError: true},
+	{id: 4, label: "Word 5", seed: "", onSeedError: true},
+	{id: 5, label: "Word 6", seed: "", onSeedError: true},
+	{id: 6, label: "Word 7", seed: "", onSeedError: true},
+	{id: 7, label: "Word 8", seed: "", onSeedError: true},
+	{id: 8, label: "Word 9", seed: "", onSeedError: true},
+	{id: 9, label: "Word 10", seed: "", onSeedError: true},
+	{id: 10, label: "Word 11", seed: "", onSeedError: true},
+	{id: 11, label: "Word 12", seed: "", onSeedError: true},
+];
 
 export const onlyNums = /^[0-9\b]+$/;

@@ -5,8 +5,14 @@ import {useDispatch, useSelector} from "react-redux";
 import {Redirect, Route, Switch, useLocation} from "react-router-dom";
 import {useMount} from "react-use";
 
+import SwapConfirmPopup from "@/components-v2/SwapConfirmPopup";
+import SwapPage from "@/components-v2/SwapPage";
+import WaitingPopup from "@/components-v2/WaitingPopup";
+import {requestPairsFetch, requestTokensFetch} from "@/store/actions/ton";
+
 import AssetsListForDeploy from "./components/AssetsListForDeploy/AssetsListForDeploy";
 import EnterPassword from "./components/EnterPassword/EnterPassword";
+import EnterSeedPhrase from "./components/EnterSeedPhrase/EnterSeedPhrase";
 import Header from "./components/Header/Header";
 import NativeLogin from "./components/NativeLogin/NativeLogin";
 import PoolExplorer from "./components/PoolExplorer/PoolExplorer";
@@ -42,17 +48,22 @@ import {LimitOrderUpdateSubscription} from "./graphql/subscriptions";
 import Account from "./pages/Account/Account";
 import AddLiquidity from "./pages/AddLiquidity/AddLiquidity";
 import Assets from "./pages/Assets/Assets";
+import Bridge from "./pages/Bridge/Bridge";
 import CreatePair from "./pages/CreatePair/CreatePair";
 import LimitOrder from "./pages/LimitOrder/LimitOrder";
 import Manage from "./pages/Manage/Manage";
 import Pool from "./pages/Pool/Pool";
 import Stacking from "./pages/Stacking/Stacking";
-import Swap from "./pages/Swap/Swap";
 import {
 	getAllPairsAndSetToStore,
 	getAllTokensAndSetToStore,
 } from "./reactUtils/reactUtils";
-import {changeTheme, handleOpenEnterSeed, hideTip, showPopup} from "./store/actions/app";
+import {
+	changeTheme,
+	handleOpenEnterSeed,
+	hideTip,
+	showPopup,
+} from "./store/actions/app";
 import {
 	enterSeedPhraseEmptyStorage,
 	setEncryptedSeedPhrase,
@@ -64,8 +75,6 @@ import {
 	setSubscribeReceiveTokens,
 } from "./store/actions/wallet";
 import {setNFTassets} from "./store/actions/walletSeed";
-import EnterSeedPhrase from "./components/EnterSeedPhrase/EnterSeedPhrase";
-import Bridge from "./pages/Bridge/Bridge";
 
 function App() {
 	const dispatch = useDispatch();
@@ -157,7 +166,7 @@ function App() {
 	});
 
 	useEffect(async () => {
-		console.log(" useeffect agregateQueryNFTassets")
+		console.log(" useeffect agregateQueryNFTassets");
 		const NFTassets = await agregateQueryNFTassets(clientData.address);
 		// setAssets(NFTassets)
 		dispatch(setNFTassets(NFTassets));
@@ -198,6 +207,8 @@ function App() {
 		) {
 			console.log("i was here", tips);
 			await getAllTokensAndSetToStore(clientData.address);
+			dispatch(requestPairsFetch());
+			dispatch(requestTokensFetch());
 		}
 		enqueueSnackbar({type: tips.type, message: tips.message});
 		newTransList.push(tips);
@@ -213,12 +224,12 @@ function App() {
 		dispatch(setAssetsFromGraphQL(addrArray));
 	}, []);
 
-	const [getLimitOrders, {subscribeToMore, called}] = useLazyQuery(
+	const [getLimitOrders, {called, subscribeToMore}] = useLazyQuery(
 		LimitOrdersForOwnerQuery,
 	);
 
 	useEffect(async () => {
-		console.log(" useeffect getLimitOrders")
+		console.log(" useeffect getLimitOrders");
 		if (clientData && clientData.address && !called)
 			getLimitOrders({variables: {addrOwner: clientData.address}});
 	}, [clientData]);
@@ -231,7 +242,7 @@ function App() {
 				updateQuery(prev, {subscriptionData}) {
 					if (!subscriptionData.data) return prev;
 
-					const {status, limitOrder} = subscriptionData.data.updateLimitOrder;
+					const {limitOrder, status} = subscriptionData.data.updateLimitOrder;
 
 					let {aSymbol, bSymbol} = limitOrder.pair;
 					if (limitOrder.directionPair === BA_DIRECTION)
@@ -327,13 +338,19 @@ function App() {
 			});
 	}, [subscribeToMore]);
 
+	useEffect(() => {
+		dispatch(requestPairsFetch());
+		dispatch(requestTokensFetch());
+	}, []);
+
 	return (
 		<>
-			{openEnterSeed &&
-			<EnterSeedPhrase
-				// setloadingUserData={(bl) => setloadingUserData(bl)}
-				handleCLoseEntSeed={()=>dispatch(handleOpenEnterSeed(false))}
-			/>}
+			{openEnterSeed && (
+				<EnterSeedPhrase
+					// setloadingUserData={(bl) => setloadingUserData(bl)}
+					handleCLoseEntSeed={() => dispatch(handleOpenEnterSeed(false))}
+				/>
+			)}
 			{visibleEnterSeedPhraseUnlock === true &&
 				emptyStorage === false &&
 				!onloading && <EnterPassword />}
@@ -346,7 +363,7 @@ function App() {
 				<Route exact path="/pool-explorer" component={PoolExplorer} />
 				<Route exact path="/pool" component={Pool} />
 				<Route exact path="/account" component={Account} />
-				<Route exact path="/swap" component={Swap} />
+				<Route exact path="/swap" component={SwapPage} />
 				<Route exact path="/manage" component={Manage} />
 				<Route exact path="/add-liquidity" component={AddLiquidity} />
 				<Route exact path="/create-pair" component={CreatePair} />
@@ -381,7 +398,7 @@ function App() {
 						/>
 					</>
 				) : null}
-				{(!walletIsConnected && clientData.address && !clientData.status) ? (
+				{!walletIsConnected && clientData.address && !clientData.status ? (
 					<>
 						<Route exact path="/wallet/settings/keys" component={KeysBlock} />
 						<Route exact path="/wallet/settings" component={WalletSettings} />
@@ -396,6 +413,8 @@ function App() {
 				<Popup type={popup.type} message={popup.message} link={popup.link} />
 			) : null}
 			{revealSeedPhraseIsVisible ? <RevealSeedPhrase /> : null}
+			<SwapConfirmPopup />
+			<WaitingPopup />
 		</>
 	);
 }

@@ -3,7 +3,7 @@ import "./PinPopup.scss";
 import {Grid} from "@material-ui/core";
 import React, {useEffect, useState} from "react";
 
-import {numPadArr, onlyNums, pincodeArray} from "../../constants/defaultData";
+import {numPadArr, onlyNums, pincodeArray} from "@/constants/defaultData";
 import arrowBack from "../../images/arrowBack.png";
 import MainBlock from "../MainBlock/MainBlock";
 import {NextBtn} from "./NextBtn";
@@ -202,10 +202,11 @@ function PinPopup(props) {
 
                         <Steppers step={props.step}/>
                         {!props.showTwoBtns ?
-                            <div className="btnsWrapper">
+                            <div style={{"display":"flex", "width":"100%"}}>
                                 <NextBtn
                                     curBtnStyles={"curBtnStylesLogin"}
                                     btnsClass={"LoginViaPinBtns"}
+                                    btnsWrapper={"btnsWrapper"}
                                     btnText={"Log out"}
                                     errColor={true}
                                     handleClickNext={() =>
@@ -215,6 +216,7 @@ function PinPopup(props) {
 								<NextBtn
                                     curBtnStyles={"curBtnStylesLogin"}
                                     btnsClass={"LoginViaPinBtns"}
+                                    btnsWrapper={"btnsWrapper"}
                                     btnText={props.btnText}
 									errColor={null}
 									handleClickNext={() =>
