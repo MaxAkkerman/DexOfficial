@@ -8,7 +8,7 @@ import {
 import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
 import client, {getShardLimit} from "../extensions/sdk_get/get";
 import getPair from "./getPair";
-import getTokenInfo from "./getTokenInfo";
+import getTokenInfo from "./getClientWallet";
 import getTokenRouter from "./getTokenRouter";
 
 export default async function makeLimitOrder(
