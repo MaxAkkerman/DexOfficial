@@ -8,21 +8,21 @@ input:focus {
 }
 @font-face {
 	font-family: "Gilroy";
-	src: url("./fonts/Gilroy-Regular.woff") format("woff");
+	src: url("@/fonts/Gilroy-Regular.woff") format("woff");
 	font-weight: 400;
 	font-style: normal;
 }
 
 @font-face {
 	font-family: "Gilroy";
-	src: url("./fonts/Gilroy-Medium.woff") format("woff");
+	src: url("@/fonts/Gilroy-Medium.woff") format("woff");
 	font-weight: 500;
 	font-style: normal;
 }
 
 @font-face {
 	font-family: "Gilroy";
-	src: url("./fonts/Gilroy-Bold.woff") format("woff");
+	src: url("@/fonts/Gilroy-Bold.woff") format("woff");
 	font-weight: 700;
 	font-style: normal;
 }
@@ -37,7 +37,7 @@ input:focus {
 	--accent-hover: #285bdb;
 	--error: #f03535;
 	--error-hover: #d73131;
-	--app-bg: url("./images/light-bg.png");
+	--app-bg: url("@/images/light-bg.png");
 	--action-btn-bg: #ffffff;
 	--icons-color: #41444e;
 	--header-link-color: #3569f0;
@@ -81,7 +81,7 @@ html[data-theme="dark"] {
 	--primary-color: #bbbbbb;
 	--accent: #3569f0;
 	--accent-hover: #285bdb;
-	--app-bg: url("./images/light-bg.png");
+	--app-bg: url("@/images/light-bg.png");
 	--action-btn-bg: #41444e;
 	--icons-color: #ffffff;
 	--header-link-color: #ffffff;
