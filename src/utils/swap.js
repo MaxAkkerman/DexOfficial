@@ -13,25 +13,28 @@ export default async function swap({
 	slippage,
 }) {
 	if (
+		!this ||
 		!this.context ||
 		!this.context.dexClientAddress ||
-		!this.context.dexClientKeyPair ||
 		!this.context.tonClient ||
 		!this.helperFunctions ||
 		!this.helperFunctions.getPair ||
-		!this.helperFunctions.getTokenInfo
+		!this.helperFunctions.getClientWallet ||
+		!this.helperFunctions.getClientKeys
 	)
 		throw new Error(NO_CONTEXT);
+
+	const dexClientKeyPair = await this.helperFunctions.getClientKeys();
 
 	const clientAcc = new Account(DEXClientContract, {
 		address: this.context.dexClientAddress,
 		client: this.context.tonClient,
-		signer: signerKeys(this.context.dexClientKeyPair),
+		signer: signerKeys(dexClientKeyPair),
 	});
 
 	const pair = await this.helperFunctions.getPair(pairAddr);
-	const tokenA = await this.helperFunctions.getTokenInfo(pair.rootA);
-	const tokenB = await this.helperFunctions.getTokenInfo(pair.rootB);
+	const tokenA = await this.helperFunctions.getClientWallet(pair.rootA);
+	const tokenB = await this.helperFunctions.getClientWallet(pair.rootB);
 
 	const minTo = qtyTo - qtyTo * slippage;
 	const maxTo = qtyTo + qtyTo * slippage;

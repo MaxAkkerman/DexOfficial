@@ -18,6 +18,7 @@ export default async function takeLimitOrder({
 		!this.context.dexClientKeyPair ||
 		!this.helperFunctions ||
 		!this.helperFunctions.getPair ||
+		!this.helperFunctions.getClientKeys ||
 		!this.helperFunctions.getTokenRouter
 	)
 		throw new Error(NO_CONTEXT);
@@ -27,10 +28,12 @@ export default async function takeLimitOrder({
 		`${pairAddr},${orderAddr},${directionPair},${qty},${price}`,
 	);
 
+	const dexClientKeyPair = await this.helperFunctions.getClientKeys();
+
 	const clientAcc = new Account(DEXClientContract, {
 		address: this.context.dexClientAddress,
 		client: this.context.tonClient,
-		signer: signerKeys(this.context.tonClientKeyPair),
+		signer: signerKeys(dexClientKeyPair),
 	});
 
 	const pair = await this.helperFunctions.getPair(pairAddr);

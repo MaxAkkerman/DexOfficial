@@ -5,9 +5,9 @@ import {INIT_TON_CONTEXT, UPDATE_TON_CONTEXT} from "@/store/actions/types";
 const initialState = {
 	context: {
 		dexClientAddress: null,
-		dexClientKeyPair: null,
 		dexRootAddress: null,
 		limitRootAddress: null,
+		reduxStore: null,
 		tonClient: null,
 	},
 	functions: {
@@ -17,9 +17,10 @@ const initialState = {
 		takeLimitOrder() {},
 	},
 	helperFunctions: {
+		getClientKeys() {},
+		getClientWallet() {},
 		getPair() {},
 		getPairsTotalSupply() {},
-		getTokenInfo() {},
 		getTokenRouter() {},
 	},
 };
@@ -57,23 +58,20 @@ export default function tonContext(state = initialState, {payload, type}) {
 					{},
 				),
 				helperFunctions,
+				original: {
+					// preserver original functions
+					functions: state.functions,
+					helperFunctions: state.helperFunctions,
+				},
 			};
 		}
 		case UPDATE_TON_CONTEXT: {
 			const {name, value} = payload;
 
-			const newValuesContext = reduce(
-				state.context,
-				(r, v, k) => {
-					if (k === name) r[name] = value;
-					else r[k] = v;
-					return r;
-				},
-				{},
-			);
+			const newValuesContext = {...state.context, [name]: value};
 
 			const helperFunctions = reduce(
-				state.helperFunctions,
+				state.original.helperFunctions,
 				(r, v, k) => {
 					r[k] = v.bind({context: newValuesContext});
 					return r;
@@ -84,7 +82,7 @@ export default function tonContext(state = initialState, {payload, type}) {
 			return {
 				context: newValuesContext,
 				functions: reduce(
-					state.functions,
+					state.original.functions,
 					(r, v, k) => {
 						r[k] = v.bind({
 							context: newValuesContext,
@@ -95,6 +93,7 @@ export default function tonContext(state = initialState, {payload, type}) {
 					{},
 				),
 				helperFunctions,
+				original: state.original, // preserve original functions
 			};
 		}
 		default:

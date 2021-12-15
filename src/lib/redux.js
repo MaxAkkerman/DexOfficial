@@ -5,12 +5,18 @@ import {composeWithDevTools} from "redux-devtools-extension";
 import createSagaMiddleware from "redux-saga";
 
 import Radiance from "@/extensions/Radiance.json";
-import {initTonContext} from "@/store/actions/ton";
+import {initTonContext, updateTonContext} from "@/store/actions/ton";
 import rootReducer from "@/store/reducers";
 import rootSaga from "@/store/sagas";
 import getAllClientWallets from "@/utils/getAllClientWallets";
 import getAllPairsWithoutProvider from "@/utils/getAllPairsWithoutProvider";
+import getClientKeys from "@/utils/getClientKeys";
+import getClientWallet from "@/utils/getClientWallet";
+import getPair from "@/utils/getPair";
 import getPairsTotalSupply from "@/utils/getPairsTotalSupply";
+import getTokenRouter from "@/utils/getTokenRouter";
+import swap from "@/utils/swap";
+import takeLimitOrder from "@/utils/takeLimitOrder";
 
 TonClient.useBinaryLibrary(libWeb);
 
@@ -33,9 +39,15 @@ export const reduxStore = createStore(
 			functions: {
 				getAllClientWallets,
 				getAllPairsWithoutProvider,
+				swap,
+				takeLimitOrder,
 			},
 			helperFunctions: {
+				getClientKeys,
+				getClientWallet,
+				getPair,
 				getPairsTotalSupply,
+				getTokenRouter,
 			},
 		},
 	},
@@ -44,3 +56,4 @@ export const reduxStore = createStore(
 
 sagaMiddleware.run(rootSaga);
 reduxStore.dispatch(initTonContext());
+reduxStore.dispatch(updateTonContext("reduxStore", reduxStore));
