@@ -74,6 +74,7 @@ export default function SwapConfirmPopup() {
 				title: "Sending message to blockchain",
 			}),
 		);
+		dispatch(resetSwapPopupValues());
 
 		/*
 		const {data} = await apolloClient.query({
@@ -171,7 +172,6 @@ export default function SwapConfirmPopup() {
 			}
 		}
 
-		dispatch(resetSwapPopupValues());
 		dispatch(resetWaitingPopupValues());
 	}
 
