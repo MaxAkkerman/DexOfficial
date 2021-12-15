@@ -14,6 +14,7 @@ import classes from "./index.module.scss";
 
 export default function SelectPopup({loading, onClose, onSelect, tokens}) {
 	const [searchWord, setSearchWord] = useState("");
+
 	const filteredTokens = useMemo(
 		() =>
 			tokens
