@@ -144,7 +144,7 @@ function PinPopup(props) {
                 classTitle={"fixFontSize"}
                 content={
                     <>
-                        <div className="head_wrapper" style={{marginBottom: "20px"}}>
+                        <div className="pin_head_wrapper">
                             {props.showTwoBtns ? <button
                                 className="arrow_back"
                                 onClick={() => props.handleClickBack(props.prevStep)}
@@ -202,7 +202,7 @@ function PinPopup(props) {
 
                         <Steppers step={props.step}/>
                         {!props.showTwoBtns ?
-                            <div style={{"display":"flex", "width":"100%"}}>
+                            <div className="btnsWrapper">
                                 <NextBtn
                                     curBtnStyles={"curBtnStylesLogin"}
                                     btnsClass={"LoginViaPinBtns"}

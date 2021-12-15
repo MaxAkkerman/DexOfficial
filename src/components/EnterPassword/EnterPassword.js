@@ -171,7 +171,7 @@ return (
                 text={`Loading user data...`}
             />
         ) : (
-            <div className="select-wrapper">
+            // <div className="select-wrapper">
                 <PinPopup
                     title={"Enter your Pin"}
                     nextStep={"step3"}
@@ -184,7 +184,7 @@ return (
                     handleClickNext={(pin) => handleLogIn(pin)}
                     handleCheckPin={(pin, step, completed) => handleCheckPin(pin, step, completed)}
                 />
-            </div>
+            // </div>
         )
         }
 

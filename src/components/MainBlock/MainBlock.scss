@@ -126,6 +126,8 @@
 
 @media screen and (max-width: 1025px) {
 	.mainblock {
+		margin-top:8px;
+
 		padding: 30px;
 		border-radius: 30px;
 		top:unset;
@@ -178,4 +180,11 @@
 			margin-top: 10px;
 		}
 	}
+}
+@media screen and (max-width: 480px) {
+
+		.mainblock {
+			padding: 25px;
+			margin-top:8px;
+		}
 }
