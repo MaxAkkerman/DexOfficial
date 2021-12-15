@@ -75,7 +75,11 @@ export default function Input({
 					) : (
 						<>
 							{onMaxClick && (
-								<button className="input-max" onClick={onMaxClick}>
+								<button
+									className="input-max"
+									onClick={onMaxClick}
+									type="button"
+								>
 									MAX
 								</button>
 							)}
