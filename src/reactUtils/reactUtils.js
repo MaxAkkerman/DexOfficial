@@ -1,23 +1,23 @@
-import {
-	setClientData,
-	setPairsList,
-	setSubscribeReceiveTokens,
-	setTransactionsList,
-} from "../store/actions/wallet";
-import {store} from "../index";
+import {reduxStore} from "@/lib/redux";
+
+import {getWalletExt} from "../extensions/extensions/checkExtensions";
 import {
 	checkClientPairExists,
 	checkPubKey,
 	checkwalletExists,
 	getAllPairsWoithoutProvider,
 	getClientBalance,
-	getClientKeys,
 	subscribe,
 	subscribeClient,
 	subscribeClientBalance,
 } from "../extensions/sdk_get/get";
 import {setCurExt, setTips, setWalletIsConnected} from "../store/actions/app";
-import {getWalletExt} from "../extensions/extensions/checkExtensions";
+import {
+	setClientData,
+	setPairsList,
+	setSubscribeReceiveTokens,
+	setTransactionsList,
+} from "../store/actions/wallet";
 
 const hex = require("ascii-hex");
 
@@ -27,14 +27,14 @@ const {getAllClientWallets} = require("../extensions/sdk_get/get");
 
 export async function InitializeClient(clientPubKey) {
 	let clientStatus = await checkPubKey(clientPubKey);
-	console.log("clientStatus clientStatus",clientStatus)
+	console.log("clientStatus clientStatus", clientStatus);
 
 	if (clientStatus.status) {
-		console.log("clientStatus init",clientStatus)
+		console.log("clientStatus init", clientStatus);
 		const dexClientAddress = clientStatus.dexclient;
 		const dexClientStatus = clientStatus.status;
 		const dexClientBalance = await getClientBalance(dexClientAddress);
-		store.dispatch(
+		reduxStore.dispatch(
 			setClientData({
 				status: dexClientStatus,
 				dexclient: dexClientAddress,
@@ -42,31 +42,34 @@ export async function InitializeClient(clientPubKey) {
 				public: clientPubKey,
 			}),
 		);
-		console.log("{\n" +
-			"\t\t\t\tstatus: dexClientStatus,\n" +
-			"\t\t\t\tdexclient: dexClientAddress,\n" +
-			"\t\t\t\tbalance: dexClientBalance,\n" +
-			"\t\t\t\tpublic: clientPubKey,\n" +
-			"\t\t\t}",{
-			status: dexClientStatus,
-			dexclient: dexClientAddress,
-			balance: dexClientBalance,
-			public: clientPubKey,
-		})
+		console.log(
+			"{\n" +
+				"\t\t\t\tstatus: dexClientStatus,\n" +
+				"\t\t\t\tdexclient: dexClientAddress,\n" +
+				"\t\t\t\tbalance: dexClientBalance,\n" +
+				"\t\t\t\tpublic: clientPubKey,\n" +
+				"\t\t\t}",
+			{
+				status: dexClientStatus,
+				dexclient: dexClientAddress,
+				balance: dexClientBalance,
+				public: clientPubKey,
+			},
+		);
 
 		const extensionWallet = await getWalletExt(dexClientAddress, clientPubKey);
 
-		store.dispatch(setCurExt(extensionWallet[0]));
+		reduxStore.dispatch(setCurExt(extensionWallet[0]));
 
-		store.dispatch(setTransactionsList([]));
-		store.dispatch(setSubscribeReceiveTokens([]));
+		reduxStore.dispatch(setTransactionsList([]));
+		reduxStore.dispatch(setSubscribeReceiveTokens([]));
 
 		subscribeClient(dexClientAddress);
 		subscribeClientBalance(dexClientAddress);
 		// subscribeClientBalanceForTips(dexClientAddress)
 		await getAllPairsAndSetToStore(dexClientAddress);
 		await getAllTokensAndSetToStore(dexClientAddress);
-		store.dispatch(setWalletIsConnected(true));
+		reduxStore.dispatch(setWalletIsConnected(true));
 	}
 	return true;
 }
@@ -78,8 +81,8 @@ export async function getAllTokensAndSetToStore(clientAddress) {
 		tokenList.forEach(async (item) => await subscribe(item.walletAddress));
 		liquidityList = tokenList.filter((i) => i.symbol.includes("/"));
 		tokenList = tokenList.filter((i) => !i.symbol.includes("/"));
-		store.dispatch(setTokenList(tokenList));
-		store.dispatch(setLiquidityList(liquidityList));
+		reduxStore.dispatch(setTokenList(tokenList));
+		reduxStore.dispatch(setLiquidityList(liquidityList));
 	}
 }
 
@@ -98,7 +101,7 @@ export async function getAllPairsAndSetToStore(clientAddress) {
 		arrPairs.push(item);
 	});
 
-	store.dispatch(setPairsList(arrPairs));
+	reduxStore.dispatch(setPairsList(arrPairs));
 }
 
 export function copyToClipboard(textToCopy) {
@@ -106,7 +109,7 @@ export function copyToClipboard(textToCopy) {
 
 	if (navigator.clipboard && window.isSecureContext) {
 		// navigator clipboard api method'
-		store.dispatch(
+		reduxStore.dispatch(
 			setTips({
 				message: `Copied`,
 				type: "info",
@@ -115,7 +118,7 @@ export function copyToClipboard(textToCopy) {
 		);
 		return navigator.clipboard.writeText(textToCopy);
 	} else {
-		store.dispatch(
+		reduxStore.dispatch(
 			setTips({
 				message: `Copied`,
 				type: "info",

@@ -16,12 +16,10 @@ export default function SlippagePopper(props) {
 	const slippageValue = useSelector((state) => state.swapReducer.slippageValue);
 
 	// const {id, open, anchorEl} = popperState;
-	function handleClick(e){
+	function handleClick(e) {
 		e.stopPropagation();
-
 	}
 	function handleSetSlippage(e) {
-
 		const newValue = Number(e.target.value.replace("%", ""));
 		// setSlippage(newValue);
 		dispatch(setSlippageValue(newValue));
@@ -29,7 +27,7 @@ export default function SlippagePopper(props) {
 
 	return (
 		<Popper
-			onClick={(e)=>handleClick(e)}
+			onClick={(e) => handleClick(e)}
 			id={props.id}
 			open={props.open}
 			anchorEl={props.anchorEl}

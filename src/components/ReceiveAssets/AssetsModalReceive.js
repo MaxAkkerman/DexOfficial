@@ -76,7 +76,7 @@ function AssetsModalReceive() {
 	return (
 		<>
 			{/*{showAssetsForSend &&*/}
-			<div className="select-wrapper" onClick={(e)=>handleClose(e)}>
+			<div className="select-wrapper" onClick={(e) => handleClose(e)}>
 				<div className="mainblock">
 					<div className="head_wrapper">
 						<button className="arrow_back" onClick={() => handleClear()}>

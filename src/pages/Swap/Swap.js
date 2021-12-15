@@ -39,7 +39,9 @@ function Swap() {
 	const history = useHistory();
 	const dispatch = useDispatch();
 
-	const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
+	const walletIsConnected = useSelector(
+		(state) => state.appReducer.walletIsConnected,
+	);
 
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
@@ -51,11 +53,14 @@ function Swap() {
 	const toValue = useSelector((state) => state.swapReducer.toInputValue);
 	const rate = useSelector((state) => state.swapReducer.rate);
 	const pairId = useSelector((state) => state.swapReducer.pairId);
-	const swapAsyncIsWaiting = useSelector((state) => state.swapReducer.swapAsyncIsWaiting);
+	const swapAsyncIsWaiting = useSelector(
+		(state) => state.swapReducer.swapAsyncIsWaiting,
+	);
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 	const tips = useSelector((state) => state.appReducer.tips);
 
-	const [swapConfirmPopupIsVisible, setSwapConfirmPopupIsVisible] = useState(false);
+	const [swapConfirmPopupIsVisible, setSwapConfirmPopupIsVisible] =
+		useState(false);
 	const [connectAsyncIsWaiting, setconnectAsyncIsWaiting] = useState(false);
 	const [curExist, setExistsPair] = useState(false);
 	const [notDeployedWallets, setNotDeployedWallets] = useState([]);
@@ -64,31 +69,30 @@ function Swap() {
 	const [errors, setErrors] = useState({});
 	const [isError, setIsError] = useState(true);
 
-	const [op,setop] = useState(false)
+	const [op, setop] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
-	const [idPop,setIdPop] = useState(undefined)
+	const [idPop, setIdPop] = useState(undefined);
 
 	const {keyPair} = useKeyPair();
 	const {assetList} = useAssetList();
-	const popper = useRef(null)
-
+	const popper = useRef(null);
 
 	useEffect(() => {
 		if (Object.keys(errors).length === 0) setIsError(false);
 		else setIsError(true);
 	}, [errors]);
 
-	useEffect(()=>{
-		if(op){
+	useEffect(() => {
+		if (op) {
 			// setOpenPop(true)
 			setAnchorEl(popper.current);
-			setIdPop("simple-popper")
-		}else{
+			setIdPop("simple-popper");
+		} else {
 			// setOpenPop(false)
 			setAnchorEl(null);
-			setIdPop(undefined)
+			setIdPop(undefined);
 		}
-	},[op])
+	}, [op]);
 
 	useEffect(() => {
 		if (fromToken && toToken) validate(fromValue, toValue, fromToken, toToken);
@@ -163,9 +167,8 @@ function Swap() {
 			);
 		}
 	}
-	function handleCloseConnect(){
+	function handleCloseConnect() {
 		setconnectAsyncIsWaiting(false);
-
 	}
 	async function handleConnectPair() {
 		if (clientData.balance < 12) {
@@ -329,22 +332,24 @@ function Swap() {
 		}
 	}
 
-
 	function handleClickOpenPop(ev) {
 		// console.log("popper",ev.currentTarget.id)
 		// console.log("popper2",ev.target.id)
 		ev.stopPropagation();
 
-		if(ev.currentTarget.id !== "popBtn"){
-			setop(false)
-		}else{
-			setop(!op)
+		if (ev.currentTarget.id !== "popBtn") {
+			setop(false);
+		} else {
+			setop(!op);
 		}
-
 	}
 
 	return (
-		<div className="container" id={"cont"} onClick={(e)=>handleClickOpenPop(e)}>
+		<div
+			className="container"
+			id={"cont"}
+			onClick={(e) => handleClickOpenPop(e)}
+		>
 			{!swapAsyncIsWaiting && !connectAsyncIsWaiting && (
 				<MainBlock
 					style={{
@@ -369,7 +374,7 @@ function Swap() {
 										aria-describedby={idPop}
 										ref={popper}
 										className="settings_btn"
-										onClick={(e)=>handleClickOpenPop(e)}
+										onClick={(e) => handleClickOpenPop(e)}
 									>
 										<img src={settingsBtn} alt={"settings"} />
 									</button>
@@ -465,10 +470,7 @@ function Swap() {
 								<div className="swap-confirm-wrap">
 									<p className="mainblock-footer-value">
 										{parseFloat(
-											(
-												toValue -
-												(toValue * slippageValue) / 100
-											).toFixed(4),
+											(toValue - (toValue * slippageValue) / 100).toFixed(4),
 										)}{" "}
 										{toToken.symbol}
 									</p>

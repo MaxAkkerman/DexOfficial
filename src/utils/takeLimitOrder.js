@@ -1,50 +1,64 @@
 import {Account} from "@tonclient/appkit";
 import {signerKeys} from "@tonclient/core";
 
-import {AB_DIRECTION} from "../constants/runtimeVariables";
-import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
-import client from "../extensions/sdk_get/get";
-import getPair from "./getPair";
-import getTokenRouter from "./getTokenRouter";
+import {NO_CONTEXT} from "@/constants/runtimeErrors";
+import {AB_DIRECTION} from "@/constants/runtimeVariables";
+import {DEXClientContract} from "@/extensions/contracts/DEXClientMainNet";
 
-export default async function takeLimitOrder(
-	{pairAddr, orderAddr, directionPair, qty, price},
-	{clientAddress, clientKeyPair},
-) {
+export default async function takeLimitOrder({
+	directionPair,
+	orderAddr,
+	pairAddr,
+	price,
+	qty,
+}) {
+	if (
+		!this.context ||
+		!this.context.dexClientAddress ||
+		!this.context.dexClientKeyPair ||
+		!this.helperFunctions ||
+		!this.helperFunctions.getPair ||
+		!this.helperFunctions.getClientKeys ||
+		!this.helperFunctions.getTokenRouter
+	)
+		throw new Error(NO_CONTEXT);
+
 	console.log(
 		"takeLimitOrder->params",
 		`${pairAddr},${orderAddr},${directionPair},${qty},${price}`,
 	);
 
+	const dexClientKeyPair = await this.helperFunctions.getClientKeys();
+
 	const clientAcc = new Account(DEXClientContract, {
-		address: clientAddress,
-		client,
-		signer: signerKeys(clientKeyPair),
+		address: this.context.dexClientAddress,
+		client: this.context.tonClient,
+		signer: signerKeys(dexClientKeyPair),
 	});
 
-	const pair = await getPair(pairAddr);
+	const pair = await this.helperFunctions.getPair(pairAddr);
 	try {
 		if (directionPair === AB_DIRECTION) {
-			const routerAddr = await getTokenRouter(pair.rootB);
+			const routerAddr = await this.helperFunctions.getTokenRouter(pair.rootB);
 			console.log("Router_address->B", routerAddr);
 			const res = await clientAcc.run("takeLimitOrderA", {
-				pairAddr,
 				limitOrderA: orderAddr,
-				routerWalletB: routerAddr,
-				qtyB: qty,
+				pairAddr,
 				priceB: price,
+				qtyB: qty,
+				routerWalletB: routerAddr,
 			});
 			console.log("takeLimitOrderA->response", res.decoded);
 			res.decoded;
 		} else {
-			const routerAddr = await getTokenRouter(pair.rootA);
+			const routerAddr = await this.helperFunctions.getTokenRouter(pair.rootA);
 			console.log("Router_address->A", routerAddr);
 			const res = await clientAcc.run("takeLimitOrderB", {
-				pairAddr,
 				limitOrderB: orderAddr,
-				routerWalletA: routerAddr,
-				qtyA: qty,
+				pairAddr,
 				priceA: price,
+				qtyA: qty,
+				routerWalletA: routerAddr,
 			});
 			console.log("takeLimitOrderB->response", res.decoded);
 			return res.decoded;

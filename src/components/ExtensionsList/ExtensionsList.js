@@ -5,7 +5,12 @@ import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
 
 import {getCurrentExtension} from "../../extensions/extensions/checkExtensions";
-import {connectWallet, handleOpenEnterSeed, setCurExt, showPopup} from "../../store/actions/app";
+import {
+	connectWallet,
+	handleOpenEnterSeed,
+	setCurExt,
+	showPopup,
+} from "../../store/actions/app";
 
 import LoginViaPin from "../LoginViaPIN/LoginViaPin";
 import MainBlock from "../MainBlock/MainBlock";
@@ -20,7 +25,8 @@ function ExtensionsList() {
 	// const enterSeedPhraseIsVisible = useSelector(
 	// 	(state) => state.enterSeedPhrase.enterSeedPhraseIsVisible,
 	// );
-	const [enterSeedPhraseIsVisible, setenterSeedPhraseIsVisible] = useState(false);
+	const [enterSeedPhraseIsVisible, setenterSeedPhraseIsVisible] =
+		useState(false);
 
 	const [loadingUserData, setloadingUserData] = useState(false);
 	const [loginViaPinIsVisible, setloginViaPinIsVisible] = useState(false);
@@ -87,7 +93,7 @@ function ExtensionsList() {
 										marginBottom: "40px",
 									}}
 									className="btn wallet-btn"
-									onClick={()=>dispatch(handleOpenEnterSeed(true))}
+									onClick={() => dispatch(handleOpenEnterSeed(true))}
 								>
 									Login using Seed Phrase
 								</button>
@@ -106,7 +112,7 @@ function ExtensionsList() {
 								{loginViaPinIsVisible && (
 									<LoginViaPin
 										setloadingUserData={(bl) => setloadingUserData(bl)}
-										handleCloseLogin={()=>setloginViaPinIsVisible(false)}
+										handleCloseLogin={() => setloginViaPinIsVisible(false)}
 									/>
 								)}
 								{loadingUserData ? (

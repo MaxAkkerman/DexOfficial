@@ -44,7 +44,9 @@ function EnterPassword(props) {
 	async function login(e) {
 		let esp = localStorage.getItem("esp");
 		let clientDataLS = JSON.parse(localStorage.getItem("clientData"));
-		let clientDataPreDeploy = JSON.parse(localStorage.getItem("clientDataPreDeploy"));
+		let clientDataPreDeploy = JSON.parse(
+			localStorage.getItem("clientDataPreDeploy"),
+		);
 
 		let decrypted = await decrypt(esp, seedPhrasePassword);
 		const clientKeys = await getClientKeys(decrypted.phrase);
@@ -68,13 +70,20 @@ function EnterPassword(props) {
 				"clientDataLS.status",
 				clientDataLS.status,
 			);
-			if (!clientDataLS.status && clientDataPreDeploy && clientDataPreDeploy.address) {
-				saveLog({
-					name: "login",
-					clientAddress: clientDataPreDeploy.address,
-					deployed: false,
-					created_at: (Date.now()+10800000)/1000,
-				}, "login")
+			if (
+				!clientDataLS.status &&
+				clientDataPreDeploy &&
+				clientDataPreDeploy.address
+			) {
+				saveLog(
+					{
+						name: "login",
+						clientAddress: clientDataPreDeploy.address,
+						deployed: false,
+						created_at: (Date.now() + 10800000) / 1000,
+					},
+					"login",
+				);
 				const dexClientAddress = clientDataPreDeploy.address;
 				const dexClientBalance = await getClientBalance(dexClientAddress);
 				console.log("i am here");
@@ -95,12 +104,15 @@ function EnterPassword(props) {
 				history.push("/swap");
 				return;
 			}
-			saveLog({
-				name: "login",
-				clientAddress: clientDataLS.dexclient,
-				deployed: true,
-				created_at: (Date.now()+10800000)/1000,
-			}, "login")
+			saveLog(
+				{
+					name: "login",
+					clientAddress: clientDataLS.dexclient,
+					deployed: true,
+					created_at: (Date.now() + 10800000) / 1000,
+				},
+				"login",
+			);
 			await InitializeClient(clientKeys.public);
 			dispatch(setSeedPassword(seedPhrasePassword));
 

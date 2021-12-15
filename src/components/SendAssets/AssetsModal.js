@@ -50,8 +50,15 @@ function AssetsModal() {
 		setFilter(text);
 	}
 	function handleClose(e) {
-		e.stopPropagation()
-		if(e.target.id === "swapPopup" || e.target.id === "searchBtn" || e.target.id === "searchBtnInp" || e.target.id === "mainBlock" || e.target.id === "mainBlockTitle")return
+		e.stopPropagation();
+		if (
+			e.target.id === "swapPopup" ||
+			e.target.id === "searchBtn" ||
+			e.target.id === "searchBtnInp" ||
+			e.target.id === "mainBlock" ||
+			e.target.id === "mainBlockTitle"
+		)
+			return;
 
 		dispatch(setInputNFTDisabled(null));
 		history.push("/wallet/send");
@@ -72,10 +79,7 @@ function AssetsModal() {
 								handleClickToken={(item) => handleSetToken(item)}
 								TokenAssetsArray={[...assetList, ...liquidityList].filter(
 									(item) =>
-										item.symbol
-											.toLowerCase()
-											.includes(filter.toLowerCase())
-
+										item.symbol.toLowerCase().includes(filter.toLowerCase()),
 								)}
 								NFTassetsArray={NFTassets}
 								orderAssetsArray={null}

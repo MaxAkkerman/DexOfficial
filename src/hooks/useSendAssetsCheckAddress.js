@@ -9,7 +9,8 @@ import {TONTokenWalletContract} from "../extensions/contracts/TONTokenWallet";
 
 const DEFAULT_VALIDATION_MSG = "Incorrect address";
 const VALIDATION_MSG_ROOTS_ERROR = "Incorrect wallet owner address";
-const VALIDATION_MSG_NOT_DEPLOYED_ERROR = "Recipient address have not wallet, sending tokens you will pay deploy fee";
+const VALIDATION_MSG_NOT_DEPLOYED_ERROR =
+	"Recipient address have not wallet, sending tokens you will pay deploy fee";
 
 const VALIDATION_MSG_ROOTS_SUC = "Complete";
 const INCORRECT_LENGTH = "Incorrect address length";

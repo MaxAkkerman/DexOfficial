@@ -101,7 +101,6 @@ function EnterSeedPhrase(props) {
   wordTwelve: "",
      */
 
-
 	const enterSeedPhraseSide = useSelector(
 		(state) => state.enterSeedPhrase.side,
 	);

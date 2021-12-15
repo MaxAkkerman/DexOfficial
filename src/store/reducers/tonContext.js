@@ -1,0 +1,102 @@
+import reduce from "lodash/reduce";
+
+import {INIT_TON_CONTEXT, UPDATE_TON_CONTEXT} from "@/store/actions/types";
+
+const initialState = {
+	context: {
+		dexClientAddress: null,
+		dexRootAddress: null,
+		limitRootAddress: null,
+		reduxStore: null,
+		tonClient: null,
+	},
+	functions: {
+		getAllClientWallets() {},
+		getAllPairsWithoutProvider() {},
+		swap() {},
+		takeLimitOrder() {},
+	},
+	helperFunctions: {
+		getClientKeys() {},
+		getClientWallet() {},
+		getPair() {},
+		getPairsTotalSupply() {},
+		getTokenRouter() {},
+	},
+};
+
+/**
+ * In the end we are creating ton context for:
+ * 	- functions - this.context and this.helperFunctions
+ * 	- helperFunctions - this.context
+ * 	and also context in context property, which equals to this.context
+ */
+
+export default function tonContext(state = initialState, {payload, type}) {
+	switch (type) {
+		case INIT_TON_CONTEXT: {
+			const helperFunctions = reduce(
+				state.helperFunctions,
+				(r, v, k) => {
+					r[k] = v.bind({context: state.context});
+					return r;
+				},
+				{},
+			);
+
+			return {
+				context: state.context,
+				functions: reduce(
+					state.functions,
+					(r, v, k) => {
+						r[k] = v.bind({
+							context: state.context,
+							helperFunctions,
+						});
+						return r;
+					},
+					{},
+				),
+				helperFunctions,
+				original: {
+					// preserver original functions
+					functions: state.functions,
+					helperFunctions: state.helperFunctions,
+				},
+			};
+		}
+		case UPDATE_TON_CONTEXT: {
+			const {name, value} = payload;
+
+			const newValuesContext = {...state.context, [name]: value};
+
+			const helperFunctions = reduce(
+				state.original.helperFunctions,
+				(r, v, k) => {
+					r[k] = v.bind({context: newValuesContext});
+					return r;
+				},
+				{},
+			);
+
+			return {
+				context: newValuesContext,
+				functions: reduce(
+					state.original.functions,
+					(r, v, k) => {
+						r[k] = v.bind({
+							context: newValuesContext,
+							helperFunctions,
+						});
+						return r;
+					},
+					{},
+				),
+				helperFunctions,
+				original: state.original, // preserve original functions
+			};
+		}
+		default:
+			return state;
+	}
+}
