@@ -1,4 +1,5 @@
 import "@/index.scss";
+import {StyledEngineProvider} from "@mui/material/styles";
 
 export const parameters = {
 	actions: {argTypesRegex: "^on[A-Z].*"},
@@ -9,3 +10,11 @@ export const parameters = {
 		},
 	},
 };
+
+export const decorators = [
+	(Story) => (
+		<StyledEngineProvider injectFirst>
+			<Story />
+		</StyledEngineProvider>
+	),
+];
