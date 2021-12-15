@@ -152,6 +152,9 @@
 @media screen and (max-width: 650px) {
 	.mainblock {
 		max-width: 90%;
+		&-title {
+			font-size: 22px;
+		}
 	}
 }
 
@@ -186,5 +189,8 @@
 		.mainblock {
 			padding: 25px;
 			margin-top:8px;
+			&-title {
+				font-size: 24px;
+			}
 		}
 }

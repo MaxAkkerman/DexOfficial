@@ -95,7 +95,7 @@ function Header() {
                     Bridge
                 </NavLink>
             </div>
-            <div className="header-wrap">
+            <div className="header_wrap_set">
                 {/*<NativeLogin/>*/}
                 {clientData.status ? (
                     <Wallet/>

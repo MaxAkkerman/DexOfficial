@@ -156,7 +156,7 @@ console.log("sounitV",sounitV)
 						// title={'Assets'}
 						content={
 							<div>
-								<div className="head_wrapper">
+								<div className="head_wrapper" style={{fontWeight: "bold"}}>
 									<div className="left_block boldFont">Your assets</div>
 									<div className={"settings_btn_container"}>
 										<button
@@ -186,7 +186,7 @@ console.log("sounitV",sounitV)
 									</div>
 								</div>
 								<div className="action_btns">
-									<div>
+									<div className="assets_btn_wrapper">
 										<div
 											className={
 												walletIsConnected ? "onHover" : "onHover btn--disabled"
@@ -203,7 +203,7 @@ console.log("sounitV",sounitV)
 										</div>
 										<div className="action_btns_bottom_text">Send</div>
 									</div>
-									<div>
+									<div className="assets_btn_wrapper">
 										<button
 											className={
 												walletIsConnected ? "onHover" : "onHover btn--disabled"
@@ -220,7 +220,7 @@ console.log("sounitV",sounitV)
 										</button>
 										<div className="action_btns_bottom_text">Receive</div>
 									</div>
-									<div>
+									<div className="assets_btn_wrapper">
 										<div
 											className={
 												walletIsConnected ? "onHover" : "onHover btn--disabled"

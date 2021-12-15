@@ -10,14 +10,15 @@
 	justify-content: space-between;
 	height: 56px;
 	position: relative;
+	font-weight: bold;
 }
 
-.action_btns {
-	font-size: 12px;
-	margin-top: 50px;
-	display: flex;
-	justify-content: space-around;
-}
+//.action_btns {
+//	font-size: 12px;
+//	margin-top: 50px;
+//	display: flex;
+//	justify-content: space-around;
+//}
 
 .arrow_icons2 {
 	width: 54px;
@@ -63,11 +64,11 @@
 	right: 0;
 }
 
-.left_block {
-	display: flex;
-	align-items: center;
-	margin: auto;
-}
+//.left_block {
+//	display: flex;
+//	align-items: center;
+//	margin: auto;
+//}
 
 .action_btns_bottom_text {
 	display: flex;
@@ -181,10 +182,11 @@
 @media screen and (max-width: 480px) {
 	.head_wrapper {
 		align-items: center;
+		margin-bottom:10px;
 	}
-	.left_block {
-		font-size: 20px;
-	}
+	//.left_block {
+	//	font-size: 20px;
+	//}
 	.settings_btn {
 		width: 34px;
 		height: 34px;
@@ -201,5 +203,36 @@
 	.arrow_icons2 {
 		width: 34px;
 		height: 34px;
+	}
+}
+
+@media screen and (max-width: 480px) {
+
+	.settings_btn {
+		width: 45px;
+		height: 45px;
+	}
+
+}
+
+@media screen and (max-width: 650px) {
+
+	.assetsList__container {
+font-size:15px;
+	}
+.settings_btn {
+
+	&.wrapUnwrap {
+		width: 95px;
+		height: 50px;
+		color: white;
+		font-size: 15px;
+	}
+}
+}
+
+@media screen and (max-width: 410px) {
+	.assetsList__item {
+		font-size:11px;
 	}
 }
