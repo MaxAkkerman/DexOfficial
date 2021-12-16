@@ -19,7 +19,7 @@ export default function SmallInput({
 	value,
 }) {
 	return (
-		<Stack direction={"column"} spacing={1} sx={{marginBottom: "3%"}}>
+		<Stack direction="column" spacing={1} sx={{marginBottom: "3%"}}>
 			<div>{label}</div>
 			<div className={classes.orders__icon_box}>
 				<input
@@ -47,9 +47,17 @@ export default function SmallInput({
 					</div>
 				)}
 			</div>
-			<FormHelperText error={touched && error}>
-				{(touched && error) || (!touched && helperText)}
-			</FormHelperText>
+			{helperText && (
+				<FormHelperText
+					error={error}
+					style={{
+						marginLeft: 17,
+						marginTop: 3,
+					}}
+				>
+					{helperText}
+				</FormHelperText>
+			)}
 		</Stack>
 	);
 }

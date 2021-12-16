@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {Redirect, Route, Switch, useLocation} from "react-router-dom";
 import {useMount} from "react-use";
 
+import LimitOrderPage from "@/components-v2/LimitOrderPage";
 import SwapConfirmPopup from "@/components-v2/SwapConfirmPopup";
 import SwapPage from "@/components-v2/SwapPage";
 import WaitingPopup from "@/components-v2/WaitingPopup";
@@ -50,7 +51,6 @@ import AddLiquidity from "./pages/AddLiquidity/AddLiquidity";
 import Assets from "./pages/Assets/Assets";
 import Bridge from "./pages/Bridge/Bridge";
 import CreatePair from "./pages/CreatePair/CreatePair";
-import LimitOrder from "./pages/LimitOrder/LimitOrder";
 import Manage from "./pages/Manage/Manage";
 import Pool from "./pages/Pool/Pool";
 import Stacking from "./pages/Stacking/Stacking";
@@ -370,7 +370,7 @@ function App() {
 				<Route exact path="/staking" component={Stacking} />
 				<Route exact path="/bridge" component={Bridge} />
 				<Route exact path="/wallet" component={Assets} />
-				<Route exact path="/orders" component={LimitOrder} />
+				<Route exact path="/orders" component={LimitOrderPage} />
 				<Route exact path="/">
 					<Redirect from="/" to="/wallet" />
 				</Route>
