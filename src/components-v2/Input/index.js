@@ -3,7 +3,7 @@ import "./index.scss";
 import {FormHelperText} from "@mui/material";
 import cls from "classnames";
 import PropTypes from "prop-types";
-import React, {useRef} from "react";
+import React, {useMemo} from "react";
 
 import {iconGenerator} from "@/iconGenerator";
 import truncateNum from "@/utils/truncateNum";
@@ -14,6 +14,7 @@ export default function Input({
 	helperText,
 	label,
 	name,
+	notExact,
 	onMaxClick,
 	onSelectClick,
 	onValueBlur,
@@ -22,7 +23,10 @@ export default function Input({
 	token,
 	value,
 }) {
-	const inputRef = useRef(null);
+	const currentLabel = useMemo(() => {
+		if (notExact && value) return `${label} (estimated)`;
+		else return label;
+	}, [label, notExact, value]);
 
 	return (
 		<>
@@ -33,7 +37,7 @@ export default function Input({
 				}}
 			>
 				<div className="input-wrapper">
-					<span className="input-title">{label}</span>
+					<span className="input-title">{currentLabel}</span>
 					<span className={cls("input-balance", {incorBalance: error})}>
 						{token && `Balance: ${truncateNum(token.balance)}`}
 					</span>
@@ -49,7 +53,6 @@ export default function Input({
 						autoFocus={autoFocus}
 						placeholder="0"
 						readOnly={readOnly}
-						ref={inputRef}
 					/>
 
 					{!token ? (
@@ -112,7 +115,7 @@ export default function Input({
 				</div>
 			</div>
 			{helperText && (
-				<FormHelperText error={error} sx={{marginLeft: "27px"}}>
+				<FormHelperText error={error} style={{marginLeft: 27}}>
 					{helperText}
 				</FormHelperText>
 			)}
@@ -126,6 +129,7 @@ Input.propTypes = {
 	helperText: PropTypes.string,
 	label: PropTypes.string.isRequired,
 	name: PropTypes.string.isRequired,
+	notExact: PropTypes.bool,
 	onMaxClick: PropTypes.func,
 	onSelectClick: PropTypes.func.isRequired,
 	onValueBlur: PropTypes.func.isRequired,
@@ -150,6 +154,7 @@ Input.defaultProps = {
 	autoFocus: false,
 	error: false,
 	helperText: "Type numeric value",
+	notExact: false,
 	onMaxClick: null,
 	readOnly: false,
 	token: null,
