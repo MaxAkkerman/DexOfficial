@@ -1,5 +1,3 @@
-import "./index.scss";
-
 import {FormHelperText} from "@mui/material";
 import cls from "classnames";
 import PropTypes from "prop-types";
@@ -7,6 +5,8 @@ import React, {useMemo} from "react";
 
 import {iconGenerator} from "@/iconGenerator";
 import truncateNum from "@/utils/truncateNum";
+
+import classes from "./index.module.scss";
 
 export default function Input({
 	autoFocus,
@@ -31,21 +31,21 @@ export default function Input({
 	return (
 		<>
 			<div
-				className="input"
+				className={classes.input}
 				style={{
 					borderColor: error ? "var(--error)" : "var(--input-border-color)",
 				}}
 			>
-				<div className="input-wrapper">
-					<span className="input-title">{currentLabel}</span>
-					<span className={cls("input-balance", {incorBalance: error})}>
+				<div className={classes.input_wrapper}>
+					<span className={classes.input_title}>{currentLabel}</span>
+					<span className={cls(classes.input_balance, {incorBalance: error})}>
 						{token && `Balance: ${truncateNum(token.balance)}`}
 					</span>
 				</div>
-				<div className="input-wrapper">
+				<div className={classes.input_wrapper}>
 					<input
 						type="number"
-						className="input-field"
+						className={classes.input_field}
 						name={name}
 						value={value}
 						onChange={onValueChange}
@@ -57,7 +57,7 @@ export default function Input({
 
 					{!token ? (
 						<button
-							className="btn input-btn"
+							className={cls("btn", classes.input_btn)}
 							onClick={onSelectClick}
 							type="button"
 						>
@@ -79,7 +79,7 @@ export default function Input({
 						<>
 							{onMaxClick && (
 								<button
-									className="input-max"
+									className={classes.input_max}
 									onClick={onMaxClick}
 									type="button"
 								>
@@ -87,14 +87,14 @@ export default function Input({
 								</button>
 							)}
 							<button
-								className="input-select"
+								className={classes.input_select}
 								onClick={onSelectClick}
 								type="button"
 							>
 								<img
 									src={iconGenerator(token.symbol)}
 									alt={token.symbol}
-									className="input-token-img"
+									className={classes.input_token_img}
 								/>
 								<span>{token.symbol}</span>
 								<svg
