@@ -282,7 +282,5 @@ function validate(values) {
 
 	if (!values.toToken) errors.toToken = SELECT_TOKEN;
 
-	console.log(errors);
-
 	return errors;
 }
