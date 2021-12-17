@@ -1,3 +1,4 @@
+import cls from "classnames";
 import {useFormik} from "formik";
 import differenceBy from "lodash/differenceBy";
 import find from "lodash/find";
@@ -13,6 +14,7 @@ import SmallInput from "@/components-v2/SmallInput";
 import SwapButton from "@/components-v2/SwapButton";
 import {AB_DIRECTION, BA_DIRECTION} from "@/constants/runtimeVariables";
 import useSelectPopup from "@/hooks/useSelectPopup";
+import {setLimitOrderPopupValues} from "@/store/actions/limitOrder";
 import truncateNum from "@/utils/truncateNum";
 
 import classes from "./index.module.scss";
@@ -45,6 +47,7 @@ export default function LimitOrderPage() {
 			toToken: null,
 			toValue: "",
 		},
+		onSubmit: handleCreateLimitOrder,
 		validate,
 	});
 
@@ -94,9 +97,7 @@ export default function LimitOrderPage() {
 	}, [values.fromValue, values.toPrice]);
 
 	function handleCreateLimitOrder() {
-		/**
-		 * Handle create limit order
-		 */
+		dispatch(setLimitOrderPopupValues(values));
 	}
 
 	function handleConnectPair() {
@@ -119,7 +120,8 @@ export default function LimitOrderPage() {
 	}
 
 	function handleSetToMarket() {
-		if (!rate) setFieldError("toPrice", "First select tokens");
+		const SELECT_PAIR = "You must select pair";
+		if (!rate) setFieldError("pair", SELECT_PAIR);
 		else setFieldValue("toPrice", rate);
 	}
 
@@ -145,7 +147,6 @@ export default function LimitOrderPage() {
 			return <Button {...props} {...p} />;
 		};
 	}, [walletConnected, values.pair, values.fromToken, values.toToken]);
-	console.log(errors);
 
 	const selectFromPopup = useSelectPopup((t) => setFieldValue("fromToken", t));
 	const selectToPopup = useSelectPopup((t) => setFieldValue("toToken", t));
@@ -154,7 +155,8 @@ export default function LimitOrderPage() {
 		<>
 			<div className="container">
 				<MainBlock
-					smallTitle={false}
+					error={Boolean(errors.pair)}
+					helperText={errors.pair}
 					content={
 						<div>
 							<div className="head_wrapper" style={{marginBottom: "40px"}}>
@@ -217,6 +219,12 @@ export default function LimitOrderPage() {
 											error={touched.toPrice && errors.toPrice}
 											helperText={touched.toPrice && errors.toPrice}
 										/>
+										<button
+											className={cls("btn", classes.set_market_btn)}
+											onClick={handleSetToMarket}
+										>
+											Set to market
+										</button>
 									</div>
 								)}
 								<CurrentButton />
@@ -259,7 +267,6 @@ function validate(values) {
 	const POSITIVE_NUMBER = "Use positive number";
 	const SELECT_TOKEN = "You must select token";
 	const BALANCE_EXCEEDS = "Input value exceeds balance";
-	const NO_PAIR = "Selected pair doesn't exist";
 
 	if (isNaN(+values.fromValue)) errors.fromValue = MUST_BE_NUMBER;
 	else if (values.fromValue <= 0) errors.fromValue = POSITIVE_NUMBER;
@@ -272,8 +279,6 @@ function validate(values) {
 		errors.fromToken = BALANCE_EXCEEDS;
 
 	if (!values.toToken) errors.toToken = SELECT_TOKEN;
-
-	if (values.fromToken && values.toToken && !values.pair) errors.pair = NO_PAIR;
 
 	console.log(errors);
 
