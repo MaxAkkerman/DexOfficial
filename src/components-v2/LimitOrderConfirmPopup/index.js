@@ -1,5 +1,3 @@
-import "./index.scss";
-
 import cls from "classnames";
 import {useSnackbar} from "notistack";
 import React, {useMemo} from "react";
