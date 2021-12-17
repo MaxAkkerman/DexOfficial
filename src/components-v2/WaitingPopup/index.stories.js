@@ -17,11 +17,24 @@ const Template = (store, args) => (
 	</Provider>
 );
 
-export const Default = Template.bind(
+export const WithoutValues = Template.bind(
 	{},
 	createStore(rootReducer, {
 		appReducer: {
 			waitingPopup: {},
+		},
+	}),
+);
+
+export const WithValues = Template.bind(
+	{},
+	createStore(rootReducer, {
+		appReducer: {
+			waitingPopup: {
+				hidable: true,
+				text: "Random text",
+				title: "Random title",
+			},
 		},
 	}),
 );
