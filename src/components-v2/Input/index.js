@@ -10,6 +10,7 @@ import classes from "./index.module.scss";
 
 export default function Input({
 	autoFocus,
+	className,
 	error,
 	helperText,
 	label,
@@ -31,7 +32,7 @@ export default function Input({
 	return (
 		<>
 			<div
-				className={classes.input}
+				className={cls(className, classes.input)}
 				style={{
 					borderColor: error ? "var(--error)" : "var(--input-border-color)",
 				}}
@@ -125,6 +126,7 @@ export default function Input({
 
 Input.propTypes = {
 	autoFocus: PropTypes.bool,
+	className: PropTypes.string,
 	error: PropTypes.bool,
 	helperText: PropTypes.string,
 	label: PropTypes.string.isRequired,
@@ -152,6 +154,7 @@ Input.propTypes = {
 
 Input.defaultProps = {
 	autoFocus: false,
+	className: null,
 	error: false,
 	helperText: "Type numeric value",
 	notExact: false,
