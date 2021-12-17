@@ -48,7 +48,14 @@ function MainBlock(
 				<div>
 					{content}
 					{helperText && (
-						<FormHelperText error={error}>{helperText}</FormHelperText>
+						<FormHelperText
+							error={error}
+							style={{
+								textAlign: "center",
+							}}
+						>
+							{helperText}
+						</FormHelperText>
 					)}
 				</div>
 			) : (
