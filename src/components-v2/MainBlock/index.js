@@ -23,7 +23,7 @@ function MainBlock(
 	ref,
 ) {
 	return (
-		<div>
+		<div className="mainblock-wrapper">
 			<div
 				className={cls("mainblock", className)}
 				style={{
