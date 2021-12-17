@@ -23,45 +23,41 @@ function MainBlock(
 	ref,
 ) {
 	return (
-		<div
-			className={cls("mainblock", className)}
-			style={{
-				borderColor: error ? "var(--error)" : "var(--mainblock-border-color)",
-			}}
-			ref={ref}
-			{...rest}
-		>
-			{(title || button) && (
-				<div className={cls("mainblock-header", classHeader)}>
-					<h2
-						className={cls("mainblock-title", classTitle, {
-							"mainblock-title--normal": normalTitle,
-							"mainblock-title--small": smallTitle,
-						})}
-					>
-						{title}
-					</h2>
-					{button}
-				</div>
-			)}
-			{helperText ? (
-				<div>
-					{content}
-					{helperText && (
-						<FormHelperText
-							error={error}
-							style={{
-								textAlign: "center",
-							}}
+		<div>
+			<div
+				className={cls("mainblock", className)}
+				style={{
+					borderColor: error ? "var(--error)" : "var(--mainblock-border-color)",
+				}}
+				ref={ref}
+				{...rest}
+			>
+				{(title || button) && (
+					<div className={cls("mainblock-header", classHeader)}>
+						<h2
+							className={cls("mainblock-title", classTitle, {
+								"mainblock-title--normal": normalTitle,
+								"mainblock-title--small": smallTitle,
+							})}
 						>
-							{helperText}
-						</FormHelperText>
-					)}
-				</div>
-			) : (
-				content
+							{title}
+						</h2>
+						{button}
+					</div>
+				)}
+				{content}
+				{footer}
+			</div>
+			{helperText && (
+				<FormHelperText
+					error={error}
+					style={{
+						textAlign: "center",
+					}}
+				>
+					{helperText}
+				</FormHelperText>
 			)}
-			{footer}
 		</div>
 	);
 }
