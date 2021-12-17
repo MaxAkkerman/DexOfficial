@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {Redirect, Route, Switch, useLocation} from "react-router-dom";
 import {useMount} from "react-use";
 
+import LimitOrderConfirmPopup from "@/components-v2/LimitOrderConfirmPopup";
 import LimitOrderPage from "@/components-v2/LimitOrderPage";
 import SwapConfirmPopup from "@/components-v2/SwapConfirmPopup";
 import SwapPage from "@/components-v2/SwapPage";
@@ -18,7 +19,6 @@ import Header from "./components/Header/Header";
 import NativeLogin from "./components/NativeLogin/NativeLogin";
 import PoolExplorer from "./components/PoolExplorer/PoolExplorer";
 import Popup from "./components/Popup/Popup";
-import PopupManager from "./components/PopupManager/PopupManager";
 import AssetsModalReceive from "./components/ReceiveAssets/AssetsModalReceive";
 import ReceiveAssets from "./components/ReceiveAssets/ReceiveAssets";
 import RevealSeedPhrase from "./components/RevealSeedPhrase/RevealSeedPhrase";
@@ -408,12 +408,9 @@ function App() {
 			{popup.isVisible ? (
 				<Popup type={popup.type} message={popup.message} link={popup.link} />
 			) : null}
-			<PopupManager />
-			{popup.isVisible ? (
-				<Popup type={popup.type} message={popup.message} link={popup.link} />
-			) : null}
 			{revealSeedPhraseIsVisible ? <RevealSeedPhrase /> : null}
 			<SwapConfirmPopup />
+			<LimitOrderConfirmPopup />
 			<WaitingPopup />
 		</>
 	);
