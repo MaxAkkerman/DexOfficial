@@ -5,7 +5,7 @@ import {hidePoolFromSelect, hidePoolToSelect} from "../../store/actions/pool";
 import {
 	hideOrdersFromSelect,
 	hideOrdersToSelect,
-} from "../../store/actions/limitOrders";
+} from "../../store/actions/limitOrder";
 
 function MainBlock({
 	smallTitle,
