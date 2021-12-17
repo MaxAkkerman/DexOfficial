@@ -15,7 +15,7 @@ export default async function makeLimitOrder({
 	qty,
 }) {
 	if (
-		~this ||
+		!this ||
 		!this.context ||
 		!this.context.dexClientAddress ||
 		!this.helperFunctions ||

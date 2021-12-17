@@ -90,7 +90,7 @@ export default function tonContext(state = initialState, {payload, type}) {
 			const helperFunctionsLvl1 = reduce(
 				state.original.helperFunctions,
 				(r, v, k) => {
-					r[k] = v.bind({context: state.context});
+					r[k] = v.bind({context: newValuesContext});
 					return r;
 				},
 				{},
@@ -100,7 +100,7 @@ export default function tonContext(state = initialState, {payload, type}) {
 				state.original.helperFunctions,
 				(r, v, k) => {
 					r[k] = v.bind({
-						context: state.context,
+						context: newValuesContext,
 						helperFunctions: helperFunctionsLvl1,
 					});
 					return r;
