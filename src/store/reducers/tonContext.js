@@ -13,6 +13,7 @@ const initialState = {
 	functions: {
 		getAllClientWallets() {},
 		getAllPairsWithoutProvider() {},
+		makeLimitOrder() {},
 		swap() {},
 		takeLimitOrder() {},
 	},
@@ -21,24 +22,40 @@ const initialState = {
 		getClientWallet() {},
 		getPair() {},
 		getPairsTotalSupply() {},
-		getTokenRouter() {},
+		getRouterAddress() {},
+		getShardLimit() {},
+		getTokenRouterAddress() {},
 	},
 };
 
 /**
  * In the end we are creating ton context for:
- * 	- functions - this.context and this.helperFunctions
- * 	- helperFunctions - this.context
- * 	and also context in context property, which equals to this.context
+ * 	- "functions" - this.context and this.helperFunctions
+ * 	- "helperFunctionsLvl1" - this.context
+ * 	- "helperFunctionsLvl2" - this.context and this.helperFunctions
+ * 	- "context" in context property, which equals to this.context
+ * ? Maybe be there are a better way to pass helperFunctions to helperFunctions with context
  */
 
 export default function tonContext(state = initialState, {payload, type}) {
 	switch (type) {
 		case INIT_TON_CONTEXT: {
-			const helperFunctions = reduce(
+			const helperFunctionsLvl1 = reduce(
 				state.helperFunctions,
 				(r, v, k) => {
 					r[k] = v.bind({context: state.context});
+					return r;
+				},
+				{},
+			);
+
+			const helperFunctionsLvl2 = reduce(
+				state.helperFunctions,
+				(r, v, k) => {
+					r[k] = v.bind({
+						context: state.context,
+						helperFunctions: helperFunctionsLvl1,
+					});
 					return r;
 				},
 				{},
@@ -51,13 +68,13 @@ export default function tonContext(state = initialState, {payload, type}) {
 					(r, v, k) => {
 						r[k] = v.bind({
 							context: state.context,
-							helperFunctions,
+							helperFunctions: helperFunctionsLvl2,
 						});
 						return r;
 					},
 					{},
 				),
-				helperFunctions,
+				helperFunctions: helperFunctionsLvl2,
 				original: {
 					// preserver original functions
 					functions: state.functions,
@@ -70,10 +87,22 @@ export default function tonContext(state = initialState, {payload, type}) {
 
 			const newValuesContext = {...state.context, [name]: value};
 
-			const helperFunctions = reduce(
+			const helperFunctionsLvl1 = reduce(
 				state.original.helperFunctions,
 				(r, v, k) => {
-					r[k] = v.bind({context: newValuesContext});
+					r[k] = v.bind({context: state.context});
+					return r;
+				},
+				{},
+			);
+
+			const helperFunctionsLvl2 = reduce(
+				state.original.helperFunctions,
+				(r, v, k) => {
+					r[k] = v.bind({
+						context: state.context,
+						helperFunctions: helperFunctionsLvl1,
+					});
 					return r;
 				},
 				{},
@@ -86,13 +115,13 @@ export default function tonContext(state = initialState, {payload, type}) {
 					(r, v, k) => {
 						r[k] = v.bind({
 							context: newValuesContext,
-							helperFunctions,
+							helperFunctions: helperFunctionsLvl2,
 						});
 						return r;
 					},
 					{},
 				),
-				helperFunctions,
+				helperFunctions: helperFunctionsLvl2,
 				original: state.original, // preserve original functions
 			};
 		}

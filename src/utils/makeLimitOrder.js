@@ -1,50 +1,66 @@
 import {Account} from "@tonclient/appkit";
 import {signerKeys} from "@tonclient/core";
 
+import {NO_CONTEXT} from "@/constants/runtimeErrors";
 import {
 	AB_DIRECTION,
 	LIMIT_ORDER_PRICE_DENOMINATOR,
-} from "../constants/runtimeVariables";
-import {DEXClientContract} from "../extensions/contracts/DEXClientMainNet";
-import client, {getShardLimit} from "../extensions/sdk_get/get";
-import getPair from "./getPair";
-import getTokenInfo from "./getClientWallet";
-import getTokenRouter from "./getTokenRouter";
+} from "@/constants/runtimeVariables";
+import {DEXClientContract} from "@/extensions/contracts/DEXClientMainNet";
 
-export default async function makeLimitOrder(
-	{pairAddr, directionPair, qty, price},
-	{clientAddress, clientKeyPair},
-) {
+export default async function makeLimitOrder({
+	directionPair,
+	pairAddr,
+	price,
+	qty,
+}) {
+	if (
+		~this ||
+		!this.context ||
+		!this.context.dexClientAddress ||
+		!this.helperFunctions ||
+		!this.helperFunctions.getPair ||
+		!this.helperFunctions.getClientKeys ||
+		!this.helperFunctions.getTokenRouterAddress ||
+		!this.helperFunctions.getShardLimit ||
+		!this.helperFunctions.getClientWallet
+	)
+		throw new Error(NO_CONTEXT);
+
+	const dexClientKeyPair = await this.helperFunctions.getClientKeys();
+
 	const clientAcc = new Account(DEXClientContract, {
-		address: clientAddress,
-		client,
-		signer: signerKeys(clientKeyPair),
+		address: this.context.dexClientAddress,
+		client: this.context.tonClient,
+		signer: signerKeys(dexClientKeyPair),
 	});
 
-	const sounitV = await getShardLimit();
+	const sounitV = await this.helperFunctions.getShardLimit();
 	console.log("sounitV", sounitV);
-	const pair = await getPair(pairAddr);
+	const pair = await this.helperFunctions.getPair(pairAddr);
 	let response = null;
 	try {
 		if (directionPair === AB_DIRECTION) {
-			const router = await getTokenRouter(pair.rootA);
-			const token = await getTokenInfo(pair.rootA);
+			const routerAddress = await this.helperFunctions.getTokenRouterAddress(
+				pair.rootA,
+			);
+			const token = await this.helperFunctions.getClientWallet(pair.rootA);
 			response = await clientAcc.run("makeLimitOrderA", {
-				routerWalletA: router,
 				pairAddr,
-				qtyA: qty * 10 ** token.decimals,
 				priceA: price * LIMIT_ORDER_PRICE_DENOMINATOR,
+				qtyA: qty * 10 ** token.decimals,
+				routerWalletA: routerAddress,
 				souint: sounitV,
 			});
 		} else {
-			const router = await getTokenRouter(pair.rootB);
-			const token = await getTokenInfo(pair.rootB);
+			const router = await this.helperFunctions.getTokenRouter(pair.rootB);
+			const token = await this.helperFunctions.getClientWallet(pair.rootB);
 			response = await clientAcc.run("makeLimitOrderB", {
-				routerWalletB: router,
 				pairAddr,
-				qtyB: qty * 10 ** token.decimals,
 				priceB: price * LIMIT_ORDER_PRICE_DENOMINATOR,
-				souint: souint,
+				qtyB: qty * 10 ** token.decimals,
+				routerWalletB: router,
+				souint: sounitV,
 			});
 		}
 

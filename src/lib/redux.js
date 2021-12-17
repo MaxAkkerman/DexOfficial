@@ -14,7 +14,10 @@ import getClientKeys from "@/utils/getClientKeys";
 import getClientWallet from "@/utils/getClientWallet";
 import getPair from "@/utils/getPair";
 import getPairsTotalSupply from "@/utils/getPairsTotalSupply";
-import getTokenRouter from "@/utils/getTokenRouter";
+import getRouterAddress from "@/utils/getRouterAddress";
+import getShardLimit from "@/utils/getShardLimit";
+import getTokenRouterAddress from "@/utils/getTokenRouterAddress";
+import makeLimitOrder from "@/utils/makeLimitOrder";
 import swap from "@/utils/swap";
 import takeLimitOrder from "@/utils/takeLimitOrder";
 
@@ -39,6 +42,7 @@ export const reduxStore = createStore(
 			functions: {
 				getAllClientWallets,
 				getAllPairsWithoutProvider,
+				makeLimitOrder,
 				swap,
 				takeLimitOrder,
 			},
@@ -47,7 +51,9 @@ export const reduxStore = createStore(
 				getClientWallet,
 				getPair,
 				getPairsTotalSupply,
-				getTokenRouter,
+				getRouterAddress,
+				getShardLimit,
+				getTokenRouterAddress,
 			},
 		},
 	},

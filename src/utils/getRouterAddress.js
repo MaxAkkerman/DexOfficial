@@ -2,13 +2,12 @@ import {Account} from "@tonclient/appkit";
 
 import {FUNC_FAIL, NO_CONTEXT} from "@/constants/runtimeErrors";
 import {LimitOrderRootContract} from "@/extensions/contracts/LimitOrderRoot";
-import {LimitOrderRouterContract} from "@/extensions/contracts/LimitOrderRouter";
 
 /**
  * @param {string} rootAddress
  * @returns {Promise<string>} routerAddress
  */
-export default async function getTokenRouter(rootAddress) {
+export default async function getRouterAddress() {
 	if (
 		!this ||
 		!this.context ||
@@ -27,14 +26,5 @@ export default async function getTokenRouter(rootAddress) {
 	const {_deployedRouter} = res.decoded.output;
 	console.log("LimitOrderRoot->deployed_router_address", _deployedRouter);
 
-	const routerAcc = new Account(LimitOrderRouterContract, {
-		address: _deployedRouter,
-		client: this.context.tonClient,
-	});
-
-	res = await routerAcc.runLocal("walletFor", {});
-	if (!res.decoded) throw new Error(FUNC_FAIL);
-	const {walletFor} = res.decoded.output;
-
-	return walletFor[rootAddress];
+	return _deployedRouter;
 }
