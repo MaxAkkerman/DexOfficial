@@ -43,8 +43,13 @@ module.exports = {
 				use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
 			},
 			{
+				exclude: /\.inline\.svg$/,
 				test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
 				type: "asset/resource",
+			},
+			{
+				test: /\.inline.svg$/,
+				use: ["@svgr/webpack"],
 			},
 		],
 	},
