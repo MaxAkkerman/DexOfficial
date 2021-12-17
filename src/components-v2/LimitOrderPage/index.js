@@ -191,6 +191,7 @@ export default function LimitOrderPage() {
 								/>
 								<Input
 									label="To"
+									className={classes.input}
 									name="toValue"
 									notExact
 									value={values.toValue}
@@ -222,6 +223,7 @@ export default function LimitOrderPage() {
 										<button
 											className={cls("btn", classes.set_market_btn)}
 											onClick={handleSetToMarket}
+											type="button"
 										>
 											Set to market
 										</button>

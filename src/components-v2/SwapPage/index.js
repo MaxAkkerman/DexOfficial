@@ -220,6 +220,7 @@ export default function SwapPage() {
 									type="button"
 								/>
 								<Input
+									className="input"
 									label="To"
 									name="toValue"
 									notExact
