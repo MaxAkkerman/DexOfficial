@@ -11,32 +11,28 @@ import rootReducer from "@/store/reducers";
 
 export default {
 	component: SwapConfirmPopup,
-	title: "Popup/Swap confirm (redux)",
+	title: "Popup/Swap confirm (redux, apollo, notistack)",
 };
 
-const Template = (store, args) => {
-	const state = store.getState();
-
-	return (
-		<Provider store={store}>
-			<SnackbarProvider
-				maxSnack={3}
-				autoHideDuration={10000}
-				anchorOrigin={{
-					horizontal: "right",
-					vertical: "bottom",
-				}}
-				content={(key, {message, type}) => (
-					<Alert id={key} message={message} type={type} />
-				)}
-			>
-				<MockedProvider>
-					{state.swapReducer.values && <SwapConfirmPopup {...args} />}
-				</MockedProvider>
-			</SnackbarProvider>
-		</Provider>
-	);
-};
+const Template = (store, args) => (
+	<Provider store={store}>
+		<SnackbarProvider
+			maxSnack={3}
+			autoHideDuration={10000}
+			anchorOrigin={{
+				horizontal: "right",
+				vertical: "bottom",
+			}}
+			content={(key, {message, type}) => (
+				<Alert id={key} message={message} type={type} />
+			)}
+		>
+			<MockedProvider>
+				<SwapConfirmPopup {...args} />
+			</MockedProvider>
+		</SnackbarProvider>
+	</Provider>
+);
 
 export const WithoutValues = Template.bind(
 	{},

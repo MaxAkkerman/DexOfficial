@@ -181,7 +181,6 @@ export default function SwapPage() {
 		<>
 			<div className="container">
 				<MainBlock
-					smallTitle={false}
 					content={
 						<div style={{display: "contents"}}>
 							<div className="head_wrapper" style={{marginBottom: "40px"}}>
@@ -344,7 +343,6 @@ function validate(values) {
 	const POSITIVE_NUMBER = "Use positive number";
 	const SELECT_TOKEN = "You must select token";
 	const BALANCE_EXCEEDS = "Input value exceeds balance";
-	const NO_PAIR = "Selected pair doesn't exist";
 
 	if (isNaN(+values.fromValue)) errors.fromValue = MUST_BE_NUMBER;
 	else if (values.fromValue <= 0) errors.fromValue = POSITIVE_NUMBER;
@@ -357,8 +355,6 @@ function validate(values) {
 		errors.fromToken = BALANCE_EXCEEDS;
 
 	if (!values.toToken) errors.toToken = SELECT_TOKEN;
-
-	if (values.fromToken && values.toToken && !values.pair) errors.pair = NO_PAIR;
 
 	return errors;
 }
