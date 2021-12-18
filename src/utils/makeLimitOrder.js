@@ -47,8 +47,10 @@ export default async function makeLimitOrder({
 			const token = await this.helperFunctions.getClientWallet(pair.rootA);
 			response = await clientAcc.run("makeLimitOrderA", {
 				pairAddr,
-				priceA: price * LIMIT_ORDER_PRICE_DENOMINATOR,
-				qtyA: qty * 10 ** token.decimals,
+				priceA: BigInt(
+					Math.round(price * LIMIT_ORDER_PRICE_DENOMINATOR),
+				).toString(),
+				qtyA: BigInt(Math.round(qty * 10 ** token.decimals)).toString(),
 				routerWalletA: routerAddress,
 				souint: sounitV,
 			});
@@ -57,8 +59,10 @@ export default async function makeLimitOrder({
 			const token = await this.helperFunctions.getClientWallet(pair.rootB);
 			response = await clientAcc.run("makeLimitOrderB", {
 				pairAddr,
-				priceB: price * LIMIT_ORDER_PRICE_DENOMINATOR,
-				qtyB: qty * 10 ** token.decimals,
+				priceB: BigInt(
+					Math.round(price * LIMIT_ORDER_PRICE_DENOMINATOR),
+				).toString(),
+				qtyB: BigInt(Math.round(qty * 10 ** token.decimals)).toString(),
 				routerWalletB: router,
 				souint: sounitV,
 			});
