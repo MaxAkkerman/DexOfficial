@@ -26,7 +26,7 @@ import {
 	setOrdersFromToken,
 	setOrdersPairId,
 	setOrdersToToken,
-} from "../../store/actions/limitOrders";
+} from "../../store/actions/limitOrder";
 import {getFullName} from "../../reactUtils/reactUtils";
 
 function SelectItem(props) {

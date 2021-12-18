@@ -1,17 +1,16 @@
-import {MockedProvider} from "@apollo/client/testing";
 import {SnackbarProvider} from "notistack";
 import React from "react";
 import {Provider} from "react-redux";
 import {createStore} from "redux";
 
 import Alert from "@/components-v2/Alert";
-import SwapConfirmPopup from "@/components-v2/SwapConfirmPopup";
+import LimitOrderConfirmPopup from "@/components-v2/LimitOrderConfirmPopup";
 import {pairs, tokens} from "@/constants/mocks";
 import rootReducer from "@/store/reducers";
 
 export default {
-	component: SwapConfirmPopup,
-	title: "Popup/Swap confirm (redux, apollo, notistack)",
+	component: LimitOrderConfirmPopup,
+	title: "Popup/Limit order confirm (redux, notistack)",
 };
 
 const Template = (store, args) => (
@@ -27,9 +26,7 @@ const Template = (store, args) => (
 				<Alert id={key} message={message} type={type} />
 			)}
 		>
-			<MockedProvider>
-				<SwapConfirmPopup {...args} />
-			</MockedProvider>
+			<LimitOrderConfirmPopup {...args} />
 		</SnackbarProvider>
 	</Provider>
 );
@@ -37,7 +34,7 @@ const Template = (store, args) => (
 export const WithoutValues = Template.bind(
 	{},
 	createStore(rootReducer, {
-		swapReducer: {
+		limitOrderReducer: {
 			values: null,
 		},
 	}),
@@ -46,14 +43,14 @@ export const WithoutValues = Template.bind(
 export const WithValues = Template.bind(
 	{},
 	createStore(rootReducer, {
-		swapReducer: {
+		limitOrderReducer: {
 			values: {
 				fromToken: tokens.WTON,
 				fromValue: 14,
 				pair: pairs.WTON_DAI,
-				slippage: 0,
+				toPrice: 5,
 				toToken: tokens.DAI,
-				toValue: 14 * pairs.WTON_DAI.rateAB,
+				toValue: 14 * 5,
 			},
 		},
 	}),

@@ -23,6 +23,17 @@ const Template = (store, args) => (
 
 export const WithoutWallet = Template.bind({}, createStore(rootReducer));
 
+export const WithoutTokens = Template.bind(
+	{},
+	createStore(rootReducer, {
+		appReducer: {walletIsConnected: true},
+		tonData: {
+			pairs: values(pairs),
+			tokens: [],
+		},
+	}),
+);
+
 export const WithoutPairs = Template.bind(
 	{},
 	createStore(rootReducer, {

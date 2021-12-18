@@ -1,10 +1,9 @@
-import "./index.scss";
-
+import cls from "classnames";
 import {useFormik} from "formik";
 import differenceBy from "lodash/differenceBy";
 import find from "lodash/find";
-import React, {useEffect, useMemo, useState} from "react";
-import {useSelector} from "react-redux";
+import React, {useEffect, useMemo} from "react";
+import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
 
 import Button from "@/components-v2/Button";
@@ -12,18 +11,23 @@ import Input from "@/components-v2/Input";
 import MainBlock from "@/components-v2/MainBlock";
 import SelectPopup from "@/components-v2/SelectPopup";
 import SmallInput from "@/components-v2/SmallInput";
-import SwapBtn from "@/components-v2/SwapButton";
+import SwapButton from "@/components-v2/SwapButton";
 import {AB_DIRECTION, BA_DIRECTION} from "@/constants/runtimeVariables";
+import useSelectPopup from "@/hooks/useSelectPopup";
+import {setLimitOrderPopupValues} from "@/store/actions/limitOrder";
 import truncateNum from "@/utils/truncateNum";
 
-export default function LimitOrder() {
+import classes from "./index.module.scss";
+
+export default function LimitOrderPage() {
 	const history = useHistory();
 
+	const dispatch = useDispatch();
 	const walletConnected = useSelector(
 		(state) => state.appReducer.walletIsConnected,
 	);
-	const tokenList = useSelector((state) => state.walletReducer.tokenList);
-	const pairList = useSelector((state) => state.walletReducer.pairsList);
+	const tokens = useSelector((state) => state.tonData.tokens);
+	const pairs = useSelector((state) => state.tonData.pairs);
 
 	const {
 		errors,
@@ -36,43 +40,44 @@ export default function LimitOrder() {
 		values,
 	} = useFormik({
 		initialValues: {
-			fromPrice: "",
 			fromToken: null,
 			fromValue: "",
 			pair: null,
+			toPrice: "",
 			toToken: null,
 			toValue: "",
 		},
+		onSubmit: handleCreateLimitOrder,
 		validate,
 	});
 
 	const leftTokens = useMemo(
 		() =>
 			differenceBy(
-				tokenList,
+				tokens,
 				[values.fromToken, values.toToken],
 				(t) => t && t.rootAddress,
 			),
-		[tokenList, values.fromToken, values.toToken],
+		[tokens, values.fromToken, values.toToken],
 	);
 
 	// Find the pair
 	useEffect(() => {
 		const {fromToken, toToken} = values;
-		if (!pairList.length || !fromToken || !toToken) return;
+		if (!pairs.length || !fromToken || !toToken) return;
 
 		setFieldValue(
 			"pair",
-			find(pairList, {
+			find(pairs, {
 				rootA: fromToken.rootAddress,
 				rootB: toToken.rootAddress,
 			}) ||
-				find(pairList, {
+				find(pairs, {
 					rootA: toToken.rootAddress,
 					rootB: fromToken.rootAddress,
 				}),
 		);
-	}, [pairList, values.fromToken, values.toToken]);
+	}, [pairs, values.fromToken, values.toToken]);
 
 	const directionPair = useMemo(() => {
 		const {fromToken, pair} = values;
@@ -86,17 +91,13 @@ export default function LimitOrder() {
 			return directionPair === AB_DIRECTION ? pair.rateAB : pair.rateBA;
 	}, [directionPair, values.pair]);
 
-	// Update "to" value
+	// Calculate "To" value
 	useEffect(() => {
-		if (rate) setFieldValue("toValue", rate);
-	}, [rate]);
-
-	const {fromPopup, toPopup} = useHandlePopups(setFieldValue);
+		setFieldValue("toValue", values.fromValue * values.toPrice);
+	}, [values.fromValue, values.toPrice]);
 
 	function handleCreateLimitOrder() {
-		/**
-		 * Handle create limit order
-		 */
+		dispatch(setLimitOrderPopupValues(values));
 	}
 
 	function handleConnectPair() {
@@ -106,7 +107,7 @@ export default function LimitOrder() {
 	}
 
 	function handleMaxClick() {
-		setFieldValue("from", values.fromToken.balance);
+		setFieldValue("fromValue", values.fromToken.balance);
 	}
 
 	function handleConnectWallet() {
@@ -119,8 +120,9 @@ export default function LimitOrder() {
 	}
 
 	function handleSetToMarket() {
-		if (!rate) setFieldError("fromPrice", "First select tokens");
-		else setFieldValue("fromPrice", rate);
+		const SELECT_PAIR = "You must select pair";
+		if (!rate) setFieldError("pair", SELECT_PAIR);
+		else setFieldValue("toPrice", rate);
 	}
 
 	const CurrentButton = useMemo(() => {
@@ -129,30 +131,32 @@ export default function LimitOrder() {
 		};
 
 		if (!walletConnected) {
-			props.type = "button";
 			props.children = "Connect wallet";
 			props.onClick = handleConnectWallet;
-		} else if (values.fromToken && values.toToken && !values.pair) {
 			props.type = "button";
+		} else if (values.fromToken && values.toToken && !values.pair) {
 			props.children = "Connect pair";
 			props.onClick = handleConnectPair;
+			props.type = "button";
 		} else {
-			props.type = "submit";
 			props.children = "Create limit order";
-			props.onClick = handleCreateLimitOrder;
+			props.type = "submit";
 		}
 
 		return function CurrentButton(p) {
 			return <Button {...props} {...p} />;
 		};
 	}, [walletConnected, values.pair, values.fromToken, values.toToken]);
-	console.log(errors);
+
+	const selectFromPopup = useSelectPopup((t) => setFieldValue("fromToken", t));
+	const selectToPopup = useSelectPopup((t) => setFieldValue("toToken", t));
 
 	return (
 		<>
 			<div className="container">
 				<MainBlock
-					smallTitle={false}
+					error={Boolean(errors.pair)}
+					helperText={errors.pair}
 					content={
 						<div>
 							<div className="head_wrapper" style={{marginBottom: "40px"}}>
@@ -170,7 +174,7 @@ export default function LimitOrder() {
 									value={values.fromValue}
 									onValueBlur={handleBlur}
 									onValueChange={handleChange}
-									onSelectClick={fromPopup.open}
+									onSelectClick={selectFromPopup.handleOpen}
 									onMaxClick={handleMaxClick}
 									token={values.fromToken}
 									error={
@@ -180,14 +184,20 @@ export default function LimitOrder() {
 										touched.fromValue && (errors.fromValue || errors.fromToken)
 									}
 								/>
-								<SwapBtn onClick={handleTokensInvert} className="swap-btn" />
+								<SwapButton
+									onClick={handleTokensInvert}
+									className="swap-btn"
+									type="button"
+								/>
 								<Input
 									label="To"
+									className={classes.input}
 									name="toValue"
+									notExact
 									value={values.toValue}
 									onValueBlur={handleBlur}
 									onValueChange={handleChange}
-									onSelectClick={toPopup.open}
+									onSelectClick={selectToPopup.handleOpen}
 									token={values.toToken}
 									error={touched.toToken && errors.toToken}
 									helperText={
@@ -197,16 +207,26 @@ export default function LimitOrder() {
 									readOnly
 								/>
 								{walletConnected && (
-									<div className="orders__price_box">
+									<div className={classes.orders__price_box}>
 										<SmallInput
-											name="fromPrice"
+											name="toPrice"
 											label="Limit order price"
 											onBlur={handleBlur}
 											onChange={handleChange}
 											onSetToMarket={handleSetToMarket}
-											touched={touched.fromPrice}
-											value={values.fromPrice}
+											token={values.toToken}
+											touched={touched.toPrice}
+											value={values.toPrice}
+											error={touched.toPrice && errors.toPrice}
+											helperText={touched.toPrice && errors.toPrice}
 										/>
+										<button
+											className={cls("btn", classes.set_market_btn)}
+											onClick={handleSetToMarket}
+											type="button"
+										>
+											Set to market
+										</button>
 									</div>
 								)}
 								<CurrentButton />
@@ -224,87 +244,43 @@ export default function LimitOrder() {
 					}
 				/>
 			</div>
-			{fromPopup.state && (
+			{selectFromPopup.open && (
 				<SelectPopup
 					tokens={leftTokens}
-					open={fromPopup.state}
-					onClose={fromPopup.close}
-					onSelect={fromPopup.select}
+					onClose={selectFromPopup.handleClose}
+					onSelect={selectFromPopup.handleSelect}
 				/>
 			)}
-			{toPopup.state && (
+			{selectToPopup.open && (
 				<SelectPopup
 					tokens={leftTokens}
-					open={toPopup.state}
-					onClose={toPopup.close}
-					onSelect={toPopup.select}
+					onClose={selectToPopup.handleClose}
+					onSelect={selectToPopup.handleSelect}
 				/>
 			)}
 		</>
 	);
 }
 
-function useHandlePopups(setFieldValue) {
-	const [fromPopupOpen, setFromPopupOpen] = useState(false);
-	const [toPopupOpen, setToPopupOpen] = useState(false);
-
-	function selectFromToken(e, t) {
-		setFieldValue("fromToken", t);
-		setFromPopupOpen(false);
-	}
-	function openFromTokenPopup() {
-		setFromPopupOpen(true);
-	}
-	function closeFromTokenPopup() {
-		setFromPopupOpen(false);
-	}
-
-	function selectToToken(e, t) {
-		setFieldValue("toToken", t);
-		setToPopupOpen(false);
-	}
-	function openToTokenPopup() {
-		setToPopupOpen(true);
-	}
-	function closeToTokenPopup() {
-		setToPopupOpen(false);
-	}
-
-	return {
-		fromPopup: {
-			close: closeFromTokenPopup,
-			open: openFromTokenPopup,
-			select: selectFromToken,
-			state: fromPopupOpen,
-		},
-		toPopup: {
-			close: closeToTokenPopup,
-			open: openToTokenPopup,
-			select: selectToToken,
-			state: toPopupOpen,
-		},
-	};
-}
-
 function validate(values) {
 	const errors = {};
 
 	const MUST_BE_NUMBER = "Input value must be a number";
-	errors.fromValue = isNaN(+values.fromValue) && MUST_BE_NUMBER;
-	errors.fromPrice = isNaN(+values.fromPrice) && MUST_BE_NUMBER;
-
 	const POSITIVE_NUMBER = "Use positive number";
-	errors.fromValue =
-		errors.fromValue || (values.fromValue <= 0 && POSITIVE_NUMBER);
-	errors.fromPrice =
-		errors.fromPrice || (values.fromPrice <= 0 && POSITIVE_NUMBER);
-
 	const SELECT_TOKEN = "You must select token";
-	errors.fromToken = !values.fromToken && SELECT_TOKEN;
-	errors.toToken = !values.toToken && SELECT_TOKEN;
+	const BALANCE_EXCEEDS = "Input value exceeds balance";
 
-	const NO_PAIR = "Selected pair doesn't exist";
-	errors.pair = values.fromToken && values.toToken && !values.pair && NO_PAIR;
+	if (isNaN(+values.fromValue)) errors.fromValue = MUST_BE_NUMBER;
+	else if (values.fromValue <= 0) errors.fromValue = POSITIVE_NUMBER;
+
+	if (isNaN(+values.toPrice)) errors.toPrice = MUST_BE_NUMBER;
+	else if (values.toPrice <= 0) errors.toPrice = POSITIVE_NUMBER;
+
+	if (!values.fromToken) errors.fromToken = SELECT_TOKEN;
+	else if (values.fromValue > values.fromToken.balance)
+		errors.fromToken = BALANCE_EXCEEDS;
+
+	if (!values.toToken) errors.toToken = SELECT_TOKEN;
 
 	return errors;
 }

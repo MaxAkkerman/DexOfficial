@@ -5,6 +5,7 @@ import differenceBy from "lodash/differenceBy";
 import find from "lodash/find";
 import React, {useEffect, useMemo, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
+import {useHistory} from "react-router-dom";
 
 import Button from "@/components-v2/Button";
 import Input from "@/components-v2/Input";
@@ -14,12 +15,14 @@ import SettingsButton from "@/components-v2/SettingsButton";
 import SlippagePopup from "@/components-v2/SlippagePopup";
 import SwapButton from "@/components-v2/SwapButton";
 import {AB_DIRECTION, BA_DIRECTION} from "@/constants/runtimeVariables";
+import useSelectPopup from "@/hooks/useSelectPopup";
 import {setSlippageValue, setSwapPopupValues} from "@/store/actions/swap";
 import truncateNum from "@/utils/truncateNum";
 
 export default function SwapPage() {
-	const dispatch = useDispatch();
+	const history = useHistory();
 
+	const dispatch = useDispatch();
 	const walletConnected = useSelector(
 		(state) => state.appReducer.walletIsConnected,
 	);
@@ -58,7 +61,7 @@ export default function SwapPage() {
 		[tokens, values.fromToken, values.toToken],
 	);
 
-	// Calculate pair
+	// Find the pair
 	useEffect(() => {
 		const {fromToken, toToken} = values;
 		if (!pairs.length || !fromToken || !toToken) return;
@@ -90,7 +93,6 @@ export default function SwapPage() {
 
 	// Calculate "To" value
 	useEffect(() => {
-		if (!rate) return;
 		setFieldValue("toValue", values.fromValue * rate);
 	}, [values.fromValue, rate]);
 
@@ -130,7 +132,8 @@ export default function SwapPage() {
 			props.type = "button";
 		} else if (values.fromToken && values.toToken && !values.pair) {
 			props.children = "Connect pair";
-			props.type = "submit";
+			props.onClick = handleConnectPair;
+			props.type = "button";
 		} else {
 			props.children = "Swap";
 			props.type = "submit";
@@ -178,7 +181,6 @@ export default function SwapPage() {
 		<>
 			<div className="container">
 				<MainBlock
-					smallTitle={false}
 					content={
 						<div style={{display: "contents"}}>
 							<div className="head_wrapper" style={{marginBottom: "40px"}}>
@@ -218,8 +220,10 @@ export default function SwapPage() {
 									type="button"
 								/>
 								<Input
+									className="input"
 									label="To"
 									name="toValue"
+									notExact
 									value={values.toValue}
 									onValueChange={handleChange}
 									onValueBlur={handleBlur}
@@ -333,30 +337,6 @@ function useSlippagePopup(setValue) {
 	};
 }
 
-function useSelectPopup(setToken) {
-	const [open, setOpen] = useState(false);
-
-	function handleSelect(e, t) {
-		setToken(t);
-		setOpen(false);
-	}
-
-	function handleOpen() {
-		setOpen(true);
-	}
-
-	function handleClose() {
-		setOpen(false);
-	}
-
-	return {
-		handleClose,
-		handleOpen,
-		handleSelect,
-		open,
-	};
-}
-
 function validate(values) {
 	const errors = {};
 
@@ -364,7 +344,6 @@ function validate(values) {
 	const POSITIVE_NUMBER = "Use positive number";
 	const SELECT_TOKEN = "You must select token";
 	const BALANCE_EXCEEDS = "Input value exceeds balance";
-	const NO_PAIR = "Selected pair doesn't exist";
 
 	if (isNaN(+values.fromValue)) errors.fromValue = MUST_BE_NUMBER;
 	else if (values.fromValue <= 0) errors.fromValue = POSITIVE_NUMBER;
@@ -377,8 +356,6 @@ function validate(values) {
 		errors.fromToken = BALANCE_EXCEEDS;
 
 	if (!values.toToken) errors.toToken = SELECT_TOKEN;
-
-	if (values.fromToken && values.toToken && !values.pair) errors.pair = NO_PAIR;
 
 	return errors;
 }

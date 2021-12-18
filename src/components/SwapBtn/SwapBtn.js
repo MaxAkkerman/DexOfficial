@@ -9,7 +9,7 @@ import {
 	setOrdersFromInputValue,
 	setOrdersFromToken,
 	setOrdersToToken,
-} from "../../store/actions/limitOrders";
+} from "../../store/actions/limitOrder";
 
 function SwapBtn(props) {
 	const dispatch = useDispatch();

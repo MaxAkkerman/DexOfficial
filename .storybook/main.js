@@ -12,7 +12,20 @@ module.exports = {
 		builder: "webpack5",
 	},
 	webpackFinal: async (config) => {
+		const fileLoaderRule = config.module.rules.find((rule) =>
+			rule.test.test(".svg"),
+		);
+		fileLoaderRule.exclude = /\.inline\.svg$/;
+
 		return merge(config, {
+			module: {
+				rules: [
+					{
+						test: /\.inline\.svg$/,
+						use: ["@svgr/webpack"],
+					},
+				],
+			},
 			resolve: {
 				alias: {
 					"@emotion/core": getPackageDir("@emotion/react"),

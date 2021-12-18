@@ -8,7 +8,7 @@ import {useLocation} from "react-router-dom";
 import {
 	hideOrdersFromSelect,
 	hideOrdersToSelect,
-} from "../../store/actions/limitOrders";
+} from "../../store/actions/limitOrder";
 import {hidePoolFromSelect, hidePoolToSelect} from "../../store/actions/pool";
 import {hideSwapFromSelect, hideSwapToSelect} from "../../store/actions/swap";
 import includesTextInToken from "../../utils/includesTextInToken";

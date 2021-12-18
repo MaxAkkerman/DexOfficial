@@ -4,7 +4,7 @@
 	border: 2px solid var(--input-border-color);
 	border-radius: 24px;
 
-	&-wrapper {
+	&_wrapper {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -14,18 +14,18 @@
 		}
 	}
 
-	&-title {
+	&_title {
 		font-size: 20px;
 		color: var(--popup-title-color);
 	}
 
-	&-balance {
+	&_balance {
 		font-weight: 600;
 		font-size: 20px;
 		color: var(--icons-color);
 	}
 
-	&-field {
+	&_field {
 		font-family: "Gilroy", sans-serif;
 		border: none;
 		background-color: transparent;
@@ -35,10 +35,6 @@
 		width: 55%;
 		flex-grow: 1;
 		margin-right: 15px;
-
-		&--zero {
-			color: var(--input-color);
-		}
 
 		&:focus {
 			outline: none;
@@ -59,7 +55,7 @@
 		}
 	}
 
-	&-max {
+	&_max {
 		padding: 8px 6px 7px 8px;
 		border-radius: 12px;
 		background: rgba(53, 105, 240, 1);
@@ -74,7 +70,7 @@
 		}
 	}
 
-	&-btn {
+	&_btn {
 		font-size: 20px;
 		padding: 14px 20px;
 		border-radius: 18px;
@@ -84,7 +80,7 @@
 		}
 	}
 
-	&-select {
+	&_select {
 		border: none;
 		background-color: transparent;
 		font-size: 26px;
@@ -92,7 +88,7 @@
 		color: var(--mainblock-title-color);
 		display: flex;
 		align-items: center;
-		padding: 0 0 0 17px;
+		margin: 0 0 0 17px;
 		cursor: pointer;
 
 		@media screen and (max-width: 769px) {
@@ -108,7 +104,7 @@
 		}
 	}
 
-	&-token-img {
+	&_token_img {
 		width: 32px;
 		height: 32px;
 	}
@@ -119,20 +115,20 @@
 		padding: 15px;
 		border-radius: 18px;
 
-		&-wrapper:first-of-type {
+		&_wrapper:first-of-type {
 			margin-bottom: 12px;
 		}
 
-		&-title,
-		&-balance {
+		&_title,
+		&_balance {
 			font-size: 18px;
 		}
 
-		&-field {
+		&_field {
 			font-size: 32px;
 		}
 
-		&-select {
+		&_select {
 			font-size: 22px;
 		}
 	}
@@ -140,13 +136,13 @@
 
 @media screen and (max-width: 769px) {
 	.input {
-		&-wrapper {
+		&_wrapper {
 			&:last-of-type {
 				flex-wrap: wrap;
 			}
 		}
 
-		&-field {
+		&_field {
 			width: 100%;
 			margin-bottom: 10px;
 			margin-right: 0;
@@ -155,13 +151,13 @@
 }
 
 @media screen and (max-width: 481px) {
-	.input-btn {
+	.input_btn {
 		width: 100%;
 	}
 }
 
 @media screen and (max-width: 415px) {
-	.input-title span {
+	.input_title span {
 		display: none;
 	}
 }

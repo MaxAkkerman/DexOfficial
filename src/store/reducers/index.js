@@ -3,7 +3,7 @@ import {combineReducers} from "redux";
 import appReducer from "./app";
 import clientWallets from "./clientWallets";
 import enterSeedPhrase from "./enterSeedPhrase";
-import limitOrders from "./limitOrders";
+import limitOrderReducer from "./limitOrder";
 import manageReducer from "./manage";
 import poolReducer from "./pool";
 import poolExplorer from "./poolExplorer";
@@ -19,7 +19,7 @@ export default combineReducers({
 	appReducer,
 	clientWallets,
 	enterSeedPhrase,
-	limitOrders,
+	limitOrderReducer,
 	manageReducer,
 	poolExplorer,
 	poolReducer,

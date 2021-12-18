@@ -64,7 +64,14 @@ export default function SwapConfirmPopup() {
 
 	async function handleSwap() {
 		const {fromToken, fromValue, pair, slippage, toToken, toValue} = values;
-		console.log("swap(A|B)->res", {fromToken, fromValue, pair, slippage, toToken, toValue});
+		console.log("swap(A|B)->res", {
+			fromToken,
+			fromValue,
+			pair,
+			slippage,
+			toToken,
+			toValue,
+		});
 		dispatch(
 			setWaitingPopupValues({
 				hidable: true,
@@ -144,7 +151,7 @@ export default function SwapConfirmPopup() {
 
 			if (!res.code)
 				enqueueSnackbar({
-					message: `Sended message to blockchain`,
+					message: "Sended message to blockchain",
 					type: "info",
 				});
 			else

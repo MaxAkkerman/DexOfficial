@@ -5,7 +5,6 @@ import {
 } from "@/store/actions/types";
 
 export function setSwapPopupValues(values) {
-	console.log("values",values)
 	return {
 		payload: values,
 		type: SET_SWAP_POPUP_VALUES,

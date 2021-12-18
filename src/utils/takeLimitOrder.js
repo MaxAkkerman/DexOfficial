@@ -13,9 +13,9 @@ export default async function takeLimitOrder({
 	qty,
 }) {
 	if (
+		!this ||
 		!this.context ||
 		!this.context.dexClientAddress ||
-		!this.context.dexClientKeyPair ||
 		!this.helperFunctions ||
 		!this.helperFunctions.getPair ||
 		!this.helperFunctions.getClientKeys ||

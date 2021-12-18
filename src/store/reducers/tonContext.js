@@ -13,6 +13,7 @@ const initialState = {
 	functions: {
 		getAllClientWallets() {},
 		getAllPairsWithoutProvider() {},
+		makeLimitOrder() {},
 		swap() {},
 		takeLimitOrder() {},
 	},
@@ -21,15 +22,17 @@ const initialState = {
 		getClientWallet() {},
 		getPair() {},
 		getPairsTotalSupply() {},
-		getTokenRouter() {},
+		getRouterAddress() {},
+		getShardLimit() {},
+		getTokenRouterAddress() {},
 	},
 };
 
 /**
  * In the end we are creating ton context for:
- * 	- functions - this.context and this.helperFunctions
- * 	- helperFunctions - this.context
- * 	and also context in context property, which equals to this.context
+ * 	- "functions" - this.context and this.helperFunctions
+ * 	- "helperFunctions" - this.context
+ * 	- "context" in context property, which equals to this.context
  */
 
 export default function tonContext(state = initialState, {payload, type}) {
@@ -66,10 +69,10 @@ export default function tonContext(state = initialState, {payload, type}) {
 			};
 		}
 		case UPDATE_TON_CONTEXT: {
-			const {name, value} = payload;
-
-			const newValuesContext = {...state.context, [name]: value};
-
+			const newValuesContext = {
+				...state.context,
+				[payload.name]: payload.value,
+			};
 			const helperFunctions = reduce(
 				state.original.helperFunctions,
 				(r, v, k) => {

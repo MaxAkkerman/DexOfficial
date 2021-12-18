@@ -1,102 +1,115 @@
-import "./OrderPopupDeploy.scss";
-
 import cls from "classnames";
 import {useSnackbar} from "notistack";
-import React from "react";
+import React, {useMemo} from "react";
 import {useDispatch, useSelector} from "react-redux";
 
-import {PAIR_NULL} from "../../constants/runtimeErrors";
-import {AB_DIRECTION, BA_DIRECTION} from "../../constants/runtimeVariables";
-import useKeyPair from "../../hooks/useKeyPair";
-import {iconGenerator} from "../../iconGenerator";
-import miniSwap from "../../images/icons/mini-swap.png";
+import IconCross from "@/components-v2/IconCross";
+import MainBlock from "@/components-v2/MainBlock";
+import {AB_DIRECTION, BA_DIRECTION} from "@/constants/runtimeVariables";
+import {iconGenerator} from "@/iconGenerator";
+import miniSwap from "@/images/icons/mini-swap.png";
+import {resetLimitOrderPopupValues} from "@/store/actions/limitOrder";
 import {
-	closeOrderWaitPopup,
-	openOrderWaitPopup,
-} from "../../store/actions/limitOrder";
-import makeLimitOrder from "../../utils/makeLimitOrder";
-import truncateNum from "../../utils/truncateNum";
-import IconCross from "../IconCross/IconCross";
-import MainBlock from "../MainBlock/MainBlock";
-import classes from "./OrderPopupDeploy.module.scss";
+	resetWaitingPopupValues,
+	setWaitingPopupValues,
+} from "@/store/actions/waitingPopup";
+import truncateNum from "@/utils/truncateNum";
 
-export default function OrderPopupDeploy({order, close}) {
-	const {fromSymbol, toSymbol, fromValue, toValue, price, pairId} = order;
+import classes from "./index.module.scss";
 
+export default function LimitOrderConfirmPopup() {
 	const dispatch = useDispatch();
+
 	const appTheme = useSelector((state) => state.appReducer.appTheme);
-	const pairList = useSelector((state) => state.walletReducer.pairsList);
-	const clientData = useSelector((state) => state.walletReducer.clientData);
-	const {keyPair} = useKeyPair();
+	const values = useSelector((state) => state.limitOrderReducer.values);
+	const makeLimitOrder = useSelector(
+		(state) => state.tonContext.functions.makeLimitOrder,
+	);
+
+	const directionPair = useMemo(() => {
+		if (!values) return;
+
+		const {fromToken, pair} = values;
+		if (fromToken && pair)
+			return fromToken.rootAddress === pair.rootA ? AB_DIRECTION : BA_DIRECTION;
+	}, [values]);
 
 	const {enqueueSnackbar} = useSnackbar();
 
 	async function handleConfirm() {
-		close();
+		const {fromToken, fromValue, pair, toPrice, toToken, toValue} = values;
+
 		dispatch(
-			openOrderWaitPopup({
-				text: `Sending message to create limit order ${fromSymbol} - ${toSymbol}`,
+			setWaitingPopupValues({
+				hidable: true,
+				text: `Creating limit order ${truncateNum(fromValue)} ${
+					fromToken.symbol
+				} for ${truncateNum(toValue)} ${toToken.symbol}`,
+				title: "Sending message to blockchain",
 			}),
 		);
+		dispatch(resetLimitOrderPopupValues());
 
-		const pairAB = pairList.find(
-			(p) => fromSymbol === p.symbolA && toSymbol === p.symbolB,
-		);
-		const pairBA = pairList.find(
-			(p) => fromSymbol === p.symbolB && toSymbol === p.symbolA,
-		);
-		if (!pairAB && !pairBA) throw new Error(PAIR_NULL);
-		const directionPair = pairAB ? AB_DIRECTION : BA_DIRECTION;
-
-		const {makeLimitOrderStatus} = await makeLimitOrder(
-			{
-				pairAddr: pairId,
+		try {
+			const res = await makeLimitOrder({
 				directionPair,
-				price,
+				pairAddr: pair.pairAddress,
+				price: toPrice,
 				qty: fromValue,
-			},
-			{
-				clientAddress: clientData.address,
-				clientKeyPair: keyPair,
-			},
-		);
-
-		if (makeLimitOrderStatus)
-			enqueueSnackbar({
-				type: "info",
-				message: `Creating limit order ${fromSymbol} - ${toSymbol} ⏳`,
 			});
-		else
+			console.log("makeLimitOrder(A|B)->res", res);
+
+			if (res.makeLimitOrderStatus)
+				enqueueSnackbar({
+					message: "Sended message to blockchain",
+					type: "info",
+				});
+			else
+				enqueueSnackbar({
+					message: `Something goes wrong - error code ${res.code}`,
+					type: "error",
+				});
+		} catch (e) {
+			console.log("makeLimitOrder->error", e);
 			enqueueSnackbar({
+				message: "Oops, something went wrong. Please try again.",
 				type: "error",
-				message: `Failed creation of limit order ${fromSymbol} - ${toSymbol}`,
 			});
+		}
 
-		dispatch(closeOrderWaitPopup());
+		dispatch(resetWaitingPopupValues());
 	}
+
+	function handleClose() {
+		dispatch(resetLimitOrderPopupValues());
+	}
+
+	console.log(values);
+
+	if (!values) return null;
 
 	return (
 		<div className="popup-wrapper">
 			<MainBlock
 				button={
-					<button onClick={close} className={classes.btn}>
+					<button onClick={handleClose} className={classes.btn}>
 						<IconCross
 							fill="none"
 							className={cls("close", classes.btn__icon)}
 						/>
 					</button>
 				}
-				title="Confirm Limit Order creation"
+				title="Confirm Limit Order"
 				content={
 					<>
 						<div className="confirm-block swap-confirm-block">
 							<span className="confirm-token">
 								<img
 									className="confirm-icon"
-									src={iconGenerator(fromSymbol)}
-									alt={fromSymbol}
+									src={iconGenerator(values.fromToken.symbol)}
+									alt={values.fromToken.symbol}
 								/>
-								{fromValue}
+								{values.fromValue}
 							</span>
 							{appTheme === "light" ? (
 								<svg
@@ -157,14 +170,14 @@ export default function OrderPopupDeploy({order, close}) {
 							<span className="confirm-token">
 								<img
 									className="confirm-icon"
-									src={iconGenerator(toSymbol)}
-									alt={toSymbol}
+									src={iconGenerator(values.toToken.symbol)}
+									alt={values.toToken.symbol}
 								/>
-								{truncateNum(toValue)}
+								{truncateNum(values.toValue)}
 							</span>
 						</div>
 						<button className="btn popup-btn" onClick={handleConfirm}>
-							Confirm Order
+							Confirm Limit Order
 						</button>
 					</>
 				}
@@ -174,14 +187,15 @@ export default function OrderPopupDeploy({order, close}) {
 							{/*<div>*/}
 							<div className="swap-confirm-wrap">
 								<p className="mainblock-footer-value">
-									<img src={miniSwap} alt="" /> {truncateNum(price)}{" "}
-									{fromSymbol}/{toSymbol}
+									<img src={miniSwap} alt="" /> {truncateNum(values.toPrice)}{" "}
+									{values.fromToken.symbol}/{values.toToken.symbol}
 								</p>
 								<p className="mainblock-footer-subtitle">Price</p>
 							</div>
 							<div className="swap-confirm-wrap">
 								<p className="mainblock-footer-value">
-									{truncateNum((fromValue * 0.3) / 100)} {fromSymbol}
+									{truncateNum((values.fromValue * 0.3) / 100)}{" "}
+									{values.fromToken.symbol}
 								</p>
 								<p className="mainblock-footer-subtitle">Fee</p>
 							</div>

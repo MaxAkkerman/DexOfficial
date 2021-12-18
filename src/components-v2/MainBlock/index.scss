@@ -1,3 +1,10 @@
+.mainblock-wrapper {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	justify-content: center;
+}
+
 .mainblock {
 	user-select: none;
 	padding: 50px;

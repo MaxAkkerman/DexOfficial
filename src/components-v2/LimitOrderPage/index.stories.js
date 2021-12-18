@@ -11,7 +11,7 @@ import rootReducer from "@/store/reducers";
 export default {
 	component: LimitOrderPage,
 	decorators: [(story) => <BrowserRouter>{story()}</BrowserRouter>],
-	title: "Pages/Create limit order",
+	title: "Pages/Create limit order (redux)",
 };
 
 // eslint-disable-next-line react/prop-types
@@ -23,13 +23,24 @@ const Template = (store, args) => (
 
 export const WithoutWallet = Template.bind({}, createStore(rootReducer));
 
-export const WithoutPairsAndTokens = Template.bind(
+export const WithoutTokens = Template.bind(
 	{},
 	createStore(rootReducer, {
 		appReducer: {walletIsConnected: true},
-		walletReducer: {
-			pairsList: [],
-			tokenList: [],
+		tonData: {
+			pairs: values(pairs),
+			tokens: [],
+		},
+	}),
+);
+
+export const WithoutPairs = Template.bind(
+	{},
+	createStore(rootReducer, {
+		appReducer: {walletIsConnected: true},
+		tonData: {
+			pairs: [],
+			tokens: values(tokens),
 		},
 	}),
 );
@@ -38,9 +49,9 @@ export const WithPairsAndTokens = Template.bind(
 	{},
 	createStore(rootReducer, {
 		appReducer: {walletIsConnected: true},
-		walletReducer: {
-			pairsList: values(pairs),
-			tokenList: values(tokens),
+		tonData: {
+			pairs: [],
+			tokens: values(tokens),
 		},
 	}),
 );

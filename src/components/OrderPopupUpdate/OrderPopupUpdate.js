@@ -19,7 +19,7 @@ import {
 	closeOrderUpdatePopup,
 	closeOrderWaitPopup,
 	openOrderWaitPopup,
-} from "../../store/actions/limitOrders";
+} from "../../store/actions/limitOrder";
 import transferLimitOrder from "../../utils/transferLimitOrder";
 import truncateNum from "../../utils/truncateNum";
 import updateLimitOrderPrice from "../../utils/updateLimitOrderPrice";

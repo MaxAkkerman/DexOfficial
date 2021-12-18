@@ -12,7 +12,7 @@ import {
 	closeOrderCancelPopup,
 	closeOrderWaitPopup,
 	openOrderWaitPopup,
-} from "../../store/actions/limitOrders";
+} from "../../store/actions/limitOrder";
 import cancelLimitOrder from "../../utils/cancelLimitOrder";
 import truncateNum from "../../utils/truncateNum";
 import IconCross from "../IconCross/IconCross";
