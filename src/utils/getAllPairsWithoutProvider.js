@@ -79,8 +79,8 @@ export default async function getAllPairsWithoutProvider() {
 		const decimalsRootB = Number(curRootDataB.decoded.output.value0.decimals);
 		const decimalsRootAB = Number(curRootDataAB.decoded.output.value0.decimals);
 
-		const balanceA = Number(bal.decoded.output.balanceReserve[root0]);
-		const balanceB = Number(bal.decoded.output.balanceReserve[root1]);
+		const balanceA = Number(bal.decoded.output.balanceReserve[root0] || 0);
+		const balanceB = Number(bal.decoded.output.balanceReserve[root1] || 0);
 
 		const fixedA = getFixedNums(decimalsRootA, balanceA);
 		const fixedB = getFixedNums(decimalsRootB, balanceB);
@@ -99,8 +99,8 @@ export default async function getAllPairsWithoutProvider() {
 
 		itemData.decimalsAB = decimalsRootAB;
 
-		itemData.rateAB = fixedB / fixedA;
-		itemData.rateBA = fixedA / fixedB;
+		itemData.rateAB = fixedB / fixedA || 0;
+		itemData.rateBA = fixedA / fixedB || 0;
 		itemData.totalSupply = await this.helperFunctions.getPairsTotalSupply(
 			addrPair,
 		);
