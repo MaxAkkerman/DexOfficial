@@ -6,7 +6,7 @@ import {
 	AB_DIRECTION,
 	LIMIT_ORDER_PRICE_DENOMINATOR,
 } from "@/constants/runtimeVariables";
-import {DEXClientContract} from "@/extensions/contracts/DEXClientMainNet";
+import {DEXClientContract} from "@/extensions/contracts/DEXClient";
 import convertToSafeNum from "@/utils/convertToSafeNum";
 
 export default async function makeLimitOrder({
@@ -46,6 +46,13 @@ export default async function makeLimitOrder({
 				pair.rootA,
 			);
 			const token = await this.helperFunctions.getClientWallet(pair.rootA);
+			console.log("$", {
+				pairAddr,
+				priceA: convertToSafeNum(price * LIMIT_ORDER_PRICE_DENOMINATOR),
+				qtyA: convertToSafeNum(qty * 10 ** token.decimals),
+				routerWalletA: routerAddress,
+				souint: sounitV,
+			});
 			response = await clientAcc.run("makeLimitOrderA", {
 				pairAddr,
 				priceA: convertToSafeNum(price * LIMIT_ORDER_PRICE_DENOMINATOR),
