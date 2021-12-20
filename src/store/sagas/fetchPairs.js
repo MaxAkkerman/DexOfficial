@@ -1,4 +1,4 @@
-import {call, put, select, takeEvery} from "redux-saga/effects";
+import {call, put, select, takeLatest} from "redux-saga/effects";
 
 import {
 	PAIRS_FETCH_FAILED,
@@ -28,5 +28,5 @@ function* fetchPairs() {
 }
 
 export default function* fetchPairsSaga() {
-	yield takeEvery(PAIRS_FETCH_REQUESTED, fetchPairs);
+	yield takeLatest(PAIRS_FETCH_REQUESTED, fetchPairs);
 }

@@ -10,7 +10,11 @@ import LimitOrderPage from "@/components-v2/LimitOrderPage";
 import SwapConfirmPopup from "@/components-v2/SwapConfirmPopup";
 import SwapPage from "@/components-v2/SwapPage";
 import WaitingPopup from "@/components-v2/WaitingPopup";
-import {requestPairsFetch, requestTokensFetch} from "@/store/actions/ton";
+import {
+	requestPairsFetch,
+	requestTokensFetch,
+	updateTonContext,
+} from "@/store/actions/ton";
 
 import AssetsListForDeploy from "./components/AssetsListForDeploy/AssetsListForDeploy";
 import EnterPassword from "./components/EnterPassword/EnterPassword";
@@ -342,6 +346,14 @@ function App() {
 		dispatch(requestPairsFetch());
 		dispatch(requestTokensFetch());
 	}, []);
+
+	useEffect(() => {
+		if (clientData.status) {
+			dispatch(updateTonContext("dexClientAddress", clientData.address));
+			dispatch(requestPairsFetch());
+			dispatch(requestTokensFetch());
+		}
+	}, [clientData]);
 
 	return (
 		<>

@@ -1,4 +1,4 @@
-import {call, put, select, takeEvery} from "redux-saga/effects";
+import {call, put, select, takeLatest} from "redux-saga/effects";
 
 import {
 	TOKENS_FETCH_FAILED,
@@ -30,5 +30,5 @@ function* fetchTokens() {
 }
 
 export default function* fetchTokensSaga() {
-	yield takeEvery(TOKENS_FETCH_REQUESTED, fetchTokens);
+	yield takeLatest(TOKENS_FETCH_REQUESTED, fetchTokens);
 }
