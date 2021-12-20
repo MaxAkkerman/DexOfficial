@@ -380,7 +380,9 @@ function App() {
 				<Route exact path="/add-liquidity" component={AddLiquidity} />
 				<Route exact path="/create-pair" component={CreatePair} />
 				<Route exact path="/staking" component={Stacking} />
-				<Route exact path="/bridge" component={Bridge} />
+				{/**
+          * TODO: Temporary commented, please remove after enabling bridge
+				<Route exact path="/bridge" component={Bridge} /> */}
 				<Route exact path="/wallet" component={Assets} />
 				<Route exact path="/orders" component={LimitOrderPage} />
 				<Route exact path="/">
