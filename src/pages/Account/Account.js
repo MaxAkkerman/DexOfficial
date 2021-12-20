@@ -4,6 +4,8 @@ import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
 
+import {resetPairs, resetTokens, resetTonContext} from "@/store/actions/ton";
+
 import ExtensionsList from "../../components/ExtensionsList/ExtensionsList";
 import Loader from "../../components/Loader/Loader";
 import MainBlock from "../../components/MainBlock/MainBlock";
@@ -12,7 +14,7 @@ import WaitingPopup from "../../components/WaitingPopup/WaitingPopup";
 import {getClientBalance} from "../../extensions/sdk_get/get";
 import {deployClient} from "../../extensions/sdk_run/run";
 import {decrypt, decryptPure, encryptPure} from "../../extensions/tonUtils";
-import {store} from "../../index";
+import {saveLog} from "../../logging/logging";
 import {copyToClipboard, InitializeClient} from "../../reactUtils/reactUtils";
 import {
 	setCurExt,
@@ -34,7 +36,6 @@ import {
 	setTransactionsList,
 	setWallet,
 } from "../../store/actions/wallet";
-import {saveLog} from "../../logging/logging";
 
 function Account() {
 	const history = useHistory();
@@ -147,15 +148,26 @@ function Account() {
 	// }
 
 	function disconnectHandler() {
-		dispatch(setWallet({id: "", balance: 0}));
-		dispatch(setWalletIsConnected(false));
 		// dispatch(setCurExt({}));
 		// dispatch(setTokenList([]));
 		// dispatch(setLiquidityList([]));
 		// dispatch(setPairsList([]))
-		console.log("disaconnect");
-		dispatch(setSeedPassword(""));
 		// dispatch(enterSeedPhraseSaveToLocalStorage(""));
+		console.log("disaconnect");
+
+		localStorage.removeItem("setSubscribeReceiveTokens");
+		localStorage.removeItem("esp");
+		localStorage.removeItem("clientDataPreDeploy");
+		localStorage.removeItem("clientData");
+
+		dispatch(resetTonContext());
+		dispatch(resetTokens());
+		dispatch(resetPairs());
+		dispatch(setTokenList([]));
+		dispatch(setLiquidityList([]));
+		dispatch(setWallet({id: "", balance: 0}));
+		dispatch(setWalletIsConnected(false));
+		dispatch(setSeedPassword(""));
 		dispatch(
 			setClientData({
 				status: false,
@@ -164,13 +176,6 @@ function Account() {
 				public: "",
 			}),
 		);
-
-		store.dispatch(setTokenList([]));
-		store.dispatch(setLiquidityList([]));
-		localStorage.removeItem("setSubscribeReceiveTokens");
-		localStorage.removeItem("esp");
-		localStorage.removeItem("clientDataPreDeploy");
-		localStorage.removeItem("clientData");
 
 		saveLog(
 			{

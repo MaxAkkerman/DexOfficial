@@ -1,6 +1,10 @@
 import reduce from "lodash/reduce";
 
-import {INIT_TON_CONTEXT, UPDATE_TON_CONTEXT} from "@/store/actions/types";
+import {
+	INIT_TON_CONTEXT,
+	RESET_TON_CONTEXT,
+	UPDATE_TON_CONTEXT,
+} from "@/store/actions/types";
 
 const initialState = {
 	context: {
@@ -73,6 +77,34 @@ export default function tonContext(state = initialState, {payload, type}) {
 				...state.context,
 				[payload.name]: payload.value,
 			};
+			const helperFunctions = reduce(
+				state.original.helperFunctions,
+				(r, v, k) => {
+					r[k] = v.bind({context: newValuesContext});
+					return r;
+				},
+				{},
+			);
+
+			return {
+				context: newValuesContext,
+				functions: reduce(
+					state.original.functions,
+					(r, v, k) => {
+						r[k] = v.bind({
+							context: newValuesContext,
+							helperFunctions,
+						});
+						return r;
+					},
+					{},
+				),
+				helperFunctions,
+				original: state.original, // preserve original functions
+			};
+		}
+		case RESET_TON_CONTEXT: {
+			const newValuesContext = {...state.context, dexClientAddress: null};
 			const helperFunctions = reduce(
 				state.original.helperFunctions,
 				(r, v, k) => {
