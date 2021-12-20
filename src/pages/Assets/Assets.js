@@ -249,7 +249,8 @@ function Assets() {
 											<AssetsList
 												TokenAssetsArray={[...tokensList, ...liquidityList]}
 												orderAssetArray={
-													limitOrdersData && limitOrdersData.limitOrders
+													[]
+													// limitOrdersData && limitOrdersData.limitOrders
 												}
 												pairList={pairList}
 												NFTassetsArray={assets}
