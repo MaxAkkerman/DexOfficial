@@ -1,2 +1,0 @@
-export const NOTIF_UPDATE_ORDER = "NOTIF_UPDATE_ORDER";
-export const LIMIT_ORDER_PRICE = 1e18;
