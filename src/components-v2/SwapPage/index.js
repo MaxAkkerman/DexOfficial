@@ -1,8 +1,9 @@
 import "./index.scss";
 
 import {useFormik} from "formik";
-import differenceBy from "lodash/differenceBy";
+import compact from "lodash/compact";
 import find from "lodash/find";
+import reject from "lodash/reject";
 import React, {useEffect, useMemo, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
@@ -51,15 +52,43 @@ export default function SwapPage() {
 		validate,
 	});
 
-	const leftTokens = useMemo(
-		() =>
-			differenceBy(
-				tokens,
-				[values.fromToken, values.toToken],
-				(t) => t && t.rootAddress,
-			),
-		[tokens, values.fromToken, values.toToken],
-	);
+	const fromTokens = useMemo(() => {
+		let leftTokens = tokens.filter((t) => !t.symbol.startsWith("DS-"));
+		if (!values.toToken) return leftTokens;
+		leftTokens = reject(leftTokens, values.toToken);
+
+		const leftPairs = pairs.filter(
+			(p) =>
+				p.rootA === values.toToken.rootAddress ||
+				p.rootB === values.toToken.rootAddress,
+		);
+		leftTokens = leftPairs.map(
+			(p) =>
+				find(leftTokens, {rootAddress: p.rootA}) ||
+				find(leftTokens, {rootAddress: p.rootB}),
+		);
+
+		return compact(leftTokens);
+	}, [tokens, values.toToken]);
+
+	const toTokens = useMemo(() => {
+		let leftTokens = tokens.filter((t) => !t.symbol.startsWith("DS-"));
+		if (!values.fromToken) return leftTokens;
+		leftTokens = reject(leftTokens, values.fromToken);
+
+		const leftPairs = pairs.filter(
+			(p) =>
+				p.rootA === values.fromToken.rootAddress ||
+				p.rootB === values.fromToken.rootAddress,
+		);
+		leftTokens = leftPairs.map(
+			(p) =>
+				find(leftTokens, {rootAddress: p.rootA}) ||
+				find(leftTokens, {rootAddress: p.rootB}),
+		);
+
+		return compact(leftTokens);
+	}, [tokens, values.fromToken]);
 
 	// Find the pair
 	useEffect(() => {
@@ -288,14 +317,14 @@ export default function SwapPage() {
 			</div>
 			{selectFromPopup.open && (
 				<SelectPopup
-					tokens={leftTokens}
+					tokens={fromTokens}
 					onClose={selectFromPopup.handleClose}
 					onSelect={selectFromPopup.handleSelect}
 				/>
 			)}
 			{selectToPopup.open && (
 				<SelectPopup
-					tokens={leftTokens}
+					tokens={toTokens}
 					onClose={selectToPopup.handleClose}
 					onSelect={selectToPopup.handleSelect}
 				/>
