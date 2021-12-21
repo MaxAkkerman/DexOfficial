@@ -76,7 +76,7 @@ function CreatePair() {
 		if (!tips || tips.length) return;
 		if (tips.name === "processLiquidityCallback") {
 			if (fromToken.symbol || toToken.Symbol) {
-				console.log("I am at chakeee");
+				// console.log("I am at chakeee");
 				const fromTokenCopy = JSON.parse(JSON.stringify(fromToken));
 				const toTokenCopy = JSON.parse(JSON.stringify(toToken));
 				const newFromTokenData = tokenList.filter(

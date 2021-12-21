@@ -64,3 +64,17 @@
 		}
 	}
 }
+@media screen and (max-width: 481px) {
+	.liquidity-item {
+		&-text {
+			font-size:12px;
+		}
+		&-btn{
+			margin-top:20px;
+		}
+		div{
+			margin-top:10px;
+		}
+	}
+}
+

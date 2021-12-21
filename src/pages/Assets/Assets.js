@@ -36,6 +36,7 @@ function Assets() {
 		(state) => state.walletReducer.updatedWallet,
 	);
 	const tonWallet = useMemo(() => {
+		// console.log('clientData',clientData)
 		if (clientData)
 			return {
 				balance: updatedWallet === null ? clientData.balance : updatedWallet,
@@ -257,7 +258,7 @@ function Assets() {
 								{walletIsConnected ? (
 									<>
 										{(NFTassets && NFTassets.length) ||
-										(tonWallet && tokenList && tokenList.length) ||
+										tonWallet  || (tokenList && tokenList.length)
 										(limitOrdersData && limitOrdersData.limitOrders.length) ? (
 											<AssetsList
 												TokenAssetsArray={uniqBy([

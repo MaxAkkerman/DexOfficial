@@ -144,7 +144,25 @@
 		}
 	}
 }
+@media screen and (max-width: 426px) {
+	.account {
 
+		&-footer {
+			&-list{
+				&-item{
+					font-size:10px;
+				}
+			}
+			&-title {
+				font-size: 12px;
+			}
+
+			&-clear {
+				font-size: 12px;
+			}
+		}
+	}
+}
 @media screen and (max-width: 481px) {
 	.account {
 		margin-bottom: 150px;
