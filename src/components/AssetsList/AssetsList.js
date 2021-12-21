@@ -10,6 +10,7 @@ import {calculateRate} from "../../reactUtils/reactUtils";
 import AssetListOrderItem from "../AssetListOrderItem/AssetListOrderItem";
 
 function AssetsList(props) {
+	console.log("AssetsList",props)
 	return (
 		<div
 			className={

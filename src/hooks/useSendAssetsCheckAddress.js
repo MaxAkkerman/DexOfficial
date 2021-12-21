@@ -17,6 +17,7 @@ const INCORRECT_LENGTH = "Incorrect address length";
 const NOT_TON_VALID_ADDRESS = "Incorrect TON blockchain address";
 const NOT_INITIALIZED = "Account not initialized";
 const FROZEN = "Account frozen";
+const NOT_EXISTS = "Account not deployed"
 const UNKNOWN_ERROR = "Something went wrong";
 
 const re = /.:.{64}/;
@@ -92,6 +93,9 @@ export default function useSendAssetsCheckAddress() {
 		} else if (acc_type === 2) {
 			setState({invalid: true, loading: false, validationMsg: FROZEN});
 			return;
+		} else if(acc_type === 3){
+			setState({invalid: true, loading: false, validationMsg: NOT_EXISTS});
+			return
 		}
 
 		if (currentTokenForSend.type === "PureToken") {
