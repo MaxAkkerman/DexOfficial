@@ -4,6 +4,8 @@ import {
 	PAIRS_FETCH_FAILED,
 	PAIRS_FETCH_LOADING,
 	PAIRS_FETCH_SUCCEEDED,
+	RESET_PAIRS,
+	RESET_TOKENS,
 	TOKENS_FETCH_FAILED,
 	TOKENS_FETCH_LOADING,
 	TOKENS_FETCH_SUCCEEDED,
@@ -49,6 +51,13 @@ export default function tonData(state = initialState, {payload, type}) {
 				draft.pairsFetched = true;
 				draft.pairsLoading = false;
 			});
+		case RESET_PAIRS:
+			return produce(state, (draft) => {
+				draft.pairs = [];
+				draft.pairsError = null;
+				draft.pairsFetched = false;
+				draft.pairsLoading = false;
+			});
 		case TOKENS_FETCH_SUCCEEDED:
 			return produce(state, (draft) => {
 				draft.tokens = payload;
@@ -66,6 +75,13 @@ export default function tonData(state = initialState, {payload, type}) {
 			return produce(state, (draft) => {
 				draft.tokensError = payload;
 				draft.tokensFetched = true;
+				draft.tokensLoading = false;
+			});
+		case RESET_TOKENS:
+			return produce(state, (draft) => {
+				draft.tokens = [];
+				draft.tokensError = null;
+				draft.tokensFetched = false;
 				draft.tokensLoading = false;
 			});
 		default:

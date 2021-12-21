@@ -10,7 +10,11 @@ import LimitOrderPage from "@/components-v2/LimitOrderPage";
 import SwapConfirmPopup from "@/components-v2/SwapConfirmPopup";
 import SwapPage from "@/components-v2/SwapPage";
 import WaitingPopup from "@/components-v2/WaitingPopup";
-import {requestPairsFetch, requestTokensFetch} from "@/store/actions/ton";
+import {
+	requestPairsFetch,
+	requestTokensFetch,
+	updateTonContext,
+} from "@/store/actions/ton";
 
 import AssetsListForDeploy from "./components/AssetsListForDeploy/AssetsListForDeploy";
 import EnterPassword from "./components/EnterPassword/EnterPassword";
@@ -343,6 +347,14 @@ function App() {
 		dispatch(requestTokensFetch());
 	}, []);
 
+	useEffect(() => {
+		if (clientData.status) {
+			dispatch(updateTonContext("dexClientAddress", clientData.address));
+			dispatch(requestPairsFetch());
+			dispatch(requestTokensFetch());
+		}
+	}, [clientData]);
+
 	return (
 		<>
 			{openEnterSeed && (
@@ -368,7 +380,9 @@ function App() {
 				<Route exact path="/add-liquidity" component={AddLiquidity} />
 				<Route exact path="/create-pair" component={CreatePair} />
 				<Route exact path="/staking" component={Stacking} />
-				<Route exact path="/bridge" component={Bridge} />
+				{/**
+          * TODO: Temporary commented, please remove after enabling bridge
+				<Route exact path="/bridge" component={Bridge} /> */}
 				<Route exact path="/wallet" component={Assets} />
 				<Route exact path="/orders" component={LimitOrderPage} />
 				<Route exact path="/">

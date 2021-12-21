@@ -21,10 +21,10 @@ export default async function getShardLimit() {
 		client: this.context.tonClient,
 	});
 
-	const souintInitial = await rootAcc.runLocal("soUINT", {});
+	const souintInitial = await rootAcc.runLocal("_deployedNumber", {});
 	console.log("souintInitial", souintInitial);
 
-	let souint = parseInt(souintInitial.decoded.output.soUINT, 16);
+	let souint = parseInt(souintInitial.decoded.output._deployedNumber, 16);
 	console.log("souint", souint);
 
 	// let souint = 0;

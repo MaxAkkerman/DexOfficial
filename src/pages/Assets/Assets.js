@@ -1,16 +1,17 @@
 import "./Assets.scss";
 
 import {useLazyQuery} from "@apollo/client";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
+
+import TONicon from "@/images/tonCrystalDefault.svg";
 
 import AssetsList from "../../components/AssetsList/AssetsList";
 import MainBlock from "../../components/MainBlock/MainBlock";
 import WithDraw from "../../components/WithDraw/WithDraw";
 import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
 import {LimitOrdersForOwnerQuery} from "../../graphql/queries";
-import useTokensList from "../../hooks/useAssetList";
 // import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 import goToExchange from "../../images/goToExchange.svg";
 import nativeBtn from "../../images/nativeadd.svg";
@@ -18,8 +19,6 @@ import receiveAssets from "../../images/receiveAssets.svg";
 import sendAssetsimg from "../../images/sendAssets.svg";
 import settingsBtn from "../../images/Vector.svg";
 import {setTokenList} from "../../store/actions/wallet";
-import axios from "axios";
-import {getShardLimit} from "../../extensions/sdk_get/get";
 
 function Assets() {
 	const history = useHistory();
@@ -30,8 +29,27 @@ function Assets() {
 	const liquidityList = useSelector(
 		(state) => state.walletReducer.liquidityList,
 	);
-	const {assetList: tokensList} = useTokensList();
-	const pairList = useSelector((state) => state.walletReducer.pairsList);
+	const tokenList = useSelector((state) => state.tonData.tokens);
+	const pairList = useSelector((state) => state.tonData.pairs);
+	const clientData = useSelector((state) => state.walletReducer.clientData);
+	const updatedWallet = useSelector(
+		(state) => state.walletReducer.updatedWallet,
+	);
+	const tonWallet = useMemo(() => {
+		if (clientData)
+			return {
+				balance: updatedWallet === null ? clientData.balance : updatedWallet,
+				icon: TONicon,
+				owner_address: clientData.address,
+				rootAddress: "none",
+				showWrapMenu: true,
+				symbol: "TON Crystal",
+				tokenName: "TON Crystal",
+				type: "Native Tons",
+				walletAddress: clientData.address,
+			};
+	}, [clientData, updatedWallet]);
+
 	const [getLimitOrders, {data: limitOrdersData}] = useLazyQuery(
 		LimitOrdersForOwnerQuery,
 	);
@@ -44,7 +62,6 @@ function Assets() {
 	const [viewData, setViewData] = useState({});
 	const [showWithdrawMenu, setshowWithdrawMenu] = useState(false);
 	const [curNFTForWithdraw, setCurNFTForWithdraw] = useState(false);
-	const clientData = useSelector((state) => state.walletReducer.clientData);
 
 	useEffect(() => {
 		setAssets(NFTassets);
@@ -87,7 +104,7 @@ function Assets() {
 	}
 	function handleClickToken(curItem) {
 		if (curItem.type !== "Native Tons") return;
-		const copyAssets = JSON.parse(JSON.stringify(tokensList));
+		const copyAssets = JSON.parse(JSON.stringify(tokenList));
 		copyAssets.map((item) => {
 			if ("Native Tons" === item.type) {
 				item.showWrapMenu = !item.showWrapMenu;
@@ -97,24 +114,23 @@ function Assets() {
 	}
 
 	async function handleWrapTons() {
-		const tonObj = tokensList.filter((item) => item.type === "Native Tons");
-		setcurrentTokenForWrap(tonObj[0]);
+		setcurrentTokenForWrap(tonWallet);
 		setViewData({
-			type: "wrap",
 			confirmText: "wrap",
-			tokenSetted: true,
 			title: "TON Crystal → WTON",
+			tokenSetted: true,
+			type: "wrap",
 		});
 		setshowWrapMenu(true);
 	}
 	async function handleUnWrapTons() {
-		const tonObj = tokensList.filter((item) => item.symbol === "WTON");
+		const tonObj = tokenList.filter((item) => item.symbol === "WTON");
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
-			type: "unwrap",
 			confirmText: "unwrap",
-			tokenSetted: true,
 			title: "WTON → TON Crystal",
+			tokenSetted: true,
+			type: "unwrap",
 		});
 		setshowWrapMenu(true);
 	}
@@ -125,10 +141,7 @@ function Assets() {
 		setCurNFTForWithdraw(item);
 		console.log("item", item);
 	}
-	async function trt() {
-		const sounitV = await getShardLimit();
-		console.log("sounitV", sounitV);
-	}
+
 	return (
 		<>
 			{showWrapMenu && !showWithdrawMenu && (
@@ -152,7 +165,7 @@ function Assets() {
 				/>
 			)}
 			{!showWrapMenu && !showWithdrawMenu && (
-				<div className="container" onClick={() => trt()}>
+				<div className="container">
 					<MainBlock
 						smallTitle={false}
 						// title={'Assets'}
@@ -244,12 +257,17 @@ function Assets() {
 								{walletIsConnected ? (
 									<>
 										{(NFTassets && NFTassets.length) ||
-										(tokensList && tokensList.length) ||
+										(tonWallet && tokenList && tokenList.length) ||
 										(limitOrdersData && limitOrdersData.limitOrders.length) ? (
 											<AssetsList
-												TokenAssetsArray={[...tokensList, ...liquidityList]}
+												TokenAssetsArray={[
+													tonWallet,
+													...tokenList,
+													...liquidityList,
+												]}
 												orderAssetArray={
-													limitOrdersData && limitOrdersData.limitOrders
+													[]
+													// limitOrdersData && limitOrdersData.limitOrders
 												}
 												pairList={pairList}
 												NFTassetsArray={assets}

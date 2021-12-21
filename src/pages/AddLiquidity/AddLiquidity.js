@@ -305,7 +305,7 @@ function AddLiquidity() {
 		}
 	}
 	return (
-		<div className="container">
+		<div className="container" style={{flexDirection:"column"}}>
 			{!poolAsyncIsWaiting && (
 				<>
 					<div style={{display: "contents"}}>
