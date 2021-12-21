@@ -76,7 +76,6 @@ function AddLiquidity() {
 		if (!tips || tips.length) return;
 		if (tips.name === "processLiquidityCallback") {
 			if (fromToken.symbol || toToken.Symbol) {
-				console.log("I am at chakeee");
 				const fromTokenCopy = JSON.parse(JSON.stringify(fromToken));
 				const toTokenCopy = JSON.parse(JSON.stringify(toToken));
 				const newFromTokenData = tokenList.filter(
@@ -341,6 +340,7 @@ function AddLiquidity() {
 										autoFocus={true}
 										token={fromToken}
 										value={fromValue}
+										ratesData={ratesData}
 										componentName={"provide"}
 										borderError={errors.fromTokenAmount}
 										incorrectBalance={incorrectBalance}
@@ -383,7 +383,7 @@ function AddLiquidity() {
 										token={toToken}
 										borderError={errors.toTokenAmount}
 										value={toValue}
-										readOnly
+										readOnly={ratesData.reservesA && ratesData.reservesB ? "readOnly" : ""}
 										incorrectBalanceToValue={incorrectBalanceToValue}
 									/>
 									{errors.toTokenAmount ? (
@@ -396,7 +396,20 @@ function AddLiquidity() {
 									) : (
 										<div style={{height: "22px"}} />
 									)}
-									{fromToken.symbol && toToken.symbol && (
+									{(!ratesData.reservesA || !ratesData.reservesB) ?
+										<div
+											style={{
+												display: "flex",
+												flexDirection: "row",
+												justifyContent: "space-evenly",
+											}}
+										>
+											The pair is empty - you can set the rate by supplying it.
+											<div className="add-liquidity-wrapper">
+											</div>
+										</div>
+										:
+										(fromToken.symbol && toToken.symbol && (
 										<div
 											style={{
 												display: "flex",
@@ -494,7 +507,7 @@ function AddLiquidity() {
 													{toTokenSymbol} pooled
 												</div>
 											</div>
-										</div>
+										</div>)
 									)}
 									{walletIsConnected ? (
 										<button

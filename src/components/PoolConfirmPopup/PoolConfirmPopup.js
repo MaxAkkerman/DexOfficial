@@ -6,6 +6,7 @@ import {iconGenerator} from "../../iconGenerator";
 import MainBlock from "../MainBlock/MainBlock";
 import {setTips} from "../../store/actions/app";
 import useKeyPair from "../../hooks/useKeyPair";
+import {setSwapFromInputValue, setSwapToInputValue} from "@/store/actions/swap";
 
 function PoolConfirmPopup(props) {
 	const dispatch = useDispatch();
@@ -33,7 +34,19 @@ function PoolConfirmPopup(props) {
 		let toTokenData = tokenList.filter(
 			(item) => item.symbol === toToken.symbol,
 		);
-
+// console.log("clientData.address,\n" +
+// 	"\t\t\tpairId,\n" +
+// 	"\t\t\tfromValue,\n" +
+// 	"\t\t\ttoValue,\n" +
+// 	"\t\t\tkeyPair,\n" +
+// 	"\t\t\tfromtokenData[0],\n" +
+// 	"\t\t\ttoTokenData[0],",clientData.address,
+// 	pairId,
+// 	fromValue,
+// 	toValue,
+// 	keyPair,
+// 	fromtokenData[0],
+// 	toTokenData[0],)
 		let poolStatus = await processLiquidity(
 			clientData.address,
 			pairId,
@@ -45,6 +58,9 @@ function PoolConfirmPopup(props) {
 		);
 		console.log("poolStatus", poolStatus);
 		dispatch(setPoolAsyncIsWaiting(false));
+		dispatch(setSwapFromInputValue(0));
+		dispatch(setSwapToInputValue(0));
+
 		if (!poolStatus.code) {
 			dispatch(
 				setTips({

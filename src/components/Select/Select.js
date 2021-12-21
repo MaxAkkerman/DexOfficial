@@ -28,9 +28,7 @@ function Select(props) {
 	const ordersFromToken = useSelector((state) => state.limitOrders.fromToken);
 	const poolFromToken = useSelector((state) => state.poolReducer.fromToken);
 
-	let fromToken = location.pathname.includes("swap")
-		? swapFromToken
-		: poolFromToken;
+	let fromToken = location.pathname.includes("swap") ? swapFromToken : poolFromToken;
 	if (location.pathname.includes("orders")) fromToken = ordersFromToken;
 
 	const swapToToken = useSelector((state) => state.swapReducer.toToken);
