@@ -114,8 +114,7 @@ function Assets() {
 	}
 
 	async function handleWrapTons() {
-		const tonObj = tokenList.filter((item) => item.type === "Native Tons");
-		setcurrentTokenForWrap(tonObj[0]);
+		setcurrentTokenForWrap(tonWallet);
 		setViewData({
 			confirmText: "wrap",
 			title: "TON Crystal → WTON",
