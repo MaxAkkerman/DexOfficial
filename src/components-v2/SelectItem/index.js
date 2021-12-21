@@ -12,10 +12,7 @@ export default function SelectItem({onClick, token}) {
 		<div className={"select-item"} onClick={onClick}>
 			<div className="select-item-wrapper">
 				<img
-					style={{
-						height: "54px",
-						width: "54px",
-					}}
+					className="item_icon"
 					src={iconGenerator(token.symbol)}
 					alt={token.symbol}
 				/>

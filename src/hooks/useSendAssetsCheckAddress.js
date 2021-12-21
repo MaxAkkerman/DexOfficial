@@ -93,10 +93,11 @@ export default function useSendAssetsCheckAddress() {
 		} else if (acc_type === 2) {
 			setState({invalid: true, loading: false, validationMsg: FROZEN});
 			return;
-		} else if(acc_type === 3){
-			setState({invalid: true, loading: false, validationMsg: NOT_EXISTS});
-			return
 		}
+		// else if(acc_type === 3){
+		// 	setState({invalid: true, loading: false, validationMsg: NOT_EXISTS});
+		// 	return
+		// }
 
 		if (currentTokenForSend.type === "PureToken") {
 			const tokenForSendRoot = currentTokenForSend.rootAddress;

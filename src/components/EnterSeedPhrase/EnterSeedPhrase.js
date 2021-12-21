@@ -256,7 +256,7 @@ function EnterSeedPhrase(props) {
 			setOnPin(ev);
 		}
 	}
-
+	// linear-gradient(92.91deg, #FFF -1%, #FFF 100%)
 	async function handleLogIn(pin) {
 
 		let seedPhrasePassword = "";

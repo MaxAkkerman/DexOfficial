@@ -57,7 +57,7 @@ export default function LimitOrderConfirmPopup() {
 				price: toPrice,
 				qty: fromValue,
 			});
-			console.log("makeLimitOrder(A|B)->res", res);
+			// console.log("makeLimitOrder(A|B)->res", res);
 
 			if (res.makeLimitOrderStatus)
 				enqueueSnackbar({
