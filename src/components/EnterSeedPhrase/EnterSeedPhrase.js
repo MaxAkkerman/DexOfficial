@@ -258,17 +258,23 @@ function EnterSeedPhrase(props) {
 	}
 
 	async function handleLogIn(pin) {
-		setLoadingUserDataIsWaiting(true);
 
 		let seedPhrasePassword = "";
 		pin.map((item) => {
 			seedPhrasePassword += item.value.toString();
 		});
+		if(seedPhrasePassword.length < 4){
+			disSetTips("Please complete PIN", "error");
+			return
+		}
+
 		if (
 			seedGlobValid &&
 			completedPass &&
 			preInitData.existsClientOnRoot.status
 		) {
+			setLoadingUserDataIsWaiting(true);
+
 			console.log("step 111");
 			// saveLog({
 			//     name: "login",
