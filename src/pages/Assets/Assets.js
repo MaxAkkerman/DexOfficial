@@ -1,5 +1,5 @@
 import "./Assets.scss";
-
+import {uniqBy} from "lodash";
 import {useLazyQuery} from "@apollo/client";
 import React, {useEffect, useMemo, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
@@ -11,7 +11,7 @@ import AssetsList from "../../components/AssetsList/AssetsList";
 import MainBlock from "../../components/MainBlock/MainBlock";
 import WithDraw from "../../components/WithDraw/WithDraw";
 import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
-import {LimitOrdersForOwnerQuery} from "../../graphql/queries";
+import {LimitOrdersForOwnerQuery} from "@/graphql/queries";
 // import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 import goToExchange from "../../images/goToExchange.svg";
 import nativeBtn from "../../images/nativeadd.svg";
@@ -260,11 +260,12 @@ function Assets() {
 										(tonWallet && tokenList && tokenList.length) ||
 										(limitOrdersData && limitOrdersData.limitOrders.length) ? (
 											<AssetsList
-												TokenAssetsArray={[
+												TokenAssetsArray={uniqBy([
 													tonWallet,
 													...tokenList,
 													...liquidityList,
-												]}
+												],'tokenName')
+													}
 												orderAssetArray={
 													[]
 													// limitOrdersData && limitOrdersData.limitOrders
