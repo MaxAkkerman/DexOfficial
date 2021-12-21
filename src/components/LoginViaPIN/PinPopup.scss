@@ -70,6 +70,13 @@
   width:100%;
   //margin-top: 20px;
 }
+@media screen and (max-width: 1060px) {
+  .gridContainer {
+  width:40vh;
+  }
+
+}
+
 @media screen and (max-width: 600px) {
 
   .gridContainer {

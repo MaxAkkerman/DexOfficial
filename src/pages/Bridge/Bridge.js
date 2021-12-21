@@ -18,6 +18,8 @@ import AssetsListBridge from "./AssetsListBridge";
 import bnb from "../../images/bridgeNets/bnb.png";
 import arrowDown from "../../images/icons/arrowBotThin.svg";
 import AddressPopup from "./AddressPopup";
+import BridgeAssets from "@/pages/Bridge/test";
+// import BridgeAssets from "@/pages/Bridge/test";
 
 const assetsBridge = [{
     name: "DAI Stablecoin",
@@ -86,6 +88,7 @@ function Bridge() {
 
     function handleShowBridgeAssets() {
         console.log("handleShowBridgeAssets")
+        setOnAssetsList(true)
 
     }
 
@@ -106,15 +109,24 @@ function Bridge() {
 
     }
     return (
-        <>{onAssetsList ?
-            <AssetsListBridge
-                handleSetToken={(e) => handleSetBridgeAsset(e)}
-                assets={assetsBridge}
-                typr={type}
-                handleClose={() => setOnAssetsList(false)}
-            /> :
+        <>
 
-            <div className="container" onClick={() => console.log(assetsBridge)}>
+
+
+            {onAssetsList ?
+                // <div>
+                //     hello
+                // </div>
+                <BridgeAssets/>
+            // <AssetsListBridge
+            //     handleSetToken={(e) => handleSetBridgeAsset(e)}
+            //     assets={assetsBridge}
+            //     typr={type}
+            //     handleClose={() => setOnAssetsList(false)}
+            // />
+                :
+
+            <div className="container" onClick={() => handleShowBridgeAssets()}>
                 <MainBlock
                     smallTitle={false}
                     // title={'Assets'}

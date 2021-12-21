@@ -117,7 +117,7 @@ function EnterSeedPhrase(props) {
 	async function checkClipboardSeedPhrase(e) {
 		e.preventDefault();
 		let sp = e.clipboardData.getData("text");
-		let arr = sp.split(" ");
+		let arr = sp.split(" ").filter(it=>it!=="");
 		if (arr.length !== 12) {
 			setValidSeedPhrase({
 				onError: true,

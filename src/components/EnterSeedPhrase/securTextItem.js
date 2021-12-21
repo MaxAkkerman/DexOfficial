@@ -5,7 +5,6 @@ import "./EnterSeedPhrase.scss";
 import {Alert, AlertTitle, Box} from "@material-ui/core";
 
 function HintItem(props) {
-	console.log("HintItem rerendered blyat");
 	return (
 		<>
 			<Box
