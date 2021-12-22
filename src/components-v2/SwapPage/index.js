@@ -163,13 +163,7 @@ export default function SwapPage() {
 			!values.pair.status
 		)
 			return "connectPair";
-		else if (
-			values.fromToken &&
-			values.toToken &&
-			values.pair &&
-			!values.pair.reserveA &&
-			!values.pair.reserveB
-		)
+		else if (values.fromToken && values.toToken && values.pair)
 			return "provideLiquidity";
 		else return "doSwap";
 	});
