@@ -4,6 +4,8 @@ import {useFormik} from "formik";
 import compact from "lodash/compact";
 import find from "lodash/find";
 import reject from "lodash/reject";
+import uniq from "lodash/uniq";
+import {useSnackbar} from "notistack";
 import React, {useEffect, useMemo, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
@@ -16,12 +18,26 @@ import SettingsButton from "@/components-v2/SettingsButton";
 import SlippagePopup from "@/components-v2/SlippagePopup";
 import SwapButton from "@/components-v2/SwapButton";
 import {AB_DIRECTION, BA_DIRECTION} from "@/constants/runtimeVariables";
+// TODO: Remove when returning to storybook
+import {
+	connectToPair,
+	connectToPairStep2DeployWallets,
+	getClientForConnect,
+} from "@/extensions/sdk_run/run";
+// TODO: Remove when returning to storybook
+import useKeyPair from "@/hooks/useKeyPair";
 import useSelectPopup from "@/hooks/useSelectPopup";
 import {setSlippageValue, setSwapPopupValues} from "@/store/actions/swap";
+import {requestPairsFetch} from "@/store/actions/ton";
+import {
+	resetWaitingPopupValues,
+	setWaitingPopupValues,
+} from "@/store/actions/waitingPopup";
 import truncateNum from "@/utils/truncateNum";
 
 export default function SwapPage() {
 	const history = useHistory();
+	const {enqueueSnackbar} = useSnackbar();
 
 	const dispatch = useDispatch();
 	const walletConnected = useSelector(
@@ -30,6 +46,32 @@ export default function SwapPage() {
 	const tokens = useSelector((state) => state.tonData.tokens);
 	const pairs = useSelector((state) => state.tonData.pairs);
 	const slippage = useSelector((state) => state.swapReducer.slippage);
+	// TODO: Remove when returning to storybook
+	const clientData = useSelector((state) => state.walletReducer.clientData);
+	// TODO: Remove when returning to storybook
+	const {keyPair} = useKeyPair();
+	// TODO: Remove when returning to storybook
+	const allTokens = useSelector(
+		(state) => state.walletReducer.assetsFromGraphQL,
+	);
+	// TODO: Remove when returning to storybook
+	const pairTokens = useMemo(() => {
+		let tokenList = [];
+
+		pairs.forEach((p) => {
+			tokenList.push(find(allTokens, {rootAddress: p.rootA}));
+			tokenList.push(find(allTokens, {rootAddress: p.rootB}));
+		});
+
+		tokenList = uniq(tokenList);
+
+		tokenList = tokenList.map((t) => {
+			const clientToken = find(tokens, {rootAddress: t.rootAddress});
+			return clientToken || t;
+		});
+
+		return tokenList;
+	}, [pairs, allTokens]);
 
 	const {
 		errors,
@@ -53,7 +95,7 @@ export default function SwapPage() {
 	});
 
 	const fromTokens = useMemo(() => {
-		let leftTokens = tokens.filter((t) => !t.symbol.startsWith("DS-"));
+		let leftTokens = pairTokens.filter((t) => !t.symbol.startsWith("DS-"));
 		if (!values.toToken) return leftTokens;
 		leftTokens = reject(leftTokens, values.toToken);
 
@@ -69,10 +111,10 @@ export default function SwapPage() {
 		);
 
 		return compact(leftTokens);
-	}, [tokens, values.toToken]);
+	}, [pairTokens, values.toToken]);
 
 	const toTokens = useMemo(() => {
-		let leftTokens = tokens.filter((t) => !t.symbol.startsWith("DS-"));
+		let leftTokens = pairTokens.filter((t) => !t.symbol.startsWith("DS-"));
 		if (!values.fromToken) return leftTokens;
 		leftTokens = reject(leftTokens, values.fromToken);
 
@@ -88,7 +130,7 @@ export default function SwapPage() {
 		);
 
 		return compact(leftTokens);
-	}, [tokens, values.fromToken]);
+	}, [pairTokens, values.fromToken]);
 
 	// Find the pair
 	useEffect(() => {
@@ -129,10 +171,68 @@ export default function SwapPage() {
 		dispatch(setSwapPopupValues(values));
 	}
 
-	function handleConnectPair() {
-		/**
-		 * Handle connect pair
-		 */
+	async function handleConnectPair() {
+		dispatch(
+			setWaitingPopupValues({
+				text: "Getting data from pair",
+			}),
+		);
+
+		try {
+			let res = await connectToPair(values.pair.pairAddress, keyPair);
+			if (
+				!res ||
+				(res && (res.code === 1000 || res.code === 3 || res.code === 2))
+			) {
+				dispatch(resetWaitingPopupValues());
+				enqueueSnackbar({
+					message: `Some error, please try again, ${res.code}`,
+					type: "error",
+				});
+				return;
+			}
+
+			dispatch(
+				setWaitingPopupValues({
+					text: "Preparing client data",
+				}),
+			);
+
+			res = await getClientForConnect(res, clientData.address);
+			if (res.code) {
+				dispatch(resetWaitingPopupValues());
+				enqueueSnackbar({
+					message: `Some error, please try again, ${res.code}`,
+					type: "error",
+				});
+				return;
+			}
+
+			dispatch(
+				setWaitingPopupValues({
+					text: "Computing the best shard for your wallets and deploying",
+				}),
+			);
+
+			res = await connectToPairStep2DeployWallets(res, keyPair);
+			if (res.code) {
+				dispatch(resetWaitingPopupValues());
+				enqueueSnackbar({
+					message: `Some error, please try again, ${res.code}`,
+					type: "error",
+				});
+				return;
+			}
+
+			dispatch(requestPairsFetch());
+			dispatch(resetWaitingPopupValues());
+		} catch (e) {
+			dispatch(resetWaitingPopupValues());
+			enqueueSnackbar({
+				message: `Some error, please try again, ${e.code}`,
+				type: "error",
+			});
+		}
 	}
 
 	function handleProvideLiquidity() {
@@ -210,14 +310,14 @@ export default function SwapPage() {
 		if (values.fromToken)
 			setFieldValue(
 				"fromToken",
-				find(tokens, {rootAddress: values.fromToken.rootAddress}),
+				find(pairTokens, {rootAddress: values.fromToken.rootAddress}),
 			);
 		if (values.toToken)
 			setFieldValue(
 				"toToken",
-				find(tokens, {rootAddress: values.toToken.rootAddress}),
+				find(pairTokens, {rootAddress: values.toToken.rootAddress}),
 			);
-	}, [tokens]);
+	}, [pairTokens]);
 
 	// Update selected pair on callback
 	useEffect(() => {
