@@ -19,6 +19,7 @@ import receiveAssets from "../../images/receiveAssets.svg";
 import sendAssetsimg from "../../images/sendAssets.svg";
 import settingsBtn from "../../images/Vector.svg";
 import {setTokenList} from "../../store/actions/wallet";
+import {setTips} from "@/store/actions/app";
 
 function Assets() {
 	const history = useHistory();
@@ -126,6 +127,16 @@ function Assets() {
 	}
 	async function handleUnWrapTons() {
 		const tonObj = tokenList.filter((item) => item.symbol === "WTON");
+		console.log("tonObj",tonObj[0],tonObj.length)
+		if(!tonObj.length){
+			dispatch(
+				setTips({
+					message: `You have not WTONs for unWrap`,
+					type: "error",
+				}),
+			)
+		return
+		}
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
 			confirmText: "unwrap",

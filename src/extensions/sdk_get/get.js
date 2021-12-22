@@ -2105,10 +2105,15 @@ const SEED_PHRASE_DICTIONARY_ENGLISH = 1; //Dictionary identifier
 
 export async function getClientKeys(phrase) {
 	//todo change with only pubkey returns
-	return await client.crypto.mnemonic_derive_sign_keys({
-		phrase,
-		path: HD_PATH,
-		dictionary: SEED_PHRASE_DICTIONARY_ENGLISH,
-		word_count: SEED_PHRASE_WORD_COUNT,
-	});
+	try{
+		return await client.crypto.mnemonic_derive_sign_keys({
+			phrase,
+			path: HD_PATH,
+			dictionary: SEED_PHRASE_DICTIONARY_ENGLISH,
+			word_count: SEED_PHRASE_WORD_COUNT,
+		});
+	}catch(e){
+		return e
+	}
+
 }

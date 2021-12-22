@@ -72,7 +72,15 @@ function EnterPassword(props) {
 
         let clientExists = clientStatus.status && decrypted.valid && (clientStatus.dexclient !== "0:0000000000000000000000000000000000000000000000000000000000000000")
         let preDeployedClientExists = clientDataPreDeploy && clientDataPreDeploy.address && clientDataPreDeploy.esp
-
+        if(!clientExists && !preDeployedClientExists){
+            dispatch(
+                setTips({
+                    message: `Wrong PIN, please try again`,
+                    type: "error",
+                }),
+            );
+            return
+        }
         if (clientExists) {
             setloadingUserDataIsWaiting(true);
             setDecryptResult(true);
