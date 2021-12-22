@@ -267,10 +267,7 @@ export default function SwapPage() {
 			values.fromToken &&
 			values.toToken &&
 			values.pair &&
-			(!values.pair.status ||
-				!values.pair.rootA ||
-				!values.pair.rootB ||
-				!values.pair.rootAB)
+			(!values.pair.exists || values.pair.walletExists.length !== 3)
 		)
 			return "connectPair";
 		else return "doSwap";

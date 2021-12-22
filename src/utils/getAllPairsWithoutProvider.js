@@ -1,11 +1,6 @@
 import {Account} from "@tonclient/appkit";
-import findIndex from "lodash/findIndex";
-import map from "lodash/map";
-import merge from "lodash/merge";
-import sortBy from "lodash/sortBy";
 
 import {NO_CONTEXT} from "@/constants/runtimeErrors";
-import {DEXClientContract} from "@/extensions/contracts/DEXClient";
 import {DEXPairContract} from "@/extensions/contracts/DEXPair";
 import {DEXRootContract} from "@/extensions/contracts/DEXRoot";
 import {RootTokenContract} from "@/extensions/contracts/RootTokenContract";
@@ -36,7 +31,9 @@ export default async function getAllPairsWithoutProvider() {
 		!this.context.dexRootAddress ||
 		!this.context.tonClient ||
 		!this.helperFunctions ||
-		!this.helperFunctions.getPairsTotalSupply
+		!this.helperFunctions.getPairsTotalSupply ||
+		!this.helperFunctions.checkClientPairExists ||
+		!this.helperFunctions.checkWalletExists
 	)
 		throw new Error(NO_CONTEXT);
 
@@ -122,27 +119,15 @@ export default async function getAllPairsWithoutProvider() {
 		itemData.rootA = root0;
 		itemData.rootB = root1;
 
+		itemData.exists = await this.helperFunctions.checkClientPairExists(
+			itemData.pairAddress,
+		);
+		itemData.walletExists = await this.helperFunctions.checkWalletExists(
+			itemData.pairAddress,
+		);
+
 		console.log("normlizeWallets!!normlizeWallets", normlizeWallets);
 	}
 
-	const dexAcc = new Account(DEXClientContract, {
-		address: this.context.dexClientAddress,
-		client: this.context.tonClient,
-	});
-
-	const dexRes = await dexAcc.runLocal("pairs", {});
-	const clientPairs = map(dexRes.decoded.output.pairs, (v, k) => ({
-		...v,
-		pairAddress: k,
-	}));
-
-	const merged = merge(
-		clientPairs,
-		sortBy(normlizeWallets, (w) => {
-			const i = findIndex(clientPairs, {pairAddress: w.pairAddress});
-			return i === -1 ? Infinity : i;
-		}),
-	);
-
-	return merged;
+	return normlizeWallets;
 }
