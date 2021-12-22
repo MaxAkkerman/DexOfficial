@@ -109,6 +109,25 @@
 		height: 32px;
 	}
 }
+@media screen and (max-width: 350px) {
+	.input {
+
+		&_field {
+			font-size: 20px;
+		}
+
+		&_select {
+			font-size: 12px;
+		}
+
+		&_max {
+			font-size: 12px;
+
+		}
+
+	}
+}
+
 
 @media screen and (max-width: 1025px) {
 	.input {
