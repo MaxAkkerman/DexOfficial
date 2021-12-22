@@ -64,7 +64,10 @@ export default function SwapPage() {
 		});
 
 		tokenList = uniq(tokenList);
-
+		tokenList = tokenList.map((t) => {
+			t.balance = 0;
+			return t;
+		});
 		tokenList = tokenList.map((t) => {
 			const clientToken = find(tokens, {rootAddress: t.rootAddress});
 			return clientToken || t;
@@ -172,6 +175,14 @@ export default function SwapPage() {
 	}
 
 	async function handleConnectPair() {
+		if (clientData.balance < 15) {
+			enqueueSnackbar({
+				message: `You need at least 15 TONs to connect pair`,
+				type: "error",
+			});
+			return;
+		}
+
 		dispatch(
 			setWaitingPopupValues({
 				text: "Getting data from pair",
@@ -235,10 +246,6 @@ export default function SwapPage() {
 		}
 	}
 
-	function handleProvideLiquidity() {
-		history.push("/pool");
-	}
-
 	function handleConnectWallet() {
 		history.push("/account");
 	}
@@ -260,11 +267,9 @@ export default function SwapPage() {
 			values.fromToken &&
 			values.toToken &&
 			values.pair &&
-			!values.pair.status
+			(!values.pair.exists || values.pair.walletExists.length !== 3)
 		)
 			return "connectPair";
-		else if (values.fromToken && values.toToken && values.pair)
-			return "provideLiquidity";
 		else return "doSwap";
 	});
 
@@ -282,11 +287,6 @@ export default function SwapPage() {
 			case "connectPair":
 				props.children = "Connect pair";
 				props.onClick = handleConnectPair;
-				props.type = "button";
-				break;
-			case "provideLiquidity":
-				props.children = "Connect pair";
-				props.onClick = handleProvideLiquidity;
 				props.type = "button";
 				break;
 			default:
@@ -392,7 +392,7 @@ export default function SwapPage() {
 									readOnly
 								/>
 								<CurrentButton />
-								{rate && (
+								{rate ? (
 									<p className="swap-rate">
 										Price{" "}
 										<span>
@@ -400,7 +400,7 @@ export default function SwapPage() {
 										</span>{" "}
 										per <span>1 {values.fromToken.symbol}</span>
 									</p>
-								)}
+								) : null}
 							</form>
 						</div>
 					}
