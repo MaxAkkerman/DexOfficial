@@ -64,7 +64,10 @@ export default function SwapPage() {
 		});
 
 		tokenList = uniq(tokenList);
-
+		tokenList = tokenList.map((t) => {
+			t.balance = 0;
+			return t;
+		});
 		tokenList = tokenList.map((t) => {
 			const clientToken = find(tokens, {rootAddress: t.rootAddress});
 			return clientToken || t;
@@ -172,6 +175,14 @@ export default function SwapPage() {
 	}
 
 	async function handleConnectPair() {
+		if (clientData.balance < 15) {
+			enqueueSnackbar({
+				message: `You need at least 15 TONs to connect pair`,
+				type: "error",
+			});
+			return;
+		}
+
 		dispatch(
 			setWaitingPopupValues({
 				text: "Getting data from pair",
