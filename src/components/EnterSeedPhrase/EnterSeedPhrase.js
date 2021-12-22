@@ -433,7 +433,7 @@ function EnterSeedPhrase(props) {
 					) : (
 						<div className="select-wrapper">
 							<PinPopup
-								title={"Enter your Pin"}
+								title={"Enter your PIN"}
 								showTwoBtns={true}
 								nextStep={"step3"}
 								prevStep={"step1"}

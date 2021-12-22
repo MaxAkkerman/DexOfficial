@@ -64,7 +64,7 @@ function PoolConfirmPopup(props) {
 		if (!poolStatus.code) {
 			dispatch(
 				setTips({
-					message: `Sended message to blockchain`,
+					message: `Sent message to blockchain`,
 					type: "info",
 				}),
 			);

@@ -38,7 +38,6 @@ function Select(props) {
 	let toToken = location.pathname.includes("swap") ? swapToToken : poolToToken;
 	if (location.pathname.includes("orders")) toToken = ordersToToken;
 	const [filter, setFilter] = useState("");
-
 	// useEffect(() => {
 	let fromArr = [];
 
@@ -109,6 +108,7 @@ function Select(props) {
 	// console.log('render select');
 	// if(toTokenList.length || fromTokenList.length) { setIsLoading(false); }
 	// });
+	console.log("pairsList",pairsList,"fromArr",fromArr,"toArr",toArr)
 
 	function handleClose(e) {
 		console.log("fromArr, toArr", fromArr, toArr);

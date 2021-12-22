@@ -163,7 +163,7 @@ function SendAssets() {
 			if (!res.code) {
 				dispatch(
 					setTips({
-						message: `Sended message to blockchain`,
+						message: `Sent message to blockchain`,
 						type: "info",
 					}),
 				);
@@ -189,7 +189,7 @@ function SendAssets() {
 			if (!res.code) {
 				dispatch(
 					setTips({
-						message: `Sended message to blockchain`,
+						message: `Sent message to blockchain`,
 						type: "info",
 					}),
 				);
@@ -252,7 +252,7 @@ console.log("sendTres",sendTres)
 			if (sendTres && !sendTres.code) {
 				dispatch(
 					setTips({
-						message: `Sended message to blockchain`,
+						message: `Sent message to blockchain`,
 						type: "info",
 					}),
 				);

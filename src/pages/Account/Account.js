@@ -30,12 +30,13 @@ import {
 import {
 	setClientData,
 	setLiquidityList,
-	setPairsList,
+	setPairsList, setPin,
 	setSubscribeReceiveTokens,
 	setTokenList,
 	setTransactionsList,
 	setWallet,
 } from "../../store/actions/wallet";
+import PinPopup from "@/components/LoginViaPIN/PinPopup";
 
 function Account() {
 	const history = useHistory();
@@ -46,6 +47,7 @@ function Account() {
 		(state) => state.walletReducer.transListReceiveTokens,
 	);
 	const [transArr, setTransArr] = useState([]);
+	const pin = useSelector((state) => state.walletReducer.pin);
 
 	const [onDeploy, setonDeploy] = useState(false);
 	const [passEnterPopup, setPasswordEnterPopup] = useState(false);
@@ -73,6 +75,7 @@ function Account() {
 		}
 		const accBalance = await getClientBalance(clientPrepData.address);
 		setclientPrepData(clientPrepData);
+		console.log("accBalance",accBalance)
 		if (accBalance > 0.5) {
 			setPasswordEnterPopup(true);
 		} else {
@@ -86,10 +89,25 @@ function Account() {
 	}
 
 	async function deployHandler() {
+		if(!compltePass){
+			dispatch(
+				setTips({
+					message: `Wrong PIN, please try again`,
+					type: "error",
+				}),
+			);
+			return
+		}
+		console.log("seedPhrasePassword",seedPhrasePassword)
+		let password = "";
+		pin.map((item) => {
+			password += item.value.toString();
+		});
 		const encClData = await decryptPure(
 			clientPrepData.secret,
-			seedPhrasePassword,
+			password,
 		);
+		console.log("password",password)
 		const encrData = JSON.parse(JSON.stringify(clientPrepData));
 		encrData.secret = encClData;
 		setPasswordEnterPopup(false);
@@ -203,6 +221,21 @@ function Account() {
 			deployHandler();
 		}
 	}
+	const [compltePass, setCompletedPass] = useState(false)
+	function handleCheckPin(pinArr, step, completed) {
+		const curEmptyPin = pinArr.filter((item) => !item.value.length);
+		if (!curEmptyPin.length) {
+			setCompletedPass(true);
+			let password = "";
+			pin.map((item) => {
+				password += item.value.toString();
+			});
+			setSeedPhrasePassword(password);
+		} else {
+			setCompletedPass(false);
+		}
+		dispatch(setPin(pinArr));
+	}
 
 	function passwordChange(event) {
 		let password = event.target.value;
@@ -214,18 +247,35 @@ function Account() {
 		<div className="container">
 			{passEnterPopup ? (
 				<div className="select-wrapper">
-					<div className="mainblock">
-						<PasswordEnterPopup
-							goIntoApp={deployHandler}
-							enterClick={enterClick}
-							passwordChange={passwordChange}
-							validPassword={validPassword}
-							submitText={"Submit"}
-							cancelText={"Cancel"}
-							handleBack={() => setPasswordEnterPopup(false)}
-						/>
-					</div>
+					<PinPopup
+						title={"Enter your PIN"}
+						showTwoBtns={true}
+						nextStep={"step3"}
+						prevStep={"step1"}
+						handleLogOut={null}
+						btnText={"Submit"}
+						pinCorrect={true}
+						handleClickBack={()=>setPasswordEnterPopup(false)}
+						handleClose={null}
+						handleClickNext={() => deployHandler()}
+						handleCheckPin={(pin, step, completed) =>
+							handleCheckPin(pin, step, completed)
+						}
+					/>
 				</div>
+				// <div className="select-wrapper">
+				// 	<div className="mainblock">
+				// 		<PasswordEnterPopup
+				// 			goIntoApp={deployHandler}
+				// 			enterClick={enterClick}
+				// 			passwordChange={passwordChange}
+				// 			validPassword={validPassword}
+				// 			submitText={"Submit"}
+				// 			cancelText={"Cancel"}
+				// 			handleBack={() => setPasswordEnterPopup(false)}
+				// 		/>
+				// 	</div>
+				// </div>
 			) : onDeploy ? (
 				<WaitingPopup
 					text={`Creating dex client...please wait`}

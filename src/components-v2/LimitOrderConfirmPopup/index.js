@@ -61,7 +61,7 @@ export default function LimitOrderConfirmPopup() {
 
 			if (res.makeLimitOrderStatus)
 				enqueueSnackbar({
-					message: "Sended message to blockchain",
+					message: "Sent message to blockchain",
 					type: "info",
 				});
 			else
