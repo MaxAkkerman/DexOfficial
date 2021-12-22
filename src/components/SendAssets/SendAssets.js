@@ -175,7 +175,7 @@ function SendAssets() {
 					}),
 				);
 			}
-		} else if (selectedToken.symbol === "TON Crystal") {
+		} else if (selectedToken.symbol === "EVER") {
 			if (!amountToSend) {
 				return;
 			}

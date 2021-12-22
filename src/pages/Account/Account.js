@@ -81,7 +81,7 @@ function Account() {
 		} else {
 			dispatch(
 				setTips({
-					message: `Not enough balance, need at least 0.5 TONs`,
+					message: `Not enough balance, need at least 0.5 EVERs`,
 					type: "error",
 				}),
 			);

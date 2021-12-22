@@ -141,7 +141,7 @@ function DeployCustomTokenPopup(props) {
 							<div
 								style={{width: "100%", marginTop: "20px", marginLeft: "20px"}}
 							>
-								<div className="send_text_headers">Deploy Fee ~ 4 TONs</div>
+								<div className="send_text_headers">Deploy Fee ~ 4 EVERs</div>
 								{rootData && (
 									<div className="DeployAssetConfirmPopup__data">
 										Root symbol{" "}

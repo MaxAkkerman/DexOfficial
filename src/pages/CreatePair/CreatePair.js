@@ -119,7 +119,7 @@ function CreatePair() {
 		if (clientData.balance < 25) {
 			dispatch(
 				setTips({
-					message: `Insufficient balance, you need at least 25 Tons to create pair`,
+					message: `Insufficient balance, you need at least 25 EVERs to create pair`,
 					type: "error",
 				}),
 			);

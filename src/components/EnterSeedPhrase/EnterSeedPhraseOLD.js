@@ -1997,7 +1997,7 @@ function EnterSeedPhrase(props) {
 												flexDirection: "column",
 											}}
 										>
-											TONs not received, please try again or wait one minute.
+											EVERs not received, please try again or wait one minute.
 										</Box>
 									)}
 									<div className={"enterSPBox"}>

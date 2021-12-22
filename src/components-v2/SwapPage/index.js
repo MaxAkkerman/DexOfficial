@@ -1,7 +1,7 @@
 import "./index.scss";
 
 import {useFormik} from "formik";
-import differenceBy from "lodash/differenceBy";
+import compact from "lodash/compact";
 import find from "lodash/find";
 import reject from "lodash/reject";
 import uniq from "lodash/uniq";
@@ -93,7 +93,6 @@ export default function SwapPage() {
 		onSubmit: handleSwap,
 		validate,
 	});
-
 
 	const fromTokens = useMemo(() => {
 		let leftTokens = pairTokens.filter((t) => !t.symbol.startsWith("DS-"));
@@ -236,6 +235,10 @@ export default function SwapPage() {
 		}
 	}
 
+	function handleProvideLiquidity() {
+		history.push("/pool");
+	}
+
 	function handleConnectWallet() {
 		history.push("/account");
 	}
@@ -270,17 +273,25 @@ export default function SwapPage() {
 			className: "mainblock-btn",
 		};
 
-		if (!walletConnected) {
-			props.children = "Connect wallet";
-			props.onClick = handleConnectWallet;
-			props.type = "button";
-		} else if (values.fromToken && values.toToken && !values.pair) {
-			props.children = "Connect pair";
-			props.onClick = handleConnectPair;
-			props.type = "button";
-		} else {
-			props.children = "Swap";
-			props.type = "submit";
+		switch (currentState) {
+			case "connectWallet":
+				props.children = "Connect wallet";
+				props.onClick = handleConnectWallet;
+				props.type = "button";
+				break;
+			case "connectPair":
+				props.children = "Connect pair";
+				props.onClick = handleConnectPair;
+				props.type = "button";
+				break;
+			case "provideLiquidity":
+				props.children = "Connect pair";
+				props.onClick = handleProvideLiquidity;
+				props.type = "button";
+				break;
+			default:
+				props.children = "Swap";
+				props.type = "submit";
 		}
 
 		return function CurrentButton(p) {
@@ -432,14 +443,14 @@ export default function SwapPage() {
 			</div>
 			{selectFromPopup.open && (
 				<SelectPopup
-					tokens={leftTokens}
+					tokens={fromTokens}
 					onClose={selectFromPopup.handleClose}
 					onSelect={selectFromPopup.handleSelect}
 				/>
 			)}
 			{selectToPopup.open && (
 				<SelectPopup
-					tokens={leftTokens}
+					tokens={toTokens}
 					onClose={selectToPopup.handleClose}
 					onSelect={selectToPopup.handleSelect}
 				/>

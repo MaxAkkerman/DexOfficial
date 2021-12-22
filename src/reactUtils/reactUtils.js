@@ -302,9 +302,9 @@ export const getMnemonics = () => {
 
 export function getFullName(name) {
 	if (name === "TON") {
-		return "TON Crystal";
+		return "Everscale";
 	} else if (name === "WTON") {
-		return "Wrapped TON Crystal";
+		return "Wrapped Everscale";
 	} else if (name === "fBTC") {
 		return "fBitcoin";
 	} else if (name === "WETH") {
@@ -314,11 +314,11 @@ export function getFullName(name) {
 	} else if (name === "WBTC") {
 		return "Wrapped Bitcoin";
 	} else if (name === "DS-WTON/USDT") {
-		return "Pool tokens of TON/USDT pair";
+		return "Pool tokens of EVER/USDT pair";
 	} else if (name === "DS-WTON/WETH") {
-		return "Pool tokens of TON/ETH pair";
+		return "Pool tokens of EVER/ETH pair";
 	} else if (name === "DS-WTON/WBTC") {
-		return "Pool tokens of TON/BTC pair";
+		return "Pool tokens of EVER/BTC pair";
 	} else if (name === "USDT") {
 		return "Tether";
 	} else {

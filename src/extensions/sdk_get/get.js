@@ -1038,7 +1038,7 @@ export async function subscribeClient(address) {
 							setTips({
 								message: `You send ${
 									Number(transactionData.value) / 1000000000
-								} TONs`,
+								} EVERs`,
 								type: "info",
 								...checkedDuple,
 								...transactionData,
@@ -1126,7 +1126,7 @@ export async function subscribeClient(address) {
 							setTips({
 								message: `You stake to dePool ${
 									Number(checkedDuple.amount) / 1000000000
-								} TONs`,
+								} EVERs`,
 								type: "info",
 								...checkedDuple,
 							}),
@@ -1326,7 +1326,7 @@ export async function subscribeClient(address) {
 								setTips({
 									message: `You get lock stake ${
 										+lockStakeData.amountLockStake / 1000000000
-									} TONs`,
+									} EVERs`,
 									type: "info",
 									...checkedDuple,
 									...lockStakeData,
@@ -1339,7 +1339,7 @@ export async function subscribeClient(address) {
 								setTips({
 									message: `You send lock stake ${
 										+lockStakeData.amountLockStake / 1000000000
-									} TONs`,
+									} EVERs`,
 									type: "info",
 									...checkedDuple,
 									...lockStakeData,

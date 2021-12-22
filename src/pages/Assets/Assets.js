@@ -45,9 +45,9 @@ function Assets() {
 				owner_address: clientData.address,
 				rootAddress: "none",
 				showWrapMenu: true,
-				symbol: "TON Crystal",
-				tokenName: "TON Crystal",
-				type: "Native Tons",
+				symbol: "EVER",
+				tokenName: "Everscale",
+				type: "Native evers",
 				walletAddress: clientData.address,
 			};
 	}, [clientData, updatedWallet]);
@@ -105,10 +105,10 @@ function Assets() {
 		setAssets(copyAssets);
 	}
 	function handleClickToken(curItem) {
-		if (curItem.type !== "Native Tons") return;
+		if (curItem.type !== "Native evers") return;
 		const copyAssets = JSON.parse(JSON.stringify(tokenList));
 		copyAssets.map((item) => {
-			if ("Native Tons" === item.type) {
+			if ("Native evers" === item.type) {
 				item.showWrapMenu = !item.showWrapMenu;
 			}
 		});
@@ -119,7 +119,7 @@ function Assets() {
 		setcurrentTokenForWrap(tonWallet);
 		setViewData({
 			confirmText: "wrap",
-			title: "TON Crystal → WTON",
+			title: "EVERs → wEVER",
 			tokenSetted: true,
 			type: "wrap",
 		});
@@ -131,7 +131,7 @@ function Assets() {
 		if(!tonObj.length){
 			dispatch(
 				setTips({
-					message: `You have not WTONs for unWrap`,
+					message: `You have not wEVER for unWrap`,
 					type: "error",
 				}),
 			)
@@ -140,7 +140,7 @@ function Assets() {
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
 			confirmText: "unwrap",
-			title: "WTON → TON Crystal",
+			title: "wEVER → EVER",
 			tokenSetted: true,
 			type: "unwrap",
 		});

@@ -61,8 +61,8 @@ export default async function getAllClientWallets() {
 
 			// console.log("hereii", curWalletData)
 			itemData.walletAddress = item[1];
-			itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
-			itemData.tokenName = getFullName(itemData.symbol);
+			itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol) === "WTON" ? "wEVER" : hex2a(curRootData.decoded.output.value0.symbol);
+			itemData.tokenName = getFullName(hex2a(curRootData.decoded.output.value0.symbol));
 			itemData.type = "PureToken";
 			itemData.owner_address =
 				curWalletData.decoded.output.value0.owner_address;

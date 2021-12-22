@@ -36,7 +36,7 @@ export default function useSendAssetsCheckAmount() {
 	const {assetList} = useAssetList();
 
 	useEffect(() => {
-		const tonAsset = assetList.find((t) => t.symbol === "TON Crystal");
+		const tonAsset = assetList.find((t) => t.symbol === "EVER");
 
 		if (!tokenSetted && amountToSend) {
 			setState({
@@ -44,7 +44,7 @@ export default function useSendAssetsCheckAmount() {
 				validationMsg: NOT_SELECTED_TOKEN,
 			});
 		} else if (
-			(currentTokenForSend.type === "Native Tons" ||
+			(currentTokenForSend.type === "Native evers" ||
 				currentTokenForSend.type === "PureToken") &&
 			currentTokenForSend.balance - amountToSend < 0
 		) {
@@ -62,7 +62,7 @@ export default function useSendAssetsCheckAmount() {
 				validationMsg: NOT_ENOUGH_CAUSE_COMMISSION,
 			});
 		} else if (
-			currentTokenForSend.type === "Native Tons" &&
+			currentTokenForSend.type === "Native evers" &&
 			currentTokenForSend.balance - amountToSend - SEND_TOKEN < 0
 		) {
 			setState({

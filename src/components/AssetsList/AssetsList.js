@@ -225,7 +225,7 @@ function AssetsList(props) {
 														<img
 															style={{marginRight: "5px", width: "20px"}}
 															src={TON}
-															alt={"Ton Crystal"}
+															alt={"Everscale"}
 														/>{" "}
 														{Number(item.stakeTotal) / 1000000000}
 													</p>
@@ -236,7 +236,7 @@ function AssetsList(props) {
 														<img
 															style={{marginRight: "5px", width: "20px"}}
 															src={TON}
-															alt={"Ton Crystal"}
+															alt={"Everscale"}
 														/>{" "}
 														{(
 															(calculateRate(
@@ -259,7 +259,7 @@ function AssetsList(props) {
 														<img
 															style={{marginRight: "5px", width: "20px"}}
 															src={TON}
-															alt={"Ton Crystal"}
+															alt={"Everscale"}
 														/>{" "}
 														{(
 															calculateRate(

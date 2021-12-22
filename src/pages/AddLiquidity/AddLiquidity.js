@@ -249,12 +249,12 @@ function AddLiquidity() {
 			if (toValue === 0 || fromValue === 0)
 				localErrors.emptyFields = NOT_TOUCHED;
 
-			const tonAsset = assetList.find((t) => t.symbol === "TON Crystal");
+			const tonAsset = assetList.find((t) => t.symbol === "EVER");
 			if (tonAsset && tonAsset.balance) {
 				const nativeTONBalance = tonAsset.balance;
 
 				if (nativeTONBalance < PROVIDE_LIQUIDITY_COMMISSION)
-					localErrors.commission = `${NOT_ENOUGH_CAUSE_COMMISSION_MSG} (Commission = ${PROVIDE_LIQUIDITY_COMMISSION} TON Crystal)`;
+					localErrors.commission = `${NOT_ENOUGH_CAUSE_COMMISSION_MSG} (Commission = ${PROVIDE_LIQUIDITY_COMMISSION} EVER)`;
 				console.log(localErrors);
 				setErrors(localErrors);
 			}
