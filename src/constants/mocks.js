@@ -27,7 +27,7 @@ export const tokens = {
 		walletAddress:
 			"0:5eeeba02539217ed8bca327ac23cb3b2da26b51e84df8d842c94a8b2d690f21b",
 	},
-	WTON: {
+	EVER: {
 		balance: 18.371355611,
 		decimals: "9",
 		icon: "https://trade.defispace.com/06f491487328de8e7fd81d835cfda442.svg",
@@ -35,8 +35,8 @@ export const tokens = {
 			"0:5b3b1c2a86941cdb30b925f711034bf3f4430d15d02a696e9242e1a7fcebaba8",
 		rootAddress:
 			"0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37",
-		symbol: "WTON",
-		tokenName: "Wrapped TON Crystal",
+		symbol: "wEVER",
+		tokenName: "Wrapped Everscale",
 		type: "PureToken",
 		walletAddress:
 			"0:53489672a1e951f2c1c3c14676a3d5b80031844daf97df6ea355f2e66ebaf731",

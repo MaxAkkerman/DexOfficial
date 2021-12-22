@@ -838,9 +838,7 @@ function EnterSeedPhrase(props) {
 								<>
 									<Grid
 										container
-										onClick={() =>
-											console.log("mnemonicWords")
-										}
+										onClick={() => console.log("mnemonicWords")}
 										spacing={3}
 										sx={{justifyContent: "center"}}
 									>
@@ -1997,7 +1995,7 @@ function EnterSeedPhrase(props) {
 												flexDirection: "column",
 											}}
 										>
-											TONs not received, please try again or wait one minute.
+											EVERs not received, please try again or wait one minute.
 										</Box>
 									)}
 									<div className={"enterSPBox"}>

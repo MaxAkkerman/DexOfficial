@@ -579,7 +579,12 @@ export async function getAllClientWallets(clientAddress) {
 
 			// console.log("hereii", curWalletData)
 			itemData.walletAddress = item[1];
-			itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
+			// itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
+			itemData.symbol =
+				hex2a(curRootData.decoded.output.value0.symbol) === "WTON"
+					? "wEVER"
+					: hex2a(curRootData.decoded.output.value0.symbol);
+
 			itemData.tokenName = getFullName(itemData.symbol);
 			itemData.type = "PureToken";
 			itemData.owner_address =
@@ -1038,7 +1043,7 @@ export async function subscribeClient(address) {
 							setTips({
 								message: `You send ${
 									Number(transactionData.value) / 1000000000
-								} TONs`,
+								} EVERs`,
 								type: "info",
 								...checkedDuple,
 								...transactionData,
@@ -1126,7 +1131,7 @@ export async function subscribeClient(address) {
 							setTips({
 								message: `You stake to dePool ${
 									Number(checkedDuple.amount) / 1000000000
-								} TONs`,
+								} EVERs`,
 								type: "info",
 								...checkedDuple,
 							}),
@@ -1326,7 +1331,7 @@ export async function subscribeClient(address) {
 								setTips({
 									message: `You get lock stake ${
 										+lockStakeData.amountLockStake / 1000000000
-									} TONs`,
+									} EVERs`,
 									type: "info",
 									...checkedDuple,
 									...lockStakeData,
@@ -1339,7 +1344,7 @@ export async function subscribeClient(address) {
 								setTips({
 									message: `You send lock stake ${
 										+lockStakeData.amountLockStake / 1000000000
-									} TONs`,
+									} EVERs`,
 									type: "info",
 									...checkedDuple,
 									...lockStakeData,
@@ -2105,15 +2110,14 @@ const SEED_PHRASE_DICTIONARY_ENGLISH = 1; //Dictionary identifier
 
 export async function getClientKeys(phrase) {
 	//todo change with only pubkey returns
-	try{
+	try {
 		return await client.crypto.mnemonic_derive_sign_keys({
 			phrase,
 			path: HD_PATH,
 			dictionary: SEED_PHRASE_DICTIONARY_ENGLISH,
 			word_count: SEED_PHRASE_WORD_COUNT,
 		});
-	}catch(e){
-		return e
+	} catch (e) {
+		return e;
 	}
-
 }

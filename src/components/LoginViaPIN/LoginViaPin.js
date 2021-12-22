@@ -245,7 +245,7 @@ function LoginViaPin(props) {
 					prevStep={"step3"}
 					step={"4"}
 					closeBtn={false}
-					btnText={"Greate!"}
+					btnText={"Great!"}
 					agreementSigned={agreementSigned}
 					handleGetBack={(bckStp) => handleClickBack(bckStp)}
 					handleSignAgreement={(bl) => handleSignAgreement(bl)}

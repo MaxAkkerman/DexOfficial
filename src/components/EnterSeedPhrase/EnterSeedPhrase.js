@@ -117,7 +117,7 @@ function EnterSeedPhrase(props) {
 	async function checkClipboardSeedPhrase(e) {
 		e.preventDefault();
 		let sp = e.clipboardData.getData("text");
-		let arr = sp.split(" ").filter(it=>it!=="");
+		let arr = sp.split(" ").filter((it) => it !== "");
 		if (arr.length !== 12) {
 			setValidSeedPhrase({
 				onError: true,
@@ -258,14 +258,13 @@ function EnterSeedPhrase(props) {
 	}
 	// linear-gradient(92.91deg, #FFF -1%, #FFF 100%)
 	async function handleLogIn(pin) {
-
 		let seedPhrasePassword = "";
 		pin.map((item) => {
 			seedPhrasePassword += item.value.toString();
 		});
-		if(seedPhrasePassword.length < 4){
+		if (seedPhrasePassword.length < 4) {
 			disSetTips("Please complete PIN", "error");
-			return
+			return;
 		}
 
 		if (
@@ -433,7 +432,7 @@ function EnterSeedPhrase(props) {
 					) : (
 						<div className="select-wrapper">
 							<PinPopup
-								title={"Enter your Pin"}
+								title={"Enter your PIN"}
 								showTwoBtns={true}
 								nextStep={"step3"}
 								prevStep={"step1"}

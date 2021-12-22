@@ -56,9 +56,9 @@ function ExtensionsList() {
 			button={
 				<svg
 					onClick={() => history.goBack()}
-					className="close"
-					width="26"
-					height="26"
+					className="loginCloseBtn close"
+					// width="26"
+					// height="26"
 					viewBox="0 0 26 26"
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
@@ -87,19 +87,19 @@ function ExtensionsList() {
 								}}
 							>
 								<button
-									style={{
-										fontSize: "16px",
-										width: "100%",
-										marginBottom: "40px",
-									}}
-									className="btn wallet-btn"
+									// style={{
+									// 	fontSize: "16px",
+									// 	width: "100%",
+									// 	marginBottom: "40px",
+									// }}
+									className="btn wallet-btn extBtns"
 									onClick={() => dispatch(handleOpenEnterSeed(true))}
 								>
 									Login using Seed Phrase
 								</button>
 								<button
-									style={{fontSize: "16px", width: "100%"}}
-									className="btn wallet-btn"
+									// style={{fontSize: "16px", width: "100%"}}
+									className="btn wallet-btn extBtns"
 									onClick={() => setloginViaPinIsVisible(true)}
 								>
 									Create a new Seed Phrase and Wallet

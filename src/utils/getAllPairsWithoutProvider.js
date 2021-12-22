@@ -27,7 +27,6 @@ export default async function getAllPairsWithoutProvider() {
 	if (
 		!this ||
 		!this.context ||
-		!this.context.dexClientAddress ||
 		!this.context.dexRootAddress ||
 		!this.context.tonClient ||
 		!this.helperFunctions ||
@@ -92,11 +91,20 @@ export default async function getAllPairsWithoutProvider() {
 		itemData.pairAddress = addrPair;
 
 		// itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
-		itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol);
+		// itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol);
+		itemData.symbolA =
+			hex2a(curRootDataA.decoded.output.value0.symbol) === "WTON"
+				? "EVER"
+				: hex2a(curRootDataA.decoded.output.value0.symbol);
+
 		itemData.reserveA = balanceA;
 		itemData.decimalsA = decimalsRootA;
+		itemData.symbolB =
+			hex2a(curRootDataB.decoded.output.value0.symbol) === "WTON"
+				? "EVER"
+				: hex2a(curRootDataB.decoded.output.value0.symbol);
 
-		itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
+		// itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
 		itemData.reserveB = balanceB;
 		itemData.decimalsB = decimalsRootB;
 
@@ -116,6 +124,17 @@ export default async function getAllPairsWithoutProvider() {
 			normlizeWallets.push(itemData);
 		}
 
+		// let wrongPairID = normlizeWallets.find((item,i)=>{
+		// 	if(item.pairAddress === "0:ea784f5e3434beb91fa56c8b0131cac0be703d6551a3bb297e4d6db95ae0af8e")
+		// 	{
+		// 		return i
+		// 	}
+		//
+		// })
+		// console.log("wrongPairID",wrongPairID)
+		// if(wrongPairID){
+		// 	normlizeWallets.splice(wrongPairID,1)
+		// }
 		itemData.rootA = root0;
 		itemData.rootB = root1;
 

@@ -174,7 +174,7 @@ function Swap() {
 		if (clientData.balance < 12) {
 			dispatch(
 				setTips({
-					message: `You need at least 12 TONs to connect pair`,
+					message: `You need at least 12 EVERs to connect pair`,
 					type: "error",
 				}),
 			);
@@ -321,7 +321,7 @@ function Swap() {
 			if (toValue === 0 || fromValue === 0)
 				localErrors.emptyFields = NOT_TOUCHED;
 
-			const tonAsset = assetList.find((t) => t.symbol === "TON Crystal");
+			const tonAsset = assetList.find((t) => t.symbol === "Everscale");
 			if (tonAsset && tonAsset.balance) {
 				const nativeTONBalance = tonAsset.balance;
 
@@ -427,7 +427,9 @@ function Swap() {
 										className="btn mainblock-btn"
 										onClick={() => history.push("/account")}
 									>
-										Connect wallet
+										{!clientData.status && clientData.address.length === 66
+											? "Deploy wallet"
+											: "Connect wallet"}
 									</button>
 								)}
 								{!fromValue && !toValue && (

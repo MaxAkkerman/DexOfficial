@@ -538,7 +538,6 @@ export async function swapA(
 	fromtokenData,
 	toTokenData,
 ) {
-
 	//fix types
 	if (slippage === 0 || !slippage) {
 		slippage = 2;
@@ -566,7 +565,6 @@ export async function swapA(
 	if (getClientAddressFromRoot.status === false) {
 		return getClientAddressFromRoot;
 	}
-
 
 	// const acc = new Account(DEXClientContract, {
 	// 	address: getClientAddressFromRoot.dexclient,
@@ -736,23 +734,23 @@ export async function processLiquidity(
 	toTokenData,
 ) {
 	// const {pubkey} = curExt._extLib;
-// console.log("pairAddr,\n" +
-// 	"\tqtyA,\n" +
-// 	"\tqtyB,\n" +
-// 	"\tkeys,\n" +
-// 	"\tfromtokenData,\n" +
-// 	"\ttoTokenData,",pairAddr,
-// 	qtyA,
-// 	qtyB,
-// 	keys,
-// 	fromtokenData,
-// 	toTokenData,)
+	// console.log("pairAddr,\n" +
+	// 	"\tqtyA,\n" +
+	// 	"\tqtyB,\n" +
+	// 	"\tkeys,\n" +
+	// 	"\tfromtokenData,\n" +
+	// 	"\ttoTokenData,",pairAddr,
+	// 	qtyA,
+	// 	qtyB,
+	// 	keys,
+	// 	fromtokenData,
+	// 	toTokenData,)
 	let qtyAnum = Number(qtyA);
 	let qtyBnum = Number(qtyB);
 
 	const qtyAfixed = Math.round(qtyAnum * getDecimals(fromtokenData.decimals));
 	const qtyBfixed = Math.round(qtyBnum * getDecimals(toTokenData.decimals));
-// console.log("qtyAfixed",qtyAfixed,"qtyBfixed",typeof qtyBfixed,qtyBfixed,"pairAddr",pairAddr)
+	// console.log("qtyAfixed",qtyAfixed,"qtyBfixed",typeof qtyBfixed,qtyBfixed,"pairAddr",pairAddr)
 	const acc = new Account(DEXClientContract, {
 		address: clientAddress,
 		signer: signerKeys(keys),

@@ -105,11 +105,13 @@
 		margin: 0;
 		transition: 0s;
 	}
+
 	&-description {
 		font-size: 16px;
 		margin: 0;
 		transition: 0s;
 	}
+
 	&-descr {
 		font-size: 16px;
 		margin: 0;
@@ -147,6 +149,7 @@
 	.PoolExplorerItem_pair_reserve_box {
 		display: flex;
 		flex-direction: row;
+
 		span {
 			margin-left: 5px;
 		}
@@ -171,6 +174,33 @@
 		&.none {
 			display: none;
 		}
+	}
+}
+
+@media screen and (max-width: 376px) {
+	.poolExplorer__icon {
+		width: 23px;
+		height: 23px;
+		margin-right: 3px;
+	}
+	.PoolExplorerItem_pair_reserve_box {
+		height: 30px;
+	}
+	.poolExplorer__fixed_width {
+		width: 100%;
+		display: flex;
+		justify-content: space-around;
+	}
+	.select-item {
+		&-description {
+			font-size: 10px;
+		}
+	}
+	.poolExplorer__pair_rate {
+		width: 100%;
+		display: flex;
+		//font-size: 12px;
+		flex-direction: row;
 	}
 }
 

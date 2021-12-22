@@ -198,7 +198,7 @@ function SwapConfirmPopup(props) {
 				if (!res.code)
 					dispatch(
 						setTips({
-							message: `Sended message to blockchain`,
+							message: `Sent message to blockchain`,
 							type: "info",
 						}),
 					);

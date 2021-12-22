@@ -45,9 +45,9 @@ function Assets() {
 				owner_address: clientData.address,
 				rootAddress: "none",
 				showWrapMenu: true,
-				symbol: "TON Crystal",
-				tokenName: "TON Crystal",
-				type: "Native Tons",
+				symbol: "EVER",
+				tokenName: "Everscale",
+				type: "Native evers",
 				walletAddress: clientData.address,
 			};
 	}, [clientData, updatedWallet]);
@@ -105,10 +105,10 @@ function Assets() {
 		setAssets(copyAssets);
 	}
 	function handleClickToken(curItem) {
-		if (curItem.type !== "Native Tons") return;
+		if (curItem.type !== "Native evers") return;
 		const copyAssets = JSON.parse(JSON.stringify(tokenList));
 		copyAssets.map((item) => {
-			if ("Native Tons" === item.type) {
+			if ("Native evers" === item.type) {
 				item.showWrapMenu = !item.showWrapMenu;
 			}
 		});
@@ -119,7 +119,7 @@ function Assets() {
 		setcurrentTokenForWrap(tonWallet);
 		setViewData({
 			confirmText: "wrap",
-			title: "TON Crystal → WTON",
+			title: "EVER → wEVER",
 			tokenSetted: true,
 			type: "wrap",
 		});
@@ -127,20 +127,20 @@ function Assets() {
 	}
 	async function handleUnWrapTons() {
 		const tonObj = tokenList.filter((item) => item.symbol === "WTON");
-		console.log("tonObj",tonObj[0],tonObj.length)
-		if(!tonObj.length){
+		console.log("tonObj", tonObj[0], tonObj.length);
+		if (!tonObj.length) {
 			dispatch(
 				setTips({
-					message: `You have not WTONs for unWrap`,
+					message: `You have not wEVER for unWrap`,
 					type: "error",
 				}),
-			)
-		return
+			);
+			return;
 		}
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
 			confirmText: "unwrap",
-			title: "WTON → TON Crystal",
+			title: "wEVER → EVER",
 			tokenSetted: true,
 			type: "unwrap",
 		});
@@ -269,15 +269,15 @@ function Assets() {
 								{walletIsConnected ? (
 									<>
 										{(NFTassets && NFTassets.length) ||
-										tonWallet  || (tokenList && tokenList.length)
-										(limitOrdersData && limitOrdersData.limitOrders.length) ? (
+										tonWallet ||
+										(tokenList && tokenList.length)(
+											limitOrdersData && limitOrdersData.limitOrders.length,
+										) ? (
 											<AssetsList
-												TokenAssetsArray={uniqBy([
-													tonWallet,
-													...tokenList,
-													...liquidityList,
-												],'tokenName')
-													}
+												TokenAssetsArray={uniqBy(
+													[tonWallet, ...tokenList, ...liquidityList],
+													"tokenName",
+												)}
 												orderAssetArray={
 													[]
 													// limitOrdersData && limitOrdersData.limitOrders
@@ -303,7 +303,9 @@ function Assets() {
 										className="btn mainblock-btn"
 										onClick={() => history.push("/account")}
 									>
-										Connect wallet
+										{!clientData.status && clientData.address.length === 66
+											? "Deploy wallet"
+											: "Connect wallet"}
 									</button>
 								)}
 							</div>

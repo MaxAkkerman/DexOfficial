@@ -9,8 +9,8 @@ function SendConfirmPopup(props) {
 	function getTitle(tp) {
 		if (tp === "PureToken") {
 			return "Send Tokens";
-		} else if (tp === "Native Tons") {
-			return "Send TONs";
+		} else if (tp === "Native evers") {
+			return "Send EVERs";
 		} else {
 			return "Send DP";
 		}
@@ -76,7 +76,9 @@ function SendConfirmPopup(props) {
 						</div>
 
 						<p className="confirm-text">
-							{props.msgText ? props.msgText : "You are going to send some assets"}
+							{props.msgText
+								? props.msgText
+								: "You are going to send some assets"}
 							{/*Output is estimated. You will receive at least <span>{toValue < 0.0001 ? parseFloat(getAmountOut(fromValue).toFixed(8)) : parseFloat(getAmountOut(fromValue).toFixed(4))} {fromToken.symbol}</span> or the transaction will revert*/}
 						</p>
 						<button

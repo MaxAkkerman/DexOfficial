@@ -34,6 +34,12 @@
 	}
 }
 
+@media screen and (max-width: 376px) {
+	.search-input {
+		font-size: 11px;
+	}
+}
+
 @media screen and (max-width: 481px) {
 	.search-input {
 		padding: 10px 10px 10px 50px;

@@ -96,3 +96,10 @@ html[data-theme="dark"] .wallet-key {
 		}
 	}
 }
+@media screen and (max-width: 321px) {
+	.wallet {
+		&-btn {
+			font-size: 13px;
+		}
+	}
+}
