@@ -392,7 +392,7 @@ export default function SwapPage() {
 									readOnly
 								/>
 								<CurrentButton />
-								{rate && (
+								{rate ? (
 									<p className="swap-rate">
 										Price{" "}
 										<span>
@@ -400,7 +400,7 @@ export default function SwapPage() {
 										</span>{" "}
 										per <span>1 {values.fromToken.symbol}</span>
 									</p>
-								)}
+								) : null}
 							</form>
 						</div>
 					}
