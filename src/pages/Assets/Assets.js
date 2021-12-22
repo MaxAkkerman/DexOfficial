@@ -119,7 +119,7 @@ function Assets() {
 		setcurrentTokenForWrap(tonWallet);
 		setViewData({
 			confirmText: "wrap",
-			title: "EVERs → wEVER",
+			title: "EVER → wEVER",
 			tokenSetted: true,
 			type: "wrap",
 		});

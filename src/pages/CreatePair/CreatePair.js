@@ -36,9 +36,11 @@ function CreatePair() {
 	const walletIsConnected = useSelector(
 		(state) => state.appReducer.walletIsConnected,
 	);
+	// const tokenList = useSelector((state) => state.tonData.tokens);
+	const tokenList = useSelector((state) => state.walletReducer.tokenList);
+
 	const fromToken = useSelector((state) => state.poolReducer.fromToken);
 	const toToken = useSelector((state) => state.poolReducer.toToken);
-	const tokenList = useSelector((state) => state.walletReducer.tokenList);
 	const liquidityList = useSelector(
 		(state) => state.walletReducer.liquidityList,
 	);
@@ -172,19 +174,30 @@ function CreatePair() {
 	}
 
 	useEffect(() => {
-		const assetsList = [...tokenList, ...liquidityList];
-		setAssetsList(assetsList);
+		const assetsList = tokenList.filter(item=>!item.symbol.includes("DS"));
+		console.log("tokenList search",tokenList.filter(it=>!it.symbol.includes("DS")))
+		setAssetsList(tokenList);
 	}, []);
 
 	useEffect(() => {
 		const assetsListCopy = JSON.parse(
-			JSON.stringify([...tokenList, ...liquidityList]),
+			JSON.stringify(tokenList),
 		);
 		const newArr = assetsListCopy.filter(
 			(item) => item.symbol !== tokenA.symbol,
 		);
 		setAssetsList(newArr);
 	}, [tokenA]);
+
+	useEffect(() => {
+		const assetsListCopy = JSON.parse(
+			JSON.stringify(tokenList),
+		);
+		const newArr = assetsListCopy.filter(
+			(item) => item.symbol !== tokenB.symbol,
+		);
+		setAssetsList(newArr);
+	}, [tokenB]);
 
 	function handleCloseAssetsListPopup() {
 		setshowAssetList(false);

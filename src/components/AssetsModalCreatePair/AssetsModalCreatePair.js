@@ -24,7 +24,7 @@ function AssetsModalCreatePair(props) {
 	// 	props.handleCloseAssetsListPopup();
 	// }
 	function handleClose(e) {
-		console.log("searchBtn swapPopup", e.target.id);
+		// console.log("searchBtn swapPopup", e.target.id);
 		if (
 			e.target.id === "swapPopup" ||
 			e.target.id === "searchBtn" ||

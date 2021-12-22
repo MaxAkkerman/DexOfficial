@@ -579,7 +579,9 @@ export async function getAllClientWallets(clientAddress) {
 
 			// console.log("hereii", curWalletData)
 			itemData.walletAddress = item[1];
-			itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
+			// itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
+			itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol) === "WTON" ? "wEVER" : hex2a(curRootData.decoded.output.value0.symbol);
+
 			itemData.tokenName = getFullName(itemData.symbol);
 			itemData.type = "PureToken";
 			itemData.owner_address =
