@@ -317,7 +317,7 @@ console.log("sendTres",sendTres)
 								})}
 							>
 								<div className="send_text_headers">Recipient address</div>
-								<div onBlur={() => handleSetView()}>
+								<div>
 									<div className="send_inputs">
 										<input
 											onChange={(e) => handleChangeAddress(e)}
