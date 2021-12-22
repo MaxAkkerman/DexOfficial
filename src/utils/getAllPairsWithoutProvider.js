@@ -1,6 +1,11 @@
 import {Account} from "@tonclient/appkit";
+import findIndex from "lodash/findIndex";
+import map from "lodash/map";
+import merge from "lodash/merge";
+import sortBy from "lodash/sortBy";
 
 import {NO_CONTEXT} from "@/constants/runtimeErrors";
+import {DEXClientContract} from "@/extensions/contracts/DEXClient";
 import {DEXPairContract} from "@/extensions/contracts/DEXPair";
 import {DEXRootContract} from "@/extensions/contracts/DEXRoot";
 import {RootTokenContract} from "@/extensions/contracts/RootTokenContract";
@@ -27,6 +32,7 @@ export default async function getAllPairsWithoutProvider() {
 	if (
 		!this ||
 		!this.context ||
+		!this.context.dexClientAddress ||
 		!this.context.dexRootAddress ||
 		!this.context.tonClient ||
 		!this.helperFunctions ||
@@ -113,21 +119,30 @@ export default async function getAllPairsWithoutProvider() {
 			normlizeWallets.push(itemData);
 		}
 
-		// let wrongPairID = normlizeWallets.find((item,i)=>{
-		// 	if(item.pairAddress === "0:ea784f5e3434beb91fa56c8b0131cac0be703d6551a3bb297e4d6db95ae0af8e")
-		// 	{
-		// 		return i
-		// 	}
-		//
-		// })
-		// console.log("wrongPairID",wrongPairID)
-		// if(wrongPairID){
-		// 	normlizeWallets.splice(wrongPairID,1)
-		// }
 		itemData.rootA = root0;
 		itemData.rootB = root1;
 
 		console.log("normlizeWallets!!normlizeWallets", normlizeWallets);
 	}
-	return normlizeWallets;
+
+	const dexAcc = new Account(DEXClientContract, {
+		address: this.context.dexClientAddress,
+		client: this.context.tonClient,
+	});
+
+	const dexRes = await dexAcc.runLocal("pairs", {});
+	const clientPairs = map(dexRes.decoded.output.pairs, (v, k) => ({
+		...v,
+		pairAddress: k,
+	}));
+
+	const merged = merge(
+		clientPairs,
+		sortBy(normlizeWallets, (w) => {
+			const i = findIndex(clientPairs, {pairAddress: w.pairAddress});
+			return i === -1 ? Infinity : i;
+		}),
+	);
+
+	return merged;
 }
