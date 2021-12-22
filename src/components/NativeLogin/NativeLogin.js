@@ -20,10 +20,10 @@ function NativeLogin() {
 				<div className="mainblock-title">Login</div>
 				{/*{(!walletIsConnected && wallet) ?*/}
 				<button className="btn wallet-btn" onClick={handleClick}>
-					Login using Seed phrase
+					Log in using Seed phrase
 				</button>
 				<button className="btn wallet-btn" onClick={handleClick}>
-					Create a new Seed Phrase and Wallet
+					Create a new Wallet
 				</button>
 			</div>
 		</div>

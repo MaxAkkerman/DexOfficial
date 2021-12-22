@@ -1,3 +1,15 @@
+
+.loginCloseBtn{
+	width:25px;
+	height:25px;
+}
+.extBtns{
+	&:first-of-type {
+		margin-bottom: 40px;
+	}
+	font-size: 16px;
+	 	width: 100%;
+}
 .extensions-list {
 	&-item {
 		display: flex;
@@ -27,5 +39,20 @@
 			margin-left: 20px;
 			text-transform: capitalize;
 		}
+	}
+}
+
+@media screen and (max-width: 376px) {
+	.loginCloseBtn{
+		width:15px;
+		height:15px;
+	}
+	.extBtns {
+		&:first-of-type {
+			margin-bottom: 20px;
+		}
+
+		font-size: 12px;
+		width: 76%;
 	}
 }
