@@ -28,6 +28,7 @@ export default function LimitOrderPage() {
 	);
 	const tokens = useSelector((state) => state.tonData.tokens);
 	const pairs = useSelector((state) => state.tonData.pairs);
+	const clientData = useSelector((state) => state.walletReducer.clientData);
 
 	const {
 		errors,
@@ -131,7 +132,7 @@ export default function LimitOrderPage() {
 		};
 
 		if (!walletConnected) {
-			props.children = "Connect wallet";
+			props.children = (!clientData.status && clientData.address.length === 66) ? "Deploy wallet" : "Connect wallet";
 			props.onClick = handleConnectWallet;
 			props.type = "button";
 		} else if (values.fromToken && values.toToken && !values.pair) {

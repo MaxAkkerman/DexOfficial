@@ -44,6 +44,7 @@ function Stacking() {
 	const showWaitingStakingPopup = useSelector(
 		(state) => state.stakingReducer.showWaitingStakingPopup,
 	);
+	const clientData = useSelector((state) => state.walletReducer.clientData);
 
 	const [period, setPeriod] = useState(1 / 30);
 	const [curProgram, setProgram] = useState(0);
@@ -523,7 +524,7 @@ function Stacking() {
 											className="btn mainblock-btn"
 											onClick={() => history.push("/account")}
 										>
-											Connect wallet
+											{(!clientData.status && clientData.address.length === 66) ? "Deploy wallet" : "Connect wallet"}
 										</button>
 									)}
 								</Stack>

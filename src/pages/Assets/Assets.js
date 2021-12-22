@@ -303,7 +303,7 @@ function Assets() {
 										className="btn mainblock-btn"
 										onClick={() => history.push("/account")}
 									>
-										Connect wallet
+										{(!clientData.status && clientData.address.length === 66) ? "Deploy wallet" : "Connect wallet"}
 									</button>
 								)}
 							</div>
