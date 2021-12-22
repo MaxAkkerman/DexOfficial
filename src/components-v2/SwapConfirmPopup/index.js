@@ -151,7 +151,7 @@ export default function SwapConfirmPopup() {
 
 			if (!res.code)
 				enqueueSnackbar({
-					message: "Sended message to blockchain",
+					message: "Sent message to blockchain",
 					type: "info",
 				});
 			else

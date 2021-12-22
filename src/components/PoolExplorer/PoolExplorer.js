@@ -8,7 +8,8 @@ import "./PoolExplorer.scss";
 
 function PoolExplorer() {
 	const [filter, setFilter] = useState("");
-	const pairsList = useSelector((state) => state.walletReducer.pairsList);
+	// const pairsList = useSelector((state) => state.walletReducer.pairsList);
+	const pairsList = useSelector((state) => state.tonData.pairs);
 
 	const [pairsArr, setPairsArray] = useState([]);
 	useEffect(() => {
@@ -40,10 +41,10 @@ function PoolExplorer() {
 								</div>
 								<div className="select-list-pool">
 									{pairsArr
-										.sort(
-											(a, b) =>
-												b.reserveA - a.reserveA - (b.reservetB - a.reservetB),
-										)
+										// .sort(
+										// 	(a, b) =>
+										// 		b.reserveA - a.reserveA - (b.reserveB - a.reserveB),
+										// )
 										.filter(
 											(item) =>
 												item.symbolA

@@ -32,7 +32,7 @@ function ReturnLiquidConfirmPopup(props) {
 		if (!returnStatus.code) {
 			dispatch(
 				setTips({
-					message: `Sended message to blockchain`,
+					message: `Sent message to blockchain`,
 					type: "info",
 				}),
 			);

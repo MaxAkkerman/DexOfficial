@@ -1,5 +1,5 @@
 import "./Assets.scss";
-
+import {uniqBy} from "lodash";
 import {useLazyQuery} from "@apollo/client";
 import React, {useEffect, useMemo, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
@@ -11,7 +11,7 @@ import AssetsList from "../../components/AssetsList/AssetsList";
 import MainBlock from "../../components/MainBlock/MainBlock";
 import WithDraw from "../../components/WithDraw/WithDraw";
 import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
-import {LimitOrdersForOwnerQuery} from "../../graphql/queries";
+import {LimitOrdersForOwnerQuery} from "@/graphql/queries";
 // import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 import goToExchange from "../../images/goToExchange.svg";
 import nativeBtn from "../../images/nativeadd.svg";
@@ -19,6 +19,7 @@ import receiveAssets from "../../images/receiveAssets.svg";
 import sendAssetsimg from "../../images/sendAssets.svg";
 import settingsBtn from "../../images/Vector.svg";
 import {setTokenList} from "../../store/actions/wallet";
+import {setTips} from "@/store/actions/app";
 
 function Assets() {
 	const history = useHistory();
@@ -36,6 +37,7 @@ function Assets() {
 		(state) => state.walletReducer.updatedWallet,
 	);
 	const tonWallet = useMemo(() => {
+		// console.log('clientData',clientData)
 		if (clientData)
 			return {
 				balance: updatedWallet === null ? clientData.balance : updatedWallet,
@@ -43,9 +45,9 @@ function Assets() {
 				owner_address: clientData.address,
 				rootAddress: "none",
 				showWrapMenu: true,
-				symbol: "TON Crystal",
-				tokenName: "TON Crystal",
-				type: "Native Tons",
+				symbol: "EVER",
+				tokenName: "Everscale",
+				type: "Native evers",
 				walletAddress: clientData.address,
 			};
 	}, [clientData, updatedWallet]);
@@ -103,10 +105,10 @@ function Assets() {
 		setAssets(copyAssets);
 	}
 	function handleClickToken(curItem) {
-		if (curItem.type !== "Native Tons") return;
+		if (curItem.type !== "Native evers") return;
 		const copyAssets = JSON.parse(JSON.stringify(tokenList));
 		copyAssets.map((item) => {
-			if ("Native Tons" === item.type) {
+			if ("Native evers" === item.type) {
 				item.showWrapMenu = !item.showWrapMenu;
 			}
 		});
@@ -117,7 +119,7 @@ function Assets() {
 		setcurrentTokenForWrap(tonWallet);
 		setViewData({
 			confirmText: "wrap",
-			title: "TON Crystal → WTON",
+			title: "EVER → wEVER",
 			tokenSetted: true,
 			type: "wrap",
 		});
@@ -125,10 +127,20 @@ function Assets() {
 	}
 	async function handleUnWrapTons() {
 		const tonObj = tokenList.filter((item) => item.symbol === "WTON");
+		console.log("tonObj", tonObj[0], tonObj.length);
+		if (!tonObj.length) {
+			dispatch(
+				setTips({
+					message: `You have not wEVER for unWrap`,
+					type: "error",
+				}),
+			);
+			return;
+		}
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
 			confirmText: "unwrap",
-			title: "WTON → TON Crystal",
+			title: "wEVER → EVER",
 			tokenSetted: true,
 			type: "unwrap",
 		});
@@ -257,14 +269,15 @@ function Assets() {
 								{walletIsConnected ? (
 									<>
 										{(NFTassets && NFTassets.length) ||
-										(tonWallet && tokenList && tokenList.length) ||
-										(limitOrdersData && limitOrdersData.limitOrders.length) ? (
+										tonWallet ||
+										(tokenList && tokenList.length)(
+											limitOrdersData && limitOrdersData.limitOrders.length,
+										) ? (
 											<AssetsList
-												TokenAssetsArray={[
-													tonWallet,
-													...tokenList,
-													...liquidityList,
-												]}
+												TokenAssetsArray={uniqBy(
+													[tonWallet, ...tokenList, ...liquidityList],
+													"tokenName",
+												)}
 												orderAssetArray={
 													[]
 													// limitOrdersData && limitOrdersData.limitOrders
@@ -290,7 +303,9 @@ function Assets() {
 										className="btn mainblock-btn"
 										onClick={() => history.push("/account")}
 									>
-										Connect wallet
+										{!clientData.status && clientData.address.length === 66
+											? "Deploy wallet"
+											: "Connect wallet"}
 									</button>
 								)}
 							</div>

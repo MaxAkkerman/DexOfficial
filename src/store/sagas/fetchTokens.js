@@ -17,6 +17,7 @@ function* fetchTokens() {
 			(state) => state.tonContext.functions.getAllClientWallets,
 		);
 		const tokens = yield call(getAllClientWallets);
+
 		yield put({
 			payload: tokens,
 			type: TOKENS_FETCH_SUCCEEDED,

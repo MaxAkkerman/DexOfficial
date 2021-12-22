@@ -194,12 +194,21 @@ function Input(props) {
 			}
 		} else if (location.pathname.includes("add-liquidity")) {
 			if (props.type === "from") {
-				dispatch(setPoolFromInputValue(value));
-				let val = value * poolRate;
-				let val1 = 0;
-				if (val < 0.0001) val1 = parseFloat(val.toFixed(8));
-				else val1 = parseFloat(val.toFixed(4));
-				dispatch(setPoolToInputValue(val1));
+				if (!poolRate) {
+					dispatch(setPoolFromInputValue(value));
+				} else {
+					dispatch(setPoolFromInputValue(value));
+
+					console.log("poolrate", poolRate);
+					let val = value * poolRate;
+					let val1 = 0;
+					if (val < 0.0001) val1 = parseFloat(val.toFixed(8));
+					else val1 = parseFloat(val.toFixed(4));
+					dispatch(setPoolToInputValue(val1));
+				}
+			}
+			if (!poolRate && props.type === "to") {
+				dispatch(setPoolToInputValue(value));
 			}
 		}
 	}

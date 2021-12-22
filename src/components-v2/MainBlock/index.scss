@@ -155,6 +155,10 @@
 	.mainblock {
 		max-width: 90%;
 	}
+	.mainblock-wrapper {
+		width: 100%;
+		//position:fixed;
+	}
 }
 
 @media screen and (max-width: 481px) {

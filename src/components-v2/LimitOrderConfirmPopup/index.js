@@ -57,11 +57,11 @@ export default function LimitOrderConfirmPopup() {
 				price: toPrice,
 				qty: fromValue,
 			});
-			console.log("makeLimitOrder(A|B)->res", res);
+			// console.log("makeLimitOrder(A|B)->res", res);
 
 			if (res.makeLimitOrderStatus)
 				enqueueSnackbar({
-					message: "Sended message to blockchain",
+					message: "Sent message to blockchain",
 					type: "info",
 				});
 			else

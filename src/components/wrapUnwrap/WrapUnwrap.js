@@ -83,7 +83,7 @@ function WrapUnwrap(props) {
 		if (clientData.balance < 4) {
 			dispatch(
 				setTips({
-					message: `You need at least 4 TON Crystal on balance to deploy WTON wallet`,
+					message: `You need at least 4 EVERs on balance to deploy WTON wallet`,
 					type: "error",
 				}),
 			);
@@ -131,7 +131,7 @@ function WrapUnwrap(props) {
 			if (amount > props.currentTokenForWrap.balance)
 				errors.amount = NOT_ENOUGH_MSG;
 
-			const tonAsset = assetList.find((t) => t.symbol === "TON Crystal");
+			const tonAsset = assetList.find((t) => t.symbol === "EVER");
 
 			if (tonAsset && tonAsset.symbol === props.currentTokenForWrap.symbol) {
 				if (tonAsset.balance - amount - WRAP_UNWRAP_COMMISSION <= 0)
@@ -156,12 +156,12 @@ function WrapUnwrap(props) {
 				}),
 			);
 		} else if (
-			props.currentTokenForWrap.type === "Native Tons" &&
+			props.currentTokenForWrap.type === "Native evers" &&
 			values.amount > props.currentTokenForWrap.balance - 1.2
 		) {
 			dispatch(
 				setTips({
-					message: `Insufficient balance, transaction fee 1.2 TONs`,
+					message: `Insufficient balance, transaction fee 1.2 EVERs`,
 					type: "error",
 				}),
 			);
@@ -188,7 +188,7 @@ function WrapUnwrap(props) {
 			if (!res.code) {
 				dispatch(
 					setTips({
-						message: `Sended message to blockchain`,
+						message: `Sent message to blockchain`,
 						type: "info",
 					}),
 				);

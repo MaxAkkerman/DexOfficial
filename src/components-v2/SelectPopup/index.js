@@ -14,11 +14,11 @@ import classes from "./index.module.scss";
 
 export default function SelectPopup({loading, onClose, onSelect, tokens}) {
 	const [searchWord, setSearchWord] = useState("");
-
+	console.log("tokens", tokens);
 	const filteredTokens = useMemo(
 		() =>
 			tokens
-				.sort((a, b) => b.balance - a.balance)
+				// .sort((a, b) => b.balance - a.balance)
 				.filter((t) => includesTextInToken(t, searchWord)),
 		[tokens, searchWord],
 	);

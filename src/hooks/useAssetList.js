@@ -17,16 +17,16 @@ export default function useAssetList() {
 
 	useEffect(() => {
 		const isTONwalletExist = tokenList.filter(
-			(item) => item.type === "Native Tons",
+			(item) => item.type === "Native evers",
 		);
 		console.log("isTONwalletExist", isTONwalletExist);
 		if (isTONwalletExist.length === 0) {
 			const TONdata = {
 				walletAddress: clientData.address,
 				owner_address: clientData.address,
-				symbol: "TON Crystal",
-				tokenName: "TON Crystal",
-				type: "Native Tons",
+				symbol: "EVER",
+				tokenName: "Everscale",
+				type: "Native evers",
 				icon: TONicon,
 				rootAddress: "none",
 				showWrapMenu: true,

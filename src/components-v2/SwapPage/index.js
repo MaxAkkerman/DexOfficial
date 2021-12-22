@@ -281,7 +281,10 @@ export default function SwapPage() {
 
 		switch (currentState) {
 			case "connectWallet":
-				props.children = "Connect wallet";
+				props.children =
+					!clientData.status && clientData.address.length === 66
+						? "Deploy wallet"
+						: "Connect wallet";
 				props.onClick = handleConnectWallet;
 				props.type = "button";
 				break;

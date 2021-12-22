@@ -5,8 +5,6 @@ import "./EnterSeedPhrase.scss";
 import {Alert, AlertTitle, Box} from "@material-ui/core";
 
 function Alerter(props) {
-	console.log("Alerter rerendered blyat");
-
 	return (
 		<Box
 			sx={{

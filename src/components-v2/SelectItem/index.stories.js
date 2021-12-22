@@ -13,7 +13,7 @@ export const Default = Template.bind({});
 Default.args = {
 	token: {
 		balance: 18.371355611,
-		symbol: "WTON",
-		tokenName: "Wrapped TON Crystal",
+		symbol: "EVER",
+		tokenName: "Everscale",
 	},
 };

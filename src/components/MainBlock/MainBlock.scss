@@ -126,11 +126,12 @@
 
 @media screen and (max-width: 1025px) {
 	.mainblock {
-		margin-top:8px;
+		margin-top: 8px;
 
 		padding: 30px;
 		border-radius: 30px;
 		top: unset;
+
 		&-header {
 			margin-bottom: 20px;
 		}
@@ -152,6 +153,7 @@
 @media screen and (max-width: 650px) {
 	.mainblock {
 		max-width: 90%;
+
 		&-title {
 			font-size: 22px;
 		}
@@ -163,11 +165,22 @@
 		padding: 20px;
 		max-width: 85%;
 	}
+	.mainblock {
+		padding: 25px;
+		margin-top: 8px;
+
+		&-title {
+			font-size: 18px;
+		}
+	}
 }
 
 @media screen and (max-width: 415px) {
 	.popup-wrapper .mainblock-footer {
 		display: none;
+	}
+	.mainblock {
+		width: 100%;
 	}
 }
 
@@ -183,14 +196,4 @@
 			margin-top: 10px;
 		}
 	}
-}
-@media screen and (max-width: 480px) {
-
-		.mainblock {
-			padding: 25px;
-			margin-top:8px;
-			&-title {
-				font-size: 24px;
-			}
-		}
 }

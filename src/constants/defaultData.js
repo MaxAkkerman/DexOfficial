@@ -120,9 +120,9 @@ export const assetstestArray = [
 			"0:4594ac781bdcdee350c9c8c25dfaf08d067b1214fa86c687f4deca048a76551f",
 	},
 	{
-		tokenName: "TON Crystal",
+		tokenName: "Everscale",
 		balance: "1052",
-		tokenSymbol: "TON",
+		tokenSymbol: "EVER",
 		icon: TON,
 		address:
 			"0:4594ac781bdcdee350c9c8c25dfaf08d067b1214fa86c687f4deca048a76551f",

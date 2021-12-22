@@ -55,7 +55,7 @@ function AssetsListForDeploy() {
 		if (clientData.balance < 4) {
 			dispatch(
 				setTips({
-					message: `You need at least 4 TON Crystal on balance to deploy ${curAssetForDeploy.tokenName} wallet`,
+					message: `You need at least 4 EVERs on balance to deploy ${curAssetForDeploy.tokenName} wallet`,
 					type: "error",
 				}),
 			);

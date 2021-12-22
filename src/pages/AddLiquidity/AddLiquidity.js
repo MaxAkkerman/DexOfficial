@@ -76,7 +76,6 @@ function AddLiquidity() {
 		if (!tips || tips.length) return;
 		if (tips.name === "processLiquidityCallback") {
 			if (fromToken.symbol || toToken.Symbol) {
-				console.log("I am at chakeee");
 				const fromTokenCopy = JSON.parse(JSON.stringify(fromToken));
 				const toTokenCopy = JSON.parse(JSON.stringify(toToken));
 				const newFromTokenData = tokenList.filter(
@@ -250,12 +249,12 @@ function AddLiquidity() {
 			if (toValue === 0 || fromValue === 0)
 				localErrors.emptyFields = NOT_TOUCHED;
 
-			const tonAsset = assetList.find((t) => t.symbol === "TON Crystal");
+			const tonAsset = assetList.find((t) => t.symbol === "EVER");
 			if (tonAsset && tonAsset.balance) {
 				const nativeTONBalance = tonAsset.balance;
 
 				if (nativeTONBalance < PROVIDE_LIQUIDITY_COMMISSION)
-					localErrors.commission = `${NOT_ENOUGH_CAUSE_COMMISSION_MSG} (Commission = ${PROVIDE_LIQUIDITY_COMMISSION} TON Crystal)`;
+					localErrors.commission = `${NOT_ENOUGH_CAUSE_COMMISSION_MSG} (Commission = ${PROVIDE_LIQUIDITY_COMMISSION} EVER)`;
 				console.log(localErrors);
 				setErrors(localErrors);
 			}
@@ -305,7 +304,7 @@ function AddLiquidity() {
 		}
 	}
 	return (
-		<div className="container">
+		<div className="container" style={{flexDirection: "column"}}>
 			{!poolAsyncIsWaiting && (
 				<>
 					<div style={{display: "contents"}}>
@@ -341,6 +340,7 @@ function AddLiquidity() {
 										autoFocus={true}
 										token={fromToken}
 										value={fromValue}
+										ratesData={ratesData}
 										componentName={"provide"}
 										borderError={errors.fromTokenAmount}
 										incorrectBalance={incorrectBalance}
@@ -383,7 +383,11 @@ function AddLiquidity() {
 										token={toToken}
 										borderError={errors.toTokenAmount}
 										value={toValue}
-										readOnly
+										readOnly={
+											ratesData.reservesA && ratesData.reservesB
+												? "readOnly"
+												: ""
+										}
 										incorrectBalanceToValue={incorrectBalanceToValue}
 									/>
 									{errors.toTokenAmount ? (
@@ -396,7 +400,7 @@ function AddLiquidity() {
 									) : (
 										<div style={{height: "22px"}} />
 									)}
-									{fromToken.symbol && toToken.symbol && (
+									{!ratesData.reservesA || !ratesData.reservesB ? (
 										<div
 											style={{
 												display: "flex",
@@ -404,97 +408,111 @@ function AddLiquidity() {
 												justifyContent: "space-evenly",
 											}}
 										>
-											<div className="add-liquidity-wrapper">
-												<div>
-													<span>
-														{
-															totalLPs
-															//todo check
-															// getTotalLP(
-															//     fromValue * 1000000000,
-															//     toValue * 1000000000,
-															//     ratesData.reservesA * 1000000000,
-															//     ratesData.reservesB * 1000000000,
-															//     ratesData.totalSupply * 1000000000,
-															// ) /
-															// 1000000000 !==
-															// 0
-															//     ? getTotalLP(
-															//     fromValue * 1000000000,
-															//     toValue * 1000000000,
-															//     ratesData.reservesA * 1000000000,
-															//     ratesData.reservesB * 1000000000,
-															//     ratesData.totalSupply * 1000000000,
-															//     ) /
-															//     1000000000 <
-															//     0.0001
-															//     ? (
-															//         getTotalLP(
-															//             fromValue * 1000000000,
-															//             toValue * 1000000000,
-															//             ratesData.reservesA * 1000000000,
-															//             ratesData.reservesB * 1000000000,
-															//             ratesData.totalSupply * 1000000000,
-															//         ) / 1000000000
-															//     ).toFixed(6)
-															//     : (
-															//         getTotalLP(
-															//             fromValue * 1000000000,
-															//             toValue * 1000000000,
-															//             ratesData.reservesA * 1000000000,
-															//             ratesData.reservesB * 1000000000,
-															//             ratesData.totalSupply * 1000000000,
-															//         ) / 1000000000
-															//     ).toFixed(4)
-															//     : (
-															//         getTotalLP(
-															//             fromValue * 1000000000,
-															//             toValue * 1000000000,
-															//             ratesData.reservesA * 1000000000,
-															//             ratesData.reservesB * 1000000000,
-															//             ratesData.totalSupply * 1000000000,
-															//         ) / 1000000000
-															//     ).toFixed(4)
-														}
-													</span>
-													You will receive LP tokens
-												</div>
-
-												<div>
-													<span>
-														{rateType === "AB"
-															? getNumType(rateBA)
-															: getNumType(rateAB)}{" "}
-													</span>
-													{fromTokenSymbol} per 1 {toTokenSymbol}
-												</div>
-
-												<div>
-													<span>
-														{rateType === "AB"
-															? getNumType(rateAB)
-															: getNumType(rateBA)}
-													</span>
-													{toTokenSymbol} per 1 {fromTokenSymbol}
-												</div>
-											</div>
-
-											<div className="add-liquidity-wrapper">
-												<div>
-													<span>{`${poolSharePercentage} %`}</span>
-													Your share of pool
-												</div>
-												<div>
-													<span>{getNumType(ratesData.reservesA)}</span>
-													{fromTokenSymbol} pooled
-												</div>
-
-												<div>
-													<span>{getNumType(ratesData.reservesB)}</span>
-													{toTokenSymbol} pooled
-												</div>
-											</div>
+											The pair is empty - you can set the rate by supplying it.
+											<div className="add-liquidity-wrapper"></div>
 										</div>
+									) : (
+										fromToken.symbol &&
+										toToken.symbol && (
+											<div
+												style={{
+													display: "flex",
+													flexDirection: "row",
+													justifyContent: "space-evenly",
+												}}
+											>
+												<div className="add-liquidity-wrapper">
+													<div>
+														<span>
+															{
+																totalLPs
+																//todo check
+																// getTotalLP(
+																//     fromValue * 1000000000,
+																//     toValue * 1000000000,
+																//     ratesData.reservesA * 1000000000,
+																//     ratesData.reservesB * 1000000000,
+																//     ratesData.totalSupply * 1000000000,
+																// ) /
+																// 1000000000 !==
+																// 0
+																//     ? getTotalLP(
+																//     fromValue * 1000000000,
+																//     toValue * 1000000000,
+																//     ratesData.reservesA * 1000000000,
+																//     ratesData.reservesB * 1000000000,
+																//     ratesData.totalSupply * 1000000000,
+																//     ) /
+																//     1000000000 <
+																//     0.0001
+																//     ? (
+																//         getTotalLP(
+																//             fromValue * 1000000000,
+																//             toValue * 1000000000,
+																//             ratesData.reservesA * 1000000000,
+																//             ratesData.reservesB * 1000000000,
+																//             ratesData.totalSupply * 1000000000,
+																//         ) / 1000000000
+																//     ).toFixed(6)
+																//     : (
+																//         getTotalLP(
+																//             fromValue * 1000000000,
+																//             toValue * 1000000000,
+																//             ratesData.reservesA * 1000000000,
+																//             ratesData.reservesB * 1000000000,
+																//             ratesData.totalSupply * 1000000000,
+																//         ) / 1000000000
+																//     ).toFixed(4)
+																//     : (
+																//         getTotalLP(
+																//             fromValue * 1000000000,
+																//             toValue * 1000000000,
+																//             ratesData.reservesA * 1000000000,
+																//             ratesData.reservesB * 1000000000,
+																//             ratesData.totalSupply * 1000000000,
+																//         ) / 1000000000
+																//     ).toFixed(4)
+															}
+														</span>
+														You will receive LP tokens
+													</div>
+
+													<div>
+														<span>
+															{rateType === "AB"
+																? getNumType(rateBA)
+																: getNumType(rateAB)}{" "}
+														</span>
+														{fromTokenSymbol} per 1 {toTokenSymbol}
+													</div>
+
+													<div>
+														<span>
+															{rateType === "AB"
+																? getNumType(rateAB)
+																: getNumType(rateBA)}
+														</span>
+														{toTokenSymbol} per 1 {fromTokenSymbol}
+													</div>
+												</div>
+
+												<div className="add-liquidity-wrapper">
+													<div>
+														<span>{`${poolSharePercentage} %`}</span>
+														Your share of pool
+													</div>
+													<div>
+														<span>{getNumType(ratesData.reservesA)}</span>
+														{fromTokenSymbol} pooled
+													</div>
+
+													<div>
+														<span>{getNumType(ratesData.reservesB)}</span>
+														{toTokenSymbol} pooled
+													</div>
+												</div>
+											</div>
+										)
 									)}
 									{walletIsConnected ? (
 										<button

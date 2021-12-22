@@ -134,10 +134,10 @@ export default function OrderPopupUpdate({order, close}) {
 			<MainBlock
 				button={
 					<button onClick={close} className={classes.btn}>
-						<IconCross
-							fill="none"
-							className={cls("close", classes.btn__icon)}
-						/>
+						{/*<IconCross*/}
+						{/*	fill="none"*/}
+						{/*	className={cls("close", classes.btn__icon)}*/}
+						{/*/>*/}
 					</button>
 				}
 				title="Update Limit Order"

@@ -476,7 +476,7 @@ function EnterSeedPhrase(props) {
 			setloadingUserDataIsWaitingSeed(true);
 			const dexClientAddress = clientDataPreDeployLS.address;
 			const dexClientBalance = await getClientBalance(dexClientAddress);
-			console.log("i am here");
+			// console.log("i am here");
 			dispatch(
 				setClientData({
 					status: false,
@@ -677,7 +677,7 @@ function EnterSeedPhrase(props) {
 		if (!walletDeployed) {
 			const dexClientAddress = clientPrepData.address;
 			const dexClientBalance = await getClientBalance(dexClientAddress);
-			console.log("i am here");
+			// console.log("i am here");
 			const data = {
 				status: false,
 				dexclient: dexClientAddress,
@@ -703,7 +703,7 @@ function EnterSeedPhrase(props) {
 			const encrData = JSON.parse(JSON.stringify(clientPrepData));
 			encrData.secret = encClData;
 			encrData.esp = encClDataSeed;
-			console.log("encClData", encClData);
+			// console.log("encClData", encClData);
 			localStorage.setItem("clientDataPreDeploy", JSON.stringify(encrData));
 			setSeedPhrasePassword(null);
 
@@ -838,9 +838,7 @@ function EnterSeedPhrase(props) {
 								<>
 									<Grid
 										container
-										onClick={() =>
-											console.log("mnemonicWords", mnemonicWords.length)
-										}
+										onClick={() => console.log("mnemonicWords")}
 										spacing={3}
 										sx={{justifyContent: "center"}}
 									>
@@ -1997,7 +1995,7 @@ function EnterSeedPhrase(props) {
 												flexDirection: "column",
 											}}
 										>
-											TONs not received, please try again or wait one minute.
+											EVERs not received, please try again or wait one minute.
 										</Box>
 									)}
 									<div className={"enterSPBox"}>
