@@ -2,6 +2,7 @@ import "./index.scss";
 
 import {useFormik} from "formik";
 import compact from "lodash/compact";
+import every from "lodash/every";
 import find from "lodash/find";
 import reject from "lodash/reject";
 import uniq from "lodash/uniq";
@@ -267,7 +268,7 @@ export default function SwapPage() {
 			values.fromToken &&
 			values.toToken &&
 			values.pair &&
-			(!values.pair.exists || values.pair.walletExists.length !== 3)
+			!every(values.pair.walletExists, "status")
 		)
 			return "connectPair";
 		else return "doSwap";
