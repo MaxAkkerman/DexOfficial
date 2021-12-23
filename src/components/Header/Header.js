@@ -86,6 +86,8 @@ function Header() {
           >
             Staking
           </NavLink>
+          {/**
+           * TODO: Uncomment later
           <NavLink
             to="/bridge"
             className={
@@ -96,6 +98,7 @@ function Header() {
           >
             Bridge
           </NavLink>
+           */}
         </div>
       </div>
       <div className="header-wrap">
