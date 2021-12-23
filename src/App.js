@@ -131,6 +131,7 @@ function App() {
 	}
 
 	useEffect(async () => {
+		// await getAllPairsAndSetToStore()
 		const pairs2 = await getAllPairsWoithoutProvider();
 		dispatch(setPairsList(pairs2));
 		setonloading(false);

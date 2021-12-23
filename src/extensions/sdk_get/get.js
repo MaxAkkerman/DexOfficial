@@ -695,11 +695,12 @@ export const getAllPairsWoithoutProvider = memoize(async () => {
 		itemData.pairAddress = item[0];
 
 		// itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
-		itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol);
+		itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol) === "WTON" ? "EVER" : hex2a(curRootDataA.decoded.output.value0.symbol);
 		itemData.reserveA = balanceA;
 		itemData.decimalsA = decimalsRootA;
+		itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol) === "WTON" ? "EVER" : hex2a(curRootDataB.decoded.output.value0.symbol);
 
-		itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
+		// itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
 		itemData.reservetB = balanceB;
 		itemData.decimalsB = decimalsRootB;
 

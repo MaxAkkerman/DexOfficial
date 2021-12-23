@@ -24,7 +24,7 @@ function LiquidityItem({symbol, balance}) {
 
 	const symbols = symbol.split("/");
 	const pairsList = useSelector((state) => state.walletReducer.pairsList);
-
+console.log("symbols",symbols)
 	const handleClick = () => {
 		const fromToken = symbols[0].replaceAll("DS-W", "");
 
@@ -39,6 +39,8 @@ function LiquidityItem({symbol, balance}) {
 				curSymbolPair.push(item);
 			}
 		});
+		console.log("curSymbolPair",curSymbolPair)
+
 		assetsArr.map((item) => {
 			if (item.symbol === curSymbolPair[0]) {
 				fromT = item.symbol;
@@ -50,6 +52,7 @@ function LiquidityItem({symbol, balance}) {
 		dispatch(setManageBalance(balance));
 
 		pairsList.forEach((i) => {
+			console.log("pairsList",pairsList, "to", toT,"from",fromT)
 			if (i.symbolA.includes(fromT) && i.symbolB.includes(toT)) {
 				dispatch(setManageFromToken({symbol: fromT, reserve: i.reserveA}));
 				dispatch(setManageToToken({symbol: toT, reserve: i.reservetB}));
