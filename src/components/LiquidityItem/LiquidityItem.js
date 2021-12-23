@@ -18,6 +18,7 @@ function LiquidityItem({symbol, balance}) {
 	const liquidityList = useSelector(
 		(state) => state.walletReducer.liquidityList,
 	);
+	console.log("symbol",symbol)
 
 	const history = useHistory();
 	const dispatch = useDispatch();
@@ -49,6 +50,8 @@ console.log("symbols",symbols)
 				toT = item.symbol;
 			}
 		});
+		console.log("assetsArr",assetsArr)
+
 		dispatch(setManageBalance(balance));
 
 		pairsList.forEach((i) => {
