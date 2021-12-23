@@ -84,8 +84,8 @@ function Header() {
 				>
 					Staking
 				</NavLink>
-				{/**
-                 * TODO: Temporary commented, please remove after enabling bridge
+
+                 {/*// * TODO: Temporary commented, please remove after enabling bridge*/}
 				<NavLink
                     to="/bridge"
                     className={
@@ -95,7 +95,7 @@ function Header() {
                     }
                 >
                     Bridge
-                </NavLink> */}
+                </NavLink>
 			</div>
 			<div className="header_wrap_set">
 				{/*<NativeLogin/>*/}

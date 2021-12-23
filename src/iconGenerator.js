@@ -1,4 +1,4 @@
-import TON from "./images/tokens/TON.svg";
+import TON from "./images/tokens/TONold.svg";
 import fBTC from "./images/tokens/wBTC.svg";
 import fETH from "./images/tokens/wETH.svg";
 import USDT from "./images/tokens/wUSDT.svg";

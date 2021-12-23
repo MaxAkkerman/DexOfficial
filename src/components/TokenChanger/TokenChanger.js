@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import SetTokenBlock from "../AmountBlock/SetTokenBlock";
 import SelectTokenMenu from "../AmountBlock/SelectTokenMenu";
 import {setTokenForReceiveSetted} from "../../store/actions/walletSeed";
-import TON from "../../images/tokens/TON.svg";
+import TON from "../../images/tokens/TONold.svg";
 import {useHistory} from "react-router-dom";
 
 function TokenChanger(props) {

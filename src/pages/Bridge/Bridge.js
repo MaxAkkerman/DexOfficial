@@ -163,15 +163,15 @@ function Bridge() {
 												classWrapper={"send_balance center"}
 												balance={5}
 												label={true}
-												showBal={true}
+												showBal={false}
 											/>
-											<AddressPopup
-												netIcon={toCurAsset.icon}
-												classWrapper={""}
-												address={
-													"0:575ae3f0babf72903f51af69a4d4f0d010f232b405a687d1ef81cd731869cb07"
-												}
-											/>
+											{/*<AddressPopup*/}
+											{/*	netIcon={toCurAsset.icon}*/}
+											{/*	classWrapper={""}*/}
+											{/*	address={*/}
+											{/*		"0:575ae3f0babf72903f51af69a4d4f0d010f232b405a687d1ef81cd731869cb07"*/}
+											{/*	}*/}
+											{/*/>*/}
 										</>
 									}
 									rightBottomBlock={
@@ -224,15 +224,15 @@ function Bridge() {
 												classWrapper={"send_balance center"}
 												balance={5}
 												label={true}
-												showBal={true}
+												showBal={false}
 											/>
-											<AddressPopup
-												netIcon={fromCurAsset.icon}
-												classWrapper={""}
-												address={
-													"0:575ae3f0babf72903f51af69a4d4f0d010f232b405a687d1ef81cd731869cb07"
-												}
-											/>
+											{/*<AddressPopup*/}
+											{/*	netIcon={fromCurAsset.icon}*/}
+											{/*	classWrapper={""}*/}
+											{/*	address={*/}
+											{/*		"0:575ae3f0babf72903f51af69a4d4f0d010f232b405a687d1ef81cd731869cb07"*/}
+											{/*	}*/}
+											{/*/>*/}
 										</>
 									}
 									rightBottomBlock={
