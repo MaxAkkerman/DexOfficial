@@ -3,5 +3,5 @@
  * @return {string} safeNum - Number in a full width
  */
 export default function convertToInt(unsafeNum) {
-	return BigInt(Math.round(unsafeNum)).toString();
+  return BigInt(Math.round(unsafeNum)).toString();
 }

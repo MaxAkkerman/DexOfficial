@@ -7,26 +7,26 @@
  * @returns {number}
  */
 export default function truncateNum(
-	num,
-	decimals = 4,
-	informativeDecimals = 1,
+  num,
+  decimals = 4,
+  informativeDecimals = 1,
 ) {
-	if (Number.isInteger(num)) return num;
+  if (Number.isInteger(num)) return num;
 
-	let truncatedNum = getFixedDown(num, decimals);
+  let truncatedNum = getFixedDown(num, decimals);
 
-	while (Number.isInteger(truncatedNum)) {
-		truncatedNum = getFixedDown(num, decimals);
-		decimals++;
-	}
+  while (Number.isInteger(truncatedNum)) {
+    truncatedNum = getFixedDown(num, decimals);
+    decimals++;
+  }
 
-	while (informativeDecimals > 1) {
-		truncatedNum = getFixedDown(num, decimals);
-		decimals++;
-		informativeDecimals--;
-	}
+  while (informativeDecimals > 1) {
+    truncatedNum = getFixedDown(num, decimals);
+    decimals++;
+    informativeDecimals--;
+  }
 
-	return truncatedNum;
+  return truncatedNum;
 }
 
 /**
@@ -38,7 +38,7 @@ export default function truncateNum(
  * @returns {number}
  */
 function getFixedDown(num, digits) {
-	const re = new RegExp("(\\d+\\.\\d{" + digits + "})(\\d)");
-	const m = num.toString().match(re);
-	return m ? parseFloat(m[1]) : num.valueOf();
+  const re = new RegExp('(\\d+\\.\\d{' + digits + '})(\\d)');
+  const m = num.toString().match(re);
+  return m ? parseFloat(m[1]) : num.valueOf();
 }

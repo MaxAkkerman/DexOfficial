@@ -1,15 +1,15 @@
-import {gql} from "@apollo/client";
+import { gql } from '@apollo/client';
 
-import {LimitOrderFieldsFragment} from "./fragments";
+import { LimitOrderFieldsFragment } from './fragments';
 
 export const LimitOrderUpdateSubscription = gql`
-	${LimitOrderFieldsFragment}
-	subscription LimitOrderUpdate($addrOwner: String!) {
-		updateLimitOrder(addrOwner: $addrOwner) {
-			status
-			limitOrder {
-				...LimitOrderFields
-			}
-		}
-	}
+  ${LimitOrderFieldsFragment}
+  subscription LimitOrderUpdate($addrOwner: String!) {
+    updateLimitOrder(addrOwner: $addrOwner) {
+      status
+      limitOrder {
+        ...LimitOrderFields
+      }
+    }
+  }
 `;
