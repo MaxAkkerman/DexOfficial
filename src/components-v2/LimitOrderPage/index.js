@@ -132,7 +132,10 @@ export default function LimitOrderPage() {
 		};
 
 		if (!walletConnected) {
-			props.children = (!clientData.status && clientData.address.length === 66) ? "Deploy wallet" : "Connect wallet";
+			props.children =
+				!clientData.status && clientData.address.length === 66
+					? "Deploy wallet"
+					: "Connect wallet";
 			props.onClick = handleConnectWallet;
 			props.type = "button";
 		} else if (values.fromToken && values.toToken && !values.pair) {

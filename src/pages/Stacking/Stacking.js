@@ -524,7 +524,9 @@ function Stacking() {
 											className="btn mainblock-btn"
 											onClick={() => history.push("/account")}
 										>
-											{(!clientData.status && clientData.address.length === 66) ? "Deploy wallet" : "Connect wallet"}
+											{!clientData.status && clientData.address.length === 66
+												? "Deploy wallet"
+												: "Connect wallet"}
 										</button>
 									)}
 								</Stack>

@@ -22,6 +22,8 @@ const initialState = {
 		takeLimitOrder() {},
 	},
 	helperFunctions: {
+		checkClientPairExists() {},
+		checkWalletExists() {},
 		getClientKeys() {},
 		getClientWallet() {},
 		getPair() {},

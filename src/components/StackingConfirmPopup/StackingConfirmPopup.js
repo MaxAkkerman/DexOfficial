@@ -88,11 +88,7 @@ function StackingConfirmPopup(props) {
 					<>
 						<div className="confirm-block swap-confirm-block">
 							<span className="confirm-token">
-								<img
-									style={{marginRight: "5px"}}
-									src={TON}
-									alt={"Everscale"}
-								/>{" "}
+								<img style={{marginRight: "5px"}} src={TON} alt={"Everscale"} />{" "}
 								{(amountForStacking / 1e9).toFixed(1) || "value for staking"}
 							</span>
 							{appTheme === "light" ? (

@@ -127,15 +127,15 @@ function Assets() {
 	}
 	async function handleUnWrapTons() {
 		const tonObj = tokenList.filter((item) => item.symbol === "WTON");
-		console.log("tonObj",tonObj[0],tonObj.length)
-		if(!tonObj.length){
+		console.log("tonObj", tonObj[0], tonObj.length);
+		if (!tonObj.length) {
 			dispatch(
 				setTips({
 					message: `You have not wEVER for unWrap`,
 					type: "error",
 				}),
-			)
-		return
+			);
+			return;
 		}
 		setcurrentTokenForWrap(tonObj[0]);
 		setViewData({
@@ -269,15 +269,15 @@ function Assets() {
 								{walletIsConnected ? (
 									<>
 										{(NFTassets && NFTassets.length) ||
-										tonWallet  || (tokenList && tokenList.length)
-										(limitOrdersData && limitOrdersData.limitOrders.length) ? (
+										tonWallet ||
+										(tokenList && tokenList.length)(
+											limitOrdersData && limitOrdersData.limitOrders.length,
+										) ? (
 											<AssetsList
-												TokenAssetsArray={uniqBy([
-													tonWallet,
-													...tokenList,
-													...liquidityList,
-												],'tokenName')
-													}
+												TokenAssetsArray={uniqBy(
+													[tonWallet, ...tokenList, ...liquidityList],
+													"tokenName",
+												)}
 												orderAssetArray={
 													[]
 													// limitOrdersData && limitOrdersData.limitOrders
@@ -303,7 +303,9 @@ function Assets() {
 										className="btn mainblock-btn"
 										onClick={() => history.push("/account")}
 									>
-										{(!clientData.status && clientData.address.length === 66) ? "Deploy wallet" : "Connect wallet"}
+										{!clientData.status && clientData.address.length === 66
+											? "Deploy wallet"
+											: "Connect wallet"}
 									</button>
 								)}
 							</div>

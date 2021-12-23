@@ -4,7 +4,7 @@ import {NO_CONTEXT} from "@/constants/runtimeErrors";
 import {DEXPairContract} from "@/extensions/contracts/DEXPair";
 import {DEXRootContract} from "@/extensions/contracts/DEXRoot";
 import {RootTokenContract} from "@/extensions/contracts/RootTokenContract";
-import {getFixedNums, getFullName, hex2a} from "@/reactUtils/reactUtils";
+import {getFixedNums, hex2a} from "@/reactUtils/reactUtils";
 
 /**
  * @returns {Promise<{
@@ -30,7 +30,9 @@ export default async function getAllPairsWithoutProvider() {
 		!this.context.dexRootAddress ||
 		!this.context.tonClient ||
 		!this.helperFunctions ||
-		!this.helperFunctions.getPairsTotalSupply
+		!this.helperFunctions.getPairsTotalSupply ||
+		!this.helperFunctions.checkClientPairExists ||
+		!this.helperFunctions.checkWalletExists
 	)
 		throw new Error(NO_CONTEXT);
 
@@ -90,11 +92,17 @@ export default async function getAllPairsWithoutProvider() {
 
 		// itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
 		// itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol);
-		itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol) === "WTON" ? "EVER" : hex2a(curRootDataA.decoded.output.value0.symbol);
+		itemData.symbolA =
+			hex2a(curRootDataA.decoded.output.value0.symbol) === "WTON"
+				? "EVER"
+				: hex2a(curRootDataA.decoded.output.value0.symbol);
 
 		itemData.reserveA = balanceA;
 		itemData.decimalsA = decimalsRootA;
-		itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol) === "WTON" ? "EVER" : hex2a(curRootDataB.decoded.output.value0.symbol);
+		itemData.symbolB =
+			hex2a(curRootDataB.decoded.output.value0.symbol) === "WTON"
+				? "EVER"
+				: hex2a(curRootDataB.decoded.output.value0.symbol);
 
 		// itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
 		itemData.reserveB = balanceB;
@@ -130,7 +138,15 @@ export default async function getAllPairsWithoutProvider() {
 		itemData.rootA = root0;
 		itemData.rootB = root1;
 
+		itemData.exists = await this.helperFunctions.checkClientPairExists(
+			itemData.pairAddress,
+		);
+		itemData.walletExists = await this.helperFunctions.checkWalletExists(
+			itemData.pairAddress,
+		);
+
 		console.log("normlizeWallets!!normlizeWallets", normlizeWallets);
 	}
+
 	return normlizeWallets;
 }

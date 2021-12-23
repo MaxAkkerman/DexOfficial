@@ -28,13 +28,15 @@ import {
     wordOneEnterSeedPhrase,
 } from "../../store/actions/enterSeedPhrase";
 import {
-    setClientData,
-    setLiquidityList,
-    setPairsList, setPin,
-    setSubscribeReceiveTokens,
-    setTokenList,
-    setTransactionsList,
-    setWallet,
+
+	setClientData,
+	setLiquidityList,
+	setPairsList,
+	setPin,
+	setSubscribeReceiveTokens,
+	setTokenList,
+	setTransactionsList,
+	setWallet,
 } from "../../store/actions/wallet";
 import PinPopup from "@/components/LoginViaPIN/PinPopup";
 
@@ -404,6 +406,7 @@ function Account() {
                                     className="account-footer-clear"
                                     onClick={() => dispatch(setSubscribeReceiveTokens([]))}
                                 >
+
 									Clear all
 								</span>
                             </div>

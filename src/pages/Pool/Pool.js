@@ -26,14 +26,11 @@ function Pool() {
 				title={"Your liquidity"}
 				button={
 					<Link
-
-
 						onClick={walletIsConnected ? () => handleClickCreatePair() : null}
 						className={`btn liquidity-btn ${
 							walletIsConnected ? null : "btn--disabled"
 						}`}
 						// style={{fontSize: "20px", borderRadius: "12px"}}
-
 					>
 						Create Pair
 					</Link>
@@ -44,7 +41,9 @@ function Pool() {
 							className="btn mainblock-btn"
 							onClick={() => history.push("/account")}
 						>
-							{(!clientData.status && clientData.address.length === 66) ? "Deploy wallet" : "Connect wallet"}
+							{!clientData.status && clientData.address.length === 66
+								? "Deploy wallet"
+								: "Connect wallet"}
 						</button>
 					) : (
 						<div className="pool-wrapper">

@@ -174,15 +174,16 @@ function CreatePair() {
 	}
 
 	useEffect(() => {
-		const assetsList = tokenList.filter(item=>!item.symbol.includes("DS"));
-		console.log("tokenList search",tokenList.filter(it=>!it.symbol.includes("DS")))
+		const assetsList = tokenList.filter((item) => !item.symbol.includes("DS"));
+		console.log(
+			"tokenList search",
+			tokenList.filter((it) => !it.symbol.includes("DS")),
+		);
 		setAssetsList(tokenList);
 	}, []);
 
 	useEffect(() => {
-		const assetsListCopy = JSON.parse(
-			JSON.stringify(tokenList),
-		);
+		const assetsListCopy = JSON.parse(JSON.stringify(tokenList));
 		const newArr = assetsListCopy.filter(
 			(item) => item.symbol !== tokenA.symbol,
 		);
@@ -190,9 +191,7 @@ function CreatePair() {
 	}, [tokenA]);
 
 	useEffect(() => {
-		const assetsListCopy = JSON.parse(
-			JSON.stringify(tokenList),
-		);
+		const assetsListCopy = JSON.parse(JSON.stringify(tokenList));
 		const newArr = assetsListCopy.filter(
 			(item) => item.symbol !== tokenB.symbol,
 		);

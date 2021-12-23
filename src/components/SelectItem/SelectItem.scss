@@ -68,24 +68,23 @@
 	}
 }
 @media screen and (max-width: 321px) {
-.select-item {
-	font-size:12px;
-	&-title{
-		font-size:12px;
+	.select-item {
+		font-size: 12px;
+		&-title {
+			font-size: 12px;
+		}
+		&-descr {
+			font-size: 14px;
+		}
+		&-wrapper {
+			align-items: center;
+			font-size: 12px;
+		}
+		img {
+			width: 34px;
+			height: 34px;
+		}
 	}
-	&-descr{
-		font-size:14px;
-
-	}
-	&-wrapper {
-		align-items: center;
-		font-size:12px;
-	}
-	img {
-		width:34px;
-		height:34px;
-	}
-}
 }
 
 .select-item-wrapper2 {

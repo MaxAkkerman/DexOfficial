@@ -247,7 +247,7 @@ function SendAssets() {
 					);
 				}
 			}
-console.log("sendTres",sendTres)
+			console.log("sendTres",sendTres)
 			dispatch(setShowWaitingSendAssetsPopup(false));
 			if (sendTres && !sendTres.code) {
 				dispatch(

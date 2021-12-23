@@ -17,7 +17,7 @@ const INCORRECT_LENGTH = "Incorrect address length";
 const NOT_TON_VALID_ADDRESS = "Incorrect TON blockchain address";
 const NOT_INITIALIZED = "Account not initialized";
 const FROZEN = "Account frozen";
-const NOT_EXISTS = "Account not deployed"
+const NOT_EXISTS = "Account not deployed";
 const UNKNOWN_ERROR = "Something went wrong";
 
 const re = /.:.{64}/;

@@ -838,9 +838,7 @@ function EnterSeedPhrase(props) {
 								<>
 									<Grid
 										container
-										onClick={() =>
-											console.log("mnemonicWords")
-										}
+										onClick={() => console.log("mnemonicWords")}
 										spacing={3}
 										sx={{justifyContent: "center"}}
 									>

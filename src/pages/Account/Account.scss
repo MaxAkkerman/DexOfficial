@@ -59,12 +59,11 @@
 		display: inline-block;
 		margin-left: 40px;
 	}
-	&-deploy{
+	&-deploy {
 		font-family: "Gilroy", sans-serif;
 		color: var(--accent);
 		font-weight: 700;
 		margin-left: 11%;
-
 	}
 	&-disconnect {
 		font-family: "Gilroy", sans-serif;
@@ -146,11 +145,10 @@
 }
 @media screen and (max-width: 426px) {
 	.account {
-
 		&-footer {
-			&-list{
-				&-item{
-					font-size:10px;
+			&-list {
+				&-item {
+					font-size: 10px;
 				}
 			}
 			&-title {

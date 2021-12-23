@@ -580,7 +580,10 @@ export async function getAllClientWallets(clientAddress) {
 			// console.log("hereii", curWalletData)
 			itemData.walletAddress = item[1];
 			// itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
-			itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol) === "WTON" ? "wEVER" : hex2a(curRootData.decoded.output.value0.symbol);
+			itemData.symbol =
+				hex2a(curRootData.decoded.output.value0.symbol) === "WTON"
+					? "wEVER"
+					: hex2a(curRootData.decoded.output.value0.symbol);
 
 			itemData.tokenName = getFullName(itemData.symbol);
 			itemData.type = "PureToken";
@@ -2108,15 +2111,14 @@ const SEED_PHRASE_DICTIONARY_ENGLISH = 1; //Dictionary identifier
 
 export async function getClientKeys(phrase) {
 	//todo change with only pubkey returns
-	try{
+	try {
 		return await client.crypto.mnemonic_derive_sign_keys({
 			phrase,
 			path: HD_PATH,
 			dictionary: SEED_PHRASE_DICTIONARY_ENGLISH,
 			word_count: SEED_PHRASE_WORD_COUNT,
 		});
-	}catch(e){
-		return e
+	} catch (e) {
+		return e;
 	}
-
 }
