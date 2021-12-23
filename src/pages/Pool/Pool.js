@@ -15,6 +15,8 @@ function Pool() {
 	const liquidityList = useSelector(
 		(state) => state.walletReducer.liquidityList,
 	);
+	// const tokens = useSelector((state) => state.tonData.tokens);
+
 	function handleClickCreatePair() {
 		history.push("/create-pair");
 	}

@@ -276,7 +276,7 @@ function Assets() {
 											<AssetsList
 												TokenAssetsArray={uniqBy(
 													[tonWallet, ...tokenList, ...liquidityList],
-													"tokenName",
+													"walletAddress",
 												)}
 												orderAssetArray={
 													[]
