@@ -27,7 +27,15 @@
   .swap {
     &-btn {
       margin: 8px auto 30px auto;
+    }
+  }
+}
 
+@media screen and (max-width: 1025px) {
+  .mainblock-footer-wrap {
+    &.swap {
+      flex-direction: column;
+      text-align: center;
     }
   }
 }

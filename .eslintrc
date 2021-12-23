@@ -1,6 +1,6 @@
 {
 	"parser": "@babel/eslint-parser",
-	"extends": ["eslint:recommended", "plugin:react/recommended"],
+	"extends": ["eslint:recommended", "plugin:react/recommended", "prettier"],
 	"plugins": ["simple-import-sort", "sort-destructure-keys"],
 	"env": {
 		"browser": true,

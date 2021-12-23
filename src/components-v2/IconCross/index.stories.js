@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import IconCross from "@/components-v2/IconCross";
+import IconCross from '@/components-v2/IconCross';
 
 export default {
-	component: IconCross,
-	title: "Components/Icons",
+  component: IconCross,
+  title: 'Components/Icons',
 };
 
 const Template = (args) => <IconCross {...args} />;

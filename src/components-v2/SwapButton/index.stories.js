@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import SwapButton from "@/components-v2/SwapButton";
+import SwapButton from '@/components-v2/SwapButton';
 
 export default {
-	component: SwapButton,
-	title: "Components/Icon button",
+  component: SwapButton,
+  title: 'Components/Icon button',
 };
 
 const Template = (args) => <SwapButton {...args} />;
