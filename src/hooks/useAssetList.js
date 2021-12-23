@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react";
 import {useSelector} from "react-redux";
-import TONicon from "../images/tonCrystalDefault.svg";
+import TONicon from "../images/tokens/TON.png";
 
 export default function useAssetList() {
 	const tokenList = useSelector((state) => state.walletReducer.tokenList);
