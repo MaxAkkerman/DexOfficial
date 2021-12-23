@@ -21,8 +21,8 @@ function SeedItem(props) {
   // const [open,setOpen] = useState(false)
   return (
     <>
-      {props.seedPhrase.map((item) => (
-        <Grid item>
+      {props.seedPhrase.map((item, n) => (
+        <Grid item key={n}>
           <Autocomplete
             id={item.id}
             key={item.id}

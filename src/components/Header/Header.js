@@ -31,74 +31,74 @@ function Header() {
   return (
     <header className="header">
       <div className="header-wrap">
-        <NavLink
-          to="/swap"
-          className="header-link"
-          activeClassName="header-link--active"
-        >
-          Swap
-        </NavLink>
-        <NavLink
-          to="/orders"
-          className="header-link"
-          activeClassName="header-link--active"
-        >
-          Limit orders
-        </NavLink>
-        <NavLink
-          to="/pool"
-          className={
-            linkIsActive('/pool')
-              ? 'header-link header-link--active'
-              : 'header-link'
-          }
-        >
-          Provide Liquidity
-        </NavLink>
-        <NavLink
-          to="/pool-explorer"
-          className={
-            linkIsActive('/pool-explorer')
-              ? 'header-link header-link--active'
-              : 'header-link'
-          }
-        >
-          Pool Explorer
-        </NavLink>
-        <NavLink
-          to="/wallet"
-          className={
-            linkIsActive('/wallet')
-              ? 'header-link header-link--active'
-              : 'header-link'
-          }
-        >
-          Assets
-        </NavLink>
-        <NavLink
-          to="/staking"
-          className={
-            linkIsActive('/staking')
-              ? 'header-link header-link--active'
-              : 'header-link'
-          }
-        >
-          Staking
-        </NavLink>
-        {/**
-                 * TODO: Temporary commented, please remove after enabling bridge
-				<NavLink
-                    to="/bridge"
-                    className={
-                        linkIsActive("/bridge")
-                            ? "header-link header-link--active"
-                            : "header-link"
-                    }
-                >
-                    Bridge
-                </NavLink> */}
+        <div className="header__items">
+          <NavLink
+            to="/swap"
+            className="header-link"
+            activeClassName="header-link--active"
+          >
+            Swap
+          </NavLink>
+          <NavLink
+            to="/orders"
+            className="header-link"
+            activeClassName="header-link--active"
+          >
+            Limit orders
+          </NavLink>
+          <NavLink
+            to="/pool"
+            className={
+              linkIsActive('/pool')
+                ? 'header-link header-link--active'
+                : 'header-link'
+            }
+          >
+            Provide Liquidity
+          </NavLink>
+          <NavLink
+            to="/pool-explorer"
+            className={
+              linkIsActive('/pool-explorer')
+                ? 'header-link header-link--active'
+                : 'header-link'
+            }
+          >
+            Pool Explorer
+          </NavLink>
+          <NavLink
+            to="/wallet"
+            className={
+              linkIsActive('/wallet')
+                ? 'header-link header-link--active'
+                : 'header-link'
+            }
+          >
+            Assets
+          </NavLink>
+          <NavLink
+            to="/staking"
+            className={
+              linkIsActive('/staking')
+                ? 'header-link header-link--active'
+                : 'header-link'
+            }
+          >
+            Staking
+          </NavLink>
+          <NavLink
+            to="/bridge"
+            className={
+              linkIsActive('/bridge')
+                ? 'header-link header-link--active'
+                : 'header-link'
+            }
+          >
+            Bridge
+          </NavLink>
+        </div>
       </div>
-      <div className="header_wrap_set">
+      <div className="header-wrap">
         {/*<NativeLogin/>*/}
         {clientData.status ? (
           <Wallet />

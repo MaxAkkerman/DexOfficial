@@ -316,7 +316,7 @@ function SendAssets() {
                 })}
               >
                 <div className="send_text_headers">Recipient address</div>
-                <div>
+                <div onBlur={() => handleSetView()}>
                   <div className="send_inputs">
                     <input
                       onChange={(e) => handleChangeAddress(e)}

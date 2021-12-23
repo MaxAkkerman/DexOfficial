@@ -1,5 +1,6 @@
 import { Box, Collapse, Stack, Tooltip, Typography } from '@mui/material';
 import cls from 'classnames';
+import React from 'react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
