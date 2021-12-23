@@ -47,7 +47,6 @@ export default function SwapPage() {
 	const tokens = useSelector((state) => state.tonData.tokens);
 	const pairs = useSelector((state) => state.tonData.pairs);
 	const slippage = useSelector((state) => state.swapReducer.slippage);
-	// TODO: Remove when returning to storybook
 	const clientData = useSelector((state) => state.walletReducer.clientData);
 	// TODO: Remove when returning to storybook
 	const {keyPair} = useKeyPair();
@@ -309,7 +308,7 @@ export default function SwapPage() {
 			dispatch(setSlippageValue(values.slippage));
 	}, [values.slippage]);
 
-	// Update selected token data on callback
+	// Update selected token balance after swap
 	useEffect(() => {
 		if (values.fromToken)
 			setFieldValue(
@@ -323,7 +322,7 @@ export default function SwapPage() {
 			);
 	}, [pairTokens]);
 
-	// Update selected pair on callback
+	// Update selected pair rate after swap
 	useEffect(() => {
 		if (values.pair)
 			setFieldValue(
