@@ -5,7 +5,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useHistory} from "react-router-dom";
 
-import TONicon from "@/images/tonCrystalDefault.svg";
+import TONicon from "@/images/tokens/TON.png";
 
 import AssetsList from "../../components/AssetsList/AssetsList";
 import MainBlock from "../../components/MainBlock/MainBlock";
@@ -126,7 +126,7 @@ function Assets() {
 		setshowWrapMenu(true);
 	}
 	async function handleUnWrapTons() {
-		const tonObj = tokenList.filter((item) => item.symbol === "WTON");
+		const tonObj = tokenList.filter((item) => item.symbol === "wEVER");
 		console.log("tonObj", tonObj[0], tonObj.length);
 		if (!tonObj.length) {
 			dispatch(
