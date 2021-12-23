@@ -2,14 +2,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  //padding: 54px 70px;
+  padding: 54px 70px;
   font-weight: 500;
 
   &-wrap {
     display: flex;
     margin-top: 15px;
     margin-left: 50px;
-    //justify-content: space-between;
+    justify-content: space-between;
   }
 
   &-link {
@@ -68,12 +68,13 @@
   .header {
     padding: 30px;
     flex-direction: column;
+    padding-top: 80px;
 
     &-wrap {
       display: flex;
       margin-bottom: 15px;
-      flex-wrap: wrap;
       justify-content: center;
+      align-items: center;
       &.first {
         flex-direction: column;
       }
