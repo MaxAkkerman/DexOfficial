@@ -40,6 +40,9 @@ import {
   decodePayload,
   getShardThis,
 } from '../tonUtils';
+import memoize from 'lodash.memoize';
+
+import { saveLog } from '../../logging/logging';
 
 const { ResponseType } = require('@tonclient/core/dist/bin');
 const { TonClient } = require('@tonclient/core');
@@ -57,10 +60,6 @@ const limitOrderRouter = Radiance.networks['2'].limitOrderRouter;
 
 const client = new TonClient({ network: { endpoints: [DappServer] } });
 export default client;
-
-import memoize from 'lodash.memoize';
-
-import { saveLog } from '../../logging/logging';
 
 export async function getShardLimit() {
   let response;
@@ -557,6 +556,15 @@ export async function checkwalletExists(clientAddress, pairAddress) {
  * @param name
  */
 
+export function getReplacedSymbol(symbol) {
+  if (symbol === 'WTON') {
+    return 'wEVER';
+  } else if (symbol.includes('DS-WTON')) {
+    return symbol.replace('WTON', 'wEVER');
+  } else {
+    return symbol;
+  }
+}
 export async function getAllClientWallets(clientAddress) {
   console.log('clientAddress____', clientAddress);
   const acc = new Account(DEXClientContract, {
@@ -592,10 +600,9 @@ export async function getAllClientWallets(clientAddress) {
       // console.log("hereii", curWalletData)
       itemData.walletAddress = item[1];
       // itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
-      itemData.symbol =
-        hex2a(curRootData.decoded.output.value0.symbol) === 'WTON'
-          ? 'wEVER'
-          : hex2a(curRootData.decoded.output.value0.symbol);
+      itemData.symbol = getReplacedSymbol(
+        hex2a(curRootData.decoded.output.value0.symbol),
+      );
 
       itemData.tokenName = getFullName(itemData.symbol);
       itemData.type = 'PureToken';
@@ -707,11 +714,18 @@ export const getAllPairsWoithoutProvider = memoize(async () => {
     itemData.pairAddress = item[0];
 
     // itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
-    itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol);
+    itemData.symbolA =
+      hex2a(curRootDataA.decoded.output.value0.symbol) === 'WTON'
+        ? 'wEVER'
+        : hex2a(curRootDataA.decoded.output.value0.symbol);
     itemData.reserveA = balanceA;
     itemData.decimalsA = decimalsRootA;
+    itemData.symbolB =
+      hex2a(curRootDataB.decoded.output.value0.symbol) === 'WTON'
+        ? 'wEVER'
+        : hex2a(curRootDataB.decoded.output.value0.symbol);
 
-    itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
+    // itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
     itemData.reservetB = balanceB;
     itemData.decimalsB = decimalsRootB;
 

@@ -1,7 +1,9 @@
 import './AssetsList.scss';
 
+import React from 'react';
+
 import CalculateTimeLeft from '../../hooks/useTimer';
-import TON from '../../images/tonCrystalDefault.svg';
+import TON from '../../images/tokens/TON.png';
 import {
   formatDate,
   getDurationFromSeconds,

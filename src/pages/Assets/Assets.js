@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { LimitOrdersForOwnerQuery } from '@/graphql/queries';
-import TONicon from '@/images/tonCrystalDefault.svg';
+import TONicon from '@/images/tokens/TON.png';
 import { setTips } from '@/store/actions/app';
 
 import AssetsList from '../../components/AssetsList/AssetsList';
@@ -277,7 +277,7 @@ function Assets() {
                       <AssetsList
                         TokenAssetsArray={uniqBy(
                           [tonWallet, ...tokenList, ...liquidityList],
-                          'tokenName',
+                          'walletAddress',
                         )}
                         orderAssetArray={
                           []

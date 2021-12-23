@@ -1,13 +1,11 @@
-import './Header.scss';
-
-import { Grid } from '@material-ui/core';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { NavLink, useHistory, useLocation } from 'react-router-dom';
 
+import { NavLink, useHistory, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { changeTheme } from '../../store/actions/app';
-import HeaderMore from '../HeaderMore/HeaderMore';
 import Wallet from '../Wallet/Wallet';
+import HeaderMore from '../HeaderMore/HeaderMore';
+import './Header.scss';
 
 function Header() {
   const history = useHistory();
@@ -56,6 +54,7 @@ function Header() {
           >
             Provide Liquidity
           </NavLink>
+
           <NavLink
             to="/pool-explorer"
             className={
@@ -86,31 +85,16 @@ function Header() {
           >
             Staking
           </NavLink>
-          {/**
-           * TODO: Uncomment later
-          <NavLink
-            to="/bridge"
-            className={
-              linkIsActive('/bridge')
-                ? 'header-link header-link--active'
-                : 'header-link'
-            }
-          >
-            Bridge
-          </NavLink>
-           */}
         </div>
       </div>
       <div className="header-wrap">
         {/*<NativeLogin/>*/}
         {clientData.status ? (
           <Wallet />
-        ) : !clientData.address ? (
+        ) : (
           <button className="btn wallet-btn" onClick={handlePushToLogin}>
             Connect wallet
           </button>
-        ) : (
-          <Wallet />
         )}
 
         {/*<Wallet />*/}

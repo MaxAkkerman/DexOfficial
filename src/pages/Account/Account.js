@@ -61,6 +61,7 @@ function Account() {
   useEffect(() => {
     setTransArr(transListReceiveTokens);
   }, []);
+
   async function onPassEnter() {
     const clientPrepData = JSON.parse(
       localStorage.getItem('clientDataPreDeploy'),
@@ -135,6 +136,7 @@ function Account() {
       setonDeploy(false);
     }
   }
+
   // function disconnectHandler() {
   // 	dispatch(setWallet({id: "", balance: 0}));
   // 	dispatch(setWalletIsConnected(false));
@@ -219,7 +221,9 @@ function Account() {
       deployHandler();
     }
   }
+
   const [compltePass, setCompletedPass] = useState(false);
+
   function handleCheckPin(pinArr, step, completed) {
     const curEmptyPin = pinArr.filter((item) => !item.value.length);
     if (!curEmptyPin.length) {
@@ -377,6 +381,13 @@ function Account() {
                   Disconnect
                 </button>
               </div>
+
+              {!clientData.status ? (
+                <div style={{ fontSize: '14px', marginTop: '20px' }}>
+                  To deploy wallet send at least 10 EVERs to this address and
+                  then click "Deploy"
+                </div>
+              ) : null}
             </div>
           }
           footer={
