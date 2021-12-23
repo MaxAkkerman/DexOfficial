@@ -120,12 +120,12 @@ function SendAssets() {
 		setsendConfirmPopupIsVisible(false);
 	}
 	function handleChangeAddress(e) {
-		console.log("e.currentTarget.value)", e.currentTarget.value);
+		console.log("e.currentTarget.value)",e.currentTarget.value)
 		// setaddressToSendView(e.currentTarget.value);
 		dispatch(setAddressForSend(e.currentTarget.value));
 	}
 	useEffect(() => {
-		console.log("addressToSendView", addressToSendView, addressToSend);
+		console.log("addressToSendView", addressToSendView,addressToSend);
 
 		if (!addressToSend) return;
 		handleSetView();
@@ -209,10 +209,10 @@ function SendAssets() {
 				selectedToken.rootAddress,
 				addressToSend,
 			);
-			console.log("addressToSend", addressToSend);
-			console.log("walletAddrByOwner", walletAddrByOwner);
+			console.log("addressToSend",addressToSend)
+			console.log("walletAddrByOwner",walletAddrByOwner)
 			const {acc_type} = await getAccType2(walletAddrByOwner.name);
-			console.log("acc_type", acc_type);
+			console.log("acc_type",acc_type)
 
 			let sendTres;
 			if (acc_type === 1) {
@@ -225,7 +225,7 @@ function SendAssets() {
 					keyPair,
 					selectedToken,
 				);
-				console.log("sendRes", sendRes);
+				console.log("sendRes",sendRes)
 			} else {
 				const deployRes = await deployEmptyWallet(
 					clientData.address,
@@ -233,7 +233,7 @@ function SendAssets() {
 					selectedToken.rootAddress,
 					addressToSend,
 				);
-				console.log("deployRes", deployRes);
+				console.log("deployRes",deployRes)
 
 				if (!deployRes.code) {
 					sendTres = await sendToken(
@@ -247,7 +247,7 @@ function SendAssets() {
 					);
 				}
 			}
-			console.log("sendTres", sendTres);
+			console.log("sendTres",sendTres)
 			dispatch(setShowWaitingSendAssetsPopup(false));
 			if (sendTres && !sendTres.code) {
 				dispatch(
