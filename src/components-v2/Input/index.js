@@ -116,7 +116,7 @@ export default function Input({
         </div>
       </div>
       {helperText && (
-        <FormHelperText error={error} style={{ marginLeft: 27 }}>
+        <FormHelperText error={error} className={classes.helper_text}>
           {helperText}
         </FormHelperText>
       )}
