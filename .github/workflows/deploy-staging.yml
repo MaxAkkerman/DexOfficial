@@ -1,14 +1,16 @@
-name: Deploy build to Test server
+name: Deploy to Staging
 on:
   push:
     branches:
-      - liketurbo
+      - main
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
       - run: npm install
       - run: npm run build
@@ -23,4 +25,4 @@ jobs:
         run: ssh-keyscan -H ${{ secrets.SSH_TEST_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy with rsync
-        run: rsync -avz ./build/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_TEST_HOST }}:/var/www/ltbranch/build/
+        run: rsync -avz ./build/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_TEST_HOST }}:/var/www/staging/build/
