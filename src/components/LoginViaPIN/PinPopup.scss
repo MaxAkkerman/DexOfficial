@@ -1,73 +1,73 @@
 .gridContainer {
-	margin: 20px auto auto auto;
-	display: grid;
+  margin: 20px auto auto auto;
+  display: grid;
 
-	width: 40vh;
-	height: 300px;
-	grid-template-columns: 33% 33% 33%;
-	grid-template-rows: 33% 33% 33% 33%;
+  width: 40vh;
+  height: 300px;
+  grid-template-columns: 33% 33% 33%;
+  grid-template-rows: 33% 33% 33% 33%;
 }
 
 .gridItem {
-	height: 66px;
-	width: 66px;
-	border-radius: 50%;
-	margin: auto;
-	font-size: 25px;
-	color: var(--mainblock-title-color);
-	border: 0.5px solid var(--mainblock-title-color);
+  height: 66px;
+  width: 66px;
+  border-radius: 50%;
+  margin: auto;
+  font-size: 25px;
+  color: var(--mainblock-title-color);
+  border: 0.5px solid var(--mainblock-title-color);
 
-	&:hover {
-		color: var(--accent);
-	}
+  &:hover {
+    color: var(--accent);
+  }
 }
 
 .numsInputContainer {
-	justify-content: space-evenly;
-	display: flex;
-	width: 66%;
-	margin: auto;
+  justify-content: space-evenly;
+  display: flex;
+  width: 66%;
+  margin: auto;
 }
 
 .Nums {
-	width: 65%;
-	display: flex !important;
-	outline: none;
-	justify-content: space-evenly;
+  width: 65%;
+  display: flex !important;
+  outline: none;
+  justify-content: space-evenly;
 }
 
 .pinInput {
-	border-bottom: 2px solid black;
-	border-top: none;
-	border-left: none;
-	border-right: none;
-	background-color: transparent;
-	color: black;
-	width: 60px;
-	height: 60px;
-	font-size: 60px;
-	padding-left: 20px;
+  border-bottom: 2px solid black;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  background-color: transparent;
+  color: black;
+  width: 60px;
+  height: 60px;
+  font-size: 60px;
+  padding-left: 20px;
 }
 
 .loginViaPinBtn {
-	height: 57px;
-	font-size: 20px;
-	padding: 16px 20px;
-	border-radius: 18px;
-	width: 100%;
+  height: 57px;
+  font-size: 20px;
+  padding: 16px 20px;
+  border-radius: 18px;
+  width: 100%;
 }
 .pin_head_wrapper {
-	display: flex;
-	justify-content: space-between;
-	height: 56px;
-	position: relative;
-	margin-bottom: 20px;
-	font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  height: 56px;
+  position: relative;
+  margin-bottom: 20px;
+  font-weight: bold;
 }
 .btnsWrapper {
-	display: flex;
-	width: 100%;
-	//margin-top: 20px;
+  display: flex;
+  width: 100%;
+  //margin-top: 20px;
 }
 //@media screen and (max-width: 1060px) {
 //  .gridContainer {
@@ -77,32 +77,32 @@
 //}
 
 @media screen and (max-width: 600px) {
-	.gridContainer {
-		width: 66%;
-	}
+  .gridContainer {
+    width: 66%;
+  }
 }
 @media screen and (max-width: 480px) {
-	.gridContainer {
-		width: 70%;
-		height: 179px;
-		margin: auto;
-	}
-	.pin_head_wrapper {
-		height: 35px;
-		margin-bottom: unset;
-	}
-	.gridItem {
-		min-width: unset;
-		height: 50px;
-		width: 53px;
-	}
-	.pinInput {
-		width: 45px;
-		height: 45px;
-		padding-left: 13px;
-		font-size: 50px;
-	}
-	.btnsWrapper {
-		margin-top: 20px;
-	}
+  .gridContainer {
+    width: 70%;
+    height: 179px;
+    margin: auto;
+  }
+  .pin_head_wrapper {
+    height: 35px;
+    margin-bottom: unset;
+  }
+  .gridItem {
+    min-width: unset;
+    height: 50px;
+    width: 53px;
+  }
+  .pinInput {
+    width: 45px;
+    height: 45px;
+    padding-left: 13px;
+    font-size: 50px;
+  }
+  .btnsWrapper {
+    margin-top: 20px;
+  }
 }

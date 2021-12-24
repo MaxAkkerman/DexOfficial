@@ -1,12 +1,12 @@
 .btn {
-	background: none;
+  background: none;
 
-	&__icon {
-		width: 26px;
-		height: 26px;
+  &__icon {
+    width: 26px;
+    height: 26px;
 
-		& > path {
-			opacity: 0.6;
-		}
-	}
+    & > path {
+      opacity: 0.6;
+    }
+  }
 }
