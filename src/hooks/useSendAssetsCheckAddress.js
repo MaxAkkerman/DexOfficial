@@ -1,20 +1,24 @@
-import {useRef, useState, useEffect} from "react";
-import {useSelector} from "react-redux";
-import tonClient, {
-	getDetailsFromTONtokenWallet,
-	getExpectedWalletAddressByOwner,
-} from "../extensions/webhook/script";
-import {Account} from "@tonclient/appkit";
-import {TONTokenWalletContract} from "../extensions/contracts/TONTokenWallet";
+import { Account } from '@tonclient/appkit';
+import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-const DEFAULT_VALIDATION_MSG = "Incorrect address";
-const VALIDATION_MSG_ROOTS_ERROR = "Incorrect wallet owner address";
-const VALIDATION_MSG_ROOTS_SUC = "Complete";
-const INCORRECT_LENGTH = "Incorrect address length";
-const NOT_TON_VALID_ADDRESS = "Incorrect TON blockchain address";
-const NOT_INITIALIZED = "Account not initialized";
-const FROZEN = "Account frozen";
-const UNKNOWN_ERROR = "Something went wrong";
+import { TONTokenWalletContract } from '../extensions/contracts/TONTokenWallet';
+import tonClient, {
+  getDetailsFromTONtokenWallet,
+  getExpectedWalletAddressByOwner,
+} from '../extensions/sdk_get/get';
+
+const DEFAULT_VALIDATION_MSG = 'Incorrect address';
+const VALIDATION_MSG_ROOTS_ERROR = 'Incorrect wallet owner address';
+const VALIDATION_MSG_NOT_DEPLOYED_ERROR =
+  "The recipient's address does not have this wallet, sending tokens, you will pay the deploy fee";
+
+const VALIDATION_MSG_ROOTS_SUC = 'Complete';
+const INCORRECT_LENGTH = 'Incorrect address length';
+const NOT_TON_VALID_ADDRESS = 'Incorrect TON blockchain address';
+const NOT_INITIALIZED = 'Account not initialized';
+const FROZEN = 'Account frozen';
+const UNKNOWN_ERROR = 'Something went wrong';
 
 const re = /.:.{64}/;
 
@@ -29,110 +33,103 @@ const re = /.:.{64}/;
  * @property {string} validationMsg
  */
 export default function useSendAssetsCheckAddress() {
-	const [state, setState] = useState({
-		invalid: undefined,
-		loading: false,
-		validationMsg: DEFAULT_VALIDATION_MSG,
-	});
+  const [state, setState] = useState({
+    invalid: undefined,
+    loading: false,
+    validationMsg: DEFAULT_VALIDATION_MSG,
+  });
 
-	const addressToSend = useSelector(
-		(state) => state.walletSeedReducer.addressToSend,
-	);
-	const currentTokenForSend = useSelector(
-		(state) => state.walletSeedReducer.currentTokenForSend,
-	);
+  const addressToSend = useSelector(
+    (state) => state.walletSeedReducer.addressToSend,
+  );
 
-	const refTimer = useRef(null);
+  const currentTokenForSend = useSelector(
+    (state) => state.walletSeedReducer.currentTokenForSend,
+  );
 
-	useEffect(async () => {
-		if (!re.test(addressToSend)) {
-			setState({
-				invalid: true,
-				loading: false,
-				validationMsg: INCORRECT_LENGTH,
-			});
-			return;
-		}
+  useEffect(async () => {
+    if (!re.test(addressToSend)) {
+      setState({
+        invalid: true,
+        loading: false,
+        validationMsg: INCORRECT_LENGTH,
+      });
+      return;
+    }
 
-		setState({invalid: undefined, loading: true});
+    try {
+      await tonClient.utils.convert_address({
+        address: addressToSend,
+        output_format: {
+          type: 'Hex',
+        },
+      });
+    } catch {
+      setState({
+        invalid: true,
+        loading: false,
+        validationMsg: NOT_TON_VALID_ADDRESS,
+      });
+      return;
+    }
 
-		if (refTimer.current) clearTimeout(refTimer.current);
+    const acc = new Account(
+      {
+        abi: TONTokenWalletContract.abi,
+        tvc: TONTokenWalletContract.tvc,
+      },
+      { client: tonClient },
+    );
 
-		refTimer.current = setTimeout(async () => {
-			try {
-				await tonClient.utils.convert_address({
-					address: addressToSend,
-					output_format: {
-						type: "Hex",
-					},
-				});
-			} catch {
-				setState({
-					invalid: true,
-					loading: false,
-					validationMsg: NOT_TON_VALID_ADDRESS,
-				});
-				return;
-			}
+    const { acc_type } = await acc.getAccount();
 
-			const acc = new Account(
-				{
-					abi: TONTokenWalletContract.abi,
-					tvc: TONTokenWalletContract.tvc,
-				},
-				{client: tonClient},
-			);
+    if (acc_type === 0) {
+      setState({
+        invalid: true,
+        loading: false,
+        validationMsg: NOT_INITIALIZED,
+      });
+      return;
+    } else if (acc_type === 2) {
+      setState({ invalid: true, loading: false, validationMsg: FROZEN });
+      return;
+    }
 
-			const {acc_type} = await acc.getAccount();
+    if (currentTokenForSend.type === 'PureToken') {
+      const tokenForSendRoot = currentTokenForSend.rootAddress;
+      setState({ invalid: undefined, loading: true });
+      const walletAddrByOwner = await getExpectedWalletAddressByOwner(
+        currentTokenForSend.rootAddress,
+        addressToSend,
+      );
+      console.log('walletAddrByOwner', walletAddrByOwner);
+      const addressToSendRoot = await getDetailsFromTONtokenWallet(
+        walletAddrByOwner.name,
+      );
+      console.log('addressToSendRoot', addressToSendRoot);
+      if (tokenForSendRoot === addressToSendRoot) {
+        setState({
+          invalid: false,
+          loading: false,
+          validationMsg: VALIDATION_MSG_ROOTS_SUC,
+        });
+      } else {
+        setState({
+          invalid: false,
+          loading: false,
+          validationMsg: VALIDATION_MSG_NOT_DEPLOYED_ERROR,
+        });
+      }
+    } else {
+      setState({
+        invalid: false,
+        loading: false,
+        validationMsg: VALIDATION_MSG_ROOTS_SUC,
+      });
+    }
+  }, [addressToSend]);
 
-			if (acc_type === 0) {
-				setState({
-					invalid: true,
-					loading: false,
-					validationMsg: NOT_INITIALIZED,
-				});
-				return;
-			} else if (acc_type === 2) {
-				setState({invalid: true, loading: false, validationMsg: FROZEN});
-				return;
-			}
-
-			if (currentTokenForSend.type === "PureToken") {
-				const tokenForSendRoot = currentTokenForSend.rootAddress;
-				setState({invalid: undefined, loading: true});
-				const walletAddrByOwner = await getExpectedWalletAddressByOwner(
-					currentTokenForSend.rootAddress,
-					addressToSend,
-				);
-				console.log("walletAddrByOwner", walletAddrByOwner);
-				const addressToSendRoot = await getDetailsFromTONtokenWallet(
-					walletAddrByOwner.name,
-				);
-				console.log("addressToSendRoot", addressToSendRoot);
-				if (tokenForSendRoot === addressToSendRoot) {
-					setState({
-						invalid: false,
-						loading: false,
-						validationMsg: VALIDATION_MSG_ROOTS_SUC,
-					});
-				} else {
-					setState({
-						invalid: true,
-						loading: false,
-						validationMsg: VALIDATION_MSG_ROOTS_ERROR,
-					});
-				}
-			} else {
-				setState({
-					invalid: false,
-					loading: false,
-					validationMsg: UNKNOWN_ERROR,
-				});
-			}
-		}, 1e3);
-	}, [addressToSend]);
-
-	return {
-		...state,
-	};
+  return {
+    ...state,
+  };
 }

@@ -1,31 +1,57 @@
+.loginCloseBtn {
+  width: 25px;
+  height: 25px;
+}
+.extBtns {
+  &:first-of-type {
+    margin-bottom: 40px;
+  }
+  font-size: 16px;
+  width: 100%;
+}
 .extensions-list {
-	&-item {
-		display: flex;
-		align-items: center;
-		cursor: pointer;
-		justify-content: center;
-		padding: 30px 0;
-		border-bottom: 1px solid var(--select-item-border-color);
+  &-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    justify-content: center;
+    padding: 30px 0;
+    border-bottom: 1px solid var(--select-item-border-color);
 
-		&:first-of-type {
-			padding-top: 0;
-		}
+    &:first-of-type {
+      padding-top: 0;
+    }
 
-		&:last-of-type {
-			border-bottom: none;
-			padding-bottom: 0;
-		}
+    &:last-of-type {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
 
-		&:hover {
-			span {
-				color: var(--accent);
-				transition: 0.3s;
-			}
-		}
+    &:hover {
+      span {
+        color: var(--accent);
+        transition: 0.3s;
+      }
+    }
 
-		span {
-			margin-left: 20px;
-			text-transform: capitalize;
-		}
-	}
+    span {
+      margin-left: 20px;
+      text-transform: capitalize;
+    }
+  }
+}
+
+@media screen and (max-width: 376px) {
+  .loginCloseBtn {
+    width: 15px;
+    height: 15px;
+  }
+  .extBtns {
+    &:first-of-type {
+      margin-bottom: 20px;
+    }
+
+    font-size: 12px;
+    width: 76%;
+  }
 }

@@ -1,292 +1,321 @@
-import React, {useState, useEffect} from "react";
-import {useHistory} from "react-router-dom";
-import MainBlock from "../../components/MainBlock/MainBlock";
-import "./Assets.scss";
-import sendAssetsimg from "../../images/sendAssets.svg";
-import receiveAssets from "../../images/receiveAssets.svg";
-import goToExchange from "../../images/goToExchange.svg";
-import settingsBtn from "../../images/Vector.svg";
-import nativeBtn from "../../images/nativeadd.svg";
-import AssetsList from "../../components/AssetsList/AssetsList";
+import './Assets.scss';
 
-import {useDispatch, useSelector} from "react-redux";
-import {showTip} from "../../store/actions/app";
-import useTokensList from "../../hooks/useAssetList";
-import {setTokenList} from "../../store/actions/wallet";
-import {unWrapTons, wrapTons} from "../../extensions/sdk/run";
-import {decrypt} from "../../extensions/seedPhrase";
-import useKeyPair from "../../hooks/useKeyPair";
-import client from "../../extensions/webhook/script";
+import { useLazyQuery } from '@apollo/client';
+import { uniqBy } from 'lodash';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
-import fetchLimitOrders from "../../utils/fetchLimitOrders";
+import { LimitOrdersForOwnerQuery } from '@/graphql/queries';
+import TONicon from '@/images/tokens/TON.png';
+import { setTips } from '@/store/actions/app';
 
-import {setOrderList} from "../../store/actions/limitOrders";
-import WrapUnwrap from "../../components/wrapUnwrap/WrapUnwrap";
-import TONicon from "../../images/tonCrystalDefault.svg";
+import AssetsList from '../../components/AssetsList/AssetsList';
+import MainBlock from '../../components/MainBlock/MainBlock';
+import WithDraw from '../../components/WithDraw/WithDraw';
+import WrapUnwrap from '../../components/wrapUnwrap/WrapUnwrap';
 // import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
+import goToExchange from '../../images/goToExchange.svg';
+import nativeBtn from '../../images/nativeadd.svg';
+import receiveAssets from '../../images/receiveAssets.svg';
+import sendAssetsimg from '../../images/sendAssets.svg';
+import settingsBtn from '../../images/Vector.svg';
+import { setTokenList } from '../../store/actions/wallet';
 
 function Assets() {
-	const history = useHistory();
-	const dispatch = useDispatch();
-	const [assets, setAssets] = useState([]);
-	const tokenList = useSelector((state) => state.walletReducer.tokenList);
-	const walletIsConnected = useSelector(
-		(state) => state.appReducer.walletIsConnected,
-	);
-	const NFTassets = useSelector((state) => state.walletSeedReducer.NFTassets);
-	const orderList = useSelector((state) => state.limitOrders.orderList);
-	// const tokenList = useSelector(state => state.walletReducer.tokenList);
+  const history = useHistory();
+  const dispatch = useDispatch();
 
-	const liquidityList = useSelector(
-		(state) => state.walletReducer.liquidityList,
-	);
-	const clientData = useSelector((state) => state.walletReducer.clientData);
+  const [assets, setAssets] = useState([]);
+  const NFTassets = useSelector((state) => state.walletSeedReducer.NFTassets);
+  const liquidityList = useSelector(
+    (state) => state.walletReducer.liquidityList,
+  );
+  const tokenList = useSelector((state) => state.tonData.tokens);
+  const pairList = useSelector((state) => state.tonData.pairs);
+  const clientData = useSelector((state) => state.walletReducer.clientData);
+  const updatedWallet = useSelector(
+    (state) => state.walletReducer.updatedWallet,
+  );
+  const tonWallet = useMemo(() => {
+    // console.log('clientData',clientData)
+    if (clientData)
+      return {
+        balance: updatedWallet === null ? clientData.balance : updatedWallet,
+        icon: TONicon,
+        owner_address: clientData.address,
+        rootAddress: 'none',
+        showWrapMenu: true,
+        symbol: 'EVER',
+        tokenName: 'Everscale',
+        type: 'Native evers',
+        walletAddress: clientData.address,
+      };
+  }, [clientData, updatedWallet]);
 
-	useEffect(async () => {
-		const orders = await fetchLimitOrders();
-		dispatch(setOrderList(orders));
-	}, []);
+  const [getLimitOrders, { data: limitOrdersData }] = useLazyQuery(
+    LimitOrdersForOwnerQuery,
+  );
 
-	useEffect(() => {
-		setAssets(NFTassets);
-	}, [NFTassets]);
+  const walletIsConnected = useSelector(
+    (state) => state.appReducer.walletIsConnected,
+  );
+  const [showWrapMenu, setshowWrapMenu] = useState(false);
+  const [currentTokenForWrap, setcurrentTokenForWrap] = useState({});
+  const [viewData, setViewData] = useState({});
+  const [showWithdrawMenu, setshowWithdrawMenu] = useState(false);
+  const [curNFTForWithdraw, setCurNFTForWithdraw] = useState(false);
 
-	function handleChangeOnSend() {
-		history.push("/wallet/send");
-	}
+  useEffect(() => {
+    setAssets(NFTassets);
+  }, [NFTassets]);
 
-	function handleChangeOnReceive() {
-		history.push("/wallet/receive");
-	}
+  useEffect(async () => {
+    if (clientData && clientData.address)
+      getLimitOrders({ variables: { addrOwner: clientData.address } });
+  }, [clientData]);
 
-	function handlePushToExchange() {
-		history.push("/swap");
-	}
+  function handleChangeOnSend() {
+    history.push('/wallet/send');
+  }
 
-	function handleGoToSettings() {
-		history.push("/wallet/settings");
-	}
+  function handleChangeOnReceive() {
+    history.push('/wallet/receive');
+  }
 
-	function addTokenWallet() {
-		history.push("/wallet/deployAssets");
-	}
+  function handlePushToExchange() {
+    history.push('/swap');
+  }
 
-	function handleShowNFTData(curItem) {
-		console.log("curItem", curItem, "NFTassets", NFTassets);
-		const copyAssets = JSON.parse(JSON.stringify(assets));
-		copyAssets.map((item) => {
-			console.log("item.id", item.id, "curItem.id", curItem.id);
+  function handleGoToSettings() {
+    console.log('clientData', clientData);
+    history.push('/wallet/settings');
+  }
 
-			if (item.id === curItem.id) {
-				console.log("item.showNftData", item.showNftData, !item.showNftData);
-				item.showNftData = !item.showNftData;
-			}
-		});
-		setAssets(copyAssets);
-	}
-	// const [tokensListChanged,settokensListChanged] = useState([])
-	function handleClickToken(curItem) {
-		if (curItem.type !== "Native Tons") return;
-		console.log("curItem", curItem);
-		const copyAssets = JSON.parse(JSON.stringify(tokensList));
-		copyAssets.map((item) => {
-			if ("Native Tons" === item.type) {
-				item.showWrapMenu = !item.showWrapMenu;
-			}
-		});
-		dispatch(setTokenList(copyAssets));
-	}
-	const {keyPair} = useKeyPair();
+  function addTokenWallet() {
+    history.push('/wallet/deployAssets');
+  }
 
-	const [showWrapMenu, setshowWrapMenu] = useState(false);
+  function handleShowNFTData(curItem) {
+    const copyAssets = JSON.parse(JSON.stringify(assets));
+    copyAssets.map((item) => {
+      if (item.id === curItem.id) {
+        item.showNftData = !item.showNftData;
+      }
+    });
+    setAssets(copyAssets);
+  }
+  function handleClickToken(curItem) {
+    if (curItem.type !== 'Native evers') return;
+    const copyAssets = JSON.parse(JSON.stringify(tokenList));
+    copyAssets.map((item) => {
+      if ('Native evers' === item.type) {
+        item.showWrapMenu = !item.showWrapMenu;
+      }
+    });
+    dispatch(setTokenList(copyAssets));
+  }
 
-	const [currentTokenForWrap, setcurrentTokenForWrap] = useState({});
-	const [viewData, setViewData] = useState({});
-	async function handleWrapTons() {
-		const tonObj = tokensList.filter((item) => item.type === "Native Tons");
-		console.log("tonObj", tonObj);
-		setcurrentTokenForWrap(tonObj[0]);
-		setViewData({
-			type: "wrap",
-			confirmText: "wrap",
-			tokenSetted: true,
-			title: "Wrap TONs",
-		});
-		setshowWrapMenu(true);
-		// const wrapRes = await wrapTons(clientData.address,keyPair,1000000000)
-		// console.log("wrapRes",wrapRes)
-	}
-	async function handleUnWrapTons() {
-		const tonObj = tokensList.filter((item) => item.symbol === "WTON");
-		setcurrentTokenForWrap(tonObj[0]);
-		setViewData({
-			type: "unwrap",
-			confirmText: "unrap",
-			tokenSetted: true,
-			title: "Unwrap TONs",
-		});
-		console.log("tonObj", tonObj);
-		setshowWrapMenu(true);
+  async function handleWrapTons() {
+    setcurrentTokenForWrap(tonWallet);
+    setViewData({
+      confirmText: 'wrap',
+      title: 'EVER → wEVER',
+      tokenSetted: true,
+      type: 'wrap',
+    });
+    setshowWrapMenu(true);
+  }
+  async function handleUnWrapTons() {
+    const tonObj = tokenList.filter((item) => item.symbol === 'WTON');
+    console.log('tonObj', tonObj[0], tonObj.length);
+    if (!tonObj.length) {
+      dispatch(
+        setTips({
+          message: `You have not wEVER for unWrap`,
+          type: 'error',
+        }),
+      );
+      return;
+    }
+    setcurrentTokenForWrap(tonObj[0]);
+    setViewData({
+      confirmText: 'unwrap',
+      title: 'wEVER → EVER',
+      tokenSetted: true,
+      type: 'unwrap',
+    });
+    setshowWrapMenu(true);
+  }
 
-		// const unWrapTonsRes = await unWrapTons(clientData.address,keyPair,1000000000)
-		// console.log("unWrapTonsRes",unWrapTonsRes)
-	}
-	// const [TONdataWallet,setTONdatawalet] = useState({})
-	//     useEffect(() => {
-	//         const TONdata = {
-	//             walletAddress: clientData.address,
-	//             symbol: "TON Crystal",
-	//             tokenName: "TON Crystal",
-	//             type: "Native Tons",
-	//             icon: TONicon,
-	//             rootAddress: "none",
-	//             showWrapMenu: false,
-	//             balance: clientData.balance
-	//         };
-	//         // const withNative = JSON.parse(JSON.stringify(tokenList));
-	//
-	//         setTONdatawalet(TONdata)
-	//
-	//
-	//
-	//     }, []);
-	const {assetList: tokensList} = useTokensList();
-	return (
-		<>
-			{showWrapMenu ? (
-				<WrapUnwrap
-					currentTokenForWrap={currentTokenForWrap}
-					confirmText={viewData.confirmText}
-					tokenSetted={viewData.tokenSetted}
-					title={viewData.title}
-					handleShow={() => setshowWrapMenu()}
-					transactionType={viewData.type}
-				/>
-			) : (
-				<div className="container" onClick={() => dispatch(showTip())}>
-					<MainBlock
-						smallTitle={false}
-						// title={'Assets'}
-						content={
-							<div>
-								<div className="head_wrapper">
-									<div className="left_block boldFont">Your assets</div>
-									<div className={"settings_btn_container"}>
-										<button
-											className={
-												walletIsConnected
-													? "settings_btn"
-													: "settings_btn btn--disabled"
-											}
-											onClick={
-												walletIsConnected ? () => addTokenWallet() : null
-											}
-										>
-											<img src={nativeBtn} alt={"native"} />
-										</button>
-										<button
-											className={
-												walletIsConnected
-													? "settings_btn"
-													: "settings_btn btn--disabled"
-											}
-											onClick={
-												walletIsConnected ? () => handleGoToSettings() : null
-											}
-										>
-											<img src={settingsBtn} alt={"settings"} />
-										</button>
-									</div>
-								</div>
-								<div className="action_btns">
-									<div>
-										<div
-											className={
-												walletIsConnected ? "onHover" : "onHover btn--disabled"
-											}
-											onClick={
-												walletIsConnected ? () => handleChangeOnSend() : null
-											}
-										>
-											<img
-												className="arrow_icons "
-												src={sendAssetsimg}
-												alt={"Send"}
-											/>
-										</div>
-										<div className="action_btns_bottom_text">Send</div>
-									</div>
-									<div>
-										<button
-											className={
-												walletIsConnected ? "onHover" : "onHover btn--disabled"
-											}
-											onClick={
-												walletIsConnected ? () => handleChangeOnReceive() : null
-											}
-										>
-											<img
-												className="arrow_icons"
-												src={receiveAssets}
-												alt={"Receive"}
-											/>
-										</button>
-										<div className="action_btns_bottom_text">Receive</div>
-									</div>
-									<div>
-										<div
-											className={
-												walletIsConnected ? "onHover" : "onHover btn--disabled"
-											}
-											onClick={() => handlePushToExchange()}
-										>
-											<img
-												className="arrow_icons"
-												src={goToExchange}
-												alt={"Exchange"}
-											/>
-										</div>
-										<div className="action_btns_bottom_text">Swap</div>
-									</div>
-								</div>
+  function handleWithdraw(item) {
+    setshowWithdrawMenu(true);
+    setshowWrapMenu(false);
+    setCurNFTForWithdraw(item);
+    console.log('item', item);
+  }
 
-								{walletIsConnected ? (
-									<>
-										{(NFTassets && NFTassets.length) ||
-										(tokensList && tokensList.length) ||
-										(orderList && orderList.length) ? (
-											<AssetsList
-												TokenAssetsArray={[...tokensList, ...liquidityList]}
-												orderAssetsArray={orderList}
-												NFTassetsArray={assets}
-												handleClickNFT={(item) => handleShowNFTData(item)}
-												// showNFTdata={showNFTdata}
-												showItBeShown={true}
-												handleClickToken={(item) => handleClickToken(item)}
-												wrapTons={() => handleWrapTons()}
-												unWrapTons={() => handleUnWrapTons()}
-											/>
-										) : (
-											<div className="assets_loader_wrapper">
-												You have no wallets yet
-											</div>
-										)}
-									</>
-								) : (
-									<button
-										className="btn mainblock-btn"
-										onClick={() => history.push("/account")}
-									>
-										Connect wallet
-									</button>
-								)}
-							</div>
-						}
-					/>
-				</div>
-			)}
-		</>
-	);
+  return (
+    <>
+      {showWrapMenu && !showWithdrawMenu && (
+        <WrapUnwrap
+          currentTokenForWrap={currentTokenForWrap}
+          confirmText={viewData.confirmText}
+          tokenSetted={viewData.tokenSetted}
+          title={viewData.title}
+          handleShow={() => setshowWrapMenu(false)}
+          transactionType={viewData.type}
+        />
+      )}
+      {!showWrapMenu && showWithdrawMenu && (
+        <WithDraw
+          curNFTForWithdraw={curNFTForWithdraw}
+          confirmText={viewData.confirmText}
+          // tokenSetted={viewData.tokenSetted}
+          title={viewData.title}
+          handleShow={() => setshowWithdrawMenu(false)}
+          transactionType={viewData.type}
+        />
+      )}
+      {!showWrapMenu && !showWithdrawMenu && (
+        <div className="container">
+          <MainBlock
+            smallTitle={false}
+            // title={'Assets'}
+            content={
+              <div>
+                <div className="head_wrapper" style={{ fontWeight: 'bold' }}>
+                  <div className="left_block boldFont">Your assets</div>
+                  <div className={'settings_btn_container'}>
+                    <button
+                      className={
+                        walletIsConnected
+                          ? 'settings_btn'
+                          : 'settings_btn btn--disabled'
+                      }
+                      onClick={
+                        walletIsConnected ? () => addTokenWallet() : null
+                      }
+                    >
+                      <img src={nativeBtn} alt={'native'} />
+                    </button>
+                    <button
+                      className={
+                        clientData.address || walletIsConnected
+                          ? 'settings_btn'
+                          : 'settings_btn btn--disabled'
+                      }
+                      onClick={
+                        clientData.address || walletIsConnected
+                          ? () => handleGoToSettings()
+                          : null
+                      }
+                    >
+                      <img src={settingsBtn} alt={'settings'} />
+                    </button>
+                  </div>
+                </div>
+                <div className="action_btns">
+                  <div className="assets_btn_wrapper">
+                    <div
+                      className={
+                        walletIsConnected ? 'onHover' : 'onHover btn--disabled'
+                      }
+                      onClick={
+                        walletIsConnected ? () => handleChangeOnSend() : null
+                      }
+                    >
+                      <img
+                        className="arrow_icons "
+                        src={sendAssetsimg}
+                        alt={'Send'}
+                      />
+                    </div>
+                    <div className="action_btns_bottom_text">Send</div>
+                  </div>
+                  <div className="assets_btn_wrapper">
+                    <button
+                      className={
+                        walletIsConnected ? 'onHover' : 'onHover btn--disabled'
+                      }
+                      onClick={
+                        walletIsConnected ? () => handleChangeOnReceive() : null
+                      }
+                    >
+                      <img
+                        className="arrow_icons"
+                        src={receiveAssets}
+                        alt={'Receive'}
+                      />
+                    </button>
+                    <div className="action_btns_bottom_text">Receive</div>
+                  </div>
+                  <div className="assets_btn_wrapper">
+                    <div
+                      className={
+                        walletIsConnected ? 'onHover' : 'onHover btn--disabled'
+                      }
+                      onClick={() => handlePushToExchange()}
+                    >
+                      <img
+                        className="arrow_icons"
+                        src={goToExchange}
+                        alt={'Exchange'}
+                      />
+                    </div>
+                    <div className="action_btns_bottom_text">Swap</div>
+                  </div>
+                </div>
+
+                {walletIsConnected ? (
+                  <>
+                    {(NFTassets && NFTassets.length) ||
+                    tonWallet ||
+                    (tokenList && tokenList.length)(
+                      limitOrdersData && limitOrdersData.limitOrders.length,
+                    ) ? (
+                      <AssetsList
+                        TokenAssetsArray={uniqBy(
+                          [tonWallet, ...tokenList, ...liquidityList],
+                          'walletAddress',
+                        )}
+                        orderAssetArray={
+                          []
+                          // limitOrdersData && limitOrdersData.limitOrders
+                        }
+                        pairList={pairList}
+                        NFTassetsArray={assets}
+                        handleClickNFT={(item) => handleShowNFTData(item)}
+                        // showNFTdata={showNFTdata}
+                        showItBeShown={true}
+                        handleClickToken={(item) => handleClickToken(item)}
+                        wrapTons={() => handleWrapTons()}
+                        unWrapTons={() => handleUnWrapTons()}
+                        handleWithdraw={(item) => handleWithdraw(item)}
+                      />
+                    ) : (
+                      <div className="assets_loader_wrapper">
+                        You have no wallets yet
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <button
+                    className="btn mainblock-btn"
+                    onClick={() => history.push('/account')}
+                  >
+                    {!clientData.status && clientData.address.length === 66
+                      ? 'Deploy wallet'
+                      : 'Connect wallet'}
+                  </button>
+                )}
+              </div>
+            }
+          />
+        </div>
+      )}
+    </>
+  );
 }
 
 export default Assets;

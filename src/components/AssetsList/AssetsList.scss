@@ -1,20 +1,39 @@
+.fixPositionCreatePairModal {
+  margin-top: 200px;
+  height: fit-content;
+}
+.settings_btn {
+  border-radius: 18px;
+  width: 56px;
+  height: 56px;
+  background: #3569f0;
+  transform: scale(0.7);
+  //height:inherit;
+  &.wrapUnwrap {
+    width: 110px;
+    height: 63px;
+    color: white;
+    font-size: 20px;
+  }
+}
 .head_wrapper {
-	display: flex;
-	justify-content: space-between;
-	height: 56px;
-	position: relative;
+  display: flex;
+  justify-content: space-between;
+  height: 56px;
+  position: relative;
+  font-weight: bold;
 }
 
-.action_btns {
-	font-size: 12px;
-	margin-top: 50px;
-	display: flex;
-	justify-content: space-around;
-}
+//.action_btns {
+//	font-size: 12px;
+//	margin-top: 50px;
+//	display: flex;
+//	justify-content: space-around;
+//}
 
 .arrow_icons2 {
-	width: 54px;
-	height: 54px;
+  width: 54px;
+  height: 54px;
 }
 
 //
@@ -24,129 +43,212 @@
 //}
 
 .assets_item_wrapper {
-	cursor: pointer;
-	margin-top: 20px;
-	display: flex;
-	justify-content: space-between;
+  cursor: pointer;
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .assets_icons {
-	width: 24px;
-	height: 24px;
-}
-
-.settings_btn {
-	border-radius: 18px;
-	width: 56px;
-	height: 56px;
-	background: #3569f0;
-	transform: scale(0.7);
-	//height:inherit;
+  width: 24px;
+  height: 24px;
 }
 
 .settings_btn_container {
-	display: flex;
-	position: absolute;
-	right: 0;
+  display: flex;
+  position: absolute;
+  right: 0;
+}
+
+.settings_btn {
+  background: var(--accent);
+  border-radius: 12px;
+  max-height: 35px;
+  min-width: 35px;
+  min-height: 35px;
+  display: flex;
+  color: white;
+  align-items: center;
+  justify-content: center;
+  img {
+    width: 23px;
+    filter: var(--arrow-back);
+  }
+}
+
+@keyframes showPopper {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .left_block {
-	display: flex;
-	align-items: center;
-	margin: auto;
+  display: flex;
+  align-items: center;
+  margin: auto;
 }
 
 .action_btns_bottom_text {
-	display: flex;
-	font-weight: bold;
-	font-size: 15px;
-	color: var(--mainblock-title-color);
-	justify-content: center;
+  display: flex;
+  font-weight: bold;
+  font-size: 15px;
+  color: var(--mainblock-title-color);
+  justify-content: center;
 }
 
 .arrow_back {
-	position: absolute;
-	height: inherit;
-	filter: var(--arrow-back);
+  position: absolute;
+  height: inherit;
+  filter: var(--arrow-back);
 }
 
 .NFT_item_header {
-	display: flex;
-	justify-content: space-between;
-	width: 100%;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .NFT_item {
-	width: 100%;
+  width: 100%;
 }
 
 .NFT_additional_data {
-	display: flex;
-	justify-content: space-around;
-	width: 100%;
-	margin-bottom: 15px;
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-bottom: 15px;
 }
 
 .NFT_additional_block2 {
-	width: 12%;
+  width: 12%;
 }
 
 .NFT_additional_block {
-	width: 100%;
-	display: flex;
-	justify-content: space-around;
-	margin-left: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  margin-left: 20px;
+  &.end {
+    justify-content: end;
+  }
 }
 
 .assetsList__nft_data_block {
-	display: flex;
+  display: flex;
 }
 
 .assetList__nft_data_header {
-	color: red;
+  color: red;
 }
 
 .assetList__nft_data {
-	color: #53e514;
+  color: #53e514;
+}
+
+.assetsList__meta_container {
+  margin-left: 15px;
+}
+
+.assetsList__symbol {
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.assetList__token_name {
+  font-size: 14px;
+}
+
+.assetsList__container {
+  width: 100%;
+}
+
+.assetsList__item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.assetList__item_meta {
+  display: flex;
+  align-items: center;
+}
+
+.assetList__token_balance {
+  color: var(--text-color);
+  font-weight: bold;
+  &.wordBreak {
+    word-break: break-all;
+  }
 }
 
 @media screen and (max-width: 1025px) {
-	.arrow_icons2 {
-		width: 38px;
-	}
-	.settings_btn_container {
-		position: unset;
-		right: unset;
-	}
-	.settings_btn {
-		transform: scale(0.7);
-		position: unset;
-		right: unset;
-	}
+  .arrow_icons2 {
+    width: 38px;
+  }
+  .settings_btn_container {
+    position: unset;
+    right: unset;
+  }
 }
 
-@media screen and (max-width: 350px) {
-	.head_wrapper {
-		align-items: center;
-	}
-	.left_block {
-		font-size: 20px;
-	}
-	.settings_btn {
-		width: 34px;
-		height: 34px;
-	}
-	.assets_item_wrapper {
-		font-size: 16px;
-		align-items: center;
-	}
-	.assetList_item_icon {
-		display: flex;
-		height: 100%;
-		align-items: center;
-	}
-	.arrow_icons2 {
-		width: 34px;
-		height: 34px;
-	}
+@media screen and (max-width: 480px) {
+  .head_wrapper {
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  //.left_block {
+  //	font-size: 20px;
+  //}
+  .settings_btn {
+    width: 34px;
+    height: 34px;
+    //.left_block {
+    //	font-size: 20px;
+  }
+  .assets_item_wrapper {
+    font-size: 16px;
+    align-items: center;
+  }
+  .assetList_item_icon {
+    display: flex;
+    height: 100%;
+    align-items: center;
+  }
+  .arrow_icons2 {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+@media screen and (max-width: 321px) {
+  .settings_btn {
+    width: 45px;
+    height: 45px;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .assetsList__container {
+    font-size: 15px;
+  }
+  .settings_btn {
+    &.wrapUnwrap {
+      width: 95px;
+      height: 50px;
+      color: white;
+      font-size: 15px;
+    }
+  }
+}
+
+@media screen and (max-width: 410px) {
+  .assetsList__item {
+    font-size: 11px;
+  }
 }

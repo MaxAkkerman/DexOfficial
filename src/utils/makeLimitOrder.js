@@ -1,59 +1,75 @@
-import {Account} from "@tonclient/appkit";
-import {signerKeys} from "@tonclient/core";
-import {DEXClientContract} from "../extensions/contracts/DEXClient";
-import client from "../extensions/webhook/script";
+import { Account } from '@tonclient/appkit';
+import { signerKeys } from '@tonclient/core';
 
-const TOKEN_ROUTER_MAP = {
-	USDT: process.env.LIMIT_ROUTER_USDT_ADDRESS,
-	WBTC: process.env.LIMIT_ROUTER_WBTC_ADDRESS,
-	WTON: process.env.LIMIT_ROUTER_WTON_ADDRESS,
-	WETH: process.env.LIMIT_ROUTER_WETH_ADDRESS,
-};
+import { NO_CONTEXT } from '@/constants/runtimeErrors';
+import {
+  AB_DIRECTION,
+  LIMIT_ORDER_PRICE_DENOMINATOR,
+} from '@/constants/runtimeVariables';
+import { DEXClientContract } from '@/extensions/contracts/DEXClient';
+import convertToSafeNum from '@/utils/convertToSafeNum';
 
-export default async function makeLimitOrder(
-	{pairAddr, tokenSymbol, qty, price},
-	{clientAddr, clientKeyPair},
-) {
-	const clientAcc = new Account(DEXClientContract, {
-		address: clientAddr,
-		client,
-		signer: signerKeys(clientKeyPair),
-	});
+export default async function makeLimitOrder({
+  directionPair,
+  pairAddr,
+  price,
+  qty,
+}) {
+  if (
+    !this ||
+    !this.context ||
+    !this.context.dexClientAddress ||
+    !this.helperFunctions ||
+    !this.helperFunctions.getPair ||
+    !this.helperFunctions.getClientKeys ||
+    !this.helperFunctions.getTokenRouterAddress ||
+    !this.helperFunctions.getShardLimit ||
+    !this.helperFunctions.getClientWallet
+  )
+    throw new Error(NO_CONTEXT);
 
-	let response = null;
-	console.log(
-		"pairAddr",
-		pairAddr,
-		"TOKEN_ROUTER_MAP",
-		TOKEN_ROUTER_MAP,
-		"TOKEN_ROUTER_MAP[tokenSymbol]",
-		TOKEN_ROUTER_MAP[tokenSymbol],
-		"tokenSymbol",
-		tokenSymbol,
-		"qty",
-		qty,
-		"price",
-		price,
-	);
-	try {
-		if (tokenSymbol === "WTON")
-			response = await clientAcc.run("makeLimitOrderA", {
-				routerWalletA: TOKEN_ROUTER_MAP[tokenSymbol],
-				pairAddr,
-				qtyA: Number(qty) * 1000000000,
-				priceA: price,
-			});
-		else
-			response = await clientAcc.run("makeLimitOrderB", {
-				routerWalletB: TOKEN_ROUTER_MAP[tokenSymbol],
-				pairAddr,
-				qtyB: Number(qty) * 1000000000,
-				priceB: price,
-			});
+  const dexClientKeyPair = await this.helperFunctions.getClientKeys();
 
-		return response.decoded.output;
-	} catch (e) {
-		console.log("eee", e);
-		return e;
-	}
+  const clientAcc = new Account(DEXClientContract, {
+    address: this.context.dexClientAddress,
+    client: this.context.tonClient,
+    signer: signerKeys(dexClientKeyPair),
+  });
+
+  const sounitV = await this.helperFunctions.getShardLimit();
+  console.log('sounitV', sounitV);
+  const pair = await this.helperFunctions.getPair(pairAddr);
+  let response = null;
+  try {
+    if (directionPair === AB_DIRECTION) {
+      const routerAddress = await this.helperFunctions.getTokenRouterAddress(
+        pair.rootA,
+      );
+      const token = await this.helperFunctions.getClientWallet(pair.rootA);
+      response = await clientAcc.run('makeLimitOrderA', {
+        pairAddr,
+        priceA: convertToSafeNum(price * LIMIT_ORDER_PRICE_DENOMINATOR),
+        qtyA: convertToSafeNum(qty * 10 ** token.decimals),
+        routerWalletA: routerAddress,
+        souint: sounitV,
+      });
+    } else {
+      const routerAddress = await this.helperFunctions.getTokenRouterAddress(
+        pair.rootB,
+      );
+      const token = await this.helperFunctions.getClientWallet(pair.rootB);
+      response = await clientAcc.run('makeLimitOrderB', {
+        pairAddr,
+        priceB: convertToSafeNum(price * LIMIT_ORDER_PRICE_DENOMINATOR),
+        qtyB: convertToSafeNum(qty * 10 ** token.decimals),
+        routerWalletB: routerAddress,
+        souint: sounitV,
+      });
+    }
+
+    return response.decoded.output;
+  } catch (e) {
+    console.log('eee', e);
+    return e;
+  }
 }

@@ -1,0 +1,127 @@
+/*!*body {*!*/
+/*!*  font-family: sans-serif;;*!*/
+/*!*  font-style: normal;*!*/
+/*!*  background-color: #1a1d26;*!*/
+/*!*  max-width: 100vw;*!*/
+/*!*  overflow: hidden;*!*/
+/*!*  margin: 0;*!*/
+/*!*  padding: 0;*!*/
+/*!*}*!*/
+
+/*!*main {*!*/
+/*!*  height: 100vh;*!*/
+/*!*  overflow: hidden;*!*/
+/*!*  box-sizing: border-box;*!*/
+/*!*}*!*/
+
+/*@media screen and (max-width: 750px) {*/
+/*  body {*/
+/*    overflow: unset;*/
+/*    overflow-x: hidden;*/
+/*  }*/
+
+/*  main {*/
+/*    height: unset;*/
+/*    overflow: unset;*/
+/*  }*/
+
+/*  section {*/
+/*    flex-direction: column;*/
+/*  }*/
+
+/*  div.container {*/
+/*    width: unset;*/
+/*  }*/
+/*}*/
+
+/*.main-content {*/
+/*  display: flex;*/
+/*  justify-content: center;*/
+/*  padding-top: 24px;*/
+/*}*/
+
+/*.vertical-main-container {*/
+/*  display: grid;*/
+/*}*/
+
+/*.container {*/
+/*  background: #383c48;*/
+/*  display: flex;*/
+/*  justify-content: center;*/
+/*  align-items: center;*/
+/*  flex-flow: column nowrap;*/
+/*  padding: 1.5rem;*/
+/*  border-radius: 8px;*/
+/*  margin: 0.75rem 1rem;*/
+/*  border: 1px solid #6c707d;*/
+/*  color: #fff;*/
+/*}*/
+
+/*.container div {*/
+/*  display: flex;*/
+/*  justify-content: center;*/
+/*  align-items: center;*/
+/*  flex-flow: row wrap;*/
+/*}*/
+
+/*.user-info {*/
+/*  display: flex;*/
+/*  justify-content: center;*/
+/*  align-items: center;*/
+/*  flex-flow: row wrap;*/
+/*  background: rgba(255, 255, 255, 0.6);*/
+/*  min-height: 3rem;*/
+/*  margin: 0.25rem;*/
+/*  border: 1px solid #eeeeee;*/
+/*  border-radius: 4px;*/
+/*}*/
+
+/*.user-info span {*/
+/*  display: flex;*/
+/*  justify-content: center;*/
+/*  align-items: center;*/
+/*  padding: 0.25rem 1rem;*/
+/*  position: relative;*/
+/*  margin: 1rem;*/
+/*  border: 1px solid black;*/
+/*  border-radius: 50px;*/
+/*  margin: 0.25rem 1rem;*/
+/*}*/
+
+/*.user-avatar {*/
+/*  width: 32px;*/
+/*  border-radius: 100%;*/
+/*  border: 1px solid black;*/
+/*  left: 0;*/
+/*  transform: translate(-50%, 0);*/
+/*  position: absolute;*/
+/*}*/
+
+/*.bn-demo-button {*/
+/*  background: #ffffffee;*/
+/*  font-size: 0.889rem;*/
+/*  border: 1px solid #eeeeee;*/
+/*  border-radius: 8px;*/
+/*  padding: 0.55rem 1.4rem;*/
+/*  color: #6370e5;*/
+/*  margin: 0.4rem 0.75rem;*/
+/*  transition: background 200ms ease-in-out, color 200ms ease-in-out;*/
+/*}*/
+
+/*.bn-demo-button:focus {*/
+/*  outline: none;*/
+/*}*/
+
+/*.bn-demo-button:hover {*/
+/*  cursor: pointer;*/
+/*}*/
+
+/*.selected-toggle-btn {*/
+/*  background: #6370e5;*/
+/*  color: white;*/
+/*}*/
+
+/*.unselected-toggle-btn {*/
+/*  color: #6370e5;*/
+/*  background: #ffffffee;*/
+/*}*/

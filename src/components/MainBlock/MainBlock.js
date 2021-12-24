@@ -1,46 +1,80 @@
-import React from "react";
-import "./MainBlock.scss";
+import './MainBlock.scss';
 
-function MainBlock(props) {
-	function classGenerator() {
-		let str = "mainblock-title";
+import React from 'react';
 
-		if (props.smallTitle) {
-			str += " mainblock-title--small";
-		}
-		if (props.normalTitle) {
-			str += " mainblock-title--normal";
-		}
+import {
+  hideOrdersFromSelect,
+  hideOrdersToSelect,
+} from '../../store/actions/limitOrder';
+import { hidePoolFromSelect, hidePoolToSelect } from '../../store/actions/pool';
+import { hideSwapFromSelect, hideSwapToSelect } from '../../store/actions/swap';
 
-		return str;
-	}
+function MainBlock({
+  button,
+  class: className,
+  classHeader,
+  classNameContainer,
+  classTitle,
+  content,
+  footer,
+  normalTitle,
+  smallTitle,
+  title,
+  ...rest
+}) {
+  function classGenerator() {
+    let str = 'mainblock-title';
 
-	return (
-		<div className={props.class ? props.class + " mainblock" : "mainblock"}>
-			{(props.title || props.button) && (
-				<div
-					className={
-						props.classHeader
-							? props.classHeader + " mainblock-header"
-							: "mainblock-header"
-					}
-				>
-					<h2
-						className={
-							props.classTitle
-								? `${props.classTitle} ` + classGenerator()
-								: classGenerator()
-						}
-					>
-						{props.title}
-					</h2>
-					{props.button && props.button}
-				</div>
-			)}
-			{props.content}
-			{props.footer && props.footer}
-		</div>
-	);
+    if (smallTitle) {
+      str += ' mainblock-title--small';
+    }
+    if (normalTitle) {
+      str += ' mainblock-title--normal';
+    }
+
+    return str;
+  }
+  // function handleCloseCurPopup(e) {
+  // 	console.log("searchBtn swapPopup",e.target.id)
+  // 	if(e.target.id === "swapPopup" || e.target.id === "searchBtn" || e.target.id === "searchBtnInp" || e.target.id === "mainBlock" || e.target.id === "mainBlockTitle") {
+  // 		return
+  // 	}else{
+  //
+  // 	}
+  //
+  // }
+  return (
+    <div
+      id="mainBlock"
+      className={
+        classNameContainer ? `mainblock ${classNameContainer}` : 'mainblock'
+      }
+      // onClick={(e)=>handleCloseCurPopup(e)}
+    >
+      {(title || button) && (
+        <div
+          id={'swapPopup'}
+          className={
+            classHeader ? classHeader + ' mainblock-header' : 'mainblock-header'
+          }
+        >
+          <h2
+            id="mainBlockTitle"
+            className={
+              classTitle
+                ? `${classTitle} ` + classGenerator()
+                : classGenerator()
+            }
+          >
+            {title}
+          </h2>
+          {button && button}
+        </div>
+      )}
+      {content}
+      {footer && footer}
+    </div>
+  );
 }
 
 export default MainBlock;
