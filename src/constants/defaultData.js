@@ -192,15 +192,15 @@ export const numPadArr = [
     value: 9,
   },
   {
-    value: 10,
     disabled: true,
+    value: 10,
   },
   {
     value: 0,
   },
   {
-    value: 12,
     disabled: true,
+    value: 12,
   },
 ];
 export const InitialSeedState = [

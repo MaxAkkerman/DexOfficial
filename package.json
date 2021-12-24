@@ -23,6 +23,7 @@
     "@material-ui/styles": "^5.0.0-beta.5",
     "@material/checkbox": "^13.0.0",
     "@mui/base": "^5.0.0-alpha.59",
+    "@mui/icons-material": "^5.2.5",
     "@mui/material": "^5.0.0",
     "@tonclient/appkit": "^0.2.0",
     "@tonclient/core": "^1.25.0",
