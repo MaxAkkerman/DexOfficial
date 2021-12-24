@@ -198,7 +198,7 @@ function EnterPassword(props) {
       ) : (
         // <div className="select-wrapper">
         <PinPopup
-          title={'Enter your Pin'}
+          title={'Enter your PIN'}
           nextStep={'step3'}
           prevStep={'step1'}
           handleLogOut={() => handleLogOut()}
