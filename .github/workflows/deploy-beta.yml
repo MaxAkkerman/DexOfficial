@@ -1,8 +1,8 @@
-name: Deploy build to Test server
+name: Deploy to Beta
 on:
   push:
     branches:
-      - dev
+      - beta
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
