@@ -5,16 +5,13 @@
   justify-content: space-between;
 }
 
-
 .addToMain {
   height: fit-content;
   min-height: 300px;
   width: 41%;
-
 }
 
 .arrowRightSt {
-
   margin: auto;
   width: 54px;
   height: 54px;
@@ -29,27 +26,26 @@
   align-self: center;
   margin-left: 15px;
 }
-.bridge_net_item{
-	display:flex;
-  margin-top:20px;
+.bridge_net_item {
+  display: flex;
+  margin-top: 20px;
 }
-.bridge_netSelector_wrapper{
+.bridge_netSelector_wrapper {
   align-items: center;
   display: flex;
   justify-content: space-around;
   margin-top: 40px;
 }
-.bridge_netItems_container{
-  margin-top:20px;
+.bridge_netItems_container {
+  margin-top: 20px;
 }
-.bridge_address_wrapper{
-  display:flex;
+.bridge_address_wrapper {
+  display: flex;
   align-items: center;
   justify-content: end;
-
 }
-.bridge_address_img{
-  display:flex;
-  margin-left:3px;
+.bridge_address_img {
+  display: flex;
+  margin-left: 3px;
   align-items: center;
 }
