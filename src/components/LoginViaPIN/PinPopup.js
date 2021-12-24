@@ -156,6 +156,8 @@ function usePinInput() {
   useKey(
     (event) => isNumber(+event.key),
     () => handleChange(event.key),
+    {},
+    [value],
   );
 
   return {
