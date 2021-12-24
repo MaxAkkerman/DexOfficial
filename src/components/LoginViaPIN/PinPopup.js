@@ -4,7 +4,7 @@ import { Grid } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { numPadArr, onlyNums, pincodeArray } from '@/constants/defaultData';
+import { onlyNums, pincodeArray } from '@/constants/defaultData';
 
 import arrowBack from '../../images/arrowBack.png';
 import CloseBtn from '../CloseBtn/CloseBtn';
@@ -199,8 +199,7 @@ function PinPopup(props) {
               })}
             </Grid>
             <PinKeyboard
-              numPadArr={numPadArr}
-              handleClickNumKeyboard={(e) => handleClickNumKeyboard(e)}
+              onClickNumKeyboard={(e) => handleClickNumKeyboard(e)}
             />
 
             <Steppers step={props.step} />
