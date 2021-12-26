@@ -18,6 +18,11 @@ function PinPopup(props) {
 
   const { complete, handleBackspace, handleChange, value } = usePinInput();
 
+  const valueArr = useMemo(
+    () => value.split('').map((v, i) => ({ id: i, value: v })),
+    [value],
+  );
+
   return (
     <div
       className="select-wrapper"
@@ -97,11 +102,7 @@ function PinPopup(props) {
                   btnText={props.btnText}
                   errColor={null}
                   handleClickNext={() =>
-                    props.handleClickNext(
-                      value.split('').map((v) => ({ value: v })),
-                      props.nextStep,
-                      complete,
-                    )
+                    props.handleClickNext(valueArr, props.nextStep, complete)
                   }
                 />
               </div>
@@ -112,11 +113,7 @@ function PinPopup(props) {
                 btnText={props.btnText}
                 errColor={null}
                 handleClickNext={() =>
-                  props.handleClickNext(
-                    value.split('').map((v) => ({ value: v })),
-                    props.nextStep,
-                    complete,
-                  )
+                  props.handleClickNext(valueArr, props.nextStep, complete)
                 }
               />
             )}
@@ -127,11 +124,11 @@ function PinPopup(props) {
   );
 }
 
-function usePinInput() {
-  const [value, setValue] = useState('    ');
+function usePinInput({ length = 4 } = {}) {
+  const [value, setValue] = useState(' '.repeat(length));
 
   const cursor = useMemo(() => value.trim().length, [value]);
-  const complete = useMemo(() => value.trim().length === 4, [value]);
+  const complete = useMemo(() => value.trim().length === length, [value]);
 
   function handleChange(v) {
     if (complete || /[^0-9]/.test(v)) return;
@@ -145,7 +142,7 @@ function usePinInput() {
 
   function handleBackspace() {
     let str = value.trim().slice(0, -1);
-    str = str.padEnd(4);
+    str = str.padEnd(length);
     console.log({ str });
 
     setValue(str);
