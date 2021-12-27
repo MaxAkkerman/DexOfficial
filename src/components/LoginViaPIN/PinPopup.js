@@ -3,7 +3,7 @@ import './PinPopup.scss';
 import { Grid } from '@material-ui/core';
 import isNumber from 'lodash/isNumber';
 import range from 'lodash/range';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useKey } from 'react-use';
 
@@ -17,6 +17,27 @@ function PinPopup(props) {
   const appTheme = useSelector((state) => state.appReducer.appTheme);
 
   const { complete, handleBackspace, handleChange, value } = usePinInput();
+
+  // Intermediate variable to match api of previous code
+  const valueArr = useMemo(
+    () =>
+      value.split('').map((v, i) => ({
+        error: false,
+        focused: false,
+        id: i,
+        value: v,
+      })),
+    [value],
+  );
+
+  // Hook to match api of previous code
+  useEffect(() => {
+    props.handleCheckPin(valueArr, props.nextStep, complete);
+  }, [value]);
+
+  function handleNextClick() {
+    props.handleClickNext(valueArr, props.nextStep, complete);
+  }
 
   return (
     <div
@@ -96,13 +117,7 @@ function PinPopup(props) {
                   btnsWrapper={'btnsWrapper'}
                   btnText={props.btnText}
                   errColor={null}
-                  handleClickNext={() =>
-                    props.handleClickNext(
-                      value.split('').map((v) => ({ value: v })),
-                      props.nextStep,
-                      complete,
-                    )
-                  }
+                  handleClickNext={handleNextClick}
                 />
               </div>
             ) : (
@@ -111,13 +126,7 @@ function PinPopup(props) {
                 btnsClass={'enterSPRegBox'}
                 btnText={props.btnText}
                 errColor={null}
-                handleClickNext={() =>
-                  props.handleClickNext(
-                    value.split('').map((v) => ({ value: v })),
-                    props.nextStep,
-                    complete,
-                  )
-                }
+                handleClickNext={handleNextClick}
               />
             )}
           </>
@@ -127,11 +136,11 @@ function PinPopup(props) {
   );
 }
 
-function usePinInput() {
-  const [value, setValue] = useState('    ');
+function usePinInput({ length = 4 } = {}) {
+  const [value, setValue] = useState(' '.repeat(length));
 
   const cursor = useMemo(() => value.trim().length, [value]);
-  const complete = useMemo(() => value.trim().length === 4, [value]);
+  const complete = useMemo(() => value.trim().length === length, [value]);
 
   function handleChange(v) {
     if (complete || /[^0-9]/.test(v)) return;
@@ -145,7 +154,7 @@ function usePinInput() {
 
   function handleBackspace() {
     let str = value.trim().slice(0, -1);
-    str = str.padEnd(4);
+    str = str.padEnd(length);
     console.log({ str });
 
     setValue(str);

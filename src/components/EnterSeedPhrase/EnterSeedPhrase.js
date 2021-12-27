@@ -442,9 +442,7 @@ function EnterSeedPhrase(props) {
                 handleClickBack={() => handleClickGoToPIN(false)}
                 handleClose={null}
                 handleClickNext={(pin) => handleLogIn(pin)}
-                handleCheckPin={(pin, step, completed) =>
-                  handleCheckPin(pin, step, completed)
-                }
+                handleCheckPin={handleCheckPin}
               />
             </div>
           )}
