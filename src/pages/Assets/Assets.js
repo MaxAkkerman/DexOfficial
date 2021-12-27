@@ -127,7 +127,7 @@ function Assets() {
     setshowWrapMenu(true);
   }
   async function handleUnWrapTons() {
-    const tonObj = tokenList.filter((item) => item.symbol === 'WTON');
+    const tonObj = tokenList.filter((item) => item.symbol === 'wEVER');
     console.log('tonObj', tonObj[0], tonObj.length);
     if (!tonObj.length) {
       dispatch(
