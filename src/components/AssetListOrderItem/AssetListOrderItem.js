@@ -97,16 +97,16 @@ export default function AssetListOrderItem({ limitOrder }) {
                   className={cls(classes.btn, classes.btn_first)}
                   onClick={handleCancel}
                 >
-                  {/*<IconCross*/}
-                  {/*	className={cls(classes.icon_close, classes.icon_white)}*/}
-                  {/*/>*/}
+                  <IconCross
+                    className={cls(classes.icon_close, classes.icon_white)}
+                  />
                 </button>
               </Tooltip>
               <Tooltip title="Update order">
                 <button className={classes.btn} onClick={handleUpdate}>
-                  {/*<IconEdit*/}
-                  {/*	className={cls(classes.icon_copy, classes.icon_white)}*/}
-                  {/*/>*/}
+                  <IconEdit
+                    className={cls(classes.icon_copy, classes.icon_white)}
+                  />
                 </button>
               </Tooltip>
             </Stack>
