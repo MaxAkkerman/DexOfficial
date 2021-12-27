@@ -44,7 +44,7 @@ function ManageConfirmPopup(props) {
     const tokeB = tokenList.filter((item) => item.symbol === curP[0].symbolB);
 
     let pooledTokensA = ((curP[0].reserveA / 1000000000) * poolShare) / 100;
-    let pooledTokensB = ((curP[0].reservetB / 1000000000) * poolShare) / 100;
+    let pooledTokensB = ((curP[0].reserveB / 1000000000) * poolShare) / 100;
 
     setpooledTokensA(pooledTokensA);
     setpooledTokensB(pooledTokensB);

@@ -726,7 +726,7 @@ export const getAllPairsWoithoutProvider = memoize(async () => {
         : hex2a(curRootDataB.decoded.output.value0.symbol);
 
     // itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
-    itemData.reservetB = balanceB;
+    itemData.reserveB = balanceB;
     itemData.decimalsB = decimalsRootB;
 
     itemData.decimalsAB = decimalsRootAB;

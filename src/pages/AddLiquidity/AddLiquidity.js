@@ -125,7 +125,7 @@ function AddLiquidity() {
       console.log('curPair', curPair);
       const totalSupply = curPair.totalSupply;
       const reservesA = curPair.reserveA;
-      const reservesB = curPair.reservetB;
+      const reservesB = curPair.reserveB;
       const symbA = curPair.symbolA;
       const symbB = curPair.symbolB;
       //console.log("curPair",curPair)

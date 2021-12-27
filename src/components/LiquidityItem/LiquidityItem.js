@@ -60,12 +60,12 @@ function LiquidityItem({ balance, symbol }) {
       console.log('pairsList', pairsList, 'to', toT, 'from', fromT);
       if (i.symbolA.includes(fromT) && i.symbolB.includes(toT)) {
         dispatch(setManageFromToken({ symbol: fromT, reserve: i.reserveA }));
-        dispatch(setManageToToken({ symbol: toT, reserve: i.reservetB }));
+        dispatch(setManageToToken({ symbol: toT, reserve: i.reserveB }));
         dispatch(setManagePairId(i.pairAddress));
         dispatch(setManageRateAB(i.rateAB));
         dispatch(setManageRateBA(i.rateBA));
       } else if (i.symbolB.includes(fromT) && i.symbolA.includes(toT)) {
-        dispatch(setManageFromToken({ symbol: fromT, reserve: i.reservetB }));
+        dispatch(setManageFromToken({ symbol: fromT, reserve: i.reserveB }));
         dispatch(setManageToToken({ symbol: toT, reserve: i.reserveA }));
         dispatch(setManagePairId(i.pairAddress));
         dispatch(setManageRateAB(i.rateAB));

@@ -99,7 +99,7 @@ function PoolExplorerItem(props) {
                 src={iconGenerator(props.pair.symbolB)}
                 alt={props.pair.symbolB}
               />
-              {getReserves(props.pair.reservetB, props.pair.decimalsB)}
+              {getReserves(props.pair.reserveB, props.pair.decimalsB)}
 
               <div className={'PoolExplorerItem_pair_margin_left'}>
                 {props.pair.symbolB}
