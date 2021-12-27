@@ -1,4 +1,5 @@
 import { SvgIcon } from '@mui/material';
+import React from 'react';
 
 import SvgCross from '../../images/icons/crossNew.inline.svg';
 

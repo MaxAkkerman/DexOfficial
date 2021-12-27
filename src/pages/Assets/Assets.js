@@ -280,8 +280,7 @@ function Assets() {
                           'walletAddress',
                         )}
                         orderAssetArray={
-                          []
-                          // limitOrdersData && limitOrdersData.limitOrders
+                          limitOrdersData && limitOrdersData.limitOrders
                         }
                         pairList={pairList}
                         NFTassetsArray={assets}

@@ -1,6 +1,7 @@
 import { SvgIcon } from '@mui/material';
+import React from 'react';
 
-import SvgCopy from '!@svgr/webpack!../../images/icons/copyNew.svg';
+import SvgCopy from '../../images/icons/copyNew.inline.svg';
 
 export default function IconEdit(props) {
   return (
