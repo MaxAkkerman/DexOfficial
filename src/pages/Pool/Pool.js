@@ -15,7 +15,7 @@ function Pool() {
     (state) => state.appReducer.walletIsConnected,
   );
   const liquidityList = useSelector(
-    (state) => state.walletReducer.liquidityList,
+    (state) => state.tonData.tokens,
   );
   function handleClickCreatePair() {
     history.push('/create-pair');
@@ -51,7 +51,7 @@ function Pool() {
             <div className="pool-wrapper">
               {!liquidityList.length
                 ? 'You don’t have liquidity pairs yet'
-                : liquidityList.map((i) => (
+                : liquidityList.filter(it=>it.symbol.includes("DS")).map((i) => (
                     <LiquidityItem
                       symbol={i.symbol}
                       balance={i.balance}

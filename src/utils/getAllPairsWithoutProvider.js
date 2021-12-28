@@ -5,6 +5,7 @@ import { DEXPairContract } from '@/extensions/contracts/DEXPair';
 import { DEXRootContract } from '@/extensions/contracts/DEXRoot';
 import { RootTokenContract } from '@/extensions/contracts/RootTokenContract';
 import { getFixedNums, hex2a } from '@/reactUtils/reactUtils';
+import {getReplacedSymbol} from "@/extensions/sdk_get/get";
 
 /**
  * @returns {Promise<{
@@ -76,7 +77,6 @@ export default async function getAllPairsWithoutProvider() {
     let curRootDataAB = await curRootTokenAB.runLocal('getDetails', {
       _answer_id: 0,
     });
-    console.log('curRootDataA', curRootDataA);
     const decimalsRootA = Number(curRootDataA.decoded.output.value0.decimals);
     const decimalsRootB = Number(curRootDataB.decoded.output.value0.decimals);
     const decimalsRootAB = Number(curRootDataAB.decoded.output.value0.decimals);
@@ -89,20 +89,21 @@ export default async function getAllPairsWithoutProvider() {
     // console.log("fixedA", fixedA, "fixedB", fixedB);
     let itemData = {};
     itemData.pairAddress = addrPair;
-
     // itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
     // itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol);
     itemData.symbolA =
-      hex2a(curRootDataA.decoded.output.value0.symbol) === 'WTON'
-        ? 'EVER'
-        : hex2a(curRootDataA.decoded.output.value0.symbol);
+        getReplacedSymbol(hex2a(curRootDataA.decoded.output.value0.symbol))
+      // hex2a(curRootDataA.decoded.output.value0.symbol) === 'WTON'
+      //   ? 'EVER'
+      //   : hex2a(curRootDataA.decoded.output.value0.symbol);
 
     itemData.reserveA = balanceA;
     itemData.decimalsA = decimalsRootA;
     itemData.symbolB =
-      hex2a(curRootDataB.decoded.output.value0.symbol) === 'WTON'
-        ? 'EVER'
-        : hex2a(curRootDataB.decoded.output.value0.symbol);
+        getReplacedSymbol(hex2a(curRootDataB.decoded.output.value0.symbol))
+      // hex2a(curRootDataB.decoded.output.value0.symbol) === 'WTON'
+      //   ? 'EVER'
+      //   : hex2a(curRootDataB.decoded.output.value0.symbol);
 
     // itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
     itemData.reserveB = balanceB;

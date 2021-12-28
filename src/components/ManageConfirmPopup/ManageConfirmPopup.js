@@ -51,8 +51,14 @@ function ManageConfirmPopup(props) {
   }, [poolShare]);
 
   const handleSupplyClick = () => {
-    tokenList.forEach((i) => {
+    console.log("tokenList",    tokenList
+        .filter(it=>!it.symbol.includes("DS")))
+
+    tokenList
+        .filter(it=>!it.symbol.includes("DS"))
+        .forEach((i) => {
       if (i.symbol.includes(fromToken.symbol)) {
+        console.log("fromToken.symbol",fromToken.symbol)
         dispatch(
           setPoolFromToken({
             symbol: i.symbol,
@@ -60,6 +66,8 @@ function ManageConfirmPopup(props) {
           }),
         );
       } else if (i.symbol.includes(toToken.symbol)) {
+        console.log("toToken.symbol",toToken.symbol)
+
         dispatch(
           setPoolToToken({
             symbol: i.symbol,
