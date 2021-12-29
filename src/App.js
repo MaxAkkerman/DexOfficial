@@ -5,6 +5,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
 import { useMount } from 'react-use';
 
+import LimitOrderConfirmPopup from '@/components-v2/LimitOrderConfirmPopup';
+import LimitOrderPage from '@/components-v2/LimitOrderPage';
+import SwapConfirmPopup from '@/components-v2/SwapConfirmPopup';
+import SwapPage from '@/components-v2/SwapPage';
+import WaitingPopup from '@/components-v2/WaitingPopup';
+import {
+  requestPairsFetch,
+  requestTokensFetch,
+  updateTonContext,
+} from '@/store/actions/ton';
+
 import AssetsListForDeploy from './components/AssetsListForDeploy/AssetsListForDeploy';
 import EnterPassword from './components/EnterPassword/EnterPassword';
 import EnterSeedPhrase from './components/EnterSeedPhrase/EnterSeedPhrase';
@@ -12,7 +23,6 @@ import Header from './components/Header/Header';
 import NativeLogin from './components/NativeLogin/NativeLogin';
 import PoolExplorer from './components/PoolExplorer/PoolExplorer';
 import Popup from './components/Popup/Popup';
-import PopupManager from './components/PopupManager/PopupManager';
 import AssetsModalReceive from './components/ReceiveAssets/AssetsModalReceive';
 import ReceiveAssets from './components/ReceiveAssets/ReceiveAssets';
 import RevealSeedPhrase from './components/RevealSeedPhrase/RevealSeedPhrase';
@@ -45,11 +55,9 @@ import AddLiquidity from './pages/AddLiquidity/AddLiquidity';
 import Assets from './pages/Assets/Assets';
 import Bridge from './pages/Bridge/Bridge';
 import CreatePair from './pages/CreatePair/CreatePair';
-import LimitOrder from './pages/LimitOrder/LimitOrder';
 import Manage from './pages/Manage/Manage';
 import Pool from './pages/Pool/Pool';
 import Stacking from './pages/Stacking/Stacking';
-import Swap from './pages/Swap/Swap';
 import {
   getAllPairsAndSetToStore,
   getAllTokensAndSetToStore,
@@ -123,6 +131,7 @@ function App() {
   }
 
   useEffect(async () => {
+    // await getAllPairsAndSetToStore()
     const pairs2 = await getAllPairsWoithoutProvider();
     dispatch(setPairsList(pairs2));
     setonloading(false);
@@ -172,7 +181,7 @@ function App() {
     if (!tips) return;
     if (
       tips.type === 'error' ||
-      tips.message === 'Sended message to blockchain' ||
+      tips.message === 'Sent message to blockchain' ||
       tips.message === 'Copied'
     ) {
       enqueueSnackbar({ type: tips.type, message: tips.message });
@@ -203,6 +212,8 @@ function App() {
     ) {
       console.log('i was here', tips);
       await getAllTokensAndSetToStore(clientData.address);
+      dispatch(requestPairsFetch());
+      dispatch(requestTokensFetch());
     }
     enqueueSnackbar({ type: tips.type, message: tips.message });
     newTransList.push(tips);
@@ -332,6 +343,19 @@ function App() {
       });
   }, [subscribeToMore]);
 
+  useEffect(() => {
+    dispatch(requestPairsFetch());
+    dispatch(requestTokensFetch());
+  }, []);
+
+  useEffect(() => {
+    if (clientData.status) {
+      dispatch(updateTonContext('dexClientAddress', clientData.address));
+      dispatch(requestPairsFetch());
+      dispatch(requestTokensFetch());
+    }
+  }, [clientData]);
+
   return (
     <>
       {openEnterSeed && (
@@ -352,14 +376,16 @@ function App() {
         <Route exact path="/pool-explorer" component={PoolExplorer} />
         <Route exact path="/pool" component={Pool} />
         <Route exact path="/account" component={Account} />
-        <Route exact path="/swap" component={Swap} />
+        <Route exact path="/swap" component={SwapPage} />
         <Route exact path="/manage" component={Manage} />
         <Route exact path="/add-liquidity" component={AddLiquidity} />
         <Route exact path="/create-pair" component={CreatePair} />
         <Route exact path="/staking" component={Stacking} />
+
+        {/** TODO: Temporary commented, please remove after enabling bridge*/}
         <Route exact path="/bridge" component={Bridge} />
         <Route exact path="/wallet" component={Assets} />
-        <Route exact path="/orders" component={LimitOrder} />
+        <Route exact path="/orders" component={LimitOrderPage} />
         <Route exact path="/">
           <Redirect from="/" to="/wallet" />
         </Route>
@@ -397,11 +423,10 @@ function App() {
       {popup.isVisible ? (
         <Popup type={popup.type} message={popup.message} link={popup.link} />
       ) : null}
-      <PopupManager />
-      {popup.isVisible ? (
-        <Popup type={popup.type} message={popup.message} link={popup.link} />
-      ) : null}
       {revealSeedPhraseIsVisible ? <RevealSeedPhrase /> : null}
+      <SwapConfirmPopup />
+      <LimitOrderConfirmPopup />
+      <WaitingPopup />
     </>
   );
 }

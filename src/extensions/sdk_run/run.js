@@ -554,15 +554,6 @@ export async function swapA(
   const minQtyB = Math.round(qtBToNum - slippageValueofTokenB);
   const maxQtyB = Math.round(qtBToNum + slippageValueofTokenB);
   const qtyANum = Number(qtyA) * getDecimals(fromtokenData.decimals);
-
-  const { pubkey } = curExt._extLib;
-
-  const keys = await getClientKeys(phrase);
-  let getClientAddressFromRoot = await checkPubKey(pubkey);
-
-  if (getClientAddressFromRoot.status === false) {
-    return getClientAddressFromRoot;
-  }
   console.log(
     'qtyA',
     qtyA,
@@ -573,23 +564,31 @@ export async function swapA(
     'qtBToNum',
     qtBToNum,
   );
+  const { pubkey } = curExt._extLib;
 
-  const acc = new Account(DEXClientContract, {
-    address: getClientAddressFromRoot.dexclient,
-    client,
-    signer: signerKeys(keys),
-  });
-  try {
-    return await acc.run('processSwapA', {
-      pairAddr: pairAddr,
-      qtyA: qtyANum,
-      minQtyB: minQtyB,
-      maxQtyB: maxQtyB,
-    });
-  } catch (e) {
-    console.log('catch E', e);
-    return e;
+  const keys = await getClientKeys(phrase);
+  let getClientAddressFromRoot = await checkPubKey(pubkey);
+
+  if (getClientAddressFromRoot.status === false) {
+    return getClientAddressFromRoot;
   }
+
+  // const acc = new Account(DEXClientContract, {
+  // 	address: getClientAddressFromRoot.dexclient,
+  // 	client,
+  // 	signer: signerKeys(keys),
+  // });
+  // try {
+  // 	return await acc.run("processSwapA", {
+  // 		pairAddr: pairAddr,
+  // 		qtyA: qtyANum,
+  // 		minQtyB: minQtyB,
+  // 		maxQtyB: maxQtyB,
+  // 	});
+  // } catch (e) {
+  // 	console.log("catch E", e);
+  // 	return e;
+  // }
 }
 
 /**
@@ -742,13 +741,11 @@ export async function processLiquidity(
   toTokenData,
 ) {
   // const {pubkey} = curExt._extLib;
-
   let qtyAnum = Number(qtyA);
   let qtyBnum = Number(qtyB);
 
   const qtyAfixed = Math.round(qtyAnum * getDecimals(fromtokenData.decimals));
   const qtyBfixed = Math.round(qtyBnum * getDecimals(toTokenData.decimals));
-
   const acc = new Account(DEXClientContract, {
     address: clientAddress,
     signer: signerKeys(keys),
@@ -759,7 +756,7 @@ export async function processLiquidity(
     return await acc.run('processLiquidity', {
       pairAddr: pairAddr,
       qtyA: qtyAfixed,
-      qtyB: qtyBfixed,
+      qtyB: qtyBfixed.toString(),
     });
   } catch (e) {
     console.log('catch E processLiquidity', e);

@@ -19,7 +19,7 @@ import {
   closeOrderUpdatePopup,
   closeOrderWaitPopup,
   openOrderWaitPopup,
-} from '../../store/actions/limitOrders';
+} from '../../store/actions/limitOrder';
 import transferLimitOrder from '../../utils/transferLimitOrder';
 import truncateNum from '../../utils/truncateNum';
 import updateLimitOrderPrice from '../../utils/updateLimitOrderPrice';
@@ -134,10 +134,10 @@ export default function OrderPopupUpdate({ close, order }) {
       <MainBlock
         button={
           <button onClick={close} className={classes.btn}>
-            <IconCross
-              fill="none"
-              className={cls('close', classes.btn__icon)}
-            />
+            {/*<IconCross*/}
+            {/*	fill="none"*/}
+            {/*	className={cls("close", classes.btn__icon)}*/}
+            {/*/>*/}
           </button>
         }
         title="Update Limit Order"

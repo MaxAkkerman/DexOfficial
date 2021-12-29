@@ -4,6 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import PinPopup from '@/components/LoginViaPIN/PinPopup';
+import { resetPairs, resetTokens, resetTonContext } from '@/store/actions/ton';
+
 import ExtensionsList from '../../components/ExtensionsList/ExtensionsList';
 import Loader from '../../components/Loader/Loader';
 import MainBlock from '../../components/MainBlock/MainBlock';
@@ -12,7 +15,6 @@ import WaitingPopup from '../../components/WaitingPopup/WaitingPopup';
 import { getClientBalance } from '../../extensions/sdk_get/get';
 import { deployClient } from '../../extensions/sdk_run/run';
 import { decrypt, decryptPure, encryptPure } from '../../extensions/tonUtils';
-import { store } from '../../index';
 import { saveLog } from '../../logging/logging';
 import { copyToClipboard, InitializeClient } from '../../reactUtils/reactUtils';
 import {
@@ -30,6 +32,7 @@ import {
   setClientData,
   setLiquidityList,
   setPairsList,
+  setPin,
   setSubscribeReceiveTokens,
   setTokenList,
   setTransactionsList,
@@ -45,6 +48,7 @@ function Account() {
     (state) => state.walletReducer.transListReceiveTokens,
   );
   const [transArr, setTransArr] = useState([]);
+  const pin = useSelector((state) => state.walletReducer.pin);
 
   const [onDeploy, setonDeploy] = useState(false);
   const [passEnterPopup, setPasswordEnterPopup] = useState(false);
@@ -57,6 +61,7 @@ function Account() {
   useEffect(() => {
     setTransArr(transListReceiveTokens);
   }, []);
+
   async function onPassEnter() {
     const clientPrepData = JSON.parse(
       localStorage.getItem('clientDataPreDeploy'),
@@ -72,12 +77,13 @@ function Account() {
     }
     const accBalance = await getClientBalance(clientPrepData.address);
     setclientPrepData(clientPrepData);
+    console.log('accBalance', accBalance);
     if (accBalance > 0.5) {
       setPasswordEnterPopup(true);
     } else {
       dispatch(
         setTips({
-          message: `Not enough balance, need at least 0.5 TONs`,
+          message: `Not enough balance, need at least 0.5 EVERs`,
           type: 'error',
         }),
       );
@@ -85,10 +91,22 @@ function Account() {
   }
 
   async function deployHandler() {
-    const encClData = await decryptPure(
-      clientPrepData.secret,
-      seedPhrasePassword,
-    );
+    if (!compltePass) {
+      dispatch(
+        setTips({
+          message: `Wrong PIN, please try again`,
+          type: 'error',
+        }),
+      );
+      return;
+    }
+    console.log('seedPhrasePassword', seedPhrasePassword);
+    let password = '';
+    pin.map((item) => {
+      password += item.value.toString();
+    });
+    const encClData = await decryptPure(clientPrepData.secret, password);
+    console.log('password', password);
     const encrData = JSON.parse(JSON.stringify(clientPrepData));
     encrData.secret = encClData;
     setPasswordEnterPopup(false);
@@ -118,6 +136,7 @@ function Account() {
       setonDeploy(false);
     }
   }
+
   // function disconnectHandler() {
   // 	dispatch(setWallet({id: "", balance: 0}));
   // 	dispatch(setWalletIsConnected(false));
@@ -147,15 +166,26 @@ function Account() {
   // }
 
   function disconnectHandler() {
-    dispatch(setWallet({ id: '', balance: 0 }));
-    dispatch(setWalletIsConnected(false));
     // dispatch(setCurExt({}));
     // dispatch(setTokenList([]));
     // dispatch(setLiquidityList([]));
     // dispatch(setPairsList([]))
-    console.log('disaconnect');
-    dispatch(setSeedPassword(''));
     // dispatch(enterSeedPhraseSaveToLocalStorage(""));
+    console.log('disaconnect');
+
+    localStorage.removeItem('setSubscribeReceiveTokens');
+    localStorage.removeItem('esp');
+    localStorage.removeItem('clientDataPreDeploy');
+    localStorage.removeItem('clientData');
+
+    dispatch(resetTonContext());
+    dispatch(resetTokens());
+    dispatch(resetPairs());
+    dispatch(setTokenList([]));
+    dispatch(setLiquidityList([]));
+    dispatch(setWallet({ id: '', balance: 0 }));
+    dispatch(setWalletIsConnected(false));
+    dispatch(setSeedPassword(''));
     dispatch(
       setClientData({
         status: false,
@@ -164,13 +194,6 @@ function Account() {
         public: '',
       }),
     );
-
-    store.dispatch(setTokenList([]));
-    store.dispatch(setLiquidityList([]));
-    localStorage.removeItem('setSubscribeReceiveTokens');
-    localStorage.removeItem('esp');
-    localStorage.removeItem('clientDataPreDeploy');
-    localStorage.removeItem('clientData');
 
     saveLog(
       {
@@ -199,6 +222,23 @@ function Account() {
     }
   }
 
+  const [compltePass, setCompletedPass] = useState(false);
+
+  function handleCheckPin(pinArr, step, completed) {
+    const curEmptyPin = pinArr.filter((item) => !item.value.length);
+    if (!curEmptyPin.length) {
+      setCompletedPass(true);
+      let password = '';
+      pin.map((item) => {
+        password += item.value.toString();
+      });
+      setSeedPhrasePassword(password);
+    } else {
+      setCompletedPass(false);
+    }
+    dispatch(setPin(pinArr));
+  }
+
   function passwordChange(event) {
     let password = event.target.value;
     if (password.length > 0) setValidPassword(true);
@@ -209,19 +249,36 @@ function Account() {
     <div className="container">
       {passEnterPopup ? (
         <div className="select-wrapper">
-          <div className="mainblock">
-            <PasswordEnterPopup
-              goIntoApp={deployHandler}
-              enterClick={enterClick}
-              passwordChange={passwordChange}
-              validPassword={validPassword}
-              submitText={'Submit'}
-              cancelText={'Cancel'}
-              handleBack={() => setPasswordEnterPopup(false)}
-            />
-          </div>
+          <PinPopup
+            title={'Enter your PIN'}
+            showTwoBtns={true}
+            nextStep={'step3'}
+            prevStep={'step1'}
+            handleLogOut={null}
+            btnText={'Submit'}
+            pinCorrect={true}
+            handleClickBack={() => setPasswordEnterPopup(false)}
+            handleClose={null}
+            handleClickNext={() => deployHandler()}
+            handleCheckPin={(pin, step, completed) =>
+              handleCheckPin(pin, step, completed)
+            }
+          />
         </div>
-      ) : onDeploy ? (
+      ) : // <div className="select-wrapper">
+      // 	<div className="mainblock">
+      // 		<PasswordEnterPopup
+      // 			goIntoApp={deployHandler}
+      // 			enterClick={enterClick}
+      // 			passwordChange={passwordChange}
+      // 			validPassword={validPassword}
+      // 			submitText={"Submit"}
+      // 			cancelText={"Cancel"}
+      // 			handleBack={() => setPasswordEnterPopup(false)}
+      // 		/>
+      // 	</div>
+      // </div>
+      onDeploy ? (
         <WaitingPopup
           text={`Creating dex client...please wait`}
           handleClose={() => setonDeploy(false)}
@@ -324,6 +381,13 @@ function Account() {
                   Disconnect
                 </button>
               </div>
+
+              {!clientData.status ? (
+                <div style={{ fontSize: '14px', marginTop: '20px' }}>
+                  To deploy wallet send at least 10 EVERs to this address and
+                  then click "Deploy"
+                </div>
+              ) : null}
             </div>
           }
           footer={

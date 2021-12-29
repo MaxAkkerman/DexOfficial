@@ -1,6 +1,7 @@
+import { ClickAwayListener } from '@mui/base';
+import { Portal } from '@mui/material';
 import PropTypes from 'prop-types';
 import React, { useMemo, useState } from 'react';
-import ReactDOM from 'react-dom';
 
 import CloseBtn from '@/components-v2/CloseBtn';
 import Loader from '@/components-v2/Loader';
@@ -11,18 +12,13 @@ import includesTextInToken from '@/utils/includesTextInToken';
 
 import classes from './index.module.scss';
 
-export default function SelectPopup({
-  loading,
-  onClose,
-  onSelect,
-  open,
-  tokens,
-}) {
+export default function SelectPopup({ loading, onClose, onSelect, tokens }) {
   const [searchWord, setSearchWord] = useState('');
+  console.log('tokens', tokens);
   const filteredTokens = useMemo(
     () =>
       tokens
-        .sort((a, b) => b.balance - a.balance)
+        // .sort((a, b) => b.balance - a.balance)
         .filter((t) => includesTextInToken(t, searchWord)),
     [tokens, searchWord],
   );
@@ -32,37 +28,40 @@ export default function SelectPopup({
     onClose(e);
   }
 
-  if (!open) return null;
-
-  return ReactDOM.createPortal(
-    <div className={classes['select-wrapper']}>
-      <MainBlock
-        title="Select a token"
-        button={<CloseBtn onClick={onClose} />}
-        content={
-          loading ? (
-            <Loader className={classes.loader} />
-          ) : (
-            <>
-              <SearchInput onChange={(e) => setSearchWord(e.target.value)} />
-              <div className={classes['select-list']}>
-                {!filteredTokens.length && (
-                  <p style={{ textAlign: 'center' }}>No tokens found</p>
-                )}
-                {filteredTokens.map((t) => (
-                  <SelectItem
-                    token={t}
-                    key={t.rootAddress}
-                    onClick={(e) => handleTokenSelect(e, t)}
+  return (
+    <Portal>
+      <div className={classes['select-wrapper']}>
+        <ClickAwayListener onClickAway={onClose}>
+          <MainBlock
+            title="Select a token"
+            button={<CloseBtn onClick={onClose} />}
+            content={
+              loading ? (
+                <Loader className={classes.loader} />
+              ) : (
+                <>
+                  <SearchInput
+                    onChange={(e) => setSearchWord(e.target.value)}
                   />
-                ))}
-              </div>
-            </>
-          )
-        }
-      />
-    </div>,
-    document.querySelector('body'),
+                  <div className={classes['select-list']}>
+                    {!filteredTokens.length && (
+                      <p style={{ textAlign: 'center' }}>No tokens found</p>
+                    )}
+                    {filteredTokens.map((t) => (
+                      <SelectItem
+                        token={t}
+                        key={t.rootAddress}
+                        onClick={(e) => handleTokenSelect(e, t)}
+                      />
+                    ))}
+                  </div>
+                </>
+              )
+            }
+          />
+        </ClickAwayListener>
+      </div>
+    </Portal>
   );
 }
 
@@ -70,7 +69,6 @@ SelectPopup.propTypes = {
   loading: PropTypes.bool,
   onClose: PropTypes.func,
   onSelect: PropTypes.func,
-  open: PropTypes.bool,
   tokens: PropTypes.array,
 };
 
@@ -78,6 +76,5 @@ SelectPopup.defaultProps = {
   loading: false,
   onClose: () => {},
   onSelect: () => {},
-  open: false,
   tokens: [],
 };

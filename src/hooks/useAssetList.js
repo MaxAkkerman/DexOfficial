@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-
-import TONicon from '../images/tonCrystalDefault.svg';
+import TONicon from '../images/tokens/TON.png';
 
 export default function useAssetList() {
   const tokenList = useSelector((state) => state.walletReducer.tokenList);
@@ -18,16 +17,16 @@ export default function useAssetList() {
 
   useEffect(() => {
     const isTONwalletExist = tokenList.filter(
-      (item) => item.type === 'Native Tons',
+      (item) => item.type === 'Native evers',
     );
     console.log('isTONwalletExist', isTONwalletExist);
     if (isTONwalletExist.length === 0) {
       const TONdata = {
         walletAddress: clientData.address,
         owner_address: clientData.address,
-        symbol: 'TON Crystal',
-        tokenName: 'TON Crystal',
-        type: 'Native Tons',
+        symbol: 'EVER',
+        tokenName: 'Everscale',
+        type: 'Native evers',
         icon: TONicon,
         rootAddress: 'none',
         showWrapMenu: true,

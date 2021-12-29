@@ -3,25 +3,31 @@ import { combineReducers } from 'redux';
 import appReducer from './app';
 import clientWallets from './clientWallets';
 import enterSeedPhrase from './enterSeedPhrase';
-import limitOrders from './limitOrders';
+import limitOrderReducer from './limitOrder';
 import manageReducer from './manage';
 import poolReducer from './pool';
 import poolExplorer from './poolExplorer';
 import stakingReducer from './stake';
 import swapReducer from './swap';
+import tonContext from './tonContext';
+import tonData from './tonData';
+import waitingPopup from './waitingPopup';
 import walletReducer from './wallet';
 import walletSeedReducer from './walletSeed';
 
 export default combineReducers({
   appReducer,
-  walletReducer,
-  swapReducer,
-  poolReducer,
-  manageReducer,
   clientWallets,
-  poolExplorer,
-  walletSeedReducer,
   enterSeedPhrase,
+  limitOrderReducer,
+  manageReducer,
+  poolExplorer,
+  poolReducer,
   stakingReducer,
-  limitOrders,
+  swapReducer,
+  tonContext,
+  tonData,
+  waitingPopup,
+  walletReducer,
+  walletSeedReducer,
 });

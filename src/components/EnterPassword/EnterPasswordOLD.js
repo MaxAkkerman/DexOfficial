@@ -88,7 +88,7 @@ function EnterPassword(props) {
         );
         const dexClientAddress = clientDataPreDeploy.address;
         const dexClientBalance = await getClientBalance(dexClientAddress);
-        console.log('i am here');
+
         dispatch(
           setClientData({
             status: false,

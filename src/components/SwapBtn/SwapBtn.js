@@ -5,7 +5,7 @@ import {
   setOrdersFromInputValue,
   setOrdersFromToken,
   setOrdersToToken,
-} from '../../store/actions/limitOrders';
+} from '../../store/actions/limitOrder';
 import {
   setSwapFromInputValueChange,
   setSwapFromToken,

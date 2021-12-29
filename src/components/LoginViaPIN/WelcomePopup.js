@@ -6,7 +6,6 @@ import React, { memo, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { numPadArr, pincodeArray } from '../../constants/defaultData';
 import arrowBack from '../../images/arrowBack.png';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import MainBlock from '../MainBlock/MainBlock';

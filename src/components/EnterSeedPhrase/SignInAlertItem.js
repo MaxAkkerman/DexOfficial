@@ -4,8 +4,6 @@ import { Alert, AlertTitle, Box } from '@material-ui/core';
 import React from 'react';
 
 function Alerter(props) {
-  console.log('Alerter rerendered blyat');
-
   return (
     <Box
       sx={{

@@ -12,7 +12,7 @@ import {
   setOrdersFromToken,
   setOrdersPairId,
   setOrdersToToken,
-} from '../../store/actions/limitOrders';
+} from '../../store/actions/limitOrder';
 import {
   hidePoolFromSelect,
   hidePoolToSelect,

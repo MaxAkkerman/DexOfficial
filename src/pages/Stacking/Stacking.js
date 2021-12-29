@@ -46,6 +46,7 @@ function Stacking() {
   const showWaitingStakingPopup = useSelector(
     (state) => state.stakingReducer.showWaitingStakingPopup,
   );
+  const clientData = useSelector((state) => state.walletReducer.clientData);
 
   const [period, setPeriod] = useState(1 / 30);
   const [curProgram, setProgram] = useState(0);
@@ -66,7 +67,7 @@ function Stacking() {
     async validate({ stake }) {
       const errors = {};
 
-      const tonAsset = assetList.find((t) => t.symbol === 'TON Crystal');
+      const tonAsset = assetList.find((t) => t.symbol === 'EVER');
       if (!tonAsset) return;
 
       if (tonAsset.balance < stake) errors.stake = NOT_ENOUGH_MSG;
@@ -179,7 +180,7 @@ function Stacking() {
       ) : null}
       {showWaitingStakingPopup ? (
         <WaitingPopup
-          text={`Stacking ${values.stake} TONS`}
+          text={`Stacking ${values.stake} EVERs`}
           handleClose={() => handleClose()}
         />
       ) : null}
@@ -207,7 +208,7 @@ function Stacking() {
                 }
               >
                 <div className="left_block boldFont">
-                  Staking with TON Crystal
+                  Staking with Everscale
                 </div>
               </div>
               <div className="program_block_wrapper">
@@ -386,7 +387,7 @@ function Stacking() {
                               <img
                                 style={{ marginRight: '5px' }}
                                 src={TON}
-                                alt={'Ton Crystal'}
+                                alt={'Everscale'}
                               />{' '}
                               {Number(values.stake + values.profit).toFixed(
                                 4,
@@ -475,7 +476,7 @@ function Stacking() {
                         <img
                           style={{ marginRight: '5px' }}
                           src={TON}
-                          alt={'Ton Crystal'}
+                          alt={'Everscale'}
                         />{' '}
                         {Number(values.profit).toFixed(1) || 0}
                       </Typography>
@@ -525,7 +526,9 @@ function Stacking() {
                       className="btn mainblock-btn"
                       onClick={() => history.push('/account')}
                     >
-                      Connect wallet
+                      {!clientData.status && clientData.address.length === 66
+                        ? 'Deploy wallet'
+                        : 'Connect wallet'}
                     </button>
                   )}
                 </Stack>

@@ -4,7 +4,6 @@ import { Alert, AlertTitle, Box } from '@material-ui/core';
 import React from 'react';
 
 function HintItem(props) {
-  console.log('HintItem rerendered blyat');
   return (
     <>
       <Box

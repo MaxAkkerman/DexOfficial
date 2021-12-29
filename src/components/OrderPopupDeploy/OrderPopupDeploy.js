@@ -13,7 +13,7 @@ import miniSwap from '../../images/icons/mini-swap.png';
 import {
   closeOrderWaitPopup,
   openOrderWaitPopup,
-} from '../../store/actions/limitOrders';
+} from '../../store/actions/limitOrder';
 import makeLimitOrder from '../../utils/makeLimitOrder';
 import truncateNum from '../../utils/truncateNum';
 import IconCross from '../IconCross/IconCross';

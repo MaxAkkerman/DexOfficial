@@ -1,7 +1,9 @@
 import './AssetsList.scss';
 
+import React from 'react';
+
 import CalculateTimeLeft from '../../hooks/useTimer';
-import TON from '../../images/tonCrystalDefault.svg';
+import TON from '../../images/tokens/TON.png';
 import {
   formatDate,
   getDurationFromSeconds,
@@ -17,9 +19,11 @@ function AssetsList(props) {
       }
       onClick={() => console.log('props', props)}
     >
-      {props.TokenAssetsArray.sort(
-        (a, b) => (b.balance || 0) - (a.balance || 0),
-      ).map((item, i) => (
+      {props.TokenAssetsArray
+      //     .sort(
+      //   (a, b) => (b.balance || 0) - (a.balance || 0),
+      // )
+          .map((item, i) => (
         <div
           className="assets_item_wrapper"
           onClick={() => props.handleClickToken(item)}
@@ -225,7 +229,7 @@ function AssetsList(props) {
                             <img
                               style={{ marginRight: '5px', width: '20px' }}
                               src={TON}
-                              alt={'Ton Crystal'}
+                              alt={'Everscale'}
                             />{' '}
                             {Number(item.stakeTotal) / 1000000000}
                           </p>
@@ -236,7 +240,7 @@ function AssetsList(props) {
                             <img
                               style={{ marginRight: '5px', width: '20px' }}
                               src={TON}
-                              alt={'Ton Crystal'}
+                              alt={'Everscale'}
                             />{' '}
                             {(
                               (calculateRate(
@@ -259,7 +263,7 @@ function AssetsList(props) {
                             <img
                               style={{ marginRight: '5px', width: '20px' }}
                               src={TON}
-                              alt={'Ton Crystal'}
+                              alt={'Everscale'}
                             />{' '}
                             {(
                               calculateRate(

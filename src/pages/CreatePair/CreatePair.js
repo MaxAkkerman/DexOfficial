@@ -37,9 +37,11 @@ function CreatePair() {
   const walletIsConnected = useSelector(
     (state) => state.appReducer.walletIsConnected,
   );
+  // const tokenList = useSelector((state) => state.tonData.tokens);
+  const tokenList = useSelector((state) => state.walletReducer.tokenList);
+
   const fromToken = useSelector((state) => state.poolReducer.fromToken);
   const toToken = useSelector((state) => state.poolReducer.toToken);
-  const tokenList = useSelector((state) => state.walletReducer.tokenList);
   const liquidityList = useSelector(
     (state) => state.walletReducer.liquidityList,
   );
@@ -77,7 +79,6 @@ function CreatePair() {
     if (!tips || tips.length) return;
     if (tips.name === 'processLiquidityCallback') {
       if (fromToken.symbol || toToken.Symbol) {
-        console.log('I am at chakeee');
         const fromTokenCopy = JSON.parse(JSON.stringify(fromToken));
         const toTokenCopy = JSON.parse(JSON.stringify(toToken));
         const newFromTokenData = tokenList.filter(
@@ -120,7 +121,7 @@ function CreatePair() {
     if (clientData.balance < 25) {
       dispatch(
         setTips({
-          message: `Insufficient balance, you need at least 25 Tons to create pair`,
+          message: `Insufficient balance, you need at least 25 EVERs to create pair`,
           type: 'error',
         }),
       );
@@ -173,19 +174,29 @@ function CreatePair() {
   }
 
   useEffect(() => {
-    const assetsList = [...tokenList, ...liquidityList];
-    setAssetsList(assetsList);
+    const assetsList = tokenList.filter((item) => !item.symbol.includes('DS'));
+    console.log(
+      'tokenList search',
+      tokenList.filter((it) => !it.symbol.includes('DS')),
+    );
+    setAssetsList(tokenList);
   }, []);
 
   useEffect(() => {
-    const assetsListCopy = JSON.parse(
-      JSON.stringify([...tokenList, ...liquidityList]),
-    );
+    const assetsListCopy = JSON.parse(JSON.stringify(tokenList));
     const newArr = assetsListCopy.filter(
       (item) => item.symbol !== tokenA.symbol,
     );
     setAssetsList(newArr);
   }, [tokenA]);
+
+  useEffect(() => {
+    const assetsListCopy = JSON.parse(JSON.stringify(tokenList));
+    const newArr = assetsListCopy.filter(
+      (item) => item.symbol !== tokenB.symbol,
+    );
+    setAssetsList(newArr);
+  }, [tokenB]);
 
   function handleCloseAssetsListPopup() {
     setshowAssetList(false);

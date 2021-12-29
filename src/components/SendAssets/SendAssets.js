@@ -7,36 +7,37 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import MainBlock from '../../components/MainBlock/MainBlock';
-import { SEND_TOKEN } from '../../constants/commissions';
+import { SEND_TOKEN } from '@/constants/commissions';
 import {
   NOT_ENOUGH_CAUSE_COMMISSION,
   NOT_TOUCHED,
-} from '../../constants/validationMessages';
+} from '@/constants/validationMessages';
 import {
   getAccType2,
   getExpectedWalletAddressByOwner,
-} from '../../extensions/sdk_get/get';
+} from '@/extensions/sdk_get/get';
 import {
   deployEmptyWallet,
   sendNativeTons,
   sendNFT,
   sendToken,
-} from '../../extensions/sdk_run/run';
-import { decrypt } from '../../extensions/tonUtils';
-import useKeyPair from '../../hooks/useKeyPair';
-import useSendAssetsCheckAddress from '../../hooks/useSendAssetsCheckAddress';
-import useSendAssetsCheckAmount from '../../hooks/useSendAssetsCheckAmount';
-import useSendAssetsSelectedToken from '../../hooks/useSendAssetsSelectedToken';
-import arrowBack from '../../images/arrowBack.png';
-import { setTips } from '../../store/actions/app';
+} from '@/extensions/sdk_run/run';
+import { decrypt } from '@/extensions/tonUtils';
+import { setTips } from '@/store/actions/app';
 import {
   setAddressForSend,
   setAmountForSend,
   setCurrentTokenForSend,
   setShowWaitingSendAssetsPopup,
   setTokenSetted,
-} from '../../store/actions/walletSeed';
+} from '@/store/actions/walletSeed';
+
+import MainBlock from '../../components/MainBlock/MainBlock';
+import useKeyPair from '../../hooks/useKeyPair';
+import useSendAssetsCheckAddress from '../../hooks/useSendAssetsCheckAddress';
+import useSendAssetsCheckAmount from '../../hooks/useSendAssetsCheckAmount';
+import useSendAssetsSelectedToken from '../../hooks/useSendAssetsSelectedToken';
+import arrowBack from '../../images/arrowBack.png';
 import BlockItem from '../AmountBlock/AmountBlock';
 import InputChange from '../AmountBlock/InputChange';
 import MaxBtn from '../AmountBlock/MAXbtn';
@@ -118,14 +119,17 @@ function SendAssets() {
     setsendConfirmPopupIsVisible(false);
   }
   function handleChangeAddress(e) {
-    setaddressToSendView(e.currentTarget.value);
+    console.log('e.currentTarget.value)', e.currentTarget.value);
+    // setaddressToSendView(e.currentTarget.value);
     dispatch(setAddressForSend(e.currentTarget.value));
   }
   useEffect(() => {
+    console.log('addressToSendView', addressToSendView, addressToSend);
+
     if (!addressToSend) return;
     handleSetView();
-    console.log('addressToSendView', addressToSendView);
   }, [addressToSend]);
+
   function handleSetView() {
     if (addressToSend.length === 66) {
       let spliced = addressToSend.slice(0, 7);
@@ -158,7 +162,7 @@ function SendAssets() {
       if (!res.code) {
         dispatch(
           setTips({
-            message: `Sended message to blockchain`,
+            message: `Sent message to blockchain`,
             type: 'info',
           }),
         );
@@ -170,7 +174,7 @@ function SendAssets() {
           }),
         );
       }
-    } else if (selectedToken.symbol === 'TON Crystal') {
+    } else if (selectedToken.symbol === 'EVER') {
       if (!amountToSend) {
         return;
       }
@@ -184,7 +188,7 @@ function SendAssets() {
       if (!res.code) {
         dispatch(
           setTips({
-            message: `Sended message to blockchain`,
+            message: `Sent message to blockchain`,
             type: 'info',
           }),
         );
@@ -204,7 +208,11 @@ function SendAssets() {
         selectedToken.rootAddress,
         addressToSend,
       );
+      console.log('addressToSend', addressToSend);
+      console.log('walletAddrByOwner', walletAddrByOwner);
       const { acc_type } = await getAccType2(walletAddrByOwner.name);
+      console.log('acc_type', acc_type);
+
       let sendTres;
       if (acc_type === 1) {
         const sendRes = await sendToken(
@@ -216,6 +224,7 @@ function SendAssets() {
           keyPair,
           selectedToken,
         );
+        console.log('sendRes', sendRes);
       } else {
         const deployRes = await deployEmptyWallet(
           clientData.address,
@@ -223,6 +232,8 @@ function SendAssets() {
           selectedToken.rootAddress,
           addressToSend,
         );
+        console.log('deployRes', deployRes);
+
         if (!deployRes.code) {
           sendTres = await sendToken(
             clientData.address,
@@ -235,12 +246,12 @@ function SendAssets() {
           );
         }
       }
-
+      console.log('sendTres', sendTres);
       dispatch(setShowWaitingSendAssetsPopup(false));
       if (sendTres && !sendTres.code) {
         dispatch(
           setTips({
-            message: `Sended message to blockchain`,
+            message: `Sent message to blockchain`,
             type: 'info',
           }),
         );

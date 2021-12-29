@@ -43,12 +43,13 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
       },
       {
-        test: /\.(png|jpg|gif|svg)$/,
-        use: 'file-loader',
+        exclude: /\.inline\.svg$/,
+        test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
+        type: 'asset/resource',
       },
       {
-        test: /\.(eot|ttf|woff|woff2)$/,
-        loader: 'file-loader',
+        test: /\.inline.svg$/,
+        use: ['@svgr/webpack'],
       },
     ],
   },
@@ -76,4 +77,16 @@ module.exports = {
     }),
     new Dotenv(),
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src/'),
+    },
+    fallback: {
+      http: require.resolve('stream-http'),
+      https: require.resolve('https-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+      os: require.resolve('os-browserify/browser'),
+      stream: require.resolve('stream-browserify'),
+    },
+  },
 };

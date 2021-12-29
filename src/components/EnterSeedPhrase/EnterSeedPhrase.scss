@@ -1,17 +1,17 @@
 .enterSPBox {
-	display: flex;
-	justify-content: space-around;
-	width: 100%;
-	margin-top: 40px;
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: 40px;
 }
 
 .enterSPContent {
 }
 
 .enterSPRegBox {
-	justify-content: center;
-	width: 320px;
-	padding-left: 16px;
+  justify-content: center;
+  width: 320px;
+  padding-left: 16px;
 }
 
 //.select {
@@ -96,34 +96,34 @@
 //}
 
 @media screen and (max-width: 481px) {
-	.select {
-		&-list {
-			max-height: calc(100% - 100px);
-			margin-right: -20px;
-			padding-right: 12px;
-		}
-	}
+  .select {
+    &-list {
+      max-height: calc(100% - 100px);
+      margin-right: -20px;
+      padding-right: 12px;
+    }
+  }
 }
 
 @media screen and (max-width: 400px) {
-	.enterSPBox {
-		flex-direction: column;
-	}
+  .enterSPBox {
+    flex-direction: column;
+  }
 
-	.enterSPContent {
-		flex-direction: column;
-	}
+  .enterSPContent {
+    flex-direction: column;
+  }
 
-	.enterSPRegBox {
-		justify-content: center;
-	}
+  .enterSPRegBox {
+    justify-content: center;
+  }
 
-	.fixheight {
-		height: auto;
-	}
-	.fixFontSize {
-		font-size: 16px;
-	}
+  .fixheight {
+    height: auto;
+  }
+  .fixFontSize {
+    font-size: 16px;
+  }
 }
 
 .fixheight {

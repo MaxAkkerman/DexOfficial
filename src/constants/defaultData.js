@@ -1,6 +1,6 @@
-import TON from '../images/tokens/TON.svg';
-import wBTC from '../images/tokens/wBTC.svg';
 import wETH from '../images/tokens/wETH.svg';
+import TON from '../images/tokens/TONold.svg';
+import wBTC from '../images/tokens/wBTC.svg';
 
 export const marks = [
   {
@@ -120,9 +120,9 @@ export const assetstestArray = [
       '0:4594ac781bdcdee350c9c8c25dfaf08d067b1214fa86c687f4deca048a76551f',
   },
   {
-    tokenName: 'TON Crystal',
+    tokenName: 'Everscale',
     balance: '1052',
-    tokenSymbol: 'TON',
+    tokenSymbol: 'EVER',
     icon: TON,
     address:
       '0:4594ac781bdcdee350c9c8c25dfaf08d067b1214fa86c687f4deca048a76551f',
@@ -192,15 +192,15 @@ export const numPadArr = [
     value: 9,
   },
   {
-    value: 10,
     disabled: true,
+    value: 10,
   },
   {
     value: 0,
   },
   {
-    value: 12,
     disabled: true,
+    value: 12,
   },
 ];
 export const InitialSeedState = [

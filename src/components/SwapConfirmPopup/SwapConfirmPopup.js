@@ -198,7 +198,7 @@ function SwapConfirmPopup(props) {
         if (!res.code)
           dispatch(
             setTips({
-              message: `Sended message to blockchain`,
+              message: `Sent message to blockchain`,
               type: 'info',
             }),
           );
@@ -247,9 +247,9 @@ function SwapConfirmPopup(props) {
     pairList.forEach(async (i) => {
       if (fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
         rootIn = reserves[0].reserveA;
-        rootOut = reserves[0].reservetB;
+        rootOut = reserves[0].reserveB;
       } else {
-        rootIn = reserves[0].reservetB;
+        rootIn = reserves[0].reserveB;
         rootOut = reserves[0].reserveA;
       }
     });

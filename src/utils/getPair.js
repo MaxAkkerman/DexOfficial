@@ -1,19 +1,12 @@
-import { PAIR_NULL } from '../constants/runtimeErrors';
-import getAllPairs from './getAllPairs';
+import find from 'lodash/find';
 
-/**
- * @typedef {Object} Pair
- * @property {string} addrPair
- * @property {string} rootA
- * @property {string} rootB
- */
-/**
- * @param {string} addrPair
- * @returns {Promise<Pair>}
- */
-export default async function getPair(addrPair) {
-  const pairs = await getAllPairs();
-  const pair = pairs.find((p) => p.addrPair === addrPair);
-  if (!pair) throw new Error(PAIR_NULL);
-  return pair;
+import { NO_CONTEXT } from '@/constants/runtimeErrors';
+
+export default function getPair(pairAddress) {
+  if (!this || !this.context || !this.context.reduxStore)
+    throw new Error(NO_CONTEXT);
+
+  const state = this.context.reduxStore.getState();
+
+  return find(state.tonData.pairs, { pairAddress });
 }

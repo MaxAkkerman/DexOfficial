@@ -1,5 +1,6 @@
 import { Box, Collapse, Stack, Tooltip, Typography } from '@mui/material';
 import cls from 'classnames';
+import React from 'react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -8,7 +9,7 @@ import { iconGenerator } from '../../iconGenerator';
 import {
   openOrderCancelPopup,
   openOrderUpdatePopup,
-} from '../../store/actions/limitOrders';
+} from '../../store/actions/limitOrder';
 import truncateNum from '../../utils/truncateNum';
 import IconCross from '../IconCross/IconCross';
 import IconEdit from '../IconEdit/IconEdit';

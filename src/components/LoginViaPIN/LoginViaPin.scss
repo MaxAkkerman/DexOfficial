@@ -1,107 +1,130 @@
 .welcomeWrapper {
-	color: var(--mainblock-title-color);
-	font-weight: bold;
-	margin: auto;
-	text-align: center;
-	font-size: 28px;
+  color: var(--mainblock-title-color);
+  font-weight: bold;
+  margin: auto;
+  text-align: center;
+  font-size: 28px;
 }
-.LoginViaPinBtns{
-	justify-content: center;
-	//width: 320px;
-	//padding-left: 16px;
+.LoginViaPinBtns {
+  justify-content: center;
+  //width: 320px;
+  //padding-left: 16px;
 }
-.curBtnStylesLogin{
-	height: 57px;
-	font-size: 20px;
-	//padding: 16px 20px;
-	border-radius: 18px;
-	width: 50%;
+.curBtnStylesLogin {
+  height: 57px;
+  font-size: 18px;
+  //padding: 16px 20px;
+  border-radius: 18px;
+  width: 50%;
 }
-.curBtnStyles{
-	height: 57px;
-	font-size: 20px;
-	padding: 16px 20px;
-	border-radius: 18px;
-	width: 100%;
+.curBtnStyles {
+  height: 57px;
+  font-size: 20px;
+  padding: 16px 20px;
+  border-radius: 18px;
+  width: 100%;
 }
-.removePad{
-	padding: unset;
+.removePad {
+  padding: unset;
 }
-.fixPaddings{
-	margin-top: 50px;
-	margin-right: 50px;
+.fixPaddings {
+  margin-top: 50px;
+  margin-right: 50px;
 }
 .linkedText {
-	color: #3569f0;
-	text-decoration: underline;
-	cursor: pointer;
+  color: #3569f0;
+  text-decoration: underline;
+  cursor: pointer;
 }
 //.fixMedia {
 //  font-size:30px;
 //}
 .welcomeTextWrapper {
-	color: var(--mainblock-title-color);
-	width: 55%;
-	text-align: center;
+  color: var(--mainblock-title-color);
+  width: 55%;
+  text-align: center;
 }
-.specForSuccess{
-	margin-top: 40px;
-	padding-left: 50px;
-	padding-right: 50px;
+.specForSuccess {
+  margin-top: 40px;
+  padding-left: 50px;
+  padding-right: 50px;
 }
 
 .agreementCheckBox {
-	width: auto;
-	height: auto;
-	transform: scale(4.5);
+  width: auto;
+  height: auto;
+  transform: scale(4.5);
 }
 
 .welcomeAgreementContainer {
-	display: flex;
-	text-align: center;
-	height: 20vh;
-	background: silver;
-	align-items: center;
-	justify-content: center;
-	margin-top: 5vh;
+  display: flex;
+  text-align: center;
+  height: 20vh;
+  background: silver;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5vh;
 }
 
 .agreementText {
-	width: 39%;
-	margin-left: 40px;
+  width: 39%;
+  margin-left: 40px;
 }
 @media screen and (max-width: 550px) {
-	.fixMedia {
-		font-size: 21px !important;
-	}
+  .fixMedia {
+    font-size: 21px !important;
+  }
 }
 @media screen and (max-width: 400px) {
-	.welcomeTextWrapper {
-		width: 100%;
-		font-size: 16px;
-	}
-	.welcomeWrapper {
-		font-size: 26px;
-	}
-	//.welcomeAgreementContainer {
-	//	width: 121.5%;
-	//	margin-left: -31px;
-	//}
-	//.fixMedia {
-	//  font-size: 21px !important;
-	//}
-	.numsInputContainer {
-		width: 90%;
-	}
-	.pinInput {
-		width: 50px;
-		height: 50px;
-		font-size: 50px;
-	}
-	.agreementText {
-		width: 47%;
-	}
-	.arrowImg {
-		height: 15px;
-	}
+  .welcomeTextWrapper {
+    width: 100%;
+    font-size: 16px;
+  }
+  .welcomeWrapper {
+    font-size: 26px;
+  }
+  //.welcomeAgreementContainer {
+  //	width: 121.5%;
+  //	margin-left: -31px;
+  //}
+  //.fixMedia {
+  //  font-size: 21px !important;
+  //}
+  .numsInputContainer {
+    width: 90%;
+  }
+  //.pinInput {
+  //	width: 50px;
+  //	height: 50px;
+  //	font-size: 50px;
+  //}
+  .agreementText {
+    width: 47%;
+  }
+  .arrowImg {
+    height: 15px;
+  }
+}
+@media screen and (max-width: 475px) {
+  .curBtnStylesLogin {
+    height: 42px;
+    font-size: 10px;
+    width: 60%;
+  }
+}
+//@media screen and (max-width: 460px) {
+//
+//	.curBtnStylesLogin{
+//
+//		font-size: 15px;
+//
+//	}
+//}
+@media screen and (max-width: 480px) {
+  .LoginViaPinBtns {
+    justify-content: center;
+    margin-left: unset;
+    //width: 320px;
+    //padding-left: 16px;
+  }
 }

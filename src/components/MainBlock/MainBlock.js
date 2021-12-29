@@ -5,7 +5,7 @@ import React from 'react';
 import {
   hideOrdersFromSelect,
   hideOrdersToSelect,
-} from '../../store/actions/limitOrders';
+} from '../../store/actions/limitOrder';
 import { hidePoolFromSelect, hidePoolToSelect } from '../../store/actions/pool';
 import { hideSwapFromSelect, hideSwapToSelect } from '../../store/actions/swap';
 

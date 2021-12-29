@@ -6,25 +6,26 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import client, {
-  checkPubKey,
-  getClientBalance,
-  getClientKeys,
-} from '../../extensions/sdk_get/get';
-import { decrypt } from '../../extensions/tonUtils';
-import { saveLog } from '../../logging/logging';
-import { InitializeClient } from '../../reactUtils/reactUtils';
-import { setTips } from '../../store/actions/app';
+import { decrypt } from '@/extensions/tonUtils';
+import { saveLog } from '@/logging/logging';
+import { InitializeClient } from '@/reactUtils/reactUtils';
+import { setTips } from '@/store/actions/app';
 import {
   hideEnterSeedPhraseUnlock,
   setSeedPassword,
-} from '../../store/actions/enterSeedPhrase';
+} from '@/store/actions/enterSeedPhrase';
 import {
   setClientData,
   setPin,
   setSubscribeReceiveTokens,
   setTransactionsList,
-} from '../../store/actions/wallet';
+} from '@/store/actions/wallet';
+
+import client, {
+  checkPubKey,
+  getClientBalance,
+  getClientKeys,
+} from '../../extensions/sdk_get/get';
 import PinPopup from '../LoginViaPIN/PinPopup';
 import MainBlock from '../MainBlock/MainBlock';
 import WaitingPopup from '../WaitingPopup/WaitingPopup';
@@ -82,7 +83,15 @@ function EnterPassword(props) {
       clientDataPreDeploy &&
       clientDataPreDeploy.address &&
       clientDataPreDeploy.esp;
-
+    if (!clientExists && !preDeployedClientExists) {
+      dispatch(
+        setTips({
+          message: `Wrong PIN, please try again`,
+          type: 'error',
+        }),
+      );
+      return;
+    }
     if (clientExists) {
       setloadingUserDataIsWaiting(true);
       setDecryptResult(true);
@@ -187,22 +196,22 @@ function EnterPassword(props) {
           text={`Loading user data...`}
         />
       ) : (
-        <div className="select-wrapper">
-          <PinPopup
-            title={'Enter your Pin'}
-            nextStep={'step3'}
-            prevStep={'step1'}
-            handleLogOut={() => handleLogOut()}
-            btnText={'Log in'}
-            pinCorrect={pinsConfirmed}
-            handleClickBack={null}
-            handleClose={null}
-            handleClickNext={(pin) => handleLogIn(pin)}
-            handleCheckPin={(pin, step, completed) =>
-              handleCheckPin(pin, step, completed)
-            }
-          />
-        </div>
+        // <div className="select-wrapper">
+        <PinPopup
+          title={'Enter your PIN'}
+          nextStep={'step3'}
+          prevStep={'step1'}
+          handleLogOut={() => handleLogOut()}
+          btnText={'Log in'}
+          pinCorrect={pinsConfirmed}
+          handleClickBack={null}
+          handleClose={null}
+          handleClickNext={(pin) => handleLogIn(pin)}
+          handleCheckPin={(pin, step, completed) =>
+            handleCheckPin(pin, step, completed)
+          }
+        />
+        // </div>
       )}
     </>
   );

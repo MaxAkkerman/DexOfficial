@@ -1,110 +1,344 @@
 import './index.scss';
 
 import { useFormik } from 'formik';
-import differenceBy from 'lodash/differenceBy';
-import React, { useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import compact from 'lodash/compact';
+import every from 'lodash/every';
+import find from 'lodash/find';
+import reject from 'lodash/reject';
+import uniq from 'lodash/uniq';
+import { useSnackbar } from 'notistack';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import Button from '@/components-v2/Button';
 import Input from '@/components-v2/Input';
 import MainBlock from '@/components-v2/MainBlock';
 import SelectPopup from '@/components-v2/SelectPopup';
 import SettingsButton from '@/components-v2/SettingsButton';
+import SlippagePopup from '@/components-v2/SlippagePopup';
 import SwapButton from '@/components-v2/SwapButton';
+import { AB_DIRECTION, BA_DIRECTION } from '@/constants/runtimeVariables';
+// TODO: Remove when returning to storybook
+import {
+  connectToPair,
+  connectToPairStep2DeployWallets,
+  getClientForConnect,
+} from '@/extensions/sdk_run/run';
+// TODO: Remove when returning to storybook
+import useKeyPair from '@/hooks/useKeyPair';
+import useSelectPopup from '@/hooks/useSelectPopup';
+import { setSlippageValue, setSwapPopupValues } from '@/store/actions/swap';
+import { requestPairsFetch } from '@/store/actions/ton';
+import {
+  resetWaitingPopupValues,
+  setWaitingPopupValues,
+} from '@/store/actions/waitingPopup';
 import truncateNum from '@/utils/truncateNum';
 
 export default function SwapPage() {
+  const history = useHistory();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const dispatch = useDispatch();
   const walletConnected = useSelector(
     (state) => state.appReducer.walletIsConnected,
   );
-  const tokenList = useSelector((state) => state.walletReducer.tokenList);
-  const pairList = useSelector((state) => state.walletReducer.pairsList);
+  const tokens = useSelector((state) => state.tonData.tokens);
+  const pairs = useSelector((state) => state.tonData.pairs);
+  const slippage = useSelector((state) => state.swapReducer.slippage);
+  const clientData = useSelector((state) => state.walletReducer.clientData);
+  // TODO: Remove when returning to storybook
+  const { keyPair } = useKeyPair();
+  // TODO: Remove when returning to storybook
+  const allTokens = useSelector(
+    (state) => state.walletReducer.assetsFromGraphQL,
+  );
+  // TODO: Remove when returning to storybook
+  const pairTokens = useMemo(() => {
+    let tokenList = [];
 
-  const { handleChange, handleSubmit, setFieldValue, values } = useFormik({
+    pairs.forEach((p) => {
+      tokenList.push(find(allTokens, { rootAddress: p.rootA }));
+      tokenList.push(find(allTokens, { rootAddress: p.rootB }));
+    });
+
+    tokenList = uniq(tokenList);
+    tokenList = tokenList.map((t) => {
+      t.balance = 0;
+      return t;
+    });
+    tokenList = tokenList.map((t) => {
+      const clientToken = find(tokens, { rootAddress: t.rootAddress });
+      return clientToken || t;
+    });
+
+    return tokenList;
+  }, [pairs, allTokens]);
+
+  const {
+    errors,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    setFieldValue,
+    touched,
+    values,
+  } = useFormik({
     initialValues: {
       fromToken: null,
       fromValue: '',
-      slippageTolerance: 0,
+      pair: null,
+      slippage,
       toToken: null,
       toValue: '',
     },
+    onSubmit: handleSwap,
+    validate,
   });
 
-  const leftTokens = useMemo(
-    () =>
-      differenceBy(
-        tokenList,
-        [values.fromToken, values.toToken],
-        (t) => t && t.rootAddress,
-      ),
-    [tokenList, values.fromToken, values.toToken],
-  );
-  const pair = useMemo(() => {
-    const { fromToken, toToken } = values;
-    if (!pairList.length || !fromToken || !toToken) return;
+  const fromTokens = useMemo(() => {
+    let leftTokens = pairTokens.filter((t) => !t.symbol.startsWith('DS-'));
+    if (!values.toToken) return leftTokens;
+    leftTokens = reject(leftTokens, values.toToken);
 
-    return pairList.find(
+    const leftPairs = pairs.filter(
       (p) =>
-        (p.rootA === fromToken.rootAddress &&
-          p.rootB === toToken.rootAddress) ||
-        (p.rootA === toToken.rootAddress && p.rootB === fromToken.rootAddress),
+        p.rootA === values.toToken.rootAddress ||
+        p.rootB === values.toToken.rootAddress,
     );
-  }, [pairList, values.fromToken, values.toToken]);
-  const rate = useMemo(() => {
+    leftTokens = leftPairs.map(
+      (p) =>
+        find(leftTokens, { rootAddress: p.rootA }) ||
+        find(leftTokens, { rootAddress: p.rootB }),
+    );
+
+    return compact(leftTokens);
+  }, [pairTokens, values.toToken]);
+
+  const toTokens = useMemo(() => {
+    let leftTokens = pairTokens.filter((t) => !t.symbol.startsWith('DS-'));
+    if (!values.fromToken) return leftTokens;
+    leftTokens = reject(leftTokens, values.fromToken);
+
+    const leftPairs = pairs.filter(
+      (p) =>
+        p.rootA === values.fromToken.rootAddress ||
+        p.rootB === values.fromToken.rootAddress,
+    );
+    leftTokens = leftPairs.map(
+      (p) =>
+        find(leftTokens, { rootAddress: p.rootA }) ||
+        find(leftTokens, { rootAddress: p.rootB }),
+    );
+
+    return compact(leftTokens);
+  }, [pairTokens, values.fromToken]);
+
+  // Find the pair
+  useEffect(() => {
     const { fromToken, toToken } = values;
-    if (!pair || !fromToken || !toToken) return;
+    if (!pairs.length || !fromToken || !toToken) return;
 
-    return fromToken.rootAddress === pair.rootA ? pair.rateAB : pair.rateBA;
-  }, [pair, values.fromToken, values.toToken]);
+    setFieldValue(
+      'pair',
+      find(pairs, {
+        rootA: fromToken.rootAddress,
+        rootB: toToken.rootAddress,
+      }) ||
+        find(pairs, {
+          rootA: toToken.rootAddress,
+          rootB: fromToken.rootAddress,
+        }),
+    );
+  }, [pairs, values.fromToken, values.toToken]);
 
-  const { fromPopup, toPopup } = useHandlePopups({ setFieldValue });
+  const directionPair = useMemo(() => {
+    const { fromToken, pair } = values;
+    if (fromToken && pair)
+      return fromToken.rootAddress === pair.rootA ? AB_DIRECTION : BA_DIRECTION;
+  }, [values.fromToken, values.pair]);
 
-  function handleSwap() {
-    /**
-     * Handle swap
-     */
+  const rate = useMemo(() => {
+    const { pair } = values;
+    if (directionPair)
+      return directionPair === AB_DIRECTION ? pair.rateAB : pair.rateBA;
+  }, [directionPair, values.pair]);
+
+  // Calculate "To" value
+  useEffect(() => {
+    setFieldValue('toValue', values.fromValue * rate);
+  }, [values.fromValue, rate]);
+
+  function handleSwap(values) {
+    dispatch(setSwapPopupValues(values));
   }
-  function handleConnectPair() {
-    /**
-     * Handle pair connect
-     */
+
+  async function handleConnectPair() {
+    if (clientData.balance < 15) {
+      enqueueSnackbar({
+        message: `You need at least 15 TONs to connect pair`,
+        type: 'error',
+      });
+      return;
+    }
+
+    dispatch(
+      setWaitingPopupValues({
+        text: 'Getting data from pair',
+      }),
+    );
+
+    try {
+      let res = await connectToPair(values.pair.pairAddress, keyPair);
+      if (
+        !res ||
+        (res && (res.code === 1000 || res.code === 3 || res.code === 2))
+      ) {
+        dispatch(resetWaitingPopupValues());
+        enqueueSnackbar({
+          message: `Some error, please try again, ${res.code}`,
+          type: 'error',
+        });
+        return;
+      }
+
+      dispatch(
+        setWaitingPopupValues({
+          text: 'Preparing client data',
+        }),
+      );
+
+      res = await getClientForConnect(res, clientData.address);
+      if (res.code) {
+        dispatch(resetWaitingPopupValues());
+        enqueueSnackbar({
+          message: `Some error, please try again, ${res.code}`,
+          type: 'error',
+        });
+        return;
+      }
+
+      dispatch(
+        setWaitingPopupValues({
+          text: 'Computing the best shard for your wallets and deploying',
+        }),
+      );
+
+      res = await connectToPairStep2DeployWallets(res, keyPair);
+      if (res.code) {
+        dispatch(resetWaitingPopupValues());
+        enqueueSnackbar({
+          message: `Some error, please try again, ${res.code}`,
+          type: 'error',
+        });
+        return;
+      }
+
+      dispatch(requestPairsFetch());
+      dispatch(resetWaitingPopupValues());
+    } catch (e) {
+      dispatch(resetWaitingPopupValues());
+      enqueueSnackbar({
+        message: `Some error, please try again, ${e.code}`,
+        type: 'error',
+      });
+    }
   }
+
   function handleConnectWallet() {
-    /**
-     * Handle wallet connect
-     */
+    history.push('/account');
   }
-  function invertTokens() {
+
+  function handleTokensInvert() {
     setFieldValue('fromToken', values.toToken);
     setFieldValue('toToken', values.fromToken);
+    setFieldValue('fromValue', values.toValue);
+    setFieldValue('toValue', values.fromValue);
   }
+
+  function handleMaxClick() {
+    setFieldValue('fromValue', values.fromToken.balance);
+  }
+
+  const currentState = useMemo(() => {
+    if (!walletConnected) return 'connectWallet';
+    else if (
+      values.fromToken &&
+      values.toToken &&
+      values.pair &&
+      !every(values.pair.walletExists, 'status')
+    )
+      return 'connectPair';
+    else return 'doSwap';
+  });
 
   const CurrentButton = useMemo(() => {
     const props = {
       className: 'mainblock-btn',
     };
 
-    if (!walletConnected) {
-      props.children = 'Connect wallet';
-      props.onClick = handleConnectWallet;
-    } else if (values.fromToken && values.toToken && !pair) {
-      props.children = 'Connect pair';
-      props.onClick = handleConnectPair;
-    } else {
-      props.children = 'Swap';
-      props.onClick = handleSwap;
+    switch (currentState) {
+      case 'connectWallet':
+        props.children =
+          !clientData.status && clientData.address.length === 66
+            ? 'Deploy wallet'
+            : 'Connect wallet';
+        props.onClick = handleConnectWallet;
+        props.type = 'button';
+        break;
+      case 'connectPair':
+        props.children = 'Connect pair';
+        props.onClick = handleConnectPair;
+        props.type = 'button';
+        break;
+      default:
+        props.children = 'Swap';
+        props.type = 'submit';
     }
 
-    return function CurrentButton({ ...p }) {
+    return function CurrentButton(p) {
       return <Button {...props} {...p} />;
     };
-  }, [walletConnected, pair, values.fromToken, values.toToken]);
+  }, [walletConnected, values.pair, values.fromToken, values.toToken]);
+
+  // Store slippage globally
+  useEffect(() => {
+    if (values.slippage !== slippage)
+      dispatch(setSlippageValue(values.slippage));
+  }, [values.slippage]);
+
+  // Update selected token balance after swap
+  useEffect(() => {
+    if (values.fromToken)
+      setFieldValue(
+        'fromToken',
+        find(pairTokens, { rootAddress: values.fromToken.rootAddress }),
+      );
+    if (values.toToken)
+      setFieldValue(
+        'toToken',
+        find(pairTokens, { rootAddress: values.toToken.rootAddress }),
+      );
+  }, [pairTokens]);
+
+  // Update selected pair rate after swap
+  useEffect(() => {
+    if (values.pair)
+      setFieldValue(
+        'pair',
+        find(pairs, { pairAddress: values.pair.pairAddress }),
+      );
+  }, [pairs]);
+
+  const slippagePopup = useSlippagePopup((v) => setFieldValue('slippage', v));
+  const selectFromPopup = useSelectPopup((t) => setFieldValue('fromToken', t));
+  const selectToPopup = useSelectPopup((t) => setFieldValue('toToken', t));
 
   return (
     <>
       <div className="container">
         <MainBlock
-          smallTitle={false}
           content={
             <div style={{ display: 'contents' }}>
               <div className="head_wrapper" style={{ marginBottom: '40px' }}>
@@ -116,8 +350,8 @@ export default function SwapPage() {
                 </div>
                 <div className="settings_btn_container">
                   <SettingsButton
-                    aria-describedby={'popperState.id'}
-                    onClick={'popperState.handleClick'}
+                    aria-describedby={slippagePopup.id}
+                    onClick={slippagePopup.handleClick}
                   />
                 </div>
               </div>
@@ -126,22 +360,42 @@ export default function SwapPage() {
                   label="From"
                   name="fromValue"
                   value={values.fromValue}
+                  onMaxClick={handleMaxClick}
                   onValueChange={handleChange}
-                  onSelectClick={fromPopup.open}
+                  onValueBlur={handleBlur}
+                  onSelectClick={selectFromPopup.handleOpen}
                   token={values.fromToken}
+                  error={
+                    touched.fromValue && (errors.fromValue || errors.fromToken)
+                  }
+                  helperText={
+                    touched.fromValue && (errors.fromValue || errors.fromToken)
+                  }
                 />
-                {/*<>   {incorrectBalance && <div>error</div>}</>*/}
-                <SwapButton onClick={invertTokens} className="swap-btn" />
+                <SwapButton
+                  onClick={handleTokensInvert}
+                  className="swap-btn"
+                  type="button"
+                />
                 <Input
+                  className="input"
                   label="To"
                   name="toValue"
+                  notExact
                   value={values.toValue}
                   onValueChange={handleChange}
-                  onSelectClick={toPopup.open}
+                  onValueBlur={handleBlur}
+                  onSelectClick={selectToPopup.handleOpen}
                   token={values.toToken}
+                  error={touched.toToken && errors.toToken}
+                  helperText={
+                    (touched.toToken && errors.toToken) ||
+                    'Field is automatically calculated'
+                  }
+                  readOnly
                 />
-                <CurrentButton type="submit" />
-                {rate && (
+                <CurrentButton />
+                {rate ? (
                   <p className="swap-rate">
                     Price{' '}
                     <span>
@@ -149,7 +403,7 @@ export default function SwapPage() {
                     </span>{' '}
                     per <span>1 {values.fromToken.symbol}</span>
                   </p>
-                )}
+                ) : null}
               </form>
             </div>
           }
@@ -163,11 +417,9 @@ export default function SwapPage() {
                 >
                   <div className="swap-confirm-wrap">
                     <p className="mainblock-footer-value">
-                      {parseFloat(
-                        (
-                          values.toValue -
-                          (values.toValue * values.slippageTolerance) / 100
-                        ).toFixed(4),
+                      {truncateNum(
+                        values.toValue -
+                          (values.toValue * values.slippage) / 100,
                       )}{' '}
                       {values.toToken.symbol}
                     </p>
@@ -175,16 +427,10 @@ export default function SwapPage() {
                       Minimum <br /> received
                     </p>
                   </div>
-                  {/*<div className="swap-confirm-wrap">*/}
-                  {/*	<p className="mainblock-footer-value">2.00%</p>*/}
-                  {/*	<p className="mainblock-footer-subtitle">*/}
-                  {/*		Price <br /> Impact*/}
-                  {/*	</p>*/}
-                  {/*</div>*/}
                   <div className="swap-confirm-wrap">
                     <p className="mainblock-footer-value">
-                      {values.fromValue && values.fromValue !== 0
-                        ? ((values.fromValue * 0.3) / 100).toFixed(4)
+                      {values.pair
+                        ? truncateNum((values.fromValue * 0.3) / 100)
                         : 0.0}{' '}
                       {values.fromToken.symbol}
                     </p>
@@ -198,64 +444,76 @@ export default function SwapPage() {
           }
         />
       </div>
-      {fromPopup && (
+      {selectFromPopup.open && (
         <SelectPopup
-          tokens={leftTokens}
-          open={fromPopup.state}
-          onClose={fromPopup.close}
-          onSelect={fromPopup.select}
+          tokens={fromTokens}
+          onClose={selectFromPopup.handleClose}
+          onSelect={selectFromPopup.handleSelect}
         />
       )}
-      {toPopup && (
+      {selectToPopup.open && (
         <SelectPopup
-          tokens={leftTokens}
-          open={toPopup.state}
-          onClose={toPopup.close}
-          onSelect={toPopup.select}
+          tokens={toTokens}
+          onClose={selectToPopup.handleClose}
+          onSelect={selectToPopup.handleSelect}
+        />
+      )}
+      {slippagePopup.open && (
+        <SlippagePopup
+          id={slippagePopup.id}
+          open={slippagePopup.open}
+          anchorEl={slippagePopup.anchorEl}
+          onClose={slippagePopup.handleClick}
+          value={values.slippage}
+          onChange={slippagePopup.handleChange}
         />
       )}
     </>
   );
 }
 
-function useHandlePopups({ setFieldValue }) {
-  const [fromPopupOpen, setFromPopupOpen] = useState(false);
-  const [toPopupOpen, setToPopupOpen] = useState(false);
+function useSlippagePopup(setValue) {
+  const [anchorEl, setAnchorEl] = useState(null);
 
-  function selectFromToken(e, t) {
-    setFieldValue('fromToken', t);
-    setFromPopupOpen(false);
-  }
-  function openFromTokenPopup() {
-    setFromPopupOpen(true);
-  }
-  function closeFromTokenPopup() {
-    setFromPopupOpen(false);
+  function handleClick(event) {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
   }
 
-  function selectToToken(e, t) {
-    setFieldValue('toToken', t);
-    setToPopupOpen(false);
+  function handleChange(values) {
+    setValue(values.floatValue);
   }
-  function openToTokenPopup() {
-    setToPopupOpen(true);
-  }
-  function closeToTokenPopup() {
-    setToPopupOpen(false);
-  }
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popper' : undefined;
 
   return {
-    fromPopup: {
-      close: closeFromTokenPopup,
-      open: openFromTokenPopup,
-      select: selectFromToken,
-      state: fromPopupOpen,
-    },
-    toPopup: {
-      close: closeToTokenPopup,
-      open: openToTokenPopup,
-      select: selectToToken,
-      state: toPopupOpen,
-    },
+    anchorEl,
+    handleChange,
+    handleClick,
+    id,
+    open,
   };
+}
+
+function validate(values) {
+  const errors = {};
+
+  const MUST_BE_NUMBER = 'Input value must be a number';
+  const POSITIVE_NUMBER = 'Use positive number';
+  const SELECT_TOKEN = 'You must select token';
+  const BALANCE_EXCEEDS = 'Input value exceeds balance';
+
+  if (isNaN(+values.fromValue)) errors.fromValue = MUST_BE_NUMBER;
+  else if (values.fromValue <= 0) errors.fromValue = POSITIVE_NUMBER;
+
+  if (isNaN(+values.toValue)) errors.toValue = MUST_BE_NUMBER;
+  else if (values.toValue <= 0) errors.toValue = POSITIVE_NUMBER;
+
+  if (!values.fromToken) errors.fromToken = SELECT_TOKEN;
+  else if (values.fromValue > values.fromToken.balance)
+    errors.fromToken = BALANCE_EXCEEDS;
+
+  if (!values.toToken) errors.toToken = SELECT_TOKEN;
+
+  return errors;
 }

@@ -44,15 +44,21 @@ function ManageConfirmPopup(props) {
     const tokeB = tokenList.filter((item) => item.symbol === curP[0].symbolB);
 
     let pooledTokensA = ((curP[0].reserveA / 1000000000) * poolShare) / 100;
-    let pooledTokensB = ((curP[0].reservetB / 1000000000) * poolShare) / 100;
+    let pooledTokensB = ((curP[0].reserveB / 1000000000) * poolShare) / 100;
 
     setpooledTokensA(pooledTokensA);
     setpooledTokensB(pooledTokensB);
   }, [poolShare]);
 
   const handleSupplyClick = () => {
-    tokenList.forEach((i) => {
+    console.log("tokenList",    tokenList
+        .filter(it=>!it.symbol.includes("DS")))
+
+    tokenList
+        .filter(it=>!it.symbol.includes("DS"))
+        .forEach((i) => {
       if (i.symbol.includes(fromToken.symbol)) {
+        console.log("fromToken.symbol",fromToken.symbol)
         dispatch(
           setPoolFromToken({
             symbol: i.symbol,
@@ -60,6 +66,8 @@ function ManageConfirmPopup(props) {
           }),
         );
       } else if (i.symbol.includes(toToken.symbol)) {
+        console.log("toToken.symbol",toToken.symbol)
+
         dispatch(
           setPoolToToken({
             symbol: i.symbol,

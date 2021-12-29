@@ -5,27 +5,28 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import { SWAP_COMMISSION } from '@/constants/commissions';
+import {
+  connectToPair,
+  connectToPairStep2DeployWallets,
+  getClientForConnect,
+} from '@/extensions/sdk_run/run';
+import { checkDecimals } from '@/reactUtils/reactUtils';
+
 import SlippagePopper from '../../components/SlippagePopper/SlippagePopper';
 import SwapBtn from '../../components/SwapBtn/SwapBtn';
 import SwapConfirmPopup from '../../components/SwapConfirmPopup/SwapConfirmPopup';
 import WaitingPopup from '../../components/WaitingPopup/WaitingPopup';
 import WaitingPopupConnect from '../../components/WaitingPopupConnect/WaitingPopupConnectConnect';
-import { SWAP_COMMISSION } from '../../constants/commissions';
 import {
   NOT_ENOUGH,
   NOT_ENOUGH as NOT_ENOUGH_MSG,
   NOT_ENOUGH_CAUSE_COMMISSION as NOT_ENOUGH_CAUSE_COMMISSION_MSG,
   NOT_TOUCHED,
 } from '../../constants/validationMessages';
-import {
-  connectToPair,
-  connectToPairStep2DeployWallets,
-  getClientForConnect,
-} from '../../extensions/sdk_run/run';
 import useAssetList from '../../hooks/useAssetList';
 import useKeyPair from '../../hooks/useKeyPair';
 import settingsBtn from '../../images/Vector.svg';
-import { checkDecimals } from '../../reactUtils/reactUtils';
 import { setTips, showPopup } from '../../store/actions/app';
 import {
   setSwapAsyncIsWaiting,
@@ -174,7 +175,7 @@ function Swap() {
     if (clientData.balance < 12) {
       dispatch(
         setTips({
-          message: `You need at least 12 TONs to connect pair`,
+          message: `You need at least 12 EVERs to connect pair`,
           type: 'error',
         }),
       );
@@ -321,7 +322,7 @@ function Swap() {
       if (toValue === 0 || fromValue === 0)
         localErrors.emptyFields = NOT_TOUCHED;
 
-      const tonAsset = assetList.find((t) => t.symbol === 'TON Crystal');
+      const tonAsset = assetList.find((t) => t.symbol === 'Everscale');
       if (tonAsset && tonAsset.balance) {
         const nativeTONBalance = tonAsset.balance;
 
@@ -360,10 +361,7 @@ function Swap() {
           smallTitle={false}
           content={
             <div style={{ display: 'contents' }}>
-              <div
-                className="head_wrapper"
-                style={{ marginBottom: '40px', alignItems: 'center' }}
-              >
+              <div className="head_wrapper">
                 <div
                   className="left_block"
                   style={{ color: 'var(--mainblock-title-color)' }}
@@ -430,7 +428,9 @@ function Swap() {
                     className="btn mainblock-btn"
                     onClick={() => history.push('/account')}
                   >
-                    Connect wallet
+                    {!clientData.status && clientData.address.length === 66
+                      ? 'Deploy wallet'
+                      : 'Connect wallet'}
                   </button>
                 )}
                 {!fromValue && !toValue && (
@@ -467,7 +467,7 @@ function Swap() {
           footer={
             <div className="mainblock-footer">
               <div
-                className="mainblock-footer-wrap swap"
+                className="mainblock-footer-wrap"
                 style={{ justifyContent: 'space-around' }}
               >
                 <div className="swap-confirm-wrap">

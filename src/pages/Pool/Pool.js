@@ -9,12 +9,13 @@ import MainBlock from '../../components/MainBlock/MainBlock';
 
 function Pool() {
   const history = useHistory();
+  const clientData = useSelector((state) => state.walletReducer.clientData);
 
   const walletIsConnected = useSelector(
     (state) => state.appReducer.walletIsConnected,
   );
   const liquidityList = useSelector(
-    (state) => state.walletReducer.liquidityList,
+    (state) => state.tonData.tokens,
   );
   function handleClickCreatePair() {
     history.push('/create-pair');
@@ -27,9 +28,11 @@ function Pool() {
         title={'Your liquidity'}
         button={
           <Link
-            to="/create-pair"
-            className="btn liquidity-btn"
-            style={{ fontSize: '20px', borderRadius: '12px' }}
+            onClick={walletIsConnected ? () => handleClickCreatePair() : null}
+            className={`btn liquidity-btn ${
+              walletIsConnected ? null : 'btn--disabled'
+            }`}
+            // style={{fontSize: "20px", borderRadius: "12px"}}
           >
             Create Pair
           </Link>
@@ -40,13 +43,15 @@ function Pool() {
               className="btn mainblock-btn"
               onClick={() => history.push('/account')}
             >
-              Connect wallet
+              {!clientData.status && clientData.address.length === 66
+                ? 'Deploy wallet'
+                : 'Connect wallet'}
             </button>
           ) : (
             <div className="pool-wrapper">
-              {!liquidityList?.length
+              {!liquidityList.length
                 ? 'You don’t have liquidity pairs yet'
-                : liquidityList.map((i) => (
+                : liquidityList.filter(it=>it.symbol.includes("DS")).map((i) => (
                     <LiquidityItem
                       symbol={i.symbol}
                       balance={i.balance}

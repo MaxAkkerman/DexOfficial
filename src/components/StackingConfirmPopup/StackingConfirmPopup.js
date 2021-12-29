@@ -51,7 +51,7 @@ function StackingConfirmPopup(props) {
     if (!stakeRes.code) {
       dispatch(
         setTips({
-          message: `Sended message to blockchain`,
+          message: `Sent message to blockchain`,
           type: 'info',
         }),
       );
@@ -93,7 +93,7 @@ function StackingConfirmPopup(props) {
                 <img
                   style={{ marginRight: '5px' }}
                   src={TON}
-                  alt={'Ton Crystal'}
+                  alt={'Everscale'}
                 />{' '}
                 {(amountForStacking / 1e9).toFixed(1) || 'value for staking'}
               </span>
@@ -164,7 +164,7 @@ function StackingConfirmPopup(props) {
               </span>
             </div>
             <div style={{ marginLeft: '14px' }}>
-              Processing fee <strong>4 TONs</strong>, change will revert.
+              Processing fee <strong>4 EVERs</strong>, change will revert.
               <br />
               <br />
               After staking into this deposit program you will receive a TrueNFT
@@ -193,7 +193,7 @@ function StackingConfirmPopup(props) {
                     <img
                       style={{ marginRight: '3px' }}
                       src={TON}
-                      alt={'Ton Crystal'}
+                      alt={'Everscale'}
                     />
                     {props.profit ? props.profit.toFixed(4) : 111}
                   </p>
@@ -212,7 +212,7 @@ function StackingConfirmPopup(props) {
                     <img
                       style={{ marginRight: '3px' }}
                       src={TON}
-                      alt={'Ton Crystal'}
+                      alt={'Everscale'}
                     />
                     {props.profit && props.stake
                       ? (props.profit + props.stake).toFixed(4)

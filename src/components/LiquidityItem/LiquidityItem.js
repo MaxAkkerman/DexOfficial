@@ -20,13 +20,14 @@ function LiquidityItem({ balance, symbol }) {
   const liquidityList = useSelector(
     (state) => state.walletReducer.liquidityList,
   );
+  console.log('symbol', symbol);
 
   const history = useHistory();
   const dispatch = useDispatch();
 
   const symbols = symbol.split('/');
   const pairsList = useSelector((state) => state.walletReducer.pairsList);
-
+  console.log('symbols', symbols);
   const handleClick = () => {
     const fromToken = symbols[0].replaceAll('DS-W', '');
 
@@ -41,6 +42,8 @@ function LiquidityItem({ balance, symbol }) {
         curSymbolPair.push(item);
       }
     });
+    console.log('curSymbolPair', curSymbolPair);
+
     assetsArr.map((item) => {
       if (item.symbol === curSymbolPair[0]) {
         fromT = item.symbol;
@@ -49,17 +52,20 @@ function LiquidityItem({ balance, symbol }) {
         toT = item.symbol;
       }
     });
+    console.log('assetsArr', assetsArr);
+
     dispatch(setManageBalance(balance));
 
     pairsList.forEach((i) => {
+      console.log('pairsList', pairsList, 'to', toT, 'from', fromT);
       if (i.symbolA.includes(fromT) && i.symbolB.includes(toT)) {
         dispatch(setManageFromToken({ symbol: fromT, reserve: i.reserveA }));
-        dispatch(setManageToToken({ symbol: toT, reserve: i.reservetB }));
+        dispatch(setManageToToken({ symbol: toT, reserve: i.reserveB }));
         dispatch(setManagePairId(i.pairAddress));
         dispatch(setManageRateAB(i.rateAB));
         dispatch(setManageRateBA(i.rateBA));
       } else if (i.symbolB.includes(fromT) && i.symbolA.includes(toT)) {
-        dispatch(setManageFromToken({ symbol: fromT, reserve: i.reservetB }));
+        dispatch(setManageFromToken({ symbol: fromT, reserve: i.reserveB }));
         dispatch(setManageToToken({ symbol: toT, reserve: i.reserveA }));
         dispatch(setManagePairId(i.pairAddress));
         dispatch(setManageRateAB(i.rateAB));

@@ -116,12 +116,12 @@ function ClientWallets(props) {
       allWallets.forEach(async (item) => await subscribe(item.walletAddress));
 
       let liquidityListST = tokenList.filter((i) => i.symbol.includes('/'));
-
+      console.log('tokenListtokenList', tokenList);
       let tokenListST = tokenList
         .filter((i) => !i.symbol.includes('/'))
         .map((i) => ({
           ...i,
-          symbol: i.symbol === 'WTON' ? 'TON' : i.symbol,
+          symbol: i.symbol === 'WTON' ? 'wEVER' : i.symbol,
         }));
 
       localStorage.setItem('tokenList', JSON.stringify(tokenListST));

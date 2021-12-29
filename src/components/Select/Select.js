@@ -8,7 +8,7 @@ import { useLocation } from 'react-router-dom';
 import {
   hideOrdersFromSelect,
   hideOrdersToSelect,
-} from '../../store/actions/limitOrders';
+} from '../../store/actions/limitOrder';
 import { hidePoolFromSelect, hidePoolToSelect } from '../../store/actions/pool';
 import { hideSwapFromSelect, hideSwapToSelect } from '../../store/actions/swap';
 import includesTextInToken from '../../utils/includesTextInToken';
@@ -24,37 +24,27 @@ function Select(props) {
   const tokenList = useSelector((state) => state.walletReducer.tokenList);
   const pairsList = useSelector((state) => state.walletReducer.pairsList);
 
-  const swapFromToken = useSelector((state) => state.swapReducer.fromToken);
-  const ordersFromToken = useSelector((state) => state.limitOrders.fromToken);
   const poolFromToken = useSelector((state) => state.poolReducer.fromToken);
+  let fromToken = poolFromToken;
 
-  let fromToken = location.pathname.includes('swap')
-    ? swapFromToken
-    : poolFromToken;
-  if (location.pathname.includes('orders')) fromToken = ordersFromToken;
-
-  const swapToToken = useSelector((state) => state.swapReducer.toToken);
-  const ordersToToken = useSelector((state) => state.limitOrders.toToken);
   const poolToToken = useSelector((state) => state.poolReducer.toToken);
+  let toToken = poolToToken;
 
-  let toToken = location.pathname.includes('swap') ? swapToToken : poolToToken;
-  if (location.pathname.includes('orders')) toToken = ordersToToken;
   const [filter, setFilter] = useState('');
-
   // useEffect(() => {
   let fromArr = [];
 
   pairsList.forEach((i) => {
     fromArr.push({
-      walletAddress: '',
-      symbol: i.symbolA,
       balance: 0,
+      symbol: i.symbolA,
+      walletAddress: '',
       // fullName:getFullName(i.symbolA)
     });
     fromArr.push({
-      walletAddress: '',
-      symbol: i.symbolB,
       balance: 0,
+      symbol: i.symbolB,
+      walletAddress: '',
       // fullName:getFullName(i.symbolA)
     });
   });
@@ -82,18 +72,18 @@ function Select(props) {
     arr.forEach((i) => {
       if (fromToken.symbol === i.symbolA) {
         toArr.push({
-          pairId: i.pairAddress,
-          walletAddress: '',
-          symbol: i.symbolB,
           balance: 0,
+          pairId: i.pairAddress,
+          symbol: i.symbolB,
+          walletAddress: '',
           // fullName:getFullName(i.symbolA)
         });
       } else if (fromToken.symbol === i.symbolB) {
         toArr.push({
-          pairId: i.pairAddress,
-          walletAddress: '',
-          symbol: i.symbolA,
           balance: 0,
+          pairId: i.pairAddress,
+          symbol: i.symbolA,
+          walletAddress: '',
           // fullName:getFullName(i.symbolA)
         });
       }
@@ -111,6 +101,7 @@ function Select(props) {
   // console.log('render select');
   // if(toTokenList.length || fromTokenList.length) { setIsLoading(false); }
   // });
+  console.log('pairsList', pairsList, 'fromArr', fromArr, 'toArr', toArr);
 
   function handleClose(e) {
     console.log('fromArr, toArr', fromArr, toArr);

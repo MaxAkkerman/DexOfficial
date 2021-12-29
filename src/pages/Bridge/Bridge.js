@@ -5,6 +5,8 @@ import cls from 'classnames';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import BridgeAssets from '@/pages/Bridge/test';
+
 import BlockItem from '../../components/AmountBlock/AmountBlock';
 import InputChange from '../../components/AmountBlock/InputChange';
 import MaxBtn from '../../components/AmountBlock/MAXbtn';
@@ -20,6 +22,7 @@ import sendAssetsimg from '../../images/sendAssets.svg';
 import AddressPopup from './AddressPopup';
 import AssetsListBridge from './AssetsListBridge';
 import BridgeNetworksList from './BridgeNetworksList';
+// import BridgeAssets from "@/pages/Bridge/test";
 
 const assetsBridge = [
   {
@@ -92,6 +95,7 @@ function Bridge() {
 
   function handleShowBridgeAssets() {
     console.log('handleShowBridgeAssets');
+    setOnAssetsList(true);
   }
 
   function handleSetBridgeAsset(e) {
@@ -110,14 +114,18 @@ function Bridge() {
   return (
     <>
       {onAssetsList ? (
-        <AssetsListBridge
-          handleSetToken={(e) => handleSetBridgeAsset(e)}
-          assets={assetsBridge}
-          typr={type}
-          handleClose={() => setOnAssetsList(false)}
-        />
+        // <div>
+        //     hello
+        // </div>
+        <BridgeAssets />
       ) : (
-        <div className="container" onClick={() => console.log(assetsBridge)}>
+        // <AssetsListBridge
+        //     handleSetToken={(e) => handleSetBridgeAsset(e)}
+        //     assets={assetsBridge}
+        //     typr={type}
+        //     handleClose={() => setOnAssetsList(false)}
+        // />
+        <div className="container" onClick={() => handleShowBridgeAssets()}>
           <MainBlock
             smallTitle={false}
             // title={'Assets'}
@@ -158,15 +166,15 @@ function Bridge() {
                         classWrapper={'send_balance center'}
                         balance={5}
                         label={true}
-                        showBal={true}
+                        showBal={false}
                       />
-                      <AddressPopup
-                        netIcon={toCurAsset.icon}
-                        classWrapper={''}
-                        address={
-                          '0:575ae3f0babf72903f51af69a4d4f0d010f232b405a687d1ef81cd731869cb07'
-                        }
-                      />
+                      {/*<AddressPopup*/}
+                      {/*	netIcon={toCurAsset.icon}*/}
+                      {/*	classWrapper={""}*/}
+                      {/*	address={*/}
+                      {/*		"0:575ae3f0babf72903f51af69a4d4f0d010f232b405a687d1ef81cd731869cb07"*/}
+                      {/*	}*/}
+                      {/*/>*/}
                     </>
                   }
                   rightBottomBlock={
@@ -219,15 +227,15 @@ function Bridge() {
                         classWrapper={'send_balance center'}
                         balance={5}
                         label={true}
-                        showBal={true}
+                        showBal={false}
                       />
-                      <AddressPopup
-                        netIcon={fromCurAsset.icon}
-                        classWrapper={''}
-                        address={
-                          '0:575ae3f0babf72903f51af69a4d4f0d010f232b405a687d1ef81cd731869cb07'
-                        }
-                      />
+                      {/*<AddressPopup*/}
+                      {/*	netIcon={fromCurAsset.icon}*/}
+                      {/*	classWrapper={""}*/}
+                      {/*	address={*/}
+                      {/*		"0:575ae3f0babf72903f51af69a4d4f0d010f232b405a687d1ef81cd731869cb07"*/}
+                      {/*	}*/}
+                      {/*/>*/}
                     </>
                   }
                   rightBottomBlock={

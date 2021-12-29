@@ -18,7 +18,7 @@ import { showPopup } from '../../store/actions/app';
 import {
   openOrderDeployPopup,
   setOrdersRate,
-} from '../../store/actions/limitOrders';
+} from '../../store/actions/limitOrder';
 import truncateNum from '../../utils/truncateNum';
 import MainBlock from './../../components/MainBlock/MainBlock';
 

@@ -1,18 +1,19 @@
 import './Assets.scss';
 
 import { useLazyQuery } from '@apollo/client';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { uniqBy } from 'lodash';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+
+import { LimitOrdersForOwnerQuery } from '@/graphql/queries';
+import TONicon from '@/images/tokens/TON.png';
+import { setTips } from '@/store/actions/app';
 
 import AssetsList from '../../components/AssetsList/AssetsList';
 import MainBlock from '../../components/MainBlock/MainBlock';
 import WithDraw from '../../components/WithDraw/WithDraw';
 import WrapUnwrap from '../../components/wrapUnwrap/WrapUnwrap';
-import { getShardLimit } from '../../extensions/sdk_get/get';
-import { LimitOrdersForOwnerQuery } from '../../graphql/queries';
-import useTokensList from '../../hooks/useAssetList';
 // import WrapUnwrap from "../../components/wrapUnwrap/wrapUnwrap";
 import goToExchange from '../../images/goToExchange.svg';
 import nativeBtn from '../../images/nativeadd.svg';
@@ -30,8 +31,28 @@ function Assets() {
   const liquidityList = useSelector(
     (state) => state.walletReducer.liquidityList,
   );
-  const { assetList: tokensList } = useTokensList();
-  const pairList = useSelector((state) => state.walletReducer.pairsList);
+  const tokenList = useSelector((state) => state.tonData.tokens);
+  const pairList = useSelector((state) => state.tonData.pairs);
+  const clientData = useSelector((state) => state.walletReducer.clientData);
+  const updatedWallet = useSelector(
+    (state) => state.walletReducer.updatedWallet,
+  );
+  const tonWallet = useMemo(() => {
+    // console.log('clientData',clientData)
+    if (clientData)
+      return {
+        balance: updatedWallet === null ? clientData.balance : updatedWallet,
+        icon: TONicon,
+        owner_address: clientData.address,
+        rootAddress: 'none',
+        showWrapMenu: true,
+        symbol: 'EVER',
+        tokenName: 'Everscale',
+        type: 'Native evers',
+        walletAddress: clientData.address,
+      };
+  }, [clientData, updatedWallet]);
+
   const [getLimitOrders, { data: limitOrdersData }] = useLazyQuery(
     LimitOrdersForOwnerQuery,
   );
@@ -44,7 +65,6 @@ function Assets() {
   const [viewData, setViewData] = useState({});
   const [showWithdrawMenu, setshowWithdrawMenu] = useState(false);
   const [curNFTForWithdraw, setCurNFTForWithdraw] = useState(false);
-  const clientData = useSelector((state) => state.walletReducer.clientData);
 
   useEffect(() => {
     setAssets(NFTassets);
@@ -86,10 +106,10 @@ function Assets() {
     setAssets(copyAssets);
   }
   function handleClickToken(curItem) {
-    if (curItem.type !== 'Native Tons') return;
-    const copyAssets = JSON.parse(JSON.stringify(tokensList));
+    if (curItem.type !== 'Native evers') return;
+    const copyAssets = JSON.parse(JSON.stringify(tokenList));
     copyAssets.map((item) => {
-      if ('Native Tons' === item.type) {
+      if ('Native evers' === item.type) {
         item.showWrapMenu = !item.showWrapMenu;
       }
     });
@@ -97,24 +117,33 @@ function Assets() {
   }
 
   async function handleWrapTons() {
-    const tonObj = tokensList.filter((item) => item.type === 'Native Tons');
-    setcurrentTokenForWrap(tonObj[0]);
+    setcurrentTokenForWrap(tonWallet);
     setViewData({
-      type: 'wrap',
       confirmText: 'wrap',
+      title: 'EVER → wEVER',
       tokenSetted: true,
-      title: 'TON Crystal → WTON',
+      type: 'wrap',
     });
     setshowWrapMenu(true);
   }
   async function handleUnWrapTons() {
-    const tonObj = tokensList.filter((item) => item.symbol === 'WTON');
+    const tonObj = tokenList.filter((item) => item.symbol === 'wEVER');
+    console.log('tonObj', tonObj[0], tonObj.length);
+    if (!tonObj.length) {
+      dispatch(
+        setTips({
+          message: `You have not wEVER for unWrap`,
+          type: 'error',
+        }),
+      );
+      return;
+    }
     setcurrentTokenForWrap(tonObj[0]);
     setViewData({
-      type: 'unwrap',
       confirmText: 'unwrap',
+      title: 'wEVER → EVER',
       tokenSetted: true,
-      title: 'WTON → TON Crystal',
+      type: 'unwrap',
     });
     setshowWrapMenu(true);
   }
@@ -125,10 +154,7 @@ function Assets() {
     setCurNFTForWithdraw(item);
     console.log('item', item);
   }
-  async function trt() {
-    const sounitV = await getShardLimit();
-    console.log('sounitV', sounitV);
-  }
+
   return (
     <>
       {showWrapMenu && !showWithdrawMenu && (
@@ -152,13 +178,13 @@ function Assets() {
         />
       )}
       {!showWrapMenu && !showWithdrawMenu && (
-        <div className="container" onClick={() => trt()}>
+        <div className="container">
           <MainBlock
             smallTitle={false}
             // title={'Assets'}
             content={
               <div>
-                <div className="head_wrapper">
+                <div className="head_wrapper" style={{ fontWeight: 'bold' }}>
                   <div className="left_block boldFont">Your assets</div>
                   <div className={'settings_btn_container'}>
                     <button
@@ -190,7 +216,7 @@ function Assets() {
                   </div>
                 </div>
                 <div className="action_btns">
-                  <div>
+                  <div className="assets_btn_wrapper">
                     <div
                       className={
                         walletIsConnected ? 'onHover' : 'onHover btn--disabled'
@@ -207,7 +233,7 @@ function Assets() {
                     </div>
                     <div className="action_btns_bottom_text">Send</div>
                   </div>
-                  <div>
+                  <div className="assets_btn_wrapper">
                     <button
                       className={
                         walletIsConnected ? 'onHover' : 'onHover btn--disabled'
@@ -224,7 +250,7 @@ function Assets() {
                     </button>
                     <div className="action_btns_bottom_text">Receive</div>
                   </div>
-                  <div>
+                  <div className="assets_btn_wrapper">
                     <div
                       className={
                         walletIsConnected ? 'onHover' : 'onHover btn--disabled'
@@ -244,10 +270,15 @@ function Assets() {
                 {walletIsConnected ? (
                   <>
                     {(NFTassets && NFTassets.length) ||
-                    (tokensList && tokensList.length) ||
-                    (limitOrdersData && limitOrdersData.limitOrders.length) ? (
+                    tonWallet ||
+                    (tokenList && tokenList.length)(
+                      limitOrdersData && limitOrdersData.limitOrders.length,
+                    ) ? (
                       <AssetsList
-                        TokenAssetsArray={[...tokensList, ...liquidityList]}
+                        TokenAssetsArray={uniqBy(
+                          [tonWallet,...tokenList, ...liquidityList],
+                          'walletAddress',
+                        )}
                         orderAssetArray={
                           limitOrdersData && limitOrdersData.limitOrders
                         }
@@ -272,7 +303,9 @@ function Assets() {
                     className="btn mainblock-btn"
                     onClick={() => history.push('/account')}
                   >
-                    Connect wallet
+                    {!clientData.status && clientData.address.length === 66
+                      ? 'Deploy wallet'
+                      : 'Connect wallet'}
                   </button>
                 )}
               </div>

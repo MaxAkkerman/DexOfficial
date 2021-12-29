@@ -11,7 +11,7 @@ import {
   setOrdersToInputValue,
   showOrdersFromSelect,
   showOrdersToSelect,
-} from '../../store/actions/limitOrders';
+} from '../../store/actions/limitOrder';
 import { setPoolRate } from '../../store/actions/pool';
 import { setSwapRate } from '../../store/actions/swap';
 import truncateNum from '../../utils/truncateNum';

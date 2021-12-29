@@ -1,141 +1,48 @@
 import './PinPopup.scss';
 
 import { Grid } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import isNumber from 'lodash/isNumber';
+import range from 'lodash/range';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useKey } from 'react-use';
 
-import { numPadArr, onlyNums, pincodeArray } from '../../constants/defaultData';
 import arrowBack from '../../images/arrowBack.png';
-import CloseBtn from '../CloseBtn/CloseBtn';
 import MainBlock from '../MainBlock/MainBlock';
 import { NextBtn } from './NextBtn';
 import PinKeyboard from './PinKeyboard';
 import Steppers from './Steppers';
 
 function PinPopup(props) {
-  const [pinArr, setPinArr] = useState(pincodeArray);
-  const [completed, setCompleted] = useState(false);
   const appTheme = useSelector((state) => state.appReducer.appTheme);
 
-  let myRefs = [];
-  const saveThisRef = (element) => {
-    myRefs.push(element);
-  };
+  const { complete, handleBackspace, handleChange, value } = usePinInput();
 
+  // Intermediate variable to match api of previous code
+  const valueArr = useMemo(
+    () =>
+      value.split('').map((v, i) => ({
+        error: false,
+        focused: false,
+        id: i,
+        value: v,
+      })),
+    [value],
+  );
+
+  // Hook to match api of previous code
   useEffect(() => {
-    if (!pinArr) return;
-    const curEmptyPin = pinArr.filter((item) => !item.value.length);
-    if (!curEmptyPin.length) {
-      setCompleted(true);
-    } else {
-      setCompleted(false);
-    }
-  }, [pinArr]);
+    props.handleCheckPin(valueArr, props.nextStep, complete);
+  }, [value]);
 
-  useEffect(() => {
-    props.handleCheckPin(pinArr, props.step, completed);
-  }, [pinArr]);
-
-  function handleClickNumKeyboard(e) {
-    let newPin = JSON.parse(JSON.stringify(pinArr));
-    const curEmptyPin = newPin.filter((item) => !item.value.length);
-    if (!curEmptyPin.length) return;
-    newPin.map((item) => {
-      if (item.id === curEmptyPin[0].id) {
-        item.value = e.target.value;
-        item.focused = false;
-      }
-      if (!curEmptyPin[1]) {
-      } else if (item.id === curEmptyPin[1].id) {
-        item.focused = true;
-      }
-    });
-    setPinArr(newPin);
-  }
-
-  function handleClickNumInp(e) {
-    let newPin = JSON.parse(JSON.stringify(pinArr));
-    newPin.map((item) => {
-      item.focused = item.id.toString() === e.target.id;
-    });
-    setPinArr(newPin);
-  }
-
-  // useEffect(() => {
-  //     window.addEventListener("keydown", keyDownHandler)
-  // }, [])
-  //
-  // function keyDownHandler(e) {
-  //
-  //     const fRefs = myRefs.filter(item => item)
-  //     if (e.key === "Meta") return
-  //     let newPin = JSON.parse(JSON.stringify(pinArr))
-  //     const curEmptyPin = newPin.filter(item => item.focused)
-  //     console.log("curEmptyPin", curEmptyPin)
-  //
-  //     if (!curEmptyPin.length) return
-  //     let nextId;
-  //     let ind;
-  //     newPin.map((item,i) => {
-  //
-  //         if (item.id === curEmptyPin[0].id) {
-  //             console.log("item.id",item.id)
-  //             item.value = e.key
-  //             item.focused = false
-  //             ind = i
-  //             nextId = +item.id + 1
-  //         }
-  //     })
-  //     // newPin.map(item => {
-  //     //     console.log("next one ocused")
-  //     //     if(item.id === nextId){
-  //     //         item.focused = true
-  //     //     }
-  //     // })
-  //     if (ind < fRefs.length) {
-  //         fRefs[nextId].focus();
-  //         newPin[nextId].focused = true;
-  //     }
-  //
-  //     setPinArr(newPin)
-  // }
-
-  function handleClickNum(e, i) {
-    let newPin = JSON.parse(JSON.stringify(pinArr));
-    const fRefs = myRefs.filter((item) => item);
-    const forwardIndex = i + 1;
-    const backIndex = i - 1;
-    if (e.key === 'Meta') return;
-
-    if (e.key === 'Backspace' || e.key === 'Delete') {
-      if (backIndex === -1) {
-        newPin[i].value = '';
-        newPin[i].focused = true;
-        setPinArr(newPin);
-        return;
-      }
-      newPin[i].value = '';
-      newPin[i].focused = false;
-      newPin[backIndex].focused = true;
-      setPinArr(newPin);
-      if (backIndex < fRefs.length) fRefs[backIndex].focus();
-      return;
-    }
-    if (!e.key.match(onlyNums)) return;
-    newPin[i].value = e.key;
-    newPin[i].focused = false;
-    if (forwardIndex < fRefs.length) {
-      fRefs[forwardIndex].focus();
-      newPin[forwardIndex].focused = true;
-    }
-    setPinArr(newPin);
+  function handleNextClick() {
+    props.handleClickNext(valueArr, props.nextStep, complete);
   }
 
   return (
     <div
       className="select-wrapper"
       style={{ backdropFilter: appTheme === 'light' ? null : 'blur(130px)' }}
-      onClick={() => console.log('pinArr', pinArr)}
     >
       <MainBlock
         // title={props.title ? props.title : "default"}
@@ -143,7 +50,7 @@ function PinPopup(props) {
         classTitle={'fixFontSize'}
         content={
           <>
-            <div className="head_wrapper" style={{ marginBottom: '20px' }}>
+            <div className="pin_head_wrapper">
               {props.showTwoBtns ? (
                 <button
                   className="arrow_back"
@@ -155,7 +62,7 @@ function PinPopup(props) {
               <div className="left_block boldFont fixMedia">{props.title}</div>
             </div>
 
-            {completed && !props.pinCorrect ? (
+            {complete && !props.pinCorrect ? (
               <Grid style={{ color: 'red', textAlign: 'center' }}>
                 PINS don't match!
               </Grid>
@@ -163,42 +70,34 @@ function PinPopup(props) {
               <div style={{ height: '23px' }}></div>
             )}
             <Grid className="numsInputContainer">
-              {pinArr.map((item, i) => {
+              {range(4).map((i) => {
                 return (
                   <input
-                    key={item.id}
-                    ref={saveThisRef}
-                    type={'password'}
+                    key={i}
+                    type="password"
                     style={{
-                      cursor: 'pointer',
+                      borderBottomColor: complete
+                        ? 'var(--accent)'
+                        : 'var(--mainblock-title-color)',
                       caretColor: 'transparent',
-                      borderBottomColor: completed
-                        ? !props.pinCorrect
-                          ? 'red'
-                          : `var(--accent)`
-                        : item.focused
-                        ? `var(--mainblock-title-color)`
-                        : null,
-                      color: completed
-                        ? !props.pinCorrect
-                          ? 'red'
-                          : `var(--accent)`
-                        : null,
+                      color: complete
+                        ? 'var(--accent)'
+                        : 'var(--mainblock-title-color)',
                     }}
                     className="pinInput"
-                    readOnly
-                    id={item.id}
-                    onClick={(e) => handleClickNumInp(e)}
+                    id={i}
                     maxLength={1}
-                    value={item.value}
-                    onKeyDown={(e) => handleClickNum(e, i)}
+                    value={value[i] === ' ' ? '' : value[i]}
+                    disabled
                   />
                 );
               })}
             </Grid>
             <PinKeyboard
-              numPadArr={numPadArr}
-              handleClickNumKeyboard={(e) => handleClickNumKeyboard(e)}
+              onClickNumKeyboard={(e, v) => {
+                if (v === 11) handleBackspace();
+                else handleChange(v + 1);
+              }}
             />
 
             <Steppers step={props.step} />
@@ -207,6 +106,7 @@ function PinPopup(props) {
                 <NextBtn
                   curBtnStyles={'curBtnStylesLogin'}
                   btnsClass={'LoginViaPinBtns'}
+                  btnsWrapper={'btnsWrapper'}
                   btnText={'Log out'}
                   errColor={true}
                   handleClickNext={() => props.handleLogOut()}
@@ -214,11 +114,10 @@ function PinPopup(props) {
                 <NextBtn
                   curBtnStyles={'curBtnStylesLogin'}
                   btnsClass={'LoginViaPinBtns'}
+                  btnsWrapper={'btnsWrapper'}
                   btnText={props.btnText}
                   errColor={null}
-                  handleClickNext={() =>
-                    props.handleClickNext(pinArr, props.nextStep, completed)
-                  }
+                  handleClickNext={handleNextClick}
                 />
               </div>
             ) : (
@@ -227,9 +126,7 @@ function PinPopup(props) {
                 btnsClass={'enterSPRegBox'}
                 btnText={props.btnText}
                 errColor={null}
-                handleClickNext={() =>
-                  props.handleClickNext(pinArr, props.nextStep, completed)
-                }
+                handleClickNext={handleNextClick}
               />
             )}
           </>
@@ -237,6 +134,47 @@ function PinPopup(props) {
       />
     </div>
   );
+}
+
+function usePinInput({ length = 4 } = {}) {
+  const [value, setValue] = useState(' '.repeat(length));
+
+  const cursor = useMemo(() => value.trim().length, [value]);
+  const complete = useMemo(() => value.trim().length === length, [value]);
+
+  function handleChange(v) {
+    if (complete || /[^0-9]/.test(v)) return;
+
+    const arr = value.split('');
+    arr[cursor] = v;
+    const str = arr.join('');
+
+    setValue(str);
+  }
+
+  function handleBackspace() {
+    let str = value.trim().slice(0, -1);
+    str = str.padEnd(length);
+    console.log({ str });
+
+    setValue(str);
+  }
+
+  useKey('Backspace', handleBackspace, {}, [value]);
+  useKey('Delete', handleBackspace, {}, [value]);
+  useKey(
+    (event) => isNumber(+event.key),
+    () => handleChange(event.key),
+    {},
+    [value],
+  );
+
+  return {
+    complete,
+    handleBackspace,
+    handleChange,
+    value,
+  };
 }
 
 export default PinPopup;

@@ -1,3 +1,5 @@
+import { reduxStore } from '@/lib/redux';
+
 import { getWalletExt } from '../extensions/extensions/checkExtensions';
 import {
   checkClientPairExists,
@@ -5,12 +7,10 @@ import {
   checkwalletExists,
   getAllPairsWoithoutProvider,
   getClientBalance,
-  getClientKeys,
   subscribe,
   subscribeClient,
   subscribeClientBalance,
 } from '../extensions/sdk_get/get';
-import { store } from '../index';
 import { setCurExt, setTips, setWalletIsConnected } from '../store/actions/app';
 import {
   setClientData,
@@ -34,7 +34,7 @@ export async function InitializeClient(clientPubKey) {
     const dexClientAddress = clientStatus.dexclient;
     const dexClientStatus = clientStatus.status;
     const dexClientBalance = await getClientBalance(dexClientAddress);
-    store.dispatch(
+    reduxStore.dispatch(
       setClientData({
         status: dexClientStatus,
         dexclient: dexClientAddress,
@@ -59,17 +59,17 @@ export async function InitializeClient(clientPubKey) {
 
     const extensionWallet = await getWalletExt(dexClientAddress, clientPubKey);
 
-    store.dispatch(setCurExt(extensionWallet[0]));
+    reduxStore.dispatch(setCurExt(extensionWallet[0]));
 
-    store.dispatch(setTransactionsList([]));
-    store.dispatch(setSubscribeReceiveTokens([]));
+    reduxStore.dispatch(setTransactionsList([]));
+    reduxStore.dispatch(setSubscribeReceiveTokens([]));
 
     subscribeClient(dexClientAddress);
     subscribeClientBalance(dexClientAddress);
     // subscribeClientBalanceForTips(dexClientAddress)
     await getAllPairsAndSetToStore(dexClientAddress);
     await getAllTokensAndSetToStore(dexClientAddress);
-    store.dispatch(setWalletIsConnected(true));
+    reduxStore.dispatch(setWalletIsConnected(true));
   }
   return true;
 }
@@ -81,8 +81,8 @@ export async function getAllTokensAndSetToStore(clientAddress) {
     tokenList.forEach(async (item) => await subscribe(item.walletAddress));
     liquidityList = tokenList.filter((i) => i.symbol.includes('/'));
     tokenList = tokenList.filter((i) => !i.symbol.includes('/'));
-    store.dispatch(setTokenList(tokenList));
-    store.dispatch(setLiquidityList(liquidityList));
+    reduxStore.dispatch(setTokenList(tokenList));
+    reduxStore.dispatch(setLiquidityList(liquidityList));
   }
 }
 
@@ -101,7 +101,7 @@ export async function getAllPairsAndSetToStore(clientAddress) {
     arrPairs.push(item);
   });
 
-  store.dispatch(setPairsList(arrPairs));
+  reduxStore.dispatch(setPairsList(arrPairs));
 }
 
 export function copyToClipboard(textToCopy) {
@@ -109,7 +109,7 @@ export function copyToClipboard(textToCopy) {
 
   if (navigator.clipboard && window.isSecureContext) {
     // navigator clipboard api method'
-    store.dispatch(
+    reduxStore.dispatch(
       setTips({
         message: `Copied`,
         type: 'info',
@@ -118,7 +118,7 @@ export function copyToClipboard(textToCopy) {
     );
     return navigator.clipboard.writeText(textToCopy);
   } else {
-    store.dispatch(
+    reduxStore.dispatch(
       setTips({
         message: `Copied`,
         type: 'info',
@@ -299,12 +299,12 @@ export const getMnemonics = () => {
   });
   return mnemonicWords;
 };
-
+//todo refactor function
 export function getFullName(name) {
   if (name === 'TON') {
-    return 'TON Crystal';
+    return 'Everscale';
   } else if (name === 'WTON') {
-    return 'Wrapped TON Crystal';
+    return 'Wrapped Everscale';
   } else if (name === 'fBTC') {
     return 'fBitcoin';
   } else if (name === 'WETH') {
@@ -314,13 +314,17 @@ export function getFullName(name) {
   } else if (name === 'WBTC') {
     return 'Wrapped Bitcoin';
   } else if (name === 'DS-WTON/USDT') {
-    return 'Pool tokens of TON/USDT pair';
-  } else if (name === 'DS-WTON/WETH') {
-    return 'Pool tokens of TON/ETH pair';
-  } else if (name === 'DS-WTON/WBTC') {
-    return 'Pool tokens of TON/BTC pair';
+    return 'Pool tokens of EVER/USDT pair';
+  } else if (name === 'DS-WTON/USDC') {
+    return 'Pool tokens of EVER/USDС pair';
+  }else if (name === 'DS-WTON/WETH') {
+    return 'Pool tokens of EVER/ETH pair';
+  } else if (name === 'DS-WTON/BTC') {
+    return 'Pool tokens of EVER/BTC pair';
   } else if (name === 'USDT') {
     return 'Tether';
+  }else if (name === 'DS-WTON/DAI') {
+    return 'Pool tokens of EVER/DAI pair';
   } else {
     return name;
   }

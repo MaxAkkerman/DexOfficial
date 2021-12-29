@@ -4,9 +4,11 @@
 import { signerKeys, signerNone } from '@tonclient/core';
 import { libWeb } from '@tonclient/lib-web';
 
+// import {reduxStore} from "../../index";
+import { reduxStore } from '@/lib/redux';
+
 import { iconGenerator } from '../../iconGenerator';
 import salary from '../../images/salary.svg';
-import { store } from '../../index';
 import {
   getDecimals,
   getFixedNums,
@@ -38,6 +40,9 @@ import {
   decodePayload,
   getShardThis,
 } from '../tonUtils';
+import memoize from 'lodash.memoize';
+
+import { saveLog } from '../../logging/logging';
 
 const { ResponseType } = require('@tonclient/core/dist/bin');
 const { TonClient } = require('@tonclient/core');
@@ -55,10 +60,6 @@ const limitOrderRouter = Radiance.networks['2'].limitOrderRouter;
 
 const client = new TonClient({ network: { endpoints: [DappServer] } });
 export default client;
-
-import memoize from 'lodash.memoize';
-
-import { saveLog } from '../../logging/logging';
 
 export async function getShardLimit() {
   let response;
@@ -555,6 +556,19 @@ export async function checkwalletExists(clientAddress, pairAddress) {
  * @param name
  */
 
+export function getReplacedSymbol(symbol) {
+  console.log("symbolTTT",symbol)
+  if (symbol === 'WTON') {
+    return 'wEVER';
+  } else if (symbol.includes('DS-WTON')) {
+    return symbol.replace('WTON', 'wEVER');
+  }else if (symbol.includes('WBTC')) {
+    return symbol.replace('WBTC', 'BTC');
+
+  } else {
+    return symbol;
+  }
+}
 export async function getAllClientWallets(clientAddress) {
   console.log('clientAddress____', clientAddress);
   const acc = new Account(DEXClientContract, {
@@ -589,7 +603,11 @@ export async function getAllClientWallets(clientAddress) {
 
       // console.log("hereii", curWalletData)
       itemData.walletAddress = item[1];
-      itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
+      // itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
+      itemData.symbol = getReplacedSymbol(
+        hex2a(curRootData.decoded.output.value0.symbol),
+      );
+
       itemData.tokenName = getFullName(itemData.symbol);
       itemData.type = 'PureToken';
       itemData.owner_address =
@@ -700,12 +718,19 @@ export const getAllPairsWoithoutProvider = memoize(async () => {
     itemData.pairAddress = item[0];
 
     // itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
-    itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol);
+    itemData.symbolA =
+      hex2a(curRootDataA.decoded.output.value0.symbol) === 'WTON'
+        ? 'wEVER'
+        : hex2a(curRootDataA.decoded.output.value0.symbol);
     itemData.reserveA = balanceA;
     itemData.decimalsA = decimalsRootA;
+    itemData.symbolB =
+      hex2a(curRootDataB.decoded.output.value0.symbol) === 'WTON'
+        ? 'wEVER'
+        : hex2a(curRootDataB.decoded.output.value0.symbol);
 
-    itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
-    itemData.reservetB = balanceB;
+    // itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
+    itemData.reserveB = balanceB;
     itemData.decimalsB = decimalsRootB;
 
     itemData.decimalsAB = decimalsRootAB;
@@ -869,7 +894,7 @@ export async function subscribeClientBalance(address) {
         if (!params.result) return;
         // if(!checkMessagesAmountClient({tonLiveID:params.result.id}))return
 
-        store.dispatch(
+        reduxStore.dispatch(
           setUpdatedBalance(Number(params.result.balance) / 1000000000),
         );
 
@@ -883,7 +908,7 @@ export async function subscribeClientBalance(address) {
           amount: Number(params.result.value) || 'default',
           src: params.result.src || 'default',
         };
-        store.dispatch(
+        reduxStore.dispatch(
           setTips({
             message: `Your balance updated ${
               Number(params.result.balance) / 1000000000
@@ -1009,7 +1034,7 @@ export async function subscribeClient(address) {
               token_name: hex2a(rootData.name) || 'default',
               token_symbol: hex2a(rootData.symbol) || 'default',
             };
-            store.dispatch(
+            reduxStore.dispatch(
               setTips({
                 message: `You deployed ${transactionData.token_name} wallet`,
                 type: 'info',
@@ -1044,11 +1069,11 @@ export async function subscribeClient(address) {
               dest: decoded.value.dest,
               value: decoded.value.value,
             };
-            store.dispatch(
+            reduxStore.dispatch(
               setTips({
                 message: `You send ${
                   Number(transactionData.value) / 1000000000
-                } TONs`,
+                } EVERs`,
                 type: 'info',
                 ...checkedDuple,
                 ...transactionData,
@@ -1090,7 +1115,7 @@ export async function subscribeClient(address) {
             };
 
             console.log('send callbackData', callbackData);
-            store.dispatch(
+            reduxStore.dispatch(
               setTips({
                 message: `You send ${callbackData.amount.toFixed(4)} ${
                   callbackData.token_name
@@ -1132,11 +1157,11 @@ export async function subscribeClient(address) {
               // token_name: hex2a(rootD.name) || "default",
               // token_symbol: hex2a(rootD.symbol) || "default"
             };
-            store.dispatch(
+            reduxStore.dispatch(
               setTips({
                 message: `You stake to dePool ${
                   Number(checkedDuple.amount) / 1000000000
-                } TONs`,
+                } EVERs`,
                 type: 'info',
                 ...checkedDuple,
               }),
@@ -1182,7 +1207,7 @@ export async function subscribeClient(address) {
               tokenABsymbol: hex2a(rootABdetails.symbol),
               tokenABname: hex2a(rootABdetails.name),
             };
-            store.dispatch(
+            reduxStore.dispatch(
               setTips({
                 message: `You return ${provideData.returnA.toFixed(4)} ${
                   provideData.tokenAname || 'def'
@@ -1284,7 +1309,7 @@ export async function subscribeClient(address) {
               tokenABsymbol: hex2a(rootABdetails.symbol),
               tokenABname: hex2a(rootABdetails.name),
             };
-            store.dispatch(
+            reduxStore.dispatch(
               setTips({
                 message: `You provided ${provideData.amountA.toFixed(4)} ${
                   provideData.tokenAname || 'def'
@@ -1332,11 +1357,11 @@ export async function subscribeClient(address) {
               params.result.src,
             );
             if (lockStakeData.addrOwner === address) {
-              store.dispatch(
+              reduxStore.dispatch(
                 setTips({
                   message: `You get lock stake ${
                     +lockStakeData.amountLockStake / 1000000000
-                  } TONs`,
+                  } EVERs`,
                   type: 'info',
                   ...checkedDuple,
                   ...lockStakeData,
@@ -1345,11 +1370,11 @@ export async function subscribeClient(address) {
             }
 
             if (lockStakeData.addrOwner !== address) {
-              store.dispatch(
+              reduxStore.dispatch(
                 setTips({
                   message: `You send lock stake ${
                     +lockStakeData.amountLockStake / 1000000000
-                  } TONs`,
+                  } EVERs`,
                   type: 'info',
                   ...checkedDuple,
                   ...lockStakeData,
@@ -1409,7 +1434,7 @@ export async function subscribeClient(address) {
                 amountB:
                   +decodedPayl.arg4 / getDecimals(Number(rootBdet.decimals)),
               };
-              store.dispatch(
+              reduxStore.dispatch(
                 setTips({
                   message: `You swapped ${transactionData.amountA.toFixed(4)} ${
                     transactionData.tokenAname
@@ -1441,7 +1466,7 @@ export async function subscribeClient(address) {
                 'swap',
               );
             } else if (payloadFlag === 8) {
-              store.dispatch(
+              reduxStore.dispatch(
                 setTips({
                   message: `Something went wrong, swap failed`,
                   type: 'error',
@@ -1451,7 +1476,7 @@ export async function subscribeClient(address) {
             } else if (payloadFlag === 1) {
               console.log('decodedPayl.arg0 === 1');
 
-              store.dispatch(
+              reduxStore.dispatch(
                 setTips({
                   message: `Someone send y ${checkedDuple.amount} ${hex2a(
                     rootD.name,
@@ -1463,7 +1488,7 @@ export async function subscribeClient(address) {
             } else if (payloadFlag === 2) {
               console.log('decodedPayl.arg0 === 2');
 
-              store.dispatch(
+              reduxStore.dispatch(
                 setTips({
                   message: `This one was your change ${
                     checkedDuple.amount
@@ -1488,7 +1513,7 @@ export async function subscribeClient(address) {
             else if (payloadFlag === 9) {
               console.log('decodedPayl.arg0 === 3');
 
-              store.dispatch(
+              reduxStore.dispatch(
                 setTips({
                   message: `Provide liquidity was unsuccessful`,
                   type: 'info',
@@ -1511,7 +1536,7 @@ export async function subscribeClient(address) {
             else if (payloadFlag === 4) {
               console.log('decodedPayl.arg0 === 3');
 
-              store.dispatch(
+              reduxStore.dispatch(
                 setTips({
                   message: `You receive ${checkedDuple.amount.toFixed(
                     4,
@@ -1670,7 +1695,7 @@ export async function subscribe(address) {
             // store.dispatch(setAcceptedPairTokens(dataFromStorage))
 
             console.log('acceptedPairTokens', acceptedPairTokens);
-            store.dispatch(
+            reduxStore.dispatch(
               setTips({
                 message: `You get ${acceptedPairTokens.amount.toFixed(
                   4,
@@ -2141,10 +2166,14 @@ const SEED_PHRASE_DICTIONARY_ENGLISH = 1; //Dictionary identifier
 
 export async function getClientKeys(phrase) {
   //todo change with only pubkey returns
-  return await client.crypto.mnemonic_derive_sign_keys({
-    phrase,
-    path: HD_PATH,
-    dictionary: SEED_PHRASE_DICTIONARY_ENGLISH,
-    word_count: SEED_PHRASE_WORD_COUNT,
-  });
+  try {
+    return await client.crypto.mnemonic_derive_sign_keys({
+      phrase,
+      path: HD_PATH,
+      dictionary: SEED_PHRASE_DICTIONARY_ENGLISH,
+      word_count: SEED_PHRASE_WORD_COUNT,
+    });
+  } catch (e) {
+    return e;
+  }
 }

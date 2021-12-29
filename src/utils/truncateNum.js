@@ -2,16 +2,29 @@
  * Returns truncated number
  *
  * @param {number} num
- * @param {number} [digits=4]
+ * @param {number} [decimals=4] - Numbers before truncate
+ * @param {number} [informativeDecimals=1] - Numbers after zero
  * @returns {number}
  */
-export default function truncateNum(num, digits = 4) {
+export default function truncateNum(
+  num,
+  decimals = 4,
+  informativeDecimals = 1,
+) {
   if (Number.isInteger(num)) return num;
 
-  let truncatedNum = getFixedDown(num, digits);
+  let truncatedNum = getFixedDown(num, decimals);
 
-  while (Number.isInteger(truncatedNum))
-    truncatedNum = getFixedDown(num, digits++);
+  while (Number.isInteger(truncatedNum)) {
+    truncatedNum = getFixedDown(num, decimals);
+    decimals++;
+  }
+
+  while (informativeDecimals > 1) {
+    truncatedNum = getFixedDown(num, decimals);
+    decimals++;
+    informativeDecimals--;
+  }
 
   return truncatedNum;
 }

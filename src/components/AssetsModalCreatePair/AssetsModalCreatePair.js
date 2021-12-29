@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import {
   hideOrdersFromSelect,
   hideOrdersToSelect,
-} from '../../store/actions/limitOrders';
+} from '../../store/actions/limitOrder';
 import { hidePoolFromSelect, hidePoolToSelect } from '../../store/actions/pool';
 import { hideSwapFromSelect, hideSwapToSelect } from '../../store/actions/swap';
 import AssetsList from '../AssetsList/AssetsList';
@@ -25,7 +25,6 @@ function AssetsModalCreatePair(props) {
   // 	props.handleCloseAssetsListPopup();
   // }
   function handleClose(e) {
-    console.log('searchBtn swapPopup', e.target.id);
     if (
       e.target.id === 'swapPopup' ||
       e.target.id === 'searchBtn' ||

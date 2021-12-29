@@ -1,24 +1,22 @@
 import { Account } from '@tonclient/appkit';
-import { memoize } from 'lodash';
 
-import { FUNC_FAIL } from '../constants/runtimeErrors';
-import { DEXRootContract } from '../extensions/contracts/DEXRoot';
-import Radiance from '../extensions/Radiance.json';
-import client from '../extensions/sdk_get/get';
+import { FUNC_FAIL, NO_CONTEXT } from '@/constants/runtimeErrors';
+import { DEXRootContract } from '@/extensions/contracts/DEXRoot';
 
 /**
- * @typedef {Object} Pair
- * @property {string} addrPair
- * @property {string} rootA
- * @property {string} rootB
+ * @returns {Promise<{
+ *	addrPair: string,
+ *	rootA: string,
+ *	rootB: string,
+ * }[]>} pairs
  */
-/**
- * @returns {Promise<Pair[]>} pairs
- */
-const getAllPairs = memoize(async () => {
+export default async function getAllPairs() {
+  if (!this.context.dexRootAddress || !this.context.tonClient)
+    throw new Error(NO_CONTEXT);
+
   const rootAcc = new Account(DEXRootContract, {
-    address: Radiance.networks[2].dexroot,
-    client,
+    address: this.networkAddress,
+    client: this.tonClient,
   });
 
   const res = await rootAcc.runLocal('pairs', {});
@@ -32,6 +30,4 @@ const getAllPairs = memoize(async () => {
   });
 
   return pairList;
-});
-
-export default getAllPairs;
+}

@@ -11,8 +11,8 @@ function SendConfirmPopup(props) {
   function getTitle(tp) {
     if (tp === 'PureToken') {
       return 'Send Tokens';
-    } else if (tp === 'Native Tons') {
-      return 'Send TONs';
+    } else if (tp === 'Native evers') {
+      return 'Send EVERs';
     } else {
       return 'Send DP';
     }
