@@ -1,10 +1,13 @@
 import './Header.scss';
 
 import { Steps } from 'intro.js-react';
+import isEmpty from 'lodash/isEmpty';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory, useLocation } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
+
+import { steps } from '@/constants/defaultData';
 
 import { changeTheme } from '../../store/actions/app';
 import HeaderMore from '../HeaderMore/HeaderMore';
@@ -29,8 +32,7 @@ export default function Header() {
     history.push('/account');
   }
 
-  const { enabled, handleNextStep, handleOnExit, initialStep, steps } =
-    useTutorial();
+  const { enabled, handleNextStep, handleOnExit, initialStep } = useTutorial();
 
   return (
     <>
@@ -171,59 +173,16 @@ export default function Header() {
 
 function useTutorial() {
   const history = useHistory();
-  const [tutored, setTutored] = useLocalStorage('tutorialFinished', false);
+
+  const [client] = useLocalStorage('clientData', {});
+  const [esp] = useLocalStorage('esp', '');
+  const [tutored, setTutored] = useLocalStorage(
+    'tutorialFinished',
+    isEmpty(client) && isEmpty(esp) ? false : true,
+  );
+
   const [enabled, setEnabled] = useState(!tutored);
   const [initialStep, setInitialStep] = useState(0);
-
-  const steps = [
-    {
-      intro:
-        'Welcome to DeFiSpace! Click “Next” to go through this tutorial and learn how to trade with ease and convenience.',
-    },
-    {
-      element: '#nav-swap',
-      intro:
-        'Swap is the easiest way to swap assets on DeFiSpace AMM DEX. Once you connect to a pair and create all the necessary wallets it only takes 10 seconds to swap!',
-    },
-    {
-      element: '#nav-limit-order',
-      intro:
-        'Limit orders can be used to create orders with specific price and volume, much like traditional exchanges.',
-    },
-    {
-      element: '#nav-provide-liquidity',
-      intro:
-        'You can become a Liquidity Provider and earn profits with every swap other traders perform on DeFiSpace AMM DEX!',
-    },
-    {
-      element: '#nav-pool-explorer',
-      intro:
-        'Pool Explorer allows you to observe the current AMM reserves on DeFiSpace.',
-    },
-    {
-      element: '#nav-wallet',
-      intro:
-        'Assets menu is where you will see all your wallets and all your assets. You can also use it to send assets to other users inside the Everscale Network.',
-    },
-    {
-      element: '#nav-stacking',
-      intro:
-        'Staking allows you to make your EVER coins work for you. You also get an NFT certificate for your stake that you can transfer, sell or use as a collateral for instant liquidity!',
-    },
-    {
-      element: '#nav-connect-wallet',
-      intro: "First let's connect a wallet to start using DeFiSpace",
-    },
-    {
-      element: '#nav-login-seed-phrase',
-      intro:
-        'If you already have a DeFiSpace wallet seed-phrase you probably know what to do.',
-    },
-    {
-      element: '#nav-register-seed-phrase',
-      intro: "If you're new to this, click here and follow the instructions.",
-    },
-  ];
 
   function handleNextStep(nextIdx) {
     if (nextIdx === 7) {
@@ -244,6 +203,5 @@ function useTutorial() {
     handleNextStep,
     handleOnExit,
     initialStep,
-    steps,
   };
 }
