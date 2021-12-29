@@ -85,6 +85,16 @@ function Header() {
           >
             Staking
           </NavLink>
+          <NavLink
+              to="/bridge"
+              className={
+                linkIsActive('/bridge')
+                    ? 'header-link header-link--active'
+                    : 'header-link'
+              }
+          >
+            Bridge
+          </NavLink>
         </div>
       </div>
       <div className="header-wrap">

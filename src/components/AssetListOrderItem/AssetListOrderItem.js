@@ -4,8 +4,8 @@ import React from 'react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { BA_DIRECTION_GRAPHQL } from '../../constants/runtimeVariables';
-import { iconGenerator } from '../../iconGenerator';
+import { BA_DIRECTION_GRAPHQL } from '@/constants/runtimeVariables';
+import { iconGenerator } from '@/iconGenerator';
 import {
   openOrderCancelPopup,
   openOrderUpdatePopup,

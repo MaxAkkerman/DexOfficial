@@ -9,6 +9,11 @@ import fBTC from './images/tokens/wBTC.svg';
 import fETH from './images/tokens/wETH.svg';
 import USDT from './images/tokens/wUSDT.svg';
 
+import bsc from './images/networks/bsc.svg';
+import ethChain from './images/networks/eth.png';
+import phantom from './images/networks/phantom.svg';
+import polygon from './images/networks/polygon.svg';
+
 export function iconGenerator(icon) {
   if (icon.includes('TON')) {
     return TON;
@@ -28,6 +33,14 @@ export function iconGenerator(icon) {
     return tonNew;
   } else if (icon.includes('QUESTION')) {
     return question;
+  }else if (icon.includes('Ethereum')) {
+    return ethChain;
+  }else if (icon.includes('BSC')) {
+    return bsc;
+  }else if (icon.includes('Polygon')) {
+    return polygon;
+  }else if (icon.includes('Fantom')) {
+    return phantom;
   } else {
     return defaultIcon;
   }
