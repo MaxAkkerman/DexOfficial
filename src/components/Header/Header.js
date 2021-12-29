@@ -1,13 +1,8 @@
 import './Header.scss';
 
-import { Steps } from 'intro.js-react';
-import isEmpty from 'lodash/isEmpty';
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory, useLocation } from 'react-router-dom';
-import { useLocalStorage } from 'react-use';
-
-import { steps } from '@/constants/defaultData';
 
 import { changeTheme } from '../../store/actions/app';
 import HeaderMore from '../HeaderMore/HeaderMore';
@@ -32,17 +27,8 @@ export default function Header() {
     history.push('/account');
   }
 
-  const { enabled, handleNextStep, handleOnExit, initialStep } = useTutorial();
-
   return (
     <>
-      <Steps
-        enabled={enabled}
-        steps={steps}
-        initialStep={initialStep}
-        onChange={handleNextStep}
-        onExit={handleOnExit}
-      />
       <header className="header">
         <div className="header-wrap">
           <div className="header__items">
@@ -169,39 +155,4 @@ export default function Header() {
       </header>
     </>
   );
-}
-
-function useTutorial() {
-  const history = useHistory();
-
-  const [client] = useLocalStorage('clientData', {});
-  const [esp] = useLocalStorage('esp', '');
-  const [tutored, setTutored] = useLocalStorage(
-    'tutorialFinished',
-    isEmpty(client) && isEmpty(esp) ? false : true,
-  );
-
-  const [enabled, setEnabled] = useState(!tutored);
-  const [initialStep, setInitialStep] = useState(0);
-
-  function handleNextStep(nextIdx) {
-    if (nextIdx === 7) {
-      setEnabled(false);
-      history.push('/account');
-      setInitialStep(7);
-      setEnabled(true);
-    }
-  }
-
-  function handleOnExit() {
-    setEnabled(false);
-    setTutored(true);
-  }
-
-  return {
-    enabled,
-    handleNextStep,
-    handleOnExit,
-    initialStep,
-  };
 }
