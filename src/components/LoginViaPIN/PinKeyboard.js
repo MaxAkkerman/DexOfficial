@@ -21,7 +21,12 @@ function PinKeyboard(props) {
                 width: 66,
               }}
             >
-              <BackspaceIcon onClick={(e) => props.onClickNumKeyboard(e, i)} />
+              <BackspaceIcon
+                sx={{
+                  color: 'var(--mainblock-title-color)',
+                }}
+                onClick={(e) => props.onClickNumKeyboard(e, i)}
+              />
             </IconButton>
           </div>
         ) : (
