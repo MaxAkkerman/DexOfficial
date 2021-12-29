@@ -48,13 +48,7 @@ export default function SmallInput({
         )}
       </div>
       {helperText && (
-        <FormHelperText
-          error={error}
-          style={{
-            marginLeft: 17,
-            marginTop: 3,
-          }}
-        >
+        <FormHelperText error={error} className={classes.helper_text}>
           {helperText}
         </FormHelperText>
       )}
