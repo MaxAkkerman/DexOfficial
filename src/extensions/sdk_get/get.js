@@ -557,10 +557,14 @@ export async function checkwalletExists(clientAddress, pairAddress) {
  */
 
 export function getReplacedSymbol(symbol) {
+  console.log("symbolTTT",symbol)
   if (symbol === 'WTON') {
     return 'wEVER';
   } else if (symbol.includes('DS-WTON')) {
     return symbol.replace('WTON', 'wEVER');
+  }else if (symbol.includes('WBTC')) {
+    return symbol.replace('WBTC', 'BTC');
+
   } else {
     return symbol;
   }

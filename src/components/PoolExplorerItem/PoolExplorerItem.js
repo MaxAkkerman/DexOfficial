@@ -84,6 +84,7 @@ function PoolExplorerItem(props) {
             <div className="poolExplorer__reserve">
               <img
                 className="poolExplorer__icon"
+                style={{width:"32px",height:"32px"}}
                 src={iconGenerator(props.pair.symbolA)}
                 alt={props.pair.symbolA}
               />
@@ -96,6 +97,7 @@ function PoolExplorerItem(props) {
             <div className="poolExplorer__reserve">
               <img
                 className="poolExplorer__icon"
+                style={{width:"32px",height:"32px"}}
                 src={iconGenerator(props.pair.symbolB)}
                 alt={props.pair.symbolB}
               />

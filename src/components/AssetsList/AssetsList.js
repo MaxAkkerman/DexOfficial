@@ -19,9 +19,11 @@ function AssetsList(props) {
       }
       onClick={() => console.log('props', props)}
     >
-      {props.TokenAssetsArray.sort(
-        (a, b) => (b.balance || 0) - (a.balance || 0),
-      ).map((item, i) => (
+      {props.TokenAssetsArray
+      //     .sort(
+      //   (a, b) => (b.balance || 0) - (a.balance || 0),
+      // )
+          .map((item, i) => (
         <div
           className="assets_item_wrapper"
           onClick={() => props.handleClickToken(item)}

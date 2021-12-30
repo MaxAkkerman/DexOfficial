@@ -30,6 +30,9 @@ const sagaMiddleware = createSagaMiddleware();
 export const reduxStore = createStore(
   rootReducer,
   {
+    chromePopup: {
+      visible: localStorage.getItem('chrome') ? false : true,
+    },
     tonContext: {
       context: {
         dexClientAddress:

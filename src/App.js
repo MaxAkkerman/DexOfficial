@@ -5,10 +5,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
 import { useMount } from 'react-use';
 
+import ChromePopup from '@/components-v2/ChromePopup';
 import LimitOrderConfirmPopup from '@/components-v2/LimitOrderConfirmPopup';
 import LimitOrderPage from '@/components-v2/LimitOrderPage';
 import SwapConfirmPopup from '@/components-v2/SwapConfirmPopup';
 import SwapPage from '@/components-v2/SwapPage';
+import TutorialSteps from '@/components-v2/TutorialSteps';
 import WaitingPopup from '@/components-v2/WaitingPopup';
 import {
   requestPairsFetch,
@@ -62,12 +64,7 @@ import {
   getAllPairsAndSetToStore,
   getAllTokensAndSetToStore,
 } from './reactUtils/reactUtils';
-import {
-  changeTheme,
-  handleOpenEnterSeed,
-  hideTip,
-  showPopup,
-} from './store/actions/app';
+import { changeTheme, handleOpenEnterSeed, hideTip } from './store/actions/app';
 import {
   enterSeedPhraseEmptyStorage,
   setEncryptedSeedPhrase,
@@ -120,15 +117,6 @@ function App() {
   const { enqueueSnackbar } = useSnackbar();
 
   const [onloading, setonloading] = useState(false);
-
-  const chrome = localStorage.getItem('chrome');
-  if (chrome === null) showChromePopup();
-  else if (chrome === 'false') showChromePopup();
-
-  function showChromePopup() {
-    dispatch(showPopup({ type: 'chrome' }));
-    localStorage.setItem('chrome', 'true');
-  }
 
   useEffect(async () => {
     // await getAllPairsAndSetToStore()
@@ -427,6 +415,8 @@ function App() {
       <SwapConfirmPopup />
       <LimitOrderConfirmPopup />
       <WaitingPopup />
+      <ChromePopup />
+      <TutorialSteps />
     </>
   );
 }
