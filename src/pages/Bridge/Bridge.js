@@ -31,6 +31,9 @@ import networkEnum from "./networkEnum"
 import SelectPopup from "@/components-v2/SelectPopup";
 import {isEmpty} from 'lodash';
 import {iconGenerator} from "@/iconGenerator";
+import {
+  getBridgeAssetsForAddress,
+} from '../../extensions/sdk_get/get';
 
 const assetsBridge = [
     {
@@ -409,6 +412,7 @@ function Bridge() {
     function handleCloseAseetsList() {
         console.log("netw",network)
         console.log("wallet",  wallet, "onboard.getState()",onboard.getState(),"onboard",onboard, "accountSelect",onboard.accountSelect().then(it=>console.log("ioioioi",it)) )
+        console.log("assets",  getBridgeAssetsForAddress(1,'0x25Beb76684EF0ba98347fE69E4D805be76f7942c').then(it=>console.log("assetsObj",it)) )
 //         let changeNet = onboard.config({ networkId: 1 })
 // setOnboard(changeNet)
 
