@@ -10,6 +10,7 @@ import LimitOrderPage from '@/components-v2/LimitOrderPage';
 import SwapConfirmPopup from '@/components-v2/SwapConfirmPopup';
 import SwapPage from '@/components-v2/SwapPage';
 import WaitingPopup from '@/components-v2/WaitingPopup';
+import { Farming } from '@/pages/Farming/Farming';
 import {
   requestPairsFetch,
   requestTokensFetch,
@@ -386,6 +387,7 @@ function App() {
         <Route exact path="/bridge" component={Bridge} />
         <Route exact path="/wallet" component={Assets} />
         <Route exact path="/orders" component={LimitOrderPage} />
+        <Route exact path="/farming" component={Farming} />
         <Route exact path="/">
           <Redirect from="/" to="/wallet" />
         </Route>

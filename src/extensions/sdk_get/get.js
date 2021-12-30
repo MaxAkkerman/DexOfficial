@@ -3,12 +3,14 @@
 */
 import { signerKeys, signerNone } from '@tonclient/core';
 import { libWeb } from '@tonclient/lib-web';
+import memoize from 'lodash.memoize';
 
 // import {reduxStore} from "../../index";
 import { reduxStore } from '@/lib/redux';
 
 import { iconGenerator } from '../../iconGenerator';
 import salary from '../../images/salary.svg';
+import { saveLog } from '../../logging/logging';
 import {
   getDecimals,
   getFixedNums,
@@ -40,9 +42,6 @@ import {
   decodePayload,
   getShardThis,
 } from '../tonUtils';
-import memoize from 'lodash.memoize';
-
-import { saveLog } from '../../logging/logging';
 
 const { ResponseType } = require('@tonclient/core/dist/bin');
 const { TonClient } = require('@tonclient/core');
@@ -557,14 +556,13 @@ export async function checkwalletExists(clientAddress, pairAddress) {
  */
 
 export function getReplacedSymbol(symbol) {
-  console.log("symbolTTT",symbol)
+  console.log('symbolTTT', symbol);
   if (symbol === 'WTON') {
     return 'wEVER';
   } else if (symbol.includes('DS-WTON')) {
     return symbol.replace('WTON', 'wEVER');
-  }else if (symbol.includes('WBTC')) {
+  } else if (symbol.includes('WBTC')) {
     return symbol.replace('WBTC', 'BTC');
-
   } else {
     return symbol;
   }

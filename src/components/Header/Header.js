@@ -1,11 +1,12 @@
-import React from 'react';
-
-import { NavLink, useHistory, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { changeTheme } from '../../store/actions/app';
-import Wallet from '../Wallet/Wallet';
-import HeaderMore from '../HeaderMore/HeaderMore';
 import './Header.scss';
+
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { NavLink, useHistory, useLocation } from 'react-router-dom';
+
+import { changeTheme } from '../../store/actions/app';
+import HeaderMore from '../HeaderMore/HeaderMore';
+import Wallet from '../Wallet/Wallet';
 
 function Header() {
   const history = useHistory();
@@ -84,6 +85,16 @@ function Header() {
             }
           >
             Staking
+          </NavLink>
+          <NavLink
+            to="/farming"
+            className={
+              linkIsActive('/farming')
+                ? 'header-link header-link--active'
+                : 'header-link'
+            }
+          >
+            Farming
           </NavLink>
         </div>
       </div>

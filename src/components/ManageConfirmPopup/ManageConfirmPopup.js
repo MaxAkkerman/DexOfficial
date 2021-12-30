@@ -51,31 +51,33 @@ function ManageConfirmPopup(props) {
   }, [poolShare]);
 
   const handleSupplyClick = () => {
-    console.log("tokenList",    tokenList
-        .filter(it=>!it.symbol.includes("DS")))
+    console.log(
+      'tokenList',
+      tokenList.filter((it) => !it.symbol.includes('DS')),
+    );
 
     tokenList
-        .filter(it=>!it.symbol.includes("DS"))
-        .forEach((i) => {
-      if (i.symbol.includes(fromToken.symbol)) {
-        console.log("fromToken.symbol",fromToken.symbol)
-        dispatch(
-          setPoolFromToken({
-            symbol: i.symbol,
-            balance: i.balance,
-          }),
-        );
-      } else if (i.symbol.includes(toToken.symbol)) {
-        console.log("toToken.symbol",toToken.symbol)
+      .filter((it) => !it.symbol.includes('DS'))
+      .forEach((i) => {
+        if (i.symbol.includes(fromToken.symbol)) {
+          console.log('fromToken.symbol', fromToken.symbol);
+          dispatch(
+            setPoolFromToken({
+              symbol: i.symbol,
+              balance: i.balance,
+            }),
+          );
+        } else if (i.symbol.includes(toToken.symbol)) {
+          console.log('toToken.symbol', toToken.symbol);
 
-        dispatch(
-          setPoolToToken({
-            symbol: i.symbol,
-            balance: i.balance,
-          }),
-        );
-      }
-    });
+          dispatch(
+            setPoolToToken({
+              symbol: i.symbol,
+              balance: i.balance,
+            }),
+          );
+        }
+      });
 
     dispatch(setPoolPairId(pairId));
     history.push('/add-liquidity');
