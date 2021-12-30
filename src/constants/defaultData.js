@@ -1,6 +1,6 @@
-import wETH from '../images/tokens/wETH.svg';
 import TON from '../images/tokens/TONold.svg';
 import wBTC from '../images/tokens/wBTC.svg';
+import wETH from '../images/tokens/wETH.svg';
 
 export const marks = [
   {

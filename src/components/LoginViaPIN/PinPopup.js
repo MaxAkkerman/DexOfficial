@@ -15,8 +15,11 @@ import Steppers from './Steppers';
 
 function PinPopup(props) {
   const appTheme = useSelector((state) => state.appReducer.appTheme);
-
-  const { complete, handleBackspace, handleChange, value } = usePinInput();
+  function handleNextClick() {
+    props.handleClickNext(valueArr, props.nextStep, complete);
+  }
+  const { complete, handleBackspace, handleChange, value } =
+    usePinInput(handleNextClick);
 
   // Intermediate variable to match api of previous code
   const valueArr = useMemo(
@@ -34,10 +37,6 @@ function PinPopup(props) {
   useEffect(() => {
     props.handleCheckPin(valueArr, props.nextStep, complete);
   }, [value]);
-
-  function handleNextClick() {
-    props.handleClickNext(valueArr, props.nextStep, complete);
-  }
 
   return (
     <div
@@ -136,7 +135,7 @@ function PinPopup(props) {
   );
 }
 
-function usePinInput({ length = 4 } = {}) {
+function usePinInput(handleNextClick, { length = 4 } = {}) {
   const [value, setValue] = useState(' '.repeat(length));
 
   const cursor = useMemo(() => value.trim().length, [value]);
@@ -159,7 +158,7 @@ function usePinInput({ length = 4 } = {}) {
 
     setValue(str);
   }
-
+  useKey('Enter', handleNextClick, {}, [value]);
   useKey('Backspace', handleBackspace, {}, [value]);
   useKey('Delete', handleBackspace, {}, [value]);
   useKey(

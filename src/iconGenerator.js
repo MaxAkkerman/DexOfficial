@@ -12,6 +12,8 @@ import USDT from './images/tokens/wUSDT.svg';
 export function iconGenerator(icon) {
   if (icon.includes('TON')) {
     return TON;
+  } else if (icon.includes('EVER')) {
+    return TON;
   } else if (icon.includes('BTC')) {
     return fBTC;
   } else if (icon.includes('ETH')) {

@@ -73,9 +73,11 @@ input:focus {
     #3569f0 0%,
     rgba(69, 88, 255, 0.8) 57.82%
   );
+  --earned-bg: #E9E9EA;
 }
 
 html[data-theme='dark'] {
+  --earned-bg: #E9E9EA;
   --text-color: #ffffff;
   --arrow-back: invert(1);
   --invert: invert(0);
