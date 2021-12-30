@@ -14,9 +14,7 @@ function Pool() {
   const walletIsConnected = useSelector(
     (state) => state.appReducer.walletIsConnected,
   );
-  const liquidityList = useSelector(
-    (state) => state.tonData.tokens,
-  );
+  const liquidityList = useSelector((state) => state.tonData.tokens);
   function handleClickCreatePair() {
     history.push('/create-pair');
   }
@@ -51,13 +49,15 @@ function Pool() {
             <div className="pool-wrapper">
               {!liquidityList.length
                 ? 'You don’t have liquidity pairs yet'
-                : liquidityList.filter(it=>it.symbol.includes("DS")).map((i) => (
-                    <LiquidityItem
-                      symbol={i.symbol}
-                      balance={i.balance}
-                      key={i.walletAddress}
-                    />
-                  ))}
+                : liquidityList
+                    .filter((it) => it.symbol.includes('DS'))
+                    .map((i) => (
+                      <LiquidityItem
+                        symbol={i.symbol}
+                        balance={i.balance}
+                        key={i.walletAddress}
+                      />
+                    ))}
             </div>
           )
         }

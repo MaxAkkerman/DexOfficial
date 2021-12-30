@@ -93,6 +93,17 @@ export default function Header() {
             >
               Staking
             </NavLink>
+            <NavLink
+              id="nav-farming"
+              to="/farming"
+              className={
+                linkIsActive('/farming')
+                  ? 'header-link header-link--active'
+                  : 'header-link'
+            }
+          >
+            Farming
+          </NavLink>
           </div>
         </div>
         <div className="header-wrap">

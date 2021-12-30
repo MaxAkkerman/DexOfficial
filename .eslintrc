@@ -1,7 +1,7 @@
 {
 	"parser": "@babel/eslint-parser",
 	"extends": ["eslint:recommended", "plugin:react/recommended", "prettier"],
-	"plugins": ["simple-import-sort", "sort-destructure-keys"],
+	"plugins": ["simple-import-sort", "sort-destructure-keys", "prettier"],
 	"env": {
 		"browser": true,
 		"node": true,
@@ -12,9 +12,11 @@
 		"BigInt": true
 	},
 	"rules": {
+		"prettier/prettier": "error",
 		"simple-import-sort/imports": "error",
 		"simple-import-sort/exports": "error",
 		"sort-keys": "error",
-		"sort-destructure-keys/sort-destructure-keys": "error"
+		"sort-destructure-keys/sort-destructure-keys": "error",
+		"react/prop-types": "off"
 	}
 }

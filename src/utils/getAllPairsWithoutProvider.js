@@ -4,8 +4,8 @@ import { NO_CONTEXT } from '@/constants/runtimeErrors';
 import { DEXPairContract } from '@/extensions/contracts/DEXPair';
 import { DEXRootContract } from '@/extensions/contracts/DEXRoot';
 import { RootTokenContract } from '@/extensions/contracts/RootTokenContract';
+import { getReplacedSymbol } from '@/extensions/sdk_get/get';
 import { getFixedNums, hex2a } from '@/reactUtils/reactUtils';
-import {getReplacedSymbol} from "@/extensions/sdk_get/get";
 
 /**
  * @returns {Promise<{
@@ -91,19 +91,21 @@ export default async function getAllPairsWithoutProvider() {
     itemData.pairAddress = addrPair;
     // itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
     // itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol);
-    itemData.symbolA =
-        getReplacedSymbol(hex2a(curRootDataA.decoded.output.value0.symbol))
-      // hex2a(curRootDataA.decoded.output.value0.symbol) === 'WTON'
-      //   ? 'EVER'
-      //   : hex2a(curRootDataA.decoded.output.value0.symbol);
+    itemData.symbolA = getReplacedSymbol(
+      hex2a(curRootDataA.decoded.output.value0.symbol),
+    );
+    // hex2a(curRootDataA.decoded.output.value0.symbol) === 'WTON'
+    //   ? 'EVER'
+    //   : hex2a(curRootDataA.decoded.output.value0.symbol);
 
     itemData.reserveA = balanceA;
     itemData.decimalsA = decimalsRootA;
-    itemData.symbolB =
-        getReplacedSymbol(hex2a(curRootDataB.decoded.output.value0.symbol))
-      // hex2a(curRootDataB.decoded.output.value0.symbol) === 'WTON'
-      //   ? 'EVER'
-      //   : hex2a(curRootDataB.decoded.output.value0.symbol);
+    itemData.symbolB = getReplacedSymbol(
+      hex2a(curRootDataB.decoded.output.value0.symbol),
+    );
+    // hex2a(curRootDataB.decoded.output.value0.symbol) === 'WTON'
+    //   ? 'EVER'
+    //   : hex2a(curRootDataB.decoded.output.value0.symbol);
 
     // itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol);
     itemData.reserveB = balanceB;

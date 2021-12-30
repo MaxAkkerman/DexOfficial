@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+
 import TONicon from '../images/tokens/TON.png';
 
 export default function useAssetList() {

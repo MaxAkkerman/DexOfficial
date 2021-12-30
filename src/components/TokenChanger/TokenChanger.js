@@ -1,10 +1,11 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import SetTokenBlock from '../AmountBlock/SetTokenBlock';
-import SelectTokenMenu from '../AmountBlock/SelectTokenMenu';
-import { setTokenForReceiveSetted } from '../../store/actions/walletSeed';
-import TON from '../../images/tokens/TONold.svg';
 import { useHistory } from 'react-router-dom';
+
+import TON from '../../images/tokens/TONold.svg';
+import { setTokenForReceiveSetted } from '../../store/actions/walletSeed';
+import SelectTokenMenu from '../AmountBlock/SelectTokenMenu';
+import SetTokenBlock from '../AmountBlock/SetTokenBlock';
 
 function TokenChanger(props) {
   const history = useHistory();
