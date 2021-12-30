@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 
 import appReducer from './app';
+import chromePopup from './chromePopup';
 import clientWallets from './clientWallets';
 import enterSeedPhrase from './enterSeedPhrase';
 import limitOrderReducer from './limitOrder';
@@ -17,6 +18,7 @@ import walletSeedReducer from './walletSeed';
 
 export default combineReducers({
   appReducer,
+  chromePopup,
   clientWallets,
   enterSeedPhrase,
   limitOrderReducer,

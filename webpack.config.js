@@ -43,6 +43,10 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
       },
       {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      },
+      {
         exclude: /\.inline\.svg$/,
         test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
         type: 'asset/resource',
@@ -90,3 +94,18 @@ module.exports = {
     },
   },
 };
+
+/**
+ * 1. Add step to connect wallet
+ * 2. Change theme step
+ */
+
+/**
+ * APPLY_ORDER - 5
+ * PART_APPLY_ORDER -
+ * TAKE_ORDER -
+ * PART_TAKE_ORDER
+ * --
+ * CHANGE_ORDER
+ * GIFT_ORDER
+ */

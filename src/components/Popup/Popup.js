@@ -88,29 +88,6 @@ function Popup(props) {
                 </a>
               </>
             )}
-            {props.type === 'chrome' && (
-              <>
-                <img width={86} height={86} src={chrome} alt="Chrome logo" />
-                <p className="popup-title">
-                  Please use the desktop version of Google Chrome for{' '}
-                  <a className="popup-link">trade.defispace.com</a>
-                </p>
-                <button
-                  className="btn popup-btn"
-                  onClick={() => dispatch(hidePopup())}
-                >
-                  Okay, i understand
-                </button>
-                <a
-                  target="_blank"
-                  href={`https://www.google.com/intl/en_us/chrome/`}
-                  className="popup-link"
-                  rel="noreferrer"
-                >
-                  Download Google Chrome
-                </a>
-              </>
-            )}
             {props.type === 'error' && (
               <>
                 <svg
