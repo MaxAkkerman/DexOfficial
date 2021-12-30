@@ -190,7 +190,7 @@ export async function getBridgeAssetsForAddress(chain, walletAddr) {
       const vault = new ethers.Contract(vaultAddr, vaultAbi, provider2);
       const tokenAddr = await vault.token();
       itemConfig.evmtoken = tokenAddr;
-      const response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=bsc&token_addresses=${tokenAddr}`, {
+      response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=bsc&token_addresses=${tokenAddr}`, {
               headers: {
                   'accept': 'application/json',
                   'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
@@ -241,7 +241,7 @@ export async function getBridgeAssetsForAddress(chain, walletAddr) {
       const vault = new ethers.Contract(vaultAddr, vaultAbi, provider3);
       const tokenAddr = await vault.token();
       itemConfig.evmtoken = tokenAddr;
-      const response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=polygon&token_addresses=${tokenAddr}`, {
+      response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=polygon&token_addresses=${tokenAddr}`, {
               headers: {
                   'accept': 'application/json',
                   'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
@@ -292,7 +292,7 @@ export async function getBridgeAssetsForAddress(chain, walletAddr) {
       const vault = new ethers.Contract(vaultAddr, vaultAbi, provider4);
       const tokenAddr = await vault.token();
       itemConfig.evmtoken = tokenAddr;
-      const response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=fantom&token_addresses=${tokenAddr}`, {
+      response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=fantom&token_addresses=${tokenAddr}`, {
               headers: {
                   'accept': 'application/json',
                   'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
