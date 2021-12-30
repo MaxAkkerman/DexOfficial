@@ -18,6 +18,7 @@ export default async function makeLimitOrder({
   if (
     !this ||
     !this.context ||
+    !this.context.tonClient ||
     !this.context.dexClientAddress ||
     !this.helperFunctions ||
     !this.helperFunctions.getPair ||

@@ -1,17 +1,14 @@
 import cls from 'classnames';
 import { useSnackbar } from 'notistack';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import IconCross from '@/components-v2/IconCross';
 import MainBlock from '@/components-v2/MainBlock';
-import { DEPLOY_LIMIT_ORDER } from '@/constants/commissions';
-import { AB_DIRECTION, BA_DIRECTION } from '@/constants/runtimeVariables';
+import { CANCEL_LIMIT_ORDER } from '@/constants/commissions';
 import { iconGenerator } from '@/iconGenerator';
-import {
-  closeLimitOrderDeployPopup,
-  resetLimitOrderPopupValues,
-} from '@/store/actions/limitOrder';
+import { closeLimitOrderCancelPopup } from '@/store/actions/limitOrder';
+import { resetLimitOrderPopupValues } from '@/store/actions/limitOrder';
 import {
   resetWaitingPopupValues,
   setWaitingPopupValues,
@@ -20,36 +17,33 @@ import truncateNum from '@/utils/truncateNum';
 
 import classes from './index.module.scss';
 
-export default function LimitOrderConfirmPopup() {
+export default function LimitOrderCancelPopup() {
   const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
 
   const appTheme = useSelector((state) => state.appReducer.appTheme);
   const values = useSelector((state) => state.limitOrderReducer.values);
   const visible = useSelector(
-    (state) => state.limitOrderReducer.deployPopupVisible,
+    (state) => state.limitOrderReducer.cancelPopupVisible,
   );
-  const makeLimitOrder = useSelector(
-    (state) => state.tonContext.functions.makeLimitOrder,
+  const cancelLimitOrder = useSelector(
+    (state) => state.tonContext.functions.cancelLimitOrder,
   );
 
-  const directionPair = useMemo(() => {
-    if (!values) return;
+  if (!values || !visible) return null;
 
-    const { fromToken, pair } = values;
-    if (fromToken && pair)
-      return fromToken.rootAddress === pair.rootA ? AB_DIRECTION : BA_DIRECTION;
-  }, [values]);
-
-  const { enqueueSnackbar } = useSnackbar();
+  async function handleClose() {
+    dispatch(closeLimitOrderCancelPopup());
+  }
 
   async function handleConfirm() {
-    const { fromToken, fromValue, pair, toPrice, toToken, toValue } = values;
+    const { addrOrder, fromToken, fromValue, toToken, toValue } = values;
 
-    dispatch(closeLimitOrderDeployPopup());
+    dispatch(closeLimitOrderCancelPopup());
     dispatch(
       setWaitingPopupValues({
         hidable: true,
-        text: `Creating limit order ${truncateNum(fromValue)} ${
+        text: `Cancelling limit order ${truncateNum(fromValue)} ${
           fromToken.symbol
         } for ${truncateNum(toValue)} ${toToken.symbol}`,
         title: 'Sending message to blockchain',
@@ -57,41 +51,29 @@ export default function LimitOrderConfirmPopup() {
     );
 
     try {
-      const res = await makeLimitOrder({
-        directionPair,
-        pairAddr: pair.pairAddress,
-        price: toPrice,
-        qty: fromValue,
-      });
+      const { cancelOrderStatus } = await cancelLimitOrder(addrOrder);
 
-      if (res.makeLimitOrderStatus)
+      if (cancelOrderStatus)
         enqueueSnackbar({
-          message: 'Sent message to blockchain',
+          message: `Canceling limit order ${fromToken.symbol} - ${toToken.symbol} ⏳`,
           type: 'info',
         });
       else
         enqueueSnackbar({
-          message: `Something goes wrong - error code ${res.code}`,
+          message: `Failed to cancel limit order ${fromToken.symbol} - ${toToken.symbol}`,
           type: 'error',
         });
     } catch (e) {
-      console.log('makeLimitOrder->error', e);
       enqueueSnackbar({
-        message: 'Oops, something went wrong. Please try again.',
+        message: `Something went wrong, error code - ${e.code}`,
         type: 'error',
       });
     }
 
     dispatch(resetWaitingPopupValues());
     dispatch(resetLimitOrderPopupValues());
-    dispatch(closeLimitOrderDeployPopup());
+    dispatch(closeLimitOrderCancelPopup());
   }
-
-  function handleClose() {
-    dispatch(resetLimitOrderPopupValues());
-  }
-
-  if (!visible || !values) return null;
 
   const { fromToken, fromValue, toPrice, toToken, toValue } = values;
 
@@ -106,10 +88,12 @@ export default function LimitOrderConfirmPopup() {
             />
           </button>
         }
-        title="Confirm Limit Order"
+        title="Cancel limit order"
         content={
           <>
-            <div className="confirm-block swap-confirm-block">
+            <div
+              className={cls('confirm-block', classes['swap-confirm-block'])}
+            >
               <span className="confirm-token">
                 <img
                   className="confirm-icon"
@@ -183,8 +167,11 @@ export default function LimitOrderConfirmPopup() {
                 {truncateNum(toValue)}
               </span>
             </div>
-            <button className="btn popup-btn" onClick={handleConfirm}>
-              Deploy
+            <button
+              className="btn popup-btn btn-error unlock"
+              onClick={handleConfirm}
+            >
+              Cancel
             </button>
           </>
         }
@@ -199,7 +186,7 @@ export default function LimitOrderConfirmPopup() {
               </div>
               <div className="swap-confirm-wrap">
                 <p className="mainblock-footer-value">
-                  {DEPLOY_LIMIT_ORDER} EVER
+                  {CANCEL_LIMIT_ORDER} EVER
                 </p>
                 <p className="mainblock-footer-subtitle">Fee</p>
               </div>

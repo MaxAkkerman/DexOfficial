@@ -6,6 +6,7 @@ import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
 import { useMount } from 'react-use';
 
 import ChromePopup from '@/components-v2/ChromePopup';
+import LimitOrderCancelPopup from '@/components-v2/LimitOrderCancelPopup';
 import LimitOrderConfirmPopup from '@/components-v2/LimitOrderConfirmPopup';
 import LimitOrderPage from '@/components-v2/LimitOrderPage';
 import SwapConfirmPopup from '@/components-v2/SwapConfirmPopup';
@@ -414,6 +415,7 @@ function App() {
       {revealSeedPhraseIsVisible ? <RevealSeedPhrase /> : null}
       <SwapConfirmPopup />
       <LimitOrderConfirmPopup />
+      <LimitOrderCancelPopup />
       <WaitingPopup />
       <ChromePopup />
       <TutorialSteps />

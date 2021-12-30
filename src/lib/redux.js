@@ -8,6 +8,7 @@ import Radiance from '@/extensions/Radiance.json';
 import { initTonContext, updateTonContext } from '@/store/actions/ton';
 import rootReducer from '@/store/reducers';
 import rootSaga from '@/store/sagas';
+import cancelLimitOrder from '@/utils/cancelLimitOrder';
 import checkClientPairExists from '@/utils/checkClientPairExists';
 import checkWalletExists from '@/utils/checkWalletExists';
 import getAllClientWallets from '@/utils/getAllClientWallets';
@@ -45,6 +46,7 @@ export const reduxStore = createStore(
         }),
       },
       functions: {
+        cancelLimitOrder,
         getAllClientWallets,
         getAllPairsWithoutProvider,
         makeLimitOrder,
