@@ -1,5 +1,6 @@
 import { TonClient } from '@tonclient/core';
 import { libWeb } from '@tonclient/lib-web';
+import isEmpty from 'lodash/isEmpty';
 import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import createSagaMiddleware from 'redux-saga';
@@ -64,6 +65,15 @@ export const reduxStore = createStore(
         getShardLimit,
         getTokenRouterAddress,
       },
+    },
+    tutorialReducer: {
+      finished:
+        localStorage.getItem('tutorialFinished') === null
+          ? isEmpty(JSON.parse(localStorage.getItem('clientData'))) &&
+            isEmpty(JSON.parse(localStorage.getItem('esp')))
+            ? false
+            : true
+          : localStorage.getItem('tutorialFinished'),
     },
   },
   composeWithDevTools(applyMiddleware(sagaMiddleware)),

@@ -23,7 +23,7 @@ export default function ChromePopup() {
     <div className="popup-wrapper">
       <MainBlock
         smallTitle={true}
-        button={<CloseBtn func={handleClose} />}
+        button={<CloseBtn onClick={handleClose} />}
         content={
           <div className="popup-content">
             <>

@@ -1,16 +1,16 @@
 import { Steps } from 'intro.js-react';
-import isEmpty from 'lodash/isEmpty';
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 
-import { steps } from '@/constants/defaultData';
+import { steps as stepsData } from '@/constants/defaultData';
+import { finishTutorial } from '@/store/actions/tutorial';
 
 export default function TutorialSteps() {
   const visible = useSelector((state) => state.chromePopup.visible);
-
-  const { enabled, handleNextStep, handleOnExit, initialStep } = useTutorial();
+  const { enabled, handleNextStep, handleOnExit, initialStep, steps } =
+    useTutorial();
 
   if (visible) return null;
 
@@ -27,16 +27,26 @@ export default function TutorialSteps() {
 
 function useTutorial() {
   const history = useHistory();
+  const dispatch = useDispatch();
 
-  const [client] = useLocalStorage('clientData', {});
-  const [esp] = useLocalStorage('esp', '');
-  const [tutored, setTutored] = useLocalStorage(
-    'tutorialFinished',
-    isEmpty(client) && isEmpty(esp) ? false : true,
-  );
+  const finished = useSelector((state) => state.tutorialReducer.finished);
+  const clientData = useSelector((state) => state.walletReducer.clientData);
+  const [, setStorage] = useLocalStorage('tutorialFinished');
 
-  const [enabled, setEnabled] = useState(!tutored);
+  const [enabled, setEnabled] = useState(!finished);
   const [initialStep, setInitialStep] = useState(0);
+  const [steps, setSteps] = useState(stepsData);
+
+  useEffect(() => {
+    if (!finished) {
+      setEnabled(true);
+      setStorage(false);
+    }
+  }, [finished]);
+
+  useEffect(() => {
+    if (clientData && clientData.status) setSteps(stepsData.slice(0, -3));
+  }, [clientData]);
 
   function handleNextStep(nextIdx) {
     if (nextIdx === 7) {
@@ -49,7 +59,8 @@ function useTutorial() {
 
   function handleOnExit() {
     setEnabled(false);
-    setTutored(true);
+    setStorage(true);
+    dispatch(finishTutorial());
   }
 
   return {
@@ -57,5 +68,6 @@ function useTutorial() {
     handleNextStep,
     handleOnExit,
     initialStep,
+    steps,
   };
 }

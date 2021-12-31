@@ -4,7 +4,7 @@ const initialState = {
   visible: false,
 };
 
-export default function waitingPopup(state = initialState, { type }) {
+export default function chromePopup(state = initialState, { type }) {
   switch (type) {
     case SHOW_CHROME_POPUP:
       return {
