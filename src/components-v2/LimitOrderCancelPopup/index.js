@@ -178,7 +178,7 @@ export default function LimitOrderCancelPopup() {
         footer={
           <div className="mainblock-footer">
             <div className="mainblock-footer-wrap">
-              <div className="swap-confirm-wrap">
+              <div className={classes['swap-confirm-wrap']}>
                 <p className="mainblock-footer-value">
                   {toPrice} {toToken.symbol}
                 </p>
