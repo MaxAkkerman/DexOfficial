@@ -15,6 +15,7 @@ const initialState = {
     tonClient: null,
   },
   functions: {
+    cancelLimitOrder() {},
     getAllClientWallets() {},
     getAllPairsWithoutProvider() {},
     makeLimitOrder() {},

@@ -1,5 +1,6 @@
 import { TonClient } from '@tonclient/core';
 import { libWeb } from '@tonclient/lib-web';
+import isEmpty from 'lodash/isEmpty';
 import { applyMiddleware, createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import createSagaMiddleware from 'redux-saga';
@@ -8,6 +9,7 @@ import Radiance from '@/extensions/Radiance.json';
 import { initTonContext, updateTonContext } from '@/store/actions/ton';
 import rootReducer from '@/store/reducers';
 import rootSaga from '@/store/sagas';
+import cancelLimitOrder from '@/utils/cancelLimitOrder';
 import checkClientPairExists from '@/utils/checkClientPairExists';
 import checkWalletExists from '@/utils/checkWalletExists';
 import getAllClientWallets from '@/utils/getAllClientWallets';
@@ -45,6 +47,7 @@ export const reduxStore = createStore(
         }),
       },
       functions: {
+        cancelLimitOrder,
         getAllClientWallets,
         getAllPairsWithoutProvider,
         makeLimitOrder,
@@ -62,6 +65,15 @@ export const reduxStore = createStore(
         getShardLimit,
         getTokenRouterAddress,
       },
+    },
+    tutorialReducer: {
+      finished:
+        localStorage.getItem('tutorialFinished') === null
+          ? isEmpty(JSON.parse(localStorage.getItem('clientData'))) &&
+            isEmpty(JSON.parse(localStorage.getItem('esp')))
+            ? false
+            : true
+          : localStorage.getItem('tutorialFinished'),
     },
   },
   composeWithDevTools(applyMiddleware(sagaMiddleware)),

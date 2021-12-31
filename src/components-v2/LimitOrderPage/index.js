@@ -14,7 +14,10 @@ import SmallInput from '@/components-v2/SmallInput';
 import SwapButton from '@/components-v2/SwapButton';
 import { AB_DIRECTION, BA_DIRECTION } from '@/constants/runtimeVariables';
 import useSelectPopup from '@/hooks/useSelectPopup';
-import { setLimitOrderPopupValues } from '@/store/actions/limitOrder';
+import {
+  openLimitOrderDeployPopup,
+  setLimitOrderPopupValues,
+} from '@/store/actions/limitOrder';
 import truncateNum from '@/utils/truncateNum';
 
 import classes from './index.module.scss';
@@ -99,6 +102,7 @@ export default function LimitOrderPage() {
 
   function handleCreateLimitOrder() {
     dispatch(setLimitOrderPopupValues(values));
+    dispatch(openLimitOrderDeployPopup());
   }
 
   function handleConnectPair() {

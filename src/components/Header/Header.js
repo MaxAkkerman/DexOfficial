@@ -1,8 +1,12 @@
 import './Header.scss';
 
+import QuizIcon from '@mui/icons-material/Quiz';
+import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, useHistory, useLocation } from 'react-router-dom';
+
+import { resetTutorial } from '@/store/actions/tutorial';
 
 import { changeTheme } from '../../store/actions/app';
 import HeaderMore from '../HeaderMore/HeaderMore';
@@ -25,6 +29,10 @@ export default function Header() {
 
   function handlePushToLogin() {
     history.push('/account');
+  }
+
+  function handleTutorialClick() {
+    dispatch(resetTutorial());
   }
 
   return (
@@ -100,10 +108,10 @@ export default function Header() {
                 linkIsActive('/farming')
                   ? 'header-link header-link--active'
                   : 'header-link'
-            }
-          >
-            Farming
-          </NavLink>
+              }
+            >
+              Farming
+            </NavLink>
           </div>
         </div>
         <div className="header-wrap">
@@ -119,11 +127,14 @@ export default function Header() {
               Connect wallet
             </button>
           )}
-
-          {/*<Wallet />*/}
-          {/*<WalletButton />*/}
-          {/*<PoolExplorerButton />*/}
-
+          <Tooltip title="Launch tutorial">
+            <button
+              onClick={handleTutorialClick}
+              className="btn action-btn header-btn first"
+            >
+              <QuizIcon />
+            </button>
+          </Tooltip>
           <button
             className="btn action-btn header-btn"
             onClick={() =>
