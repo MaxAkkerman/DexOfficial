@@ -1,83 +1,131 @@
+import { FormHelperText } from '@mui/material';
 import cls from 'classnames';
+import { useFormik } from 'formik';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import IconCross from '@/components-v2/IconCross';
 import MainBlock from '@/components-v2/MainBlock';
-import { CANCEL_LIMIT_ORDER } from '@/constants/commissions';
+import { UPDATE_LIMIT_ORDER } from '@/constants/commissions';
+import {
+  ADDRESS_INCORRECT_LENGTH,
+  NOT_POSITIVE,
+  NOT_TOUCHED,
+} from '@/constants/validationMessages';
 import { iconGenerator } from '@/iconGenerator';
 import {
-  closeLimitOrderCancelPopup,
+  closeLimitOrderUpdatePopup,
   resetLimitOrderPopupValues,
 } from '@/store/actions/limitOrder';
 import {
   resetWaitingPopupValues,
   setWaitingPopupValues,
 } from '@/store/actions/waitingPopup';
+import transferLimitOrder from '@/utils/transferLimitOrder';
 import truncateNum from '@/utils/truncateNum';
+import updateLimitOrderPrice from '@/utils/updateLimitOrderPrice';
 
 import classes from './index.module.scss';
 
-export default function LimitOrderCancelPopup() {
+export default function LimitOrderUpdatePopup() {
   const dispatch = useDispatch();
-  const { enqueueSnackbar } = useSnackbar();
 
   const appTheme = useSelector((state) => state.appReducer.appTheme);
-  const values = useSelector((state) => state.limitOrderReducer.values);
+  const initialValues = useSelector((state) => state.limitOrderReducer.values);
   const visible = useSelector(
-    (state) => state.limitOrderReducer.cancelPopupVisible,
+    (state) => state.limitOrderReducer.updatePopupVisible,
   );
-  const cancelLimitOrder = useSelector(
-    (state) => state.tonContext.functions.cancelLimitOrder,
-  );
+  const clientData = useSelector((state) => state.walletReducer.clientData);
 
-  if (!values || !visible) return null;
+  const {
+    dirty,
+    errors,
+    handleBlur,
+    handleChange,
+    isValid: valid,
+    values,
+  } = useFormik({
+    initialValues: {
+      newAddress: clientData.address,
+      newPrice: initialValues ? initialValues.toPrice : 0,
+    },
+    validate,
+  });
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  async function validate({ newAddress, newPrice }) {
+    const errors = {};
+
+    if (newPrice <= 0) errors.newPrice = NOT_POSITIVE;
+    else if (newAddress.length !== 66)
+      errors.newAddress = ADDRESS_INCORRECT_LENGTH;
+
+    return errors;
+  }
 
   async function handleClose() {
-    dispatch(closeLimitOrderCancelPopup());
+    dispatch(closeLimitOrderUpdatePopup());
   }
 
   async function handleConfirm() {
-    const { addrOrder, fromToken, fromValue, toToken, toValue } = values;
+    const { addrOrder, fromToken, toPrice, toToken } = values;
 
-    dispatch(closeLimitOrderCancelPopup());
+    dispatch(closeLimitOrderUpdatePopup());
     dispatch(
       setWaitingPopupValues({
         hidable: true,
-        text: `Cancelling limit order ${truncateNum(fromValue)} ${
+        text: `Updating limit order ${truncateNum(fromValue)} ${
           fromToken.symbol
         } for ${truncateNum(toValue)} ${toToken.symbol}`,
         title: 'Sending message to blockchain',
       }),
     );
 
-    try {
-      const { cancelOrderStatus } = await cancelLimitOrder(addrOrder);
+    const processes = [];
 
-      if (cancelOrderStatus)
-        enqueueSnackbar({
-          message: `Canceling limit order ${fromToken.symbol} - ${toToken.symbol} ⏳`,
-          type: 'info',
-        });
-      else
-        enqueueSnackbar({
-          message: `Failed to cancel limit order ${fromToken.symbol} - ${toToken.symbol}`,
-          type: 'error',
-        });
-    } catch (e) {
+    if (values.newPrice !== toPrice) {
+      const changePriceProcess = updateLimitOrderPrice({
+        addrOrder: addrOrder,
+        newPrice: values.newPrice,
+      }).then((r) => r.changePriceStatus);
+
+      processes.push(changePriceProcess);
+    }
+
+    if (values.newAddress !== clientData.address) {
+      const transferProcess = transferLimitOrder({
+        addrOrder,
+        fromRootAddr: fromToken.addrRoot,
+        newOwnerAddress: values.newAddress,
+        toRootAddr: toToken.addrRoot,
+      }).then((r) => r.transferLimitOrderStatus);
+
+      processes.push(transferProcess);
+    }
+
+    const result = await Promise.all(processes);
+
+    if (result.every((s) => s))
       enqueueSnackbar({
-        message: `Something went wrong, error code - ${e.code}`,
+        message: `Updating limit order ${fromToken.symbol} - ${toToken.symbol} ⏳`,
+        type: 'info',
+      });
+    else
+      enqueueSnackbar({
+        message: `Failed to update limit order ${fromToken.symbol} - ${toToken.symbol}`,
         type: 'error',
       });
-    }
 
     dispatch(resetWaitingPopupValues());
     dispatch(resetLimitOrderPopupValues());
-    dispatch(closeLimitOrderCancelPopup());
+    dispatch(closeLimitOrderUpdatePopup());
   }
 
-  const { fromToken, fromValue, toPrice, toToken, toValue } = values;
+  if (!visible || !initialValues) return null;
+
+  const { fromToken, fromValue, toPrice, toToken, toValue } = initialValues;
 
   return (
     <div className="popup-wrapper">
@@ -90,7 +138,7 @@ export default function LimitOrderCancelPopup() {
             />
           </button>
         }
-        title="Cancel limit order"
+        title="Update Limit Order"
         content={
           <>
             <div
@@ -169,12 +217,71 @@ export default function LimitOrderCancelPopup() {
                 {truncateNum(toValue)}
               </span>
             </div>
+            <div
+              className={cls(
+                'recipient_wrapper',
+                errors.newPrice && 'amount_wrapper_error',
+              )}
+              style={{
+                height: 100,
+                marginTop: 25,
+                padding: 15,
+              }}
+            >
+              <div className="send_text_headers">New price</div>
+              <div className="send_inputs">
+                <input
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.newPrice}
+                  name="newPrice"
+                  className="recipient_input"
+                  placeholder="0"
+                  style={{ marginTop: 0 }}
+                  type="number"
+                />
+              </div>
+            </div>
+            {errors.newPrice && (
+              <FormHelperText error>{errors.newPrice}</FormHelperText>
+            )}
+            <div
+              className={cls(
+                'recipient_wrapper',
+                errors.newAddress && 'amount_wrapper_error',
+              )}
+              style={{
+                height: 100,
+                marginTop: 25,
+                padding: 15,
+              }}
+            >
+              <div className="send_text_headers">New owner</div>
+              <div className="send_inputs">
+                <input
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.newAddress}
+                  name="newAddress"
+                  className="recipient_input"
+                  placeholder="0:..."
+                  style={{ marginTop: 0 }}
+                />
+              </div>
+            </div>
+            {errors.newAddress && (
+              <FormHelperText error>{errors.newAddress}</FormHelperText>
+            )}
             <button
-              className="btn popup-btn btn-error unlock"
+              className={cls(
+                'btn popup-btn',
+                (!dirty || !valid) && 'btn--disabled',
+              )}
               onClick={handleConfirm}
             >
-              Cancel
+              Update Order
             </button>
+            {!dirty && <FormHelperText>{NOT_TOUCHED}</FormHelperText>}
           </>
         }
         footer={
@@ -188,7 +295,7 @@ export default function LimitOrderCancelPopup() {
               </div>
               <div className="swap-confirm-wrap">
                 <p className="mainblock-footer-value">
-                  {CANCEL_LIMIT_ORDER} EVER
+                  {UPDATE_LIMIT_ORDER} EVER
                 </p>
                 <p className="mainblock-footer-subtitle">Fee</p>
               </div>

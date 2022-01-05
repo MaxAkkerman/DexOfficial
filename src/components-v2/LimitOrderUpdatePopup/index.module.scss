@@ -1,0 +1,20 @@
+.btn {
+  background: none;
+
+  &__icon {
+    width: 26px;
+    height: 26px;
+
+    & > path {
+      opacity: 0.6;
+    }
+  }
+}
+
+.swap-confirm-block {
+  justify-content: space-between;
+}
+
+.swap-confirm-wrap {
+  margin-top: 20px;
+}

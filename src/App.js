@@ -9,6 +9,7 @@ import ChromePopup from '@/components-v2/ChromePopup';
 import LimitOrderCancelPopup from '@/components-v2/LimitOrderCancelPopup';
 import LimitOrderConfirmPopup from '@/components-v2/LimitOrderConfirmPopup';
 import LimitOrderPage from '@/components-v2/LimitOrderPage';
+import LimitOrderUpdatePopup from '@/components-v2/LimitOrderUpdatePopup';
 import SwapConfirmPopup from '@/components-v2/SwapConfirmPopup';
 import SwapPage from '@/components-v2/SwapPage';
 import TutorialSteps from '@/components-v2/TutorialSteps';
@@ -418,6 +419,7 @@ function App() {
       <SwapConfirmPopup />
       <LimitOrderConfirmPopup />
       <LimitOrderCancelPopup />
+      <LimitOrderUpdatePopup />
       <WaitingPopup />
       <ChromePopup />
       <TutorialSteps />

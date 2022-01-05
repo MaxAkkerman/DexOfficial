@@ -5,3 +5,4 @@ export const PROVIDE_LIQUIDITY_COMMISSION = 3;
 export const SWAP_COMMISSION = 1.5;
 export const CANCEL_LIMIT_ORDER = 1.5;
 export const DEPLOY_LIMIT_ORDER = 1.5;
+export const UPDATE_LIMIT_ORDER = 1.5;
