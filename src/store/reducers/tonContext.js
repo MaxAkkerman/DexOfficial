@@ -21,6 +21,8 @@ const initialState = {
     makeLimitOrder() {},
     swap() {},
     takeLimitOrder() {},
+    transferLimitOrder() {},
+    updateLimitOrderPrice() {},
   },
   helperFunctions: {
     checkClientPairExists() {},
@@ -29,9 +31,11 @@ const initialState = {
     getClientWallet() {},
     getPair() {},
     getPairsTotalSupply() {},
+    getRootFromWallet() {},
     getRouterAddress() {},
     getShardLimit() {},
     getTokenRouterAddress() {},
+    getWalletFromRoot() {},
   },
 };
 

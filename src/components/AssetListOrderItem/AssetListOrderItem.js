@@ -21,19 +21,16 @@ export default function AssetListOrderItem({ limitOrder }) {
     addrOrder,
     amount,
     directionPair,
-    pair: { aRoot, aSymbol, bRoot, bSymbol },
+    pair: { aSymbol, bSymbol },
     price,
+    walletOwnerFrom,
+    walletOwnerTo,
   } = limitOrder;
 
   const [fromSymbol, toSymbol] = useMemo(() => {
     if (directionPair === AB_DIRECTION_GRAPHQL) return [aSymbol, bSymbol];
     return [bSymbol, aSymbol];
   }, [aSymbol, bSymbol]);
-
-  const [fromRoot, toRoot] = useMemo(() => {
-    if (directionPair === AB_DIRECTION_GRAPHQL) return [aRoot, bRoot];
-    return [bRoot, aRoot];
-  }, [aRoot, bRoot]);
 
   const dispatch = useDispatch();
   const [fold, setFold] = useState(false);
@@ -65,14 +62,14 @@ export default function AssetListOrderItem({ limitOrder }) {
       setLimitOrderPopupValues({
         addrOrder,
         fromToken: {
-          addrRoot: fromRoot,
           symbol: fromSymbol,
+          walletAddress: walletOwnerFrom,
         },
         fromValue: amount,
         toPrice: price,
         toToken: {
-          addrRoot: fromRoot,
           symbol: toSymbol,
+          walletAddress: walletOwnerTo,
         },
         toValue: amount * price,
       }),

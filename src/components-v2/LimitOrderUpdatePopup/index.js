@@ -22,9 +22,7 @@ import {
   resetWaitingPopupValues,
   setWaitingPopupValues,
 } from '@/store/actions/waitingPopup';
-import transferLimitOrder from '@/utils/transferLimitOrder';
 import truncateNum from '@/utils/truncateNum';
-import updateLimitOrderPrice from '@/utils/updateLimitOrderPrice';
 
 import classes from './index.module.scss';
 
@@ -37,6 +35,12 @@ export default function LimitOrderUpdatePopup() {
     (state) => state.limitOrderReducer.updatePopupVisible,
   );
   const clientData = useSelector((state) => state.walletReducer.clientData);
+  const updateLimitOrderPrice = useSelector(
+    (state) => state.tonContext.functions.updateLimitOrderPrice,
+  );
+  const transferLimitOrder = useSelector(
+    (state) => state.tonContext.functions.transferLimitOrder,
+  );
 
   const {
     dirty,
@@ -97,9 +101,9 @@ export default function LimitOrderUpdatePopup() {
     if (values.newAddress !== clientData.address) {
       const transferProcess = transferLimitOrder({
         addrOrder,
-        fromRootAddr: fromToken.addrRoot,
         newOwnerAddress: values.newAddress,
-        toRootAddr: toToken.addrRoot,
+        walletOwnerFrom: fromToken.walletAddress,
+        walletOwnerTo: toToken.walletAddress,
       }).then((r) => r.transferLimitOrderStatus);
 
       processes.push(transferProcess);
