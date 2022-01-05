@@ -1,3 +1,5 @@
+@import "../../Mixins";
+
 .header {
   display: flex;
   align-items: center;
@@ -60,7 +62,7 @@
         flex-direction: column;
       }
       .first {
-        margin-left: 0;
+
       }
     }
 

@@ -2,8 +2,8 @@ import './PoolExplorerItem.scss';
 
 import React from 'react';
 
-import { iconGenerator } from '../../iconGenerator';
-import { getDecimals } from '../../reactUtils/reactUtils';
+import { iconGenerator } from '../../../iconGenerator';
+import { getDecimals } from '../../../reactUtils/reactUtils';
 
 function PoolExplorerItem(props) {
   console.log('thisprops', props);

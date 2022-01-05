@@ -3,7 +3,8 @@ import './LoginViaPin.scss';
 
 import { Box, Grid } from '@material-ui/core';
 import React, { memo, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 import arrowBack from '../../images/arrowBack.png';
@@ -17,9 +18,14 @@ import Steppers from './Steppers';
 
 function WelcomePopup(props) {
   const appTheme = useSelector((state) => state.appReducer.appTheme);
-
+  const router = useHistory();
+  const dispatch = useDispatch();
   function href(path) {
     if (path === 'gogle') window.open('https://google.com');
+  }
+
+  function goToRecovery() {
+    router.push('/wallet/settings');
   }
 
   return (
@@ -54,12 +60,12 @@ function WelcomePopup(props) {
                   className="welcomeTextWrapper"
                   style={{ height: '59px', margin: '10px auto auto auto' }}
                 >
-                  You are registered in DefiSpace
+                  You are registered in DeFiSpace
                 </Grid>
               </>
             ) : (
               <>
-                <Grid className="welcomeWrapper">Welcome to DefiSpace!</Grid>
+                <Grid className="welcomeWrapper">Welcome to DeFiSpace!</Grid>
                 <Grid
                   className="welcomeTextWrapper"
                   style={{ margin: '10px auto auto auto' }}
@@ -89,7 +95,7 @@ function WelcomePopup(props) {
               ) : (
                 <Grid className="welcomeTextWrapper" style={{ width: '55' }}>
                   Don't forget to save the seed-phrase from your&nbsp;
-                  <a className="linkedText" onClick={() => href('gogle')}>
+                  <a className="linkedText" onClick={goToRecovery}>
                     account recovery settings
                   </a>
                 </Grid>
