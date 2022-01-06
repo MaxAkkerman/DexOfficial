@@ -15,16 +15,19 @@ import Steppers from './Steppers';
 
 function PinPopup(props) {
   const appTheme = useSelector((state) => state.appReducer.appTheme);
+
   function handleNextClick() {
     props.handleClickNext(valueArr, props.nextStep, complete);
   }
-  const { complete, handleBackspace, handleChange, value } =
-    usePinInput(handleNextClick);
+
+  const { complete, handleBackspace, handleChange, value } = usePinInput({
+    handleEnter: handleNextClick,
+  });
 
   // Intermediate variable to match api of previous code
   const valueArr = useMemo(
     () =>
-      value.split('').map((v, i) => ({
+      value.map((v, i) => ({
         error: false,
         focused: false,
         id: i,
@@ -63,7 +66,7 @@ function PinPopup(props) {
 
             {complete && !props.pinCorrect ? (
               <Grid style={{ color: 'red', textAlign: 'center' }}>
-                PINS don't match!
+                PINS don&apos;t match!
               </Grid>
             ) : (
               <div style={{ height: '23px' }}></div>
@@ -86,7 +89,7 @@ function PinPopup(props) {
                     className="pinInput"
                     id={i}
                     maxLength={1}
-                    value={value[i] === ' ' ? '' : value[i]}
+                    value={value[i]}
                     disabled
                   />
                 );
@@ -135,11 +138,14 @@ function PinPopup(props) {
   );
 }
 
-function usePinInput(handleNextClick, { length = 4 } = {}) {
+function usePinInput({ handleEnter = () => {}, length = 4 } = {}) {
   const [value, setValue] = useState(' '.repeat(length));
 
   const cursor = useMemo(() => value.trim().length, [value]);
   const complete = useMemo(() => value.trim().length === length, [value]);
+  const valueArr = useMemo(() =>
+    value.split('').map((v) => (v === ' ' ? '' : v)),
+  );
 
   function handleChange(v) {
     if (complete || /[^0-9]/.test(v)) return;
@@ -154,11 +160,11 @@ function usePinInput(handleNextClick, { length = 4 } = {}) {
   function handleBackspace() {
     let str = value.trim().slice(0, -1);
     str = str.padEnd(length);
-    console.log({ str });
 
     setValue(str);
   }
-  useKey('Enter', handleNextClick, {}, [value]);
+
+  useKey('Enter', handleEnter, {}, [value]);
   useKey('Backspace', handleBackspace, {}, [value]);
   useKey('Delete', handleBackspace, {}, [value]);
   useKey(
@@ -172,7 +178,7 @@ function usePinInput(handleNextClick, { length = 4 } = {}) {
     complete,
     handleBackspace,
     handleChange,
-    value,
+    value: valueArr,
   };
 }
 
