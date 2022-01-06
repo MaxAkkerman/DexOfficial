@@ -32,7 +32,6 @@ const initialState = {
     getPair() {},
     getPairsTotalSupply() {},
     getRootFromWallet() {},
-    getRouterAddress() {},
     getShardLimit() {},
     getTokenRouterAddress() {},
     getWalletFromRoot() {},

@@ -19,7 +19,6 @@ import getClientWallet from '@/utils/getClientWallet';
 import getPair from '@/utils/getPair';
 import getPairsTotalSupply from '@/utils/getPairsTotalSupply';
 import getRootFromWallet from '@/utils/getRootFromWallet';
-import getRouterAddress from '@/utils/getRouterAddress';
 import getShardLimit from '@/utils/getShardLimit';
 import getTokenRouterAddress from '@/utils/getTokenRouterAddress';
 import getWalletFromRoot from '@/utils/getWalletFromRoot';
@@ -68,7 +67,6 @@ export const reduxStore = createStore(
         getPair,
         getPairsTotalSupply,
         getRootFromWallet,
-        getRouterAddress,
         getShardLimit,
         getTokenRouterAddress,
         getWalletFromRoot,

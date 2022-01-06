@@ -4,6 +4,7 @@ import { NO_CONTEXT } from '@/constants/runtimeErrors';
 import { DEXPairContract } from '@/extensions/contracts/DEXPair';
 
 /**
+ * @param pairAddress - The address of the pair
  * @returns {Promise<number>} totalSupply
  */
 export default async function getPairsTotalSupply(pairAddress) {

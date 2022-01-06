@@ -7,7 +7,7 @@ import { DEXClientContract } from '@/extensions/contracts/DEXClient';
  * Get the wallet address (token) from the DEX client using the root address (token)
  * @param {string} dexClientAddr - The address of the DEX client
  * @param {string} tokenRootAddr - The root address of the token
- * @returns {string} walletAddress - The wallet address (token) that corresponds to the root address (token)
+ * @returns {Promise<string>} walletAddress - The wallet address (token) that corresponds to the root address (token)
  */
 export default async function getWalletFromRoot(dexClientAddr, tokenRootAddr) {
   if (!this || !this.context || !this.context.tonClient)
