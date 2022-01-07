@@ -5,12 +5,12 @@ import { useDispatch } from 'react-redux';
 
 import {
   openLimitOrderCancelPopup,
+  openLimitOrderUpdatePopup,
   setLimitOrderPopupValues,
 } from '@/store/actions/limitOrder';
 
 import { AB_DIRECTION_GRAPHQL } from '../../constants/runtimeVariables';
 import { iconGenerator } from '../../iconGenerator';
-import { openOrderUpdatePopup } from '../../store/actions/limitOrder';
 import truncateNum from '../../utils/truncateNum';
 import IconCross from '../IconCross/IconCross';
 import IconEdit from '../IconEdit/IconEdit';
@@ -21,14 +21,16 @@ export default function AssetListOrderItem({ limitOrder }) {
     addrOrder,
     amount,
     directionPair,
-    pair: { aRoot, aSymbol, bRoot, bSymbol },
+    pair: { aSymbol, bSymbol },
     price,
+    walletOwnerFrom,
+    walletOwnerTo,
   } = limitOrder;
 
   const [fromSymbol, toSymbol] = useMemo(() => {
     if (directionPair === AB_DIRECTION_GRAPHQL) return [aSymbol, bSymbol];
-    else return [bSymbol, aSymbol];
-  }, []);
+    return [bSymbol, aSymbol];
+  }, [aSymbol, bSymbol]);
 
   const dispatch = useDispatch();
   const [fold, setFold] = useState(false);
@@ -55,20 +57,24 @@ export default function AssetListOrderItem({ limitOrder }) {
 
   async function handleUpdate(e) {
     e.stopPropagation();
+
     dispatch(
-      openOrderUpdatePopup({
-        order: {
-          addrOrder,
-          fromSymbol: aSymbol,
-          toSymbol: bSymbol,
-          fromValue: amount,
-          toValue: amount * price,
-          fromRootAddr: aRoot,
-          toRootAddr: bRoot,
-          price,
+      setLimitOrderPopupValues({
+        addrOrder,
+        fromToken: {
+          symbol: fromSymbol,
+          walletAddress: walletOwnerFrom,
         },
+        fromValue: amount,
+        toPrice: price,
+        toToken: {
+          symbol: toSymbol,
+          walletAddress: walletOwnerTo,
+        },
+        toValue: amount * price,
       }),
     );
+    dispatch(openLimitOrderUpdatePopup());
   }
 
   return (

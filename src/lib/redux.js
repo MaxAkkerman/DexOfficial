@@ -18,12 +18,15 @@ import getClientKeys from '@/utils/getClientKeys';
 import getClientWallet from '@/utils/getClientWallet';
 import getPair from '@/utils/getPair';
 import getPairsTotalSupply from '@/utils/getPairsTotalSupply';
-import getRouterAddress from '@/utils/getRouterAddress';
+import getRootFromWallet from '@/utils/getRootFromWallet';
 import getShardLimit from '@/utils/getShardLimit';
 import getTokenRouterAddress from '@/utils/getTokenRouterAddress';
+import getWalletFromRoot from '@/utils/getWalletFromRoot';
 import makeLimitOrder from '@/utils/makeLimitOrder';
 import swap from '@/utils/swap';
 import takeLimitOrder from '@/utils/takeLimitOrder';
+import updateLimitOrderPrice from '@/utils/updateLimitOrderPrice';
+import transferLimitOrder from '@/utils/updateLimitOrderPrice';
 
 TonClient.useBinaryLibrary(libWeb);
 
@@ -53,6 +56,8 @@ export const reduxStore = createStore(
         makeLimitOrder,
         swap,
         takeLimitOrder,
+        transferLimitOrder,
+        updateLimitOrderPrice,
       },
       helperFunctions: {
         checkClientPairExists,
@@ -61,9 +66,10 @@ export const reduxStore = createStore(
         getClientWallet,
         getPair,
         getPairsTotalSupply,
-        getRouterAddress,
+        getRootFromWallet,
         getShardLimit,
         getTokenRouterAddress,
+        getWalletFromRoot,
       },
     },
     tutorialReducer: {

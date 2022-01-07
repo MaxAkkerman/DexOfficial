@@ -7,8 +7,10 @@ import IconCross from '@/components-v2/IconCross';
 import MainBlock from '@/components-v2/MainBlock';
 import { CANCEL_LIMIT_ORDER } from '@/constants/commissions';
 import { iconGenerator } from '@/iconGenerator';
-import { closeLimitOrderCancelPopup } from '@/store/actions/limitOrder';
-import { resetLimitOrderPopupValues } from '@/store/actions/limitOrder';
+import {
+  closeLimitOrderCancelPopup,
+  resetLimitOrderPopupValues,
+} from '@/store/actions/limitOrder';
 import {
   resetWaitingPopupValues,
   setWaitingPopupValues,
@@ -178,7 +180,7 @@ export default function LimitOrderCancelPopup() {
         footer={
           <div className="mainblock-footer">
             <div className="mainblock-footer-wrap">
-              <div className="swap-confirm-wrap">
+              <div className={classes['swap-confirm-wrap']}>
                 <p className="mainblock-footer-value">
                   {toPrice} {toToken.symbol}
                 </p>

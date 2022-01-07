@@ -1,5 +1,3 @@
-import './OrderPopupUpdate.scss';
-
 import { FormHelperText } from '@mui/material';
 import cls from 'classnames';
 import { useFormik } from 'formik';
@@ -7,44 +5,42 @@ import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import IconCross from '@/components-v2/IconCross';
+import MainBlock from '@/components-v2/MainBlock';
+import { UPDATE_LIMIT_ORDER } from '@/constants/commissions';
 import {
   ADDRESS_INCORRECT_LENGTH,
   NOT_POSITIVE,
   NOT_TOUCHED,
-} from '../../constants/validationMessages';
-import useKeyPair from '../../hooks/useKeyPair';
-import { iconGenerator } from '../../iconGenerator';
-import miniSwap from '../../images/icons/mini-swap.png';
+} from '@/constants/validationMessages';
+import { iconGenerator } from '@/iconGenerator';
 import {
-  closeOrderUpdatePopup,
-  closeOrderWaitPopup,
-  openOrderWaitPopup,
-} from '../../store/actions/limitOrder';
-import transferLimitOrder from '../../utils/transferLimitOrder';
-import truncateNum from '../../utils/truncateNum';
-import updateLimitOrderPrice from '../../utils/updateLimitOrderPrice';
-import IconCross from '../IconCross/IconCross';
-import MainBlock from '../MainBlock/MainBlock';
-import classes from './OrderPopupUpdate.module.scss';
+  closeLimitOrderUpdatePopup,
+  resetLimitOrderPopupValues,
+} from '@/store/actions/limitOrder';
+import {
+  resetWaitingPopupValues,
+  setWaitingPopupValues,
+} from '@/store/actions/waitingPopup';
+import truncateNum from '@/utils/truncateNum';
 
-export default function OrderPopupUpdate({ close, order }) {
-  const {
-    addrOrder,
-    fromRootAddr,
-    fromSymbol,
-    fromValue,
-    price,
-    toRootAddr,
-    toSymbol,
-    toValue,
-  } = order;
+import classes from './index.module.scss';
 
+export default function LimitOrderUpdatePopup() {
   const dispatch = useDispatch();
 
   const appTheme = useSelector((state) => state.appReducer.appTheme);
-
+  const initialValues = useSelector((state) => state.limitOrderReducer.values);
+  const visible = useSelector(
+    (state) => state.limitOrderReducer.updatePopupVisible,
+  );
   const clientData = useSelector((state) => state.walletReducer.clientData);
-  const { keyPair } = useKeyPair();
+  const updateLimitOrderPrice = useSelector(
+    (state) => state.tonContext.functions.updateLimitOrderPrice,
+  );
+  const transferLimitOrder = useSelector(
+    (state) => state.tonContext.functions.transferLimitOrder,
+  );
 
   const {
     dirty,
@@ -55,100 +51,108 @@ export default function OrderPopupUpdate({ close, order }) {
     values,
   } = useFormik({
     initialValues: {
-      newPrice: price,
       newAddress: clientData.address,
+      newPrice: initialValues ? initialValues.toPrice : 0,
     },
-    validate({ newAddress, newPrice }) {
-      const errors = {};
-
-      if (newPrice <= 0) errors.newPrice = NOT_POSITIVE;
-      else if (newAddress.length !== 66)
-        errors.newAddress = ADDRESS_INCORRECT_LENGTH;
-
-      return errors;
-    },
+    validate,
   });
 
   const { enqueueSnackbar } = useSnackbar();
 
-  async function handleConfirm() {
-    if (!valid || !dirty) return;
+  async function validate({ newAddress, newPrice }) {
+    const errors = {};
 
-    dispatch(closeOrderUpdatePopup());
+    if (newPrice <= 0) errors.newPrice = NOT_POSITIVE;
+    else if (newAddress.length !== 66)
+      errors.newAddress = ADDRESS_INCORRECT_LENGTH;
+
+    return errors;
+  }
+
+  async function handleClose() {
+    dispatch(closeLimitOrderUpdatePopup());
+  }
+
+  async function handleConfirm() {
+    const { addrOrder, fromToken, toPrice, toToken } = values;
+
+    dispatch(closeLimitOrderUpdatePopup());
     dispatch(
-      openOrderWaitPopup({
-        text: `Sending message to update limit order ${fromSymbol} - ${toSymbol}`,
+      setWaitingPopupValues({
+        hidable: true,
+        text: `Updating limit order ${truncateNum(fromValue)} ${
+          fromToken.symbol
+        } for ${truncateNum(toValue)} ${toToken.symbol}`,
+        title: 'Sending message to blockchain',
       }),
     );
 
-    const status = [];
+    const processes = [];
 
-    if (values.newPrice !== price) {
-      const { changePriceStatus } = await updateLimitOrderPrice(
-        {
-          addrOrder: addrOrder,
-          newPrice: values.newPrice,
-        },
-        {
-          clientKeyPair: keyPair,
-          clientAddress: clientData.address,
-        },
-      );
+    if (values.newPrice !== toPrice) {
+      const changePriceProcess = updateLimitOrderPrice({
+        addrOrder: addrOrder,
+        newPrice: values.newPrice,
+      }).then((r) => r.changePriceStatus);
 
-      status.push(changePriceStatus);
+      processes.push(changePriceProcess);
     }
 
     if (values.newAddress !== clientData.address) {
-      const { transferLimitOrderStatus } = await transferLimitOrder(
-        {
-          addrOrder,
-          fromRootAddr,
-          toRootAddr,
-          newOwnerAddress: values.newAddress,
-        },
-        {
-          clientKeyPair: keyPair,
-          clientAddress: clientData.address,
-        },
-      );
+      const transferProcess = transferLimitOrder({
+        addrOrder,
+        newOwnerAddress: values.newAddress,
+        walletOwnerFrom: fromToken.walletAddress,
+        walletOwnerTo: toToken.walletAddress,
+      }).then((r) => r.transferLimitOrderStatus);
 
-      status.push(transferLimitOrderStatus);
+      processes.push(transferProcess);
     }
 
-    if (status.every((s) => s))
+    const result = await Promise.all(processes);
+
+    if (result.every((s) => s))
       enqueueSnackbar({
+        message: `Updating limit order ${fromToken.symbol} - ${toToken.symbol} ⏳`,
         type: 'info',
-        message: `Updating limit order ${fromSymbol} - ${toSymbol} ⏳`,
       });
     else
       enqueueSnackbar({
+        message: `Failed to update limit order ${fromToken.symbol} - ${toToken.symbol}`,
         type: 'error',
-        message: `Failed to update limit order ${fromSymbol} - ${toSymbol}`,
       });
 
-    dispatch(closeOrderWaitPopup());
+    dispatch(resetWaitingPopupValues());
+    dispatch(resetLimitOrderPopupValues());
+    dispatch(closeLimitOrderUpdatePopup());
   }
+
+  if (!visible || !initialValues) return null;
+
+  const { fromToken, fromValue, toPrice, toToken, toValue } = initialValues;
 
   return (
     <div className="popup-wrapper">
       <MainBlock
         button={
-          <button onClick={close} className={classes.btn}>
-            {/*<IconCross*/}
-            {/*	fill="none"*/}
-            {/*	className={cls("close", classes.btn__icon)}*/}
-            {/*/>*/}
+          <button onClick={handleClose} className={classes.btn}>
+            <IconCross
+              fill="none"
+              className={cls('close', classes.btn__icon)}
+            />
           </button>
         }
         title="Update Limit Order"
         content={
           <>
-            <div className="confirm-block swap-confirm-block">
+            <div
+              className={cls('confirm-block', classes['swap-confirm-block'])}
+            >
               <span className="confirm-token">
                 <img
                   className="confirm-icon"
-                  src={iconGenerator(fromSymbol)}
-                  alt={fromSymbol}
+                  src={iconGenerator(fromToken.symbol)}
+                  alt={fromToken.symbol}
                 />
                 {fromValue}
               </span>
@@ -211,8 +215,8 @@ export default function OrderPopupUpdate({ close, order }) {
               <span className="confirm-token">
                 <img
                   className="confirm-icon"
-                  src={iconGenerator(toSymbol)}
-                  alt={toSymbol}
+                  src={iconGenerator(toToken.symbol)}
+                  alt={toToken.symbol}
                 />
                 {truncateNum(toValue)}
               </span>
@@ -222,7 +226,11 @@ export default function OrderPopupUpdate({ close, order }) {
                 'recipient_wrapper',
                 errors.newPrice && 'amount_wrapper_error',
               )}
-              style={{ height: 100, padding: 15, marginTop: 25 }}
+              style={{
+                height: 100,
+                marginTop: 25,
+                padding: 15,
+              }}
             >
               <div className="send_text_headers">New price</div>
               <div className="send_inputs">
@@ -246,7 +254,11 @@ export default function OrderPopupUpdate({ close, order }) {
                 'recipient_wrapper',
                 errors.newAddress && 'amount_wrapper_error',
               )}
-              style={{ height: 100, padding: 15, marginTop: 25 }}
+              style={{
+                height: 100,
+                marginTop: 25,
+                padding: 15,
+              }}
             >
               <div className="send_text_headers">New owner</div>
               <div className="send_inputs">
@@ -279,17 +291,15 @@ export default function OrderPopupUpdate({ close, order }) {
         footer={
           <div className="mainblock-footer">
             <div className="mainblock-footer-wrap">
-              {/*<div>*/}
-              <div className="swap-confirm-wrap">
+              <div className={classes['swap-confirm-wrap']}>
                 <p className="mainblock-footer-value">
-                  <img src={miniSwap} alt="" /> {truncateNum(price)}{' '}
-                  {fromSymbol}/{toSymbol}
+                  {toPrice} {toToken.symbol}
                 </p>
                 <p className="mainblock-footer-subtitle">Price</p>
               </div>
               <div className="swap-confirm-wrap">
                 <p className="mainblock-footer-value">
-                  {truncateNum((fromValue * 0.3) / 100)} {fromSymbol}
+                  {UPDATE_LIMIT_ORDER} EVER
                 </p>
                 <p className="mainblock-footer-subtitle">Fee</p>
               </div>

@@ -1,29 +1,57 @@
 import { Account } from '@tonclient/appkit';
 import { signerKeys } from '@tonclient/core';
 
-import { FUNC_FAIL } from '../constants/runtimeErrors';
-import { DEXClientContract } from '../extensions/contracts/DEXClient';
-import client from '../extensions/sdk_get/get';
+import { NO_CONTEXT } from '@/constants/runtimeErrors';
+import { DEXClientContract } from '@/extensions/contracts/DEXClientMainNet';
 
-export default async function transferLimitOrder(
-  { addrOrder, fromRootAddr, newOwnerAddress, toRootAddr },
-  { clientAddress, clientKeyPair },
-) {
+export default async function transferLimitOrder({
+  addrOrder,
+  newOwnerAddress,
+  walletOwnerFrom,
+  walletOwnerTo,
+}) {
+  if (
+    !this ||
+    !this.context ||
+    !this.context.tonClient ||
+    !this.context.dexClientAddress ||
+    !this.helperFunctions ||
+    !this.helperFunctions.getClientKeys ||
+    !this.helperFunctions.getWalletFromRoot ||
+    !this.helperFunctions.getRootFromWallet
+  )
+    throw new Error(NO_CONTEXT);
+
+  const dexClientKeyPair = await this.helperFunctions.getClientKeys();
+
   const clientAcc = new Account(DEXClientContract, {
-    address: clientAddress,
-    client,
-    signer: signerKeys(clientKeyPair),
+    address: this.context.dexClientAddress,
+    client: this.context.tonClient,
+    signer: signerKeys(dexClientKeyPair),
   });
 
-  const res = await clientAcc.runLocal('rootWallet', {});
-  if (!res.decoded) throw new Error(FUNC_FAIL);
-  const { rootWallet } = res.decoded.output;
+  const rootFrom = this.helperFunctions.getRootFromWallet(
+    this.context.dexClientAddress,
+    walletOwnerFrom,
+  );
+  const rootTo = this.helperFunctions.getRootFromWallet(
+    this.context.dexClientAddress,
+    walletOwnerTo,
+  );
+  const walletNewOwnerFrom = this.helperFunctions.getWalletFromRoot(
+    newOwnerAddress,
+    rootFrom,
+  );
+  const walletNewOwnerTo = this.helperFunctions.getWalletFromRoot(
+    newOwnerAddress,
+    rootTo,
+  );
 
   const response = await clientAcc.run('transferLimitOrder', {
-    limitOrder: addrOrder,
     addrNewOwner: newOwnerAddress,
-    walletNewOwnerFrom: rootWallet[fromRootAddr],
-    walletNewOwnerTo: rootWallet[toRootAddr],
+    limitOrder: addrOrder,
+    walletNewOwnerFrom,
+    walletNewOwnerTo,
   });
 
   return response.decoded.output;
