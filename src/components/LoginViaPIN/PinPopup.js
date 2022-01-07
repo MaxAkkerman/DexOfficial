@@ -77,7 +77,7 @@ function PinPopup(props) {
               }}
             />
 
-            <Steppers step={props.step} />
+            <Steppers step={props.step} lastStep={props.lastStep} />
             {!props.showTwoBtns ? (
               <div style={{ display: 'flex', width: '100%' }}>
                 <NextBtn

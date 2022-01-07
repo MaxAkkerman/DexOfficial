@@ -1,12 +1,13 @@
 import './EnterSeedPhrase.scss';
 
 import { Grid } from '@material-ui/core';
+import produce from 'immer';
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { useMount, useUnmount } from 'react-use';
 
-import { InitialSeedState, onlyNums } from '../../constants/defaultData';
+import { InitialSeedState } from '../../constants/defaultData';
 import {
   checkPubKey,
   getClientBalance,
@@ -24,11 +25,7 @@ import {
   enterSeedPhraseSaveToLocalStorage,
   setSeedPassword,
 } from '../../store/actions/enterSeedPhrase';
-import {
-  setClientData,
-  setPin,
-  setTransactionsList,
-} from '../../store/actions/wallet';
+import { setClientData, setTransactionsList } from '../../store/actions/wallet';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import { NextBtn } from '../LoginViaPIN/NextBtn';
 import PinPopup from '../LoginViaPIN/PinPopup';
@@ -40,11 +37,11 @@ import Alerter from './SignInAlertItem';
 const mnemonicWords = getMnemonics();
 
 const InitialValidationState = {
-  onError: true,
   msg: `Enter seed phrase or just paste it`,
+  onError: true,
 };
 
-function EnterSeedPhrase(props) {
+export default function EnterSeedPhrase(props) {
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -57,6 +54,13 @@ function EnterSeedPhrase(props) {
     );
   }
 
+  const [tempPin, setTempPin] = useState('');
+  const [steps, setStep] = useState([
+    { name: 'step1', weAreHere: true },
+    { name: 'step2', weAreHere: false },
+    { name: 'step3', weAreHere: false },
+  ]);
+
   useMount(async () => {
     // if (enterSeedPhraseSide === "login") {
     window.addEventListener('paste', checkClipboardSeedPhrase);
@@ -66,7 +70,6 @@ function EnterSeedPhrase(props) {
     window.removeEventListener('paste', checkClipboardSeedPhrase);
     // clearState()
   });
-  const pin = useSelector((state) => state.walletReducer.pin);
 
   const [seedPhraseString, setSeedPhraseString] = useState(``);
   const [validSeedPhrase, setValidSeedPhrase] = useState(
@@ -77,10 +80,6 @@ function EnterSeedPhrase(props) {
   const [seedPhrase, setSeedPhrase] = useState(InitialSeedState);
   const [loadingUserDataIsWaiting, setLoadingUserDataIsWaiting] =
     useState(false);
-  // const [openedPopups, setopenedPopups] = useState(false);
-  const [onPin, setOnPin] = useState(false);
-  const [pinsConfirmed, setPinsConfirmed] = useState(true);
-  const [completedPass, setCompletedPass] = useState(false);
   const [preInitData, setPreInitData] = useState({});
 
   //Here i get seed string from seeds array to use it further
@@ -103,9 +102,7 @@ function EnterSeedPhrase(props) {
     setSeedPhrasePassword('');
     setseedGlobValid(false);
     setValidSeedPhrase(InitialValidationState);
-    setCompletedPass(false);
     setPreInitData({});
-    setOnPin(false);
   }
 
   function handleClose() {
@@ -120,8 +117,8 @@ function EnterSeedPhrase(props) {
     let arr = sp.split(' ').filter((it) => it !== '');
     if (arr.length !== 12) {
       setValidSeedPhrase({
-        onError: true,
         msg: 'Pasted words count should be equal to 12, please check it',
+        onError: true,
       });
       setseedGlobValid(false);
       return;
@@ -141,14 +138,14 @@ function EnterSeedPhrase(props) {
     });
     if (onErr !== 0) {
       setValidSeedPhrase({
-        onError: true,
         msg: `For seed phrase we use mnemonic words library, ${onErr} seeds are not of them, please check it`,
+        onError: true,
       });
       setseedGlobValid(false);
     } else {
       setValidSeedPhrase({
-        onError: false,
         msg: `It remains to enter the Encryption password to complete the wallet setup.`,
+        onError: false,
       });
       setseedGlobValid(true);
     }
@@ -159,27 +156,7 @@ function EnterSeedPhrase(props) {
     let encrypted = await encrypt(seedPhraseString2, seedPhrasePassword2);
     dispatch(setSeedPassword(seedPhrasePassword2));
     dispatch(enterSeedPhraseSaveToLocalStorage(encrypted));
-    // localStorage.setItem("seedPhraseString2", seedPhraseString2);
-    // localStorage.setItem("seedPhrasePassword2", seedPhrasePassword2);
   }
-
-  // function enterClick(e) {
-  //     if (e.code === "NumpadEnter" || e.code === "Enter") {
-  //         login();
-  //     }
-  // }
-
-  // function passwordChange(event) {
-  //     let password = event.target.value;
-  //
-  //     if (event.target.value === '' || onlyNums.test(password)) {
-  //         setValidPassword(password.length > 0)
-  //         setSeedPhrasePassword(password);
-  //
-  //     } else {
-  //         setValidPassword(false)
-  //     }
-  // }
 
   function handleChangeSeed(e, val) {
     const curId = Number(e.currentTarget.id[0]);
@@ -201,172 +178,215 @@ function EnterSeedPhrase(props) {
     setSeedPhrase(newSeedArr);
   }
 
-  async function handleClickGoToPIN(ev) {
-    if (ev) {
-      let clientDataPreDeployLS = JSON.parse(
-        localStorage.getItem('clientDataPreDeploy'),
-      );
-      let seedPhraseString = getSeedsString();
-      if (!seedPhraseString) {
-        disSetTips('Some error, seed phrase not valid, please retry', 'error');
-        return;
-      }
+  function handleSeedPhrase() {
+    return {
+      async forward() {
+        let seedPhraseString = getSeedsString();
+        if (!seedPhraseString) {
+          disSetTips(
+            'Some error, seed phrase not valid, please retry',
+            'error',
+          );
+          return;
+        }
 
-      const verStatus = await verifySeed(seedPhraseString);
-      if (!verStatus) {
-        disSetTips(
-          'Some error, seed phrase or password not valid, please retry',
-          'error',
+        const verStatus = await verifySeed(seedPhraseString);
+        if (!verStatus) {
+          disSetTips(
+            'Some error, seed phrase or password not valid, please retry',
+            'error',
+          );
+          return;
+        }
+
+        let clientDataPreDeployLS = JSON.parse(
+          localStorage.getItem('clientDataPreDeploy'),
         );
-        return;
-      }
+        const clientKeys = await getClientKeys(seedPhraseString);
+        console.log('clientKeys.public', clientKeys.public);
+        const existsClientOnRoot = await checkPubKey(clientKeys.public);
+        console.log('existsClientOnRoot', existsClientOnRoot);
 
-      const clientKeys = await getClientKeys(seedPhraseString);
-      console.log('clientKeys.public', clientKeys.public);
-      const existsClientOnRoot = await checkPubKey(clientKeys.public);
-      console.log('existsClientOnRoot', existsClientOnRoot);
+        let verifSeedFromLS;
+        let notDeployedClientExists;
 
-      let verifSeedFromLS;
-      let notDeployedClientExists;
+        if (clientDataPreDeployLS) {
+          verifSeedFromLS = await decryptPure(
+            clientDataPreDeployLS.esp,
+            seedPhrasePassword,
+          );
+          notDeployedClientExists = verifSeedFromLS === seedPhraseString;
+        }
 
-      if (clientDataPreDeployLS) {
-        verifSeedFromLS = await decryptPure(
-          clientDataPreDeployLS.esp,
-          seedPhrasePassword,
+        if (!notDeployedClientExists && !existsClientOnRoot.status) {
+          disSetTips(
+            'Some error, no such client on root, please use another seed or create new client',
+            'error',
+          );
+          return;
+        }
+        setPreInitData({
+          clientDataPreDeployLS: { ...clientDataPreDeployLS },
+          clientKeys: { ...clientKeys },
+          existsClientOnRoot: { ...existsClientOnRoot },
+          notDeployedClientExists: notDeployedClientExists,
+        });
+
+        setStep(
+          produce(steps, (draft) => {
+            draft[0].weAreHere = false;
+            draft[1].weAreHere = true;
+          }),
         );
-        notDeployedClientExists = verifSeedFromLS === seedPhraseString;
-      }
-
-      if (!notDeployedClientExists && !existsClientOnRoot.status) {
-        disSetTips(
-          'Some error, no such client on root, please use another seed or create new client',
-          'error',
-        );
-        return;
-      }
-      setPreInitData({
-        clientDataPreDeployLS: { ...clientDataPreDeployLS },
-        clientKeys: { ...clientKeys },
-        notDeployedClientExists: notDeployedClientExists,
-        existsClientOnRoot: { ...existsClientOnRoot },
-      });
-      setOnPin(ev);
-    } else {
-      clearState();
-      setOnPin(ev);
-    }
-  }
-  // linear-gradient(92.91deg, #FFF -1%, #FFF 100%)
-  async function handleLogIn(pin) {
-    let seedPhrasePassword = '';
-    pin.map((item) => {
-      seedPhrasePassword += item.value.toString();
-    });
-    if (seedPhrasePassword.length < 4) {
-      disSetTips('Please complete PIN', 'error');
-      return;
-    }
-
-    if (
-      seedGlobValid &&
-      completedPass &&
-      preInitData.existsClientOnRoot.status
-    ) {
-      setLoadingUserDataIsWaiting(true);
-
-      console.log('step 111');
-      // saveLog({
-      //     name: "login",
-      //     clientAddress: preInitData.existsClientOnRoot.dexclient,
-      //     deployed:true,
-      //     created_at: (Date.now()+10800000)/1000,
-      // },"login")
-      // dispatch(showEnterSeedPhrase(false));
-      // props.handleCLoseEntSeed(false)
-      // props.setloadingUserData(true);
-
-      await handleSetEncription(seedPhraseString, seedPhrasePassword);
-
-      await InitializeClient(preInitData.clientKeys.public);
-      setLoadingUserDataIsWaiting(false);
-
-      dispatch(handleOpenEnterSeed(false));
-      history.push('/swap');
-      disSetTips('Success, welcome onboard!', 'success');
-
-      // props.setloadingUserData(false);
-      clearState();
-    } else if (
-      seedGlobValid &&
-      completedPass &&
-      !preInitData.existsClientOnRoot.status &&
-      preInitData.notDeployedClientExists
-    ) {
-      // setLoadingUserDataIsWaiting(true)
-
-      // dispatch(showEnterSeedPhrase(false));
-      props.handleCLoseEntSeed(false);
-      // props.setloadingUserData(true);
-
-      const dexClientAddress = preInitData.clientDataPreDeployLS.address;
-      const dexClientBalance = await getClientBalance(dexClientAddress);
-      dispatch(
-        setClientData({
-          status: false,
-          dexclient: dexClientAddress,
-          balance: dexClientBalance,
-          deployed: false,
-        }),
-      );
-      saveLog(
-        {
-          name: 'login',
-          clientAddress: dexClientAddress,
-          deployed: false,
-          created_at: (Date.now() + 10800000) / 1000,
-        },
-        'login',
-      );
-      dispatch(setTransactionsList([]));
-      await handleSetEncription(seedPhraseString, seedPhrasePassword);
-
-      // props.setloadingUserData(false);
-      dispatch(setWalletIsConnected(false));
-
-      setLoadingUserDataIsWaiting(false);
-      dispatch(handleOpenEnterSeed(false));
-      history.push('/swap');
-      disSetTips('Success, welcome onboard!', 'success');
-
-      clearState();
-    } else {
-      disSetTips(
-        'Some error, no such client on root, please use another seed or create new client',
-        'error',
-      );
-    }
+      },
+    };
   }
 
-  function handleCheckPin(pinArr, step, completed) {
-    const curEmptyPin = pinArr.filter((item) => !item.value.length);
-    if (!curEmptyPin.length) {
-      setCompletedPass(true);
-      let password = '';
-      pin.map((item) => {
-        password += item.value.toString();
-      });
-      setSeedPhrasePassword(password);
-    } else {
-      setCompletedPass(false);
-    }
-    dispatch(setPin(pinArr));
+  function handleSetPin() {
+    return {
+      backward() {
+        clearState();
+        setTempPin('');
+        setStep(
+          produce(steps, (draft) => {
+            draft[1].weAreHere = false;
+            draft[0].weAreHere = true;
+          }),
+        );
+      },
+      forward({ complete, pin }) {
+        if (!complete) {
+          disSetTips('Please, complete PIN', 'error');
+          return;
+        }
+
+        setTempPin(pin.join(''));
+        setStep(
+          produce(steps, (draft) => {
+            draft[1].weAreHere = false;
+            draft[2].weAreHere = true;
+          }),
+        );
+      },
+    };
+  }
+
+  function handleRepeatPin() {
+    return {
+      backward() {
+        setTempPin('');
+        setStep(
+          produce(steps, (draft) => {
+            draft[2].weAreHere = false;
+            draft[1].weAreHere = true;
+          }),
+        );
+      },
+      async forward({ complete, pin }) {
+        if (!complete) {
+          dispatch(
+            setTips({
+              message: 'Please, complete PIN',
+              type: 'error',
+            }),
+          );
+          return;
+        }
+
+        if (tempPin !== pin.join('')) {
+          dispatch(
+            setTips({
+              message: "PINs doesn't match",
+              type: 'error',
+            }),
+          );
+          return;
+        }
+
+        let seedPhrasePassword = '';
+        pin.map((v) => {
+          seedPhrasePassword += v;
+        });
+
+        if (seedGlobValid && preInitData.existsClientOnRoot.status) {
+          setLoadingUserDataIsWaiting(true);
+
+          console.log('step 111');
+          // saveLog({
+          //     name: "login",
+          //     clientAddress: preInitData.existsClientOnRoot.dexclient,
+          //     deployed:true,
+          //     created_at: (Date.now()+10800000)/1000,
+          // },"login")
+          // dispatch(showEnterSeedPhrase(false));
+          // props.handleCLoseEntSeed(false)
+          // props.setloadingUserData(true);
+
+          await handleSetEncription(seedPhraseString, seedPhrasePassword);
+
+          await InitializeClient(preInitData.clientKeys.public);
+          setLoadingUserDataIsWaiting(false);
+
+          dispatch(handleOpenEnterSeed(false));
+          history.push('/swap');
+          disSetTips('Success, welcome onboard!', 'success');
+
+          // props.setloadingUserData(false);
+          clearState();
+        } else if (
+          seedGlobValid &&
+          !preInitData.existsClientOnRoot.status &&
+          preInitData.notDeployedClientExists
+        ) {
+          // setLoadingUserDataIsWaiting(true)
+
+          // dispatch(showEnterSeedPhrase(false));
+          props.handleCLoseEntSeed(false);
+          // props.setloadingUserData(true);
+
+          const dexClientAddress = preInitData.clientDataPreDeployLS.address;
+          const dexClientBalance = await getClientBalance(dexClientAddress);
+          dispatch(
+            setClientData({
+              balance: dexClientBalance,
+              deployed: false,
+              dexclient: dexClientAddress,
+              status: false,
+            }),
+          );
+          saveLog(
+            {
+              clientAddress: dexClientAddress,
+              created_at: (Date.now() + 10800000) / 1000,
+              deployed: false,
+              name: 'login',
+            },
+            'login',
+          );
+          dispatch(setTransactionsList([]));
+          await handleSetEncription(seedPhraseString, seedPhrasePassword);
+
+          // props.setloadingUserData(false);
+          dispatch(setWalletIsConnected(false));
+
+          setLoadingUserDataIsWaiting(false);
+          dispatch(handleOpenEnterSeed(false));
+          history.push('/swap');
+          disSetTips('Success, welcome onboard!', 'success');
+
+          clearState();
+        } else {
+          disSetTips(
+            'Some error, no such client on root, please use another seed or create new client',
+            'error',
+          );
+        }
+      },
+    };
   }
 
   return (
-    <div
-      className="select-wrapper"
-      onClick={() => console.log('completedPass', completedPass)}
-    >
+    <div className="select-wrapper">
       {loadingUserDataIsWaiting ? (
         <WaitingPopup
           hide={true}
@@ -375,7 +395,7 @@ function EnterSeedPhrase(props) {
         />
       ) : (
         <>
-          {!onPin ? (
+          {steps[0].weAreHere ? (
             <MainBlock
               title={`Log in with seed phrase`}
               classHeader={'fixFontSize'}
@@ -401,22 +421,6 @@ function EnterSeedPhrase(props) {
                   </Grid>
 
                   <Alerter validSeedPhrase={validSeedPhrase} />
-                  {/*{noClientError ? (*/}
-                  {/*    <Box*/}
-                  {/*        sx={{*/}
-                  {/*            display: "flex",*/}
-                  {/*            justifyContent: "center",*/}
-                  {/*            marginTop: "24px",*/}
-                  {/*        }}*/}
-                  {/*    >*/}
-                  {/*        <Alert severity={"warning"} sx={{width: "100%"}}>*/}
-                  {/*            <AlertTitle>{"Client not exists"}</AlertTitle>*/}
-                  {/*            {*/}
-                  {/*                "There is no DEX client smart contract with such pubkey registered on DEX, please check your seed phrase or create new client."*/}
-                  {/*            }*/}
-                  {/*        </Alert>*/}
-                  {/*    </Box>*/}
-                  {/*) : null}*/}
 
                   <NextBtn
                     curBtnStyles={'curBtnStyles'}
@@ -424,32 +428,46 @@ function EnterSeedPhrase(props) {
                     marginBottom={''}
                     errColor={null}
                     btnText={'Next'}
-                    handleClickNext={() => handleClickGoToPIN(true)}
+                    handleClickNext={handleSeedPhrase().forward}
                   />
                 </>
               }
             />
-          ) : (
+          ) : null}
+          {steps[1].weAreHere ? (
             <div className="select-wrapper">
               <PinPopup
-                title={'Enter your PIN'}
+                title={'Set PIN for quick login'}
+                step={'2'}
+                lastStep={'3'}
+                handleLogOut={null}
                 showTwoBtns={true}
                 nextStep={'step3'}
                 prevStep={'step1'}
-                handleLogOut={null}
-                btnText={'Log in'}
-                pinCorrect={pinsConfirmed}
-                handleClickBack={() => handleClickGoToPIN(false)}
-                handleClose={null}
-                handleClickNext={(pin) => handleLogIn(pin)}
-                handleCheckPin={handleCheckPin}
+                btnText={'Next'}
+                handleClickBack={handleSetPin().backward}
+                handleClickNext={handleSetPin().forward}
               />
             </div>
-          )}
+          ) : null}
+          {steps[2].weAreHere ? (
+            <div className="select-wrapper">
+              <PinPopup
+                title={'Repeat PIN'}
+                step={'3'}
+                lastStep={'3'}
+                nextStep={'goInToApp'}
+                prevStep={'step2'}
+                showTwoBtns={true}
+                btnText={'Log in'}
+                handleLogOut={null}
+                handleClickBack={handleRepeatPin().backward}
+                handleClickNext={handleRepeatPin().forward}
+              />
+            </div>
+          ) : null}
         </>
       )}
     </div>
   );
 }
-
-export default EnterSeedPhrase;
