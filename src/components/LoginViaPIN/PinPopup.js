@@ -1,7 +1,6 @@
 import './PinPopup.scss';
 
 import { Grid } from '@material-ui/core';
-import isNumber from 'lodash/isNumber';
 import range from 'lodash/range';
 import React, { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -21,9 +20,10 @@ function PinPopup(props) {
   });
 
   function handleNextClick() {
-    props.handleCheckPin({ complete, pin: value.map((v) => ({ value: v })) });
-    props.handleClickNext({ complete, pin: value.map((v) => ({ value: v })) });
+    props.handleClickNext({ complete, pin: value });
   }
+
+  console.log('$', value);
 
   return (
     <div
@@ -47,14 +47,7 @@ function PinPopup(props) {
               ) : null}
               <div className="left_block boldFont fixMedia">{props.title}</div>
             </div>
-
-            {complete && !props.pinCorrect ? (
-              <Grid style={{ color: 'red', textAlign: 'center' }}>
-                PINS don&apos;t match!
-              </Grid>
-            ) : (
-              <div style={{ height: '23px' }}></div>
-            )}
+            <div style={{ height: '23px' }}></div>
             <Grid className="numsInputContainer">
               {range(4).map((i) => {
                 return (
@@ -127,8 +120,9 @@ function usePinInput({ handleEnter = () => {}, length = 4 } = {}) {
 
   const cursor = useMemo(() => rawValue.trim().length, [rawValue]);
   const complete = useMemo(() => rawValue.trim().length === length, [rawValue]);
-  const valueArr = useMemo(() =>
-    rawValue.split('').map((v) => (v === ' ' ? '' : v)),
+  const valueArr = useMemo(
+    () => rawValue.split('').map((v) => (v === ' ' ? '' : v)),
+    [rawValue],
   );
 
   function handleChange(v) {
@@ -152,7 +146,7 @@ function usePinInput({ handleEnter = () => {}, length = 4 } = {}) {
   useKey('Backspace', handleBackspace, {}, [rawValue]);
   useKey('Delete', handleBackspace, {}, [rawValue]);
   useKey(
-    (event) => isNumber(+event.key),
+    (event) => /^[0-9]$/.test(event.key),
     () => handleChange(event.key),
     {},
     [rawValue],
