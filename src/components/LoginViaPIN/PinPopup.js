@@ -3,7 +3,7 @@ import './PinPopup.scss';
 import { Grid } from '@material-ui/core';
 import isNumber from 'lodash/isNumber';
 import range from 'lodash/range';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useKey } from 'react-use';
 
@@ -16,30 +16,14 @@ import Steppers from './Steppers';
 function PinPopup(props) {
   const appTheme = useSelector((state) => state.appReducer.appTheme);
 
-  function handleNextClick() {
-    props.handleClickNext(valueArr, props.nextStep, complete);
-  }
-
   const { complete, handleBackspace, handleChange, value } = usePinInput({
     handleEnter: handleNextClick,
   });
 
-  // Intermediate variable to match api of previous code
-  const valueArr = useMemo(
-    () =>
-      value.map((v, i) => ({
-        error: false,
-        focused: false,
-        id: i,
-        value: v,
-      })),
-    [value],
-  );
-
-  // Hook to match api of previous code
-  useEffect(() => {
-    props.handleCheckPin(valueArr, props.nextStep, complete);
-  }, [value]);
+  function handleNextClick() {
+    props.handleCheckPin({ complete, pin: value.map((v) => ({ value: v })) });
+    props.handleClickNext({ complete, pin: value.map((v) => ({ value: v })) });
+  }
 
   return (
     <div
@@ -139,39 +123,39 @@ function PinPopup(props) {
 }
 
 function usePinInput({ handleEnter = () => {}, length = 4 } = {}) {
-  const [value, setValue] = useState(' '.repeat(length));
+  const [rawValue, setRawValue] = useState(' '.repeat(length));
 
-  const cursor = useMemo(() => value.trim().length, [value]);
-  const complete = useMemo(() => value.trim().length === length, [value]);
+  const cursor = useMemo(() => rawValue.trim().length, [rawValue]);
+  const complete = useMemo(() => rawValue.trim().length === length, [rawValue]);
   const valueArr = useMemo(() =>
-    value.split('').map((v) => (v === ' ' ? '' : v)),
+    rawValue.split('').map((v) => (v === ' ' ? '' : v)),
   );
 
   function handleChange(v) {
-    if (complete || /[^0-9]/.test(v)) return;
+    if (complete) return;
 
-    const arr = value.split('');
+    const arr = rawValue.split('');
     arr[cursor] = v;
     const str = arr.join('');
 
-    setValue(str);
+    setRawValue(str);
   }
 
   function handleBackspace() {
-    let str = value.trim().slice(0, -1);
+    let str = rawValue.trim().slice(0, -1);
     str = str.padEnd(length);
 
-    setValue(str);
+    setRawValue(str);
   }
 
-  useKey('Enter', handleEnter, {}, [value]);
-  useKey('Backspace', handleBackspace, {}, [value]);
-  useKey('Delete', handleBackspace, {}, [value]);
+  useKey('Enter', handleEnter, {}, [rawValue]);
+  useKey('Backspace', handleBackspace, {}, [rawValue]);
+  useKey('Delete', handleBackspace, {}, [rawValue]);
   useKey(
     (event) => isNumber(+event.key),
     () => handleChange(event.key),
     {},
-    [value],
+    [rawValue],
   );
 
   return {
