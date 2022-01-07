@@ -23,8 +23,6 @@ function PinPopup(props) {
     props.handleClickNext({ complete, pin: value });
   }
 
-  console.log('$', value);
-
   return (
     <div
       className="select-wrapper"
