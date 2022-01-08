@@ -155,7 +155,7 @@ function LoginViaPin(props) {
           }),
         );
       },
-      async forward() {
+      async forward(reveal = false) {
         dispatch(showEnterSeedPhrase(false));
         props.setloadingUserData(true);
         let pinString = '';
@@ -206,7 +206,8 @@ function LoginViaPin(props) {
           }),
         );
         props.setloadingUserData(false);
-        history.push('/swap');
+        if (reveal === false) history.push('/swap');
+        else history.push('/wallet/settings');
         return;
       },
     };

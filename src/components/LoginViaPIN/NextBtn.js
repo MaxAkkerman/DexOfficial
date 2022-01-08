@@ -15,7 +15,7 @@ export function NextBtn(props) {
       <Grid container className={props.btnsClass} spacing={2}>
         <button
           // style={...props.curBtnStyles}
-
+          disabled={props.disabled}
           onClick={() => props.handleClickNext()}
           className={
             props.errColor
