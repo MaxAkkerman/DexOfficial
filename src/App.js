@@ -15,6 +15,7 @@ import SwapPage from '@/components-v2/SwapPage';
 import TutorialSteps from '@/components-v2/TutorialSteps';
 import WaitingPopup from '@/components-v2/WaitingPopup';
 import { Farming } from '@/pages/Farming/Farming';
+import { TermsOfUse } from '@/pages/TermsOfUse/TermsOfUse';
 import {
   requestPairsFetch,
   requestTokensFetch,
@@ -363,6 +364,7 @@ function App() {
       </div>
       <Header />
       <Switch location={location}>
+        <Route exact path="/terms-of-use" component={TermsOfUse} />
         <Route exact path="/native-login" component={NativeLogin} />
         <Route exact path="/pool-explorer" component={PoolExplorer} />
         <Route exact path="/pool" component={Pool} />

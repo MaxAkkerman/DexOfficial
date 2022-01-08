@@ -1,0 +1,37 @@
+@import "../../Mixins";
+
+.TermsOfUse {
+  width: 100%;
+  height: 100%;
+  border-radius: 50px;
+  margin-left: 5%;
+  margin-right: 5%;
+  padding: 5%;
+  background-color: var(--mainblock-bg-color);
+  border: 1px solid var(--mainblock-border-color);
+}
+.TermsOfUse__text_container {
+
+}
+.TermsOfUse__text {
+  word-break: break-word;
+  display: flex;
+  flex-direction: column;
+}
+
+.TermsOfUse__paragraph {
+  display: flex;
+  flex-direction: column;
+}
+
+.TermsOfUse__header {
+  color: var(--accent);
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.TermsOfUse__content {
+  margin-bottom: 15px;
+  color: var(--mainblock-title-color);
+  word-break: break-word;
+}

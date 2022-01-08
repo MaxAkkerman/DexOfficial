@@ -1,5 +1,5 @@
 
-Terms of Service
+Terms of Use
 
 Welcome to https://trade.defispace.com, a website-hosted user interface (the "Interface" or "App") provided by DeFiSpace ("we", "our", or "us"). The Interface provides access to a decentralized protocol on the Everscale blockchain that allows users to trade certain digital assets ("the DeFiSpace protocol" or the "Protocol"). The Interface is one, but not the exclusive, means of accessing the Protocol.
 
