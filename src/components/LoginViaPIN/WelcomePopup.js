@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
+import { setTips } from '@/store/actions/app';
+
 import arrowBack from '../../images/arrowBack.png';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import MainBlock from '../MainBlock/MainBlock';
@@ -20,12 +22,22 @@ function WelcomePopup(props) {
   const appTheme = useSelector((state) => state.appReducer.appTheme);
   const router = useHistory();
   const dispatch = useDispatch();
+  const [lockedInterface, setLockedInterface] = React.useState(false);
   function href(path) {
     if (path === 'gogle') window.open('https://google.com');
   }
 
   function goToRecovery() {
-    router.push('/wallet/settings');
+    if (!lockedInterface) {
+      dispatch(
+        setTips({
+          message: 'Please, wait...',
+          type: 'info',
+        }),
+      );
+      setLockedInterface(true);
+      props.handleClickNext(true);
+    }
   }
 
   return (
@@ -37,7 +49,11 @@ function WelcomePopup(props) {
         title={props.title ? props.title : ''}
         button={
           props.showCloseBtn ? (
-            <CloseBtn func={() => props.handleClose()} width="20" height="20" />
+            <CloseBtn
+              func={() => (lockedInterface ? null : props.handleClose())}
+              width="20"
+              height="20"
+            />
           ) : null
         }
         classHeader={props.showCloseBtn ? 'fixPaddings' : ''}
@@ -107,8 +123,18 @@ function WelcomePopup(props) {
               btnsClass={'enterSPRegBox'}
               marginBottom={'50px'}
               errColor={null}
+              disabled={lockedInterface}
               btnText={props.btnText}
-              handleClickNext={() => props.handleClickNext(props.nextStep)}
+              handleClickNext={() => {
+                setLockedInterface(true);
+                dispatch(
+                  setTips({
+                    message: 'Please, wait...',
+                    type: 'info',
+                  }),
+                );
+                props.handleClickNext(props.nextStep);
+              }}
             />
           </>
         }
