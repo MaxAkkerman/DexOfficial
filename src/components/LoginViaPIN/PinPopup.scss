@@ -2,7 +2,7 @@
   margin: 20px auto auto auto;
   display: grid;
 
-  width: 25vh;
+  width: 32vh;
   height: 300px;
   grid-template-columns: 33% 33% 33%;
   grid-template-rows: 33% 33% 33% 33%;
@@ -75,6 +75,10 @@
 //  }
 //
 //}
+
+.boldFont {
+  color: var(--mainblock-title-color);
+}
 
 @media screen and (max-width: 600px) {
   .gridContainer {

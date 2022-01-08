@@ -3,8 +3,11 @@ import './LoginViaPin.scss';
 
 import { Box, Grid } from '@material-ui/core';
 import React, { memo, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+
+import { setTips } from '@/store/actions/app';
 
 import arrowBack from '../../images/arrowBack.png';
 import CloseBtn from '../CloseBtn/CloseBtn';
@@ -17,9 +20,24 @@ import Steppers from './Steppers';
 
 function WelcomePopup(props) {
   const appTheme = useSelector((state) => state.appReducer.appTheme);
-
+  const router = useHistory();
+  const dispatch = useDispatch();
+  const [lockedInterface, setLockedInterface] = React.useState(false);
   function href(path) {
     if (path === 'gogle') window.open('https://google.com');
+  }
+
+  function goToRecovery() {
+    if (!lockedInterface) {
+      dispatch(
+        setTips({
+          message: 'Please, wait...',
+          type: 'info',
+        }),
+      );
+      setLockedInterface(true);
+      props.handleClickNext(true);
+    }
   }
 
   return (
@@ -31,7 +49,11 @@ function WelcomePopup(props) {
         title={props.title ? props.title : ''}
         button={
           props.showCloseBtn ? (
-            <CloseBtn func={() => props.handleClose()} width="20" height="20" />
+            <CloseBtn
+              func={() => (lockedInterface ? null : props.handleClose())}
+              width="20"
+              height="20"
+            />
           ) : null
         }
         classHeader={props.showCloseBtn ? 'fixPaddings' : ''}
@@ -54,12 +76,12 @@ function WelcomePopup(props) {
                   className="welcomeTextWrapper"
                   style={{ height: '59px', margin: '10px auto auto auto' }}
                 >
-                  You are registered in DefiSpace
+                  You are registered in DeFiSpace
                 </Grid>
               </>
             ) : (
               <>
-                <Grid className="welcomeWrapper">Welcome to DefiSpace!</Grid>
+                <Grid className="welcomeWrapper">Welcome to DeFiSpace!</Grid>
                 <Grid
                   className="welcomeTextWrapper"
                   style={{ margin: '10px auto auto auto' }}
@@ -89,7 +111,7 @@ function WelcomePopup(props) {
               ) : (
                 <Grid className="welcomeTextWrapper" style={{ width: '55' }}>
                   Don't forget to save the seed-phrase from your&nbsp;
-                  <a className="linkedText" onClick={() => href('gogle')}>
+                  <a className="linkedText" onClick={goToRecovery}>
                     account recovery settings
                   </a>
                 </Grid>
@@ -101,8 +123,18 @@ function WelcomePopup(props) {
               btnsClass={'enterSPRegBox'}
               marginBottom={'50px'}
               errColor={null}
+              disabled={lockedInterface}
               btnText={props.btnText}
-              handleClickNext={() => props.handleClickNext(props.nextStep)}
+              handleClickNext={() => {
+                setLockedInterface(true);
+                dispatch(
+                  setTips({
+                    message: 'Please, wait...',
+                    type: 'info',
+                  }),
+                );
+                props.handleClickNext(props.nextStep);
+              }}
             />
           </>
         }

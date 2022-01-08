@@ -21,6 +21,9 @@ export default function TutorialSteps() {
       initialStep={initialStep}
       onChange={handleNextStep}
       onExit={handleOnExit}
+      options={{
+        tooltipClass: 'Tooltip',
+      }}
     />
   );
 }

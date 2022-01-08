@@ -81,6 +81,34 @@ function HeaderMore() {
               </svg>
               <span className="more-link-text">GitHub</span>
             </a>
+            <a
+              href={'https://trade.defispace.com/terms-of-use'}
+              target="_blank"
+              className="more-link"
+              rel="noreferrer"
+            >
+              <svg
+                width="17"
+                height="17"
+                viewBox="0 0 17 17"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <g clipPath="url(#clip0_296_139)">
+                  <path
+                    d="M8.50019 0L1.7002 2.55V7.7265C1.7002 12.019 4.59869 16.0225 8.50019 17C12.4017 16.0225 15.3002 12.019 15.3002 7.7265V2.55L8.50019 0ZM13.6002 7.7265C13.6002 11.1265 11.4327 14.2715 8.50019 15.232C5.56769 14.2715 3.4002 11.135 3.4002 7.7265V3.7315L8.50019 1.819L13.6002 3.7315V7.7265V7.7265Z"
+                    fill="black"
+                  />
+                </g>
+                <defs>
+                  <clipPath id="clip0_296_139">
+                    <rect width="17" height="17" fill="white" />
+                  </clipPath>
+                </defs>
+              </svg>
+
+              <span className="more-link-text">Terms</span>
+            </a>
             <div className={'more__ver'}>v.0.1.19</div>
           </div>
         ) : null}
