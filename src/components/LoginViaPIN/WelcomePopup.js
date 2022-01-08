@@ -126,13 +126,16 @@ function WelcomePopup(props) {
               disabled={lockedInterface}
               btnText={props.btnText}
               handleClickNext={() => {
-                setLockedInterface(true);
-                dispatch(
-                  setTips({
-                    message: 'Please, wait...',
-                    type: 'info',
-                  }),
-                );
+                if (props.btnText === 'Great!') {
+                  setLockedInterface(true);
+                  dispatch(
+                    setTips({
+                      message: 'Please, wait...',
+                      type: 'info',
+                    }),
+                  );
+                }
+
                 props.handleClickNext(props.nextStep);
               }}
             />
