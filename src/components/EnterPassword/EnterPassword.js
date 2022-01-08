@@ -1,9 +1,7 @@
 import './EnterPassword.scss';
 
-import styled from '@emotion/styled';
-import { Alert, AlertTitle, Box, TextField } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import { decrypt } from '@/extensions/tonUtils';
@@ -16,41 +14,47 @@ import {
 } from '@/store/actions/enterSeedPhrase';
 import {
   setClientData,
-  setPin,
   setSubscribeReceiveTokens,
   setTransactionsList,
 } from '@/store/actions/wallet';
 
-import client, {
+import {
   checkPubKey,
   getClientBalance,
   getClientKeys,
 } from '../../extensions/sdk_get/get';
 import PinPopup from '../LoginViaPIN/PinPopup';
-import MainBlock from '../MainBlock/MainBlock';
 import WaitingPopup from '../WaitingPopup/WaitingPopup';
 
-function EnterPassword(props) {
+function EnterPassword() {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const [seedPhrasePassword, setSeedPhrasePassword] = useState(``);
-  const [validPassword, setValidPassword] = useState(false);
-
-  const [decryptResult, setDecryptResult] = React.useState(null);
   const [loadingUserDataIsWaiting, setloadingUserDataIsWaiting] =
     useState(false);
 
-  function enterClick(e) {
-    if (e.code === 'NumpadEnter' || e.code === 'Enter') {
-      handleLogIn();
+  async function handleLogIn(pin, complete) {
+    if (!complete) {
+      dispatch(
+        setTips({
+          message: 'Please, complete PIN',
+          type: 'error',
+        }),
+      );
+      return;
     }
-  }
 
-  async function handleLogIn(pin, step) {
-    if (!pin) return;
-    const curEmptyPin = pin.filter((item) => !item.value.length);
-    if (curEmptyPin.length) {
+    let seedPhrasePassword = '';
+    pin.map((v) => {
+      seedPhrasePassword += v;
+    });
+    let esp = localStorage.getItem('esp');
+    let clientDataPreDeploy = JSON.parse(
+      localStorage.getItem('clientDataPreDeploy'),
+    );
+
+    let decrypted = await decrypt(esp, seedPhrasePassword);
+    if (!decrypted.valid) {
       dispatch(
         setTips({
           message: `Wrong PIN, please try again`,
@@ -60,17 +64,6 @@ function EnterPassword(props) {
       return;
     }
 
-    let seedPhrasePassword = '';
-    pin.map((item) => {
-      seedPhrasePassword += item.value.toString();
-    });
-    let esp = localStorage.getItem('esp');
-    let clientDataLS = JSON.parse(localStorage.getItem('clientData'));
-    let clientDataPreDeploy = JSON.parse(
-      localStorage.getItem('clientDataPreDeploy'),
-    );
-
-    let decrypted = await decrypt(esp, seedPhrasePassword);
     const clientKeys = await getClientKeys(decrypted.phrase);
     let clientStatus = await checkPubKey(clientKeys.public);
 
@@ -94,13 +87,12 @@ function EnterPassword(props) {
     }
     if (clientExists) {
       setloadingUserDataIsWaiting(true);
-      setDecryptResult(true);
       saveLog(
         {
-          name: 'login',
           clientAddress: clientStatus.dexclient,
-          deployed: true,
           created_at: (Date.now() + 10800000) / 1000,
+          deployed: true,
+          name: 'login',
         },
         'login',
       );
@@ -117,13 +109,12 @@ function EnterPassword(props) {
       history.push('/swap');
     } else if (!clientExists && preDeployedClientExists) {
       setloadingUserDataIsWaiting(true);
-      setDecryptResult(true);
       saveLog(
         {
-          name: 'login',
           clientAddress: clientDataPreDeploy.address,
-          deployed: false,
           created_at: (Date.now() + 10800000) / 1000,
+          deployed: false,
+          name: 'login',
         },
         'login',
       );
@@ -131,10 +122,10 @@ function EnterPassword(props) {
       const dexClientBalance = await getClientBalance(dexClientAddress);
       dispatch(
         setClientData({
-          status: false,
-          dexclient: dexClientAddress,
           balance: dexClientBalance,
+          dexclient: dexClientAddress,
           public: clientKeys.public,
+          status: false,
         }),
       );
       dispatch(setTransactionsList([]));
@@ -154,37 +145,10 @@ function EnterPassword(props) {
     }
   }
 
-  function passwordChange(event) {
-    let password = event.target.value;
-    if (password.length > 0) setValidPassword(true);
-    else setDecryptResult(null);
-    setSeedPhrasePassword(password);
-  }
-
   function handleLogOut() {
     localStorage.removeItem('esp');
     localStorage.removeItem('setSubscribeReceiveTokens');
     window.location.reload();
-  }
-
-  const CssTextField = styled(TextField)({
-    '& .MuiOutlinedInput-input': {
-      '&.Mui-disabled': {
-        color: 'var(--text-color)',
-        '-webkit-text-fill-color': 'unset',
-      },
-      color: 'var(--text-color)',
-    },
-    '& .Mui-disabled': {
-      color: 'var(--text-color)',
-    },
-  });
-
-  const [pinsConfirmed, setPinsConfirmed] = useState(true);
-
-  function handleCheckPin(pinArr, step) {
-    // console.log("pinArr", pinArr)
-    dispatch(setPin(pinArr));
   }
 
   return (
@@ -203,13 +167,9 @@ function EnterPassword(props) {
           prevStep={'step1'}
           handleLogOut={() => handleLogOut()}
           btnText={'Log in'}
-          pinCorrect={pinsConfirmed}
           handleClickBack={null}
           handleClose={null}
-          handleClickNext={(pin) => handleLogIn(pin)}
-          handleCheckPin={(pin, step, completed) =>
-            handleCheckPin(pin, step, completed)
-          }
+          handleClickNext={({ complete, pin }) => handleLogIn(pin, complete)}
         />
         // </div>
       )}

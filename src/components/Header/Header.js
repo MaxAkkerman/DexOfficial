@@ -116,7 +116,7 @@ export default function Header() {
         </div>
         <div className="header-wrap">
           {/*<NativeLogin/>*/}
-          {clientData.status ? (
+          {clientData ? (
             <Wallet />
           ) : (
             <button

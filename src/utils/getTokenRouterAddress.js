@@ -5,8 +5,9 @@ import { LimitOrderRootContract } from '@/extensions/contracts/LimitOrderRoot';
 import { LimitOrderRouterContract } from '@/extensions/contracts/LimitOrderRouter';
 
 /**
- * @param {string} rootAddress
- * @returns {Promise<string>} routerAddress
+ * Get router address that corresponds to the root address (token)
+ * @param {string} rootAddress - The root address of the token
+ * @returns {Promise<string>} routerAddress - The router address that corresponds to the token
  */
 export default async function getTokenRouterAddress(rootAddress) {
   if (

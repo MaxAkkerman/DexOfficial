@@ -1,21 +1,29 @@
 import { Box } from '@material-ui/core';
-import React, { memo } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 
-function Steppers(props) {
-  console.log('propspropsprops', typeof props.step, props.step);
+export default function Steppers({ lastStep, step }) {
   return (
     <Box
       sx={{
+        color: `var(--mainblock-title-color)`,
         display: 'flex',
         justifyContent: 'center',
-        color: `var(--mainblock-title-color)`,
         marginTop: `${
-          props.step === '1' ? '12vh' : props.step === '4' ? '14.85vh' : '14vh'
+          step === '1' ? '12vh' : step === lastStep ? '14.85vh' : '14vh'
         }`,
       }}
     >
-      {props.step ? `Step ${props.step}/4` : ''}
+      {step ? `Step ${step}/${lastStep}` : ''}
     </Box>
   );
 }
-export default memo(Steppers);
+
+Steppers.propTypes = {
+  lastStep: PropTypes.string,
+  step: PropTypes.string.isRequired,
+};
+
+Steppers.defaultProps = {
+  lastStep: '4',
+};
