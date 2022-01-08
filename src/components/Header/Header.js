@@ -1,6 +1,5 @@
 import './Header.scss';
 
-import QuizIcon from '@mui/icons-material/Quiz';
 import Tooltip from '@mui/material/Tooltip';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -116,7 +115,7 @@ export default function Header() {
         </div>
         <div className="header-wrap">
           {/*<NativeLogin/>*/}
-          {clientData ? (
+          {clientData && clientData.address ? (
             <Wallet />
           ) : (
             <button
