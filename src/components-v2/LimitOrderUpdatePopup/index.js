@@ -11,7 +11,6 @@ import { UPDATE_LIMIT_ORDER } from '@/constants/commissions';
 import {
   ADDRESS_INCORRECT_LENGTH,
   NOT_POSITIVE,
-  NOT_TOUCHED,
 } from '@/constants/validationMessages';
 import { iconGenerator } from '@/iconGenerator';
 import {
@@ -25,6 +24,8 @@ import {
 import truncateNum from '@/utils/truncateNum';
 
 import classes from './index.module.scss';
+
+const NO_CHANGE = 'Values are not changed';
 
 export default function LimitOrderUpdatePopup() {
   const dispatch = useDispatch();
@@ -42,18 +43,13 @@ export default function LimitOrderUpdatePopup() {
     (state) => state.tonContext.functions.transferLimitOrder,
   );
 
-  const {
-    dirty,
-    errors,
-    handleBlur,
-    handleChange,
-    isValid: valid,
-    values,
-  } = useFormik({
+  const { errors, handleBlur, handleChange, handleSubmit, values } = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      newAddress: clientData.address,
-      newPrice: initialValues ? initialValues.toPrice : 0,
+      newAddress: clientData ? clientData.address : '',
+      newPrice: initialValues ? initialValues.toPrice : '',
     },
+    onSubmit: handleConfirm,
     validate,
   });
 
@@ -65,17 +61,24 @@ export default function LimitOrderUpdatePopup() {
     if (newPrice <= 0) errors.newPrice = NOT_POSITIVE;
     else if (newAddress.length !== 66)
       errors.newAddress = ADDRESS_INCORRECT_LENGTH;
+    else if (
+      newPrice === initialValues.toPrice &&
+      newAddress === clientData.address
+    )
+      errors.common = NO_CHANGE;
 
     return errors;
   }
 
   async function handleClose() {
+    dispatch(resetLimitOrderPopupValues());
     dispatch(closeLimitOrderUpdatePopup());
   }
 
   async function handleConfirm() {
-    const { addrOrder, fromToken, toPrice, toToken } = values;
+    const { addrOrder, fromToken, toPrice, toToken } = initialValues;
 
+    dispatch(resetLimitOrderPopupValues());
     dispatch(closeLimitOrderUpdatePopup());
     dispatch(
       setWaitingPopupValues({
@@ -123,8 +126,6 @@ export default function LimitOrderUpdatePopup() {
       });
 
     dispatch(resetWaitingPopupValues());
-    dispatch(resetLimitOrderPopupValues());
-    dispatch(closeLimitOrderUpdatePopup());
   }
 
   if (!visible || !initialValues) return null;
@@ -134,6 +135,7 @@ export default function LimitOrderUpdatePopup() {
   return (
     <div className="popup-wrapper">
       <MainBlock
+        class={classes['reset-fixed']}
         button={
           <button onClick={handleClose} className={classes.btn}>
             <IconCross
@@ -143,8 +145,10 @@ export default function LimitOrderUpdatePopup() {
           </button>
         }
         title="Update Limit Order"
+        helperText={errors.common}
+        error={errors.common}
         content={
-          <>
+          <form onSubmit={handleSubmit}>
             <div
               className={cls('confirm-block', classes['swap-confirm-block'])}
             >
@@ -276,17 +280,10 @@ export default function LimitOrderUpdatePopup() {
             {errors.newAddress && (
               <FormHelperText error>{errors.newAddress}</FormHelperText>
             )}
-            <button
-              className={cls(
-                'btn popup-btn',
-                (!dirty || !valid) && 'btn--disabled',
-              )}
-              onClick={handleConfirm}
-            >
+            <button type="submit" className={cls('btn popup-btn')}>
               Update Order
             </button>
-            {!dirty && <FormHelperText>{NOT_TOUCHED}</FormHelperText>}
-          </>
+          </form>
         }
         footer={
           <div className="mainblock-footer">
