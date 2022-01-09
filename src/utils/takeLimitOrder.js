@@ -4,6 +4,7 @@ import { signerKeys } from '@tonclient/core';
 import { NO_CONTEXT } from '@/constants/runtimeErrors';
 import { AB_DIRECTION } from '@/constants/runtimeVariables';
 import { DEXClientContract } from '@/extensions/contracts/DEXClientMainNet';
+import convertToSafeInt from '@/utils/convertToSafeInt';
 
 export default async function takeLimitOrder({
   directionPair,
@@ -20,7 +21,7 @@ export default async function takeLimitOrder({
     !this.helperFunctions ||
     !this.helperFunctions.getPair ||
     !this.helperFunctions.getClientKeys ||
-    !this.helperFunctions.getTokenRouter
+    !this.helperFunctions.getTokenRouterAddress
   )
     throw new Error(NO_CONTEXT);
 
@@ -40,25 +41,29 @@ export default async function takeLimitOrder({
   const pair = await this.helperFunctions.getPair(pairAddr);
   try {
     if (directionPair === AB_DIRECTION) {
-      const routerAddr = await this.helperFunctions.getTokenRouter(pair.rootB);
+      const routerAddr = await this.helperFunctions.getTokenRouterAddress(
+        pair.rootB,
+      );
       console.log('Router_address->B', routerAddr);
       const res = await clientAcc.run('takeLimitOrderA', {
         limitOrderA: orderAddr,
         pairAddr,
-        priceB: price,
-        qtyB: qty,
+        priceB: convertToSafeInt(price),
+        qtyB: convertToSafeInt(qty),
         routerWalletB: routerAddr,
       });
       console.log('takeLimitOrderA->response', res.decoded);
       res.decoded;
     } else {
-      const routerAddr = await this.helperFunctions.getTokenRouter(pair.rootA);
+      const routerAddr = await this.helperFunctions.getTokenRouterAddress(
+        pair.rootA,
+      );
       console.log('Router_address->A', routerAddr);
       const res = await clientAcc.run('takeLimitOrderB', {
         limitOrderB: orderAddr,
         pairAddr,
-        priceA: price,
-        qtyA: qty,
+        priceA: convertToSafeInt(price),
+        qtyA: convertToSafeInt(qty),
         routerWalletA: routerAddr,
       });
       console.log('takeLimitOrderB->response', res.decoded);
