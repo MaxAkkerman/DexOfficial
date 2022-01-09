@@ -47,6 +47,7 @@ import {
 import memoize from 'lodash.memoize';
 
 import { saveLog } from '../../logging/logging';
+import daiData from "@/pages/Bridge/abis";
 
 const { ResponseType } = require('@tonclient/core/dist/bin');
 const { TonClient } = require('@tonclient/core');
@@ -81,8 +82,12 @@ const  vaultAbi = [
   "function token() external view returns (address)",
 ];
 
-export async function getBridgeAssetsForAddress(chain, walletAddr) {
 
+
+
+
+export async function getBridgeAssetsForAddress(chain, walletAddr) {
+console.log("getBridgeAssetsForAddress",chain, walletAddr)
     let eth1 = [];
     let bcs56 = [];
     let polygon137 = [];
@@ -126,7 +131,8 @@ export async function getBridgeAssetsForAddress(chain, walletAddr) {
       itemConfig =  { token: item.token, symbol: '', config: '', vaultWrapper: '', vault: '', evmtoken: '', balance: '', decimals: '', name: '', evmsymbol: '', logo: '', thumbnail: ''};
       const rootAcc = new Account(RootTokenContract, {address: item.token,client,});
       response = await rootAcc.runLocal("symbol", {});
-      itemConfig.symbol = response.decoded.output.symbol;
+      itemConfig.symbol = hex2a(response.decoded.output.symbol);
+      itemConfig.icon = iconGenerator(getReplacedSymbol(hex2a(response.decoded.output.symbol)))
       itemConfig.config = item.config;
       const configAcc = new Account(CreditEthereumEventConfigurationContract, {address: item.config,client,});
       response = await configAcc.runLocal("getDetails", {answerId: 0});
@@ -177,8 +183,10 @@ export async function getBridgeAssetsForAddress(chain, walletAddr) {
       itemConfig =  { token: item.token, symbol: '', config: '', vaultWrapper: '', vault: '', evmtoken: '', balance: '', decimals: '', name: '', evmsymbol: '', logo: '', thumbnail: ''};
       const rootAcc = new Account(RootTokenContract, {address: item.token,client,});
       response = await rootAcc.runLocal("symbol", {});
-      itemConfig.symbol = response.decoded.output.symbol;
-      itemConfig.config = item.config;
+      itemConfig.symbol = hex2a(response.decoded.output.symbol);
+        itemConfig.icon = iconGenerator(getReplacedSymbol(hex2a(response.decoded.output.symbol)))
+
+        itemConfig.config = item.config;
       const configAcc = new Account(CreditEthereumEventConfigurationContract, {address: item.config,client,});
       response = await configAcc.runLocal("getDetails", {answerId: 0});
       let dec = response.decoded.output._networkConfiguration.eventEmitter;
@@ -228,8 +236,10 @@ export async function getBridgeAssetsForAddress(chain, walletAddr) {
       itemConfig =  { token: item.token, symbol: '', config: '', vaultWrapper: '', vault: '', evmtoken: '', balance: '', decimals: '', name: '', evmsymbol: '', logo: '', thumbnail: ''};
       const rootAcc = new Account(RootTokenContract, {address: item.token,client,});
       response = await rootAcc.runLocal("symbol", {});
-      itemConfig.symbol = response.decoded.output.symbol;
-      itemConfig.config = item.config;
+      itemConfig.symbol = hex2a(response.decoded.output.symbol);
+        itemConfig.icon = iconGenerator(getReplacedSymbol(hex2a(response.decoded.output.symbol)))
+
+        itemConfig.config = item.config;
       const configAcc = new Account(CreditEthereumEventConfigurationContract, {address: item.config,client,});
       response = await configAcc.runLocal("getDetails", {answerId: 0});
       let dec = response.decoded.output._networkConfiguration.eventEmitter;
@@ -279,8 +289,10 @@ export async function getBridgeAssetsForAddress(chain, walletAddr) {
       itemConfig =  { token: item.token, symbol: '', config: '', vaultWrapper: '', vault: '', evmtoken: '', balance: '', decimals: '', name: '', evmsymbol: '', logo: '', thumbnail: ''};
       const rootAcc = new Account(RootTokenContract, {address: item.token,client,});
       response = await rootAcc.runLocal("symbol", {});
-      itemConfig.symbol = response.decoded.output.symbol;
-      itemConfig.config = item.config;
+      itemConfig.symbol = hex2a(response.decoded.output.symbol);
+        itemConfig.icon = iconGenerator(getReplacedSymbol(hex2a(response.decoded.output.symbol)))
+
+        itemConfig.config = item.config;
       const configAcc = new Account(CreditEthereumEventConfigurationContract, {address: item.config,client,});
       response = await configAcc.runLocal("getDetails", {answerId: 0});
       let dec = response.decoded.output._networkConfiguration.eventEmitter;

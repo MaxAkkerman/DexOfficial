@@ -1,39 +1,32 @@
 import './Bridge.scss';
 
 import {Grid} from '@material-ui/core';
-import cls from 'classnames';
-import React, {useEffect, useRef, useState} from 'react';
-import {useSelector} from 'react-redux';
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {BigNumber} from 'bignumber.js';
-import avatarPlaceholder from './avatar-placeholder.png';
-import BridgeAssets from '@/pages/Bridge/test';
 
 import BlockItem from '../../components/AmountBlock/AmountBlock';
 import InputChange from '../../components/AmountBlock/InputChange';
-import MaxBtn from '../../components/AmountBlock/MAXbtn';
 import RightBlockBottom from '../../components/AmountBlock/RightBlockBottom';
 import ShowBalance from '../../components/AmountBlock/ShowBalance';
-import AssetsList from '../../components/AssetsList/AssetsList';
 import {NextBtn} from '../../components/LoginViaPIN/NextBtn';
 import MainBlock from '../../components/MainBlock/MainBlock';
-import {NOT_ENOUGH_CAUSE_COMMISSION} from '../../constants/validationMessages';
 import bnb from '../../images/bridgeNets/bnb.png';
-import arrowDown from '../../images/icons/arrowBotThin.svg';
-import sendAssetsimg from '../../images/sendAssets.svg';
-import AddressPopup from './AddressPopup';
-import AssetsListBridge from './AssetsListBridge';
-import BridgeNetworksList from './BridgeNetworksList';
 import {initNotify, initOnboard} from "@/pages/Bridge/services";
 import {ethers} from "ethers";
 // import BridgeAssets from "@/pages/Bridge/test";
 import daiData from "./abis"
-import networkEnum from "./networkEnum"
 import SelectPopup from "@/components-v2/SelectPopup";
 import {isEmpty} from 'lodash';
 import {iconGenerator} from "@/iconGenerator";
-import {
-  getBridgeAssetsForAddress,
-} from '../../extensions/sdk_get/get';
+import {getBridgeAssetsForAddress,} from '../../extensions/sdk_get/get';
+import {FormHelperText} from "@mui/material";
+import {setCurrentTokenForSend, setTokenSetted} from "@/store/actions/walletSeed";
+import {setTips} from "@/store/actions/app";
+import SendConfirmPopup from "@/components/SendConfirmPopup/SendConfirmPopup";
+import {useUnmount} from "react-use";
+// import {
+//     setNotify, setOnboard} from "@/store/actions/bridge";
 
 const assetsBridge = [
     {
@@ -79,12 +72,19 @@ const assetsBridge = [
 
 let provider;
 
+let objc = {
+    1: "eth1",
+    56: "bcs56",
+    127: "polygon137",
+    250: "phantom250"
+}
 
 function Bridge() {
+    const dispatch = useDispatch();
     const {
         daiVaultWrapperAddress,
         daiVaultAddress,
-        daiBEP20Address,
+        // daiBEP20Address,
         daiDecimals,
         daiVaultABI,
         internalTransferABI,
@@ -95,10 +95,21 @@ function Bridge() {
     let internalTransferContract;
     let daiContract;
     let daiVaultContract;
+    const tokenList = useSelector((state) => state.walletReducer.tokenList);
 
-    const walletIsConnected = useSelector(
-        (state) => state.appReducer.walletIsConnected,
-    );
+    // const onboard = useSelector((state) => state.bridgeReducer.onboard);
+    // const notify = useSelector((state) => state.bridgeReducer.notify);
+    // const address = useSelector((state) => state.bridgeReducer.address);
+    // const ens = useSelector((state) => state.bridgeReducer.ens);
+    // const network = useSelector((state) => state.bridgeReducer.network);
+    // const balance = useSelector((state) => state.bridgeReducer.balance);
+
+
+    const amountToSend = useSelector((state) => state.walletSeedReducer.amountToSend);
+    const currentTokenForSend = useSelector((state) => state.walletSeedReducer.currentTokenForSend);
+    const walletIsConnected = useSelector((state) => state.appReducer.walletIsConnected);
+    const clientData = useSelector((state) => state.walletReducer.clientData);
+
     const [amountTo, setAmountTo] = useState(null);
     const [amountFrom, setAmountFrom] = useState(null);
 
@@ -123,35 +134,76 @@ function Bridge() {
     const [onNetworkChange, setOnNetworkChange] = useState(false)
 
     const [toAddress, setToAddress] = useState('');
-    const [approveValue, setApproveValue] = useState('');
+    const [ethAddress, setEthAddress] = useState('');
+    const [curToken, setCurToken] = useState({})
+    const [amountValidate, setamountValidate] = useState({error: false, helperText: "Insufficient balance"})
+    // const [walletState,setWalletState] = useState({})
+    const [walletSelected, setWalletSelected] = useState(false)
+    const [onConfirmPopup, setOnConfirmPopup] = useState(false)
+    const [onApprove, setOnApprove] = useState(false)
+    const [onFetchTokens, setonFetchTokens] = useState(false)
+    const [tokensArr, setTokensArr] = useState([])
+
+    async function clearState() {
+        // notify.close()
+        // notify.unsubscribe(await onboard.getState().address)
+        provider = null
+        // setWallet({})
+        // setChain({})
+        // setNetwork(56)
+        setNotify(null)
+        setOnboard(null)
+        setFromTokenSetted(false)
+        await onboard.walletReset()
+        dispatch(setCurrentTokenForSend({}));
+        setCurToken({})
+        setFromCurAsset({});
+        dispatch(setTokenSetted(false));
+    }
+
+    useUnmount(async () => {
+        await clearState()
+
+    });
 
     function handleOnAssetsListOpen(type) {
+        getTokens()
         setType(type);
+
         setOnAssetsList(true);
     }
 
     function changeAmountToSend(am, type) {
+        let tokenBalance = curToken.balance / 10 ** curToken.decimals
+
         if (type === 'from') {
-            setAmountFrom(am);
+            console.log("amamam", am, "tokenBalance", tokenBalance)
+            if (am > tokenBalance) {
+                setamountValidate({...amountValidate, error: true})
+                setAmountFrom(am);
+
+            } else {
+                setamountValidate({...amountValidate, error: false})
+                setAmountFrom(am);
+            }
         } else {
             setAmountTo(am);
         }
     }
 
 
-
     // useEffect(() => {
-        // console.log("onboard changed",onboard,onboard.getState())
-        // const previouslySelectedWallet =
-        //     window.localStorage.getItem('selectedWallet');
-        //
-        // if (previouslySelectedWallet && onboard) {
-        //     onboard.walletSelect(previouslySelectedWallet);
-        // }
+    //     console.log("onboard changed",onboard,onboard.getState())
+    //     const previouslySelectedWallet =
+    //         window.localStorage.getItem('selectedWallet');
+    //
+    //     if (previouslySelectedWallet && onboard) {
+    //         onboard.walletSelect(previouslySelectedWallet);
+    //     }
     // }, [onboard]);
 
     useEffect(() => {
-        console.log("initOnboard changes",setNetwork)
+        console.log("onboard", onboard, "notify", notify, "wallet", wallet)
         const onboard = initOnboard({
             address: setAddress,
             ens: setEns,
@@ -163,23 +215,23 @@ function Bridge() {
 
                     provider = new ethers.providers.Web3Provider(wallet.provider, 'any');
 
-                    internalTransferContract = new ethers.Contract(
-                        '0xb8c12850827ded46b9ded8c1b6373da0c4d60370',
-                        internalTransferABI,
-                        provider.getUncheckedSigner(),
-                    );
+                    // internalTransferContract = new ethers.Contract(
+                    //     '0xb8c12850827ded46b9ded8c1b6373da0c4d60370',
+                    //     internalTransferABI,
+                    //     provider.getUncheckedSigner(),
+                    // );
 
-                    daiContract = new ethers.Contract(
-                        daiBEP20Address,
-                        daiABI,
-                        provider.getUncheckedSigner(),
-                    );
+                    // daiContract = new ethers.Contract(
+                    //     daiBEP20Address,
+                    //     daiABI,
+                    //     provider.getUncheckedSigner(),
+                    // );
 
-                    daiVaultContract = new ethers.Contract(
-                        daiVaultWrapperAddress,
-                        daiVaultABI,
-                        provider.getUncheckedSigner(),
-                    );
+                    // daiVaultContract = new ethers.Contract(
+                    //     daiVaultWrapperAddress,
+                    //     daiVaultABI,
+                    //     provider.getUncheckedSigner(),
+                    // );
 
                     window.localStorage.setItem('selectedWallet', wallet.name);
                 } else {
@@ -188,21 +240,88 @@ function Bridge() {
                 }
             },
         });
+        // if(!onboard){
+        console.log("onboard", onboard)
+        // dispatch(setOnboard(onboard))
+        setOnboard(onboard)
+        // }
+        // if(!notify){
+        console.log("notify", notify)
 
-        setOnboard(onboard);
+        // dispatch(setNotify(initNotify()))
+        setNotify(initNotify())
+        // }
+        //
+        // setOnboard(onboard);
+        //     setNotify(initNotify());
 
-        // setNotify(initNotify());
+
     }, []);
 
-    // const readyToTransact = async () => {
-    //     if (!provider) {
-    //         const walletSelected = await onboard.walletSelect();
-    //         if (!walletSelected) return false;
-    //     }
-    //
-    //     const ready = await onboard.walletCheck();
-    //     return ready;
-    // };
+    useEffect(() => {
+        console.log("onboard", onboard, "notify", notify, "wallet", wallet)
+        const onboard = initOnboard({
+            address: setAddress,
+            ens: setEns,
+            network: setNetwork,
+            balance: setBalance,
+            wallet: (wallet) => {
+                if (wallet.provider) {
+                    setWallet(wallet);
+
+                    provider = new ethers.providers.Web3Provider(wallet.provider, 'any');
+
+                    // internalTransferContract = new ethers.Contract(
+                    //     '0xb8c12850827ded46b9ded8c1b6373da0c4d60370',
+                    //     internalTransferABI,
+                    //     provider.getUncheckedSigner(),
+                    // );
+
+                    // daiContract = new ethers.Contract(
+                    //     daiBEP20Address,
+                    //     daiABI,
+                    //     provider.getUncheckedSigner(),
+                    // );
+
+                    // daiVaultContract = new ethers.Contract(
+                    //     daiVaultWrapperAddress,
+                    //     daiVaultABI,
+                    //     provider.getUncheckedSigner(),
+                    // );
+
+                    window.localStorage.setItem('selectedWallet', wallet.name);
+                } else {
+                    provider = null;
+                    setWallet({});
+                }
+            },
+        });
+        // if(!onboard){
+        console.log("onboard", onboard)
+        // dispatch(setOnboard(onboard))
+        setOnboard(onboard)
+        // }
+        // if(!notify){
+        console.log("notify", notify)
+
+        // dispatch(setNotify(initNotify()))
+        setNotify(initNotify())
+        // }
+        //
+        // setOnboard(onboard);
+        //     setNotify(initNotify());
+
+
+    }, [wallet]);
+
+    const readyToTransact = async () => {
+        if (!provider) {
+            const walletSelected = await onboard.walletSelect();
+            if (!walletSelected) return false;
+        }
+
+        return await onboard.walletCheck();
+    };
 
     // const sendHash = async () => {
     //     if (!toAddress) {
@@ -257,79 +376,127 @@ function Bridge() {
     //     emitter.on('txCancel', console.log);
     //     emitter.on('txFailed', console.log);
     // };
+    async function handleCloseAseetsList() {
+        console.log("ens", ens,"wallet", wallet, "onboard", onboard, "notify",notify)
+        console.log("curToken.evmtoken, await onboard.getState().address, curToken.vault", curToken.evmtoken, Object.keys(onboard.getState()), curToken.vault)
+        await getApproval(curToken.evmtoken, await onboard.getState().address, curToken.vault)
+    }
 
-    // const approveForWrapper = async () => {
-    //     if (!approveValue) {
-    //         alert('value to approve is required.');
-    //         return;
-    //     }
-    //
-    //     let av = new BigNumber(approveValue).shiftedBy(daiDecimals).toFixed();
-    //     console.log('approveValue: ', av);
-    //
-    //     const {hash} = await daiContract.approve(daiVaultAddress, av, {
-    //         value: 0,
-    //     });
-    //
-    //     const {emitter} = notify.hash(hash);
-    //
-    //     emitter.on('txSent', console.log);
-    //     emitter.on('txPool', console.log);
-    //     emitter.on('txConfirmed', console.log);
-    //     emitter.on('txSpeedUp', console.log);
-    //     emitter.on('txCancel', console.log);
-    //     emitter.on('txFailed', console.log);
-    // };
+    const approveForWrapper = async () => {
+        console.log("om a[[rove")
+        if (!amountFrom) {
+            alert('value to approve is required.');
+            return;
+        }
+        const daiContract = new ethers.Contract(
+            curToken.evmtoken,
+            daiABI,
+            provider.getUncheckedSigner(),
+        );
+        console.log('approveValue: ', amountFrom, "curToken", curToken);
 
-    // const depositToVault = async () => {
-    //     if (!approveValue) {
-    //         alert('value to approve is required.');
-    //         return;
-    //     }
-    //
-    //     let av = new BigNumber(approveValue).shiftedBy(daiDecimals).toFixed();
-    //     console.log('approveValue: ', av);
-    //
-    //     // if (!toAddress) {
-    //     //   alert('An Ethereum address to send Eth to is required.')
-    //     //   return
-    //     // }
-    //     //
-    //     // const { hash } = await internalTransferContract.internalTransfer(
-    //     //   toAddress,
-    //     //   {
-    //     //     value: av
-    //     //   }
-    //     // )
-    //
-    //     const {hash} = await daiVaultContract.depositToFactory(
-    //         av,
-    //         0,
-    //         // DEXClient Addr for TON from Bridge
-    //         '0xe6cd868e34a0558171483682b2dcbb19f0cc1ba8c13aef97c8c2c862b93d2094',
-    //         '0x48b1daf7ff5c10ec590628e65702dcd01d947b36660a6348e5360f92c8b7bae5',
-    //         // owber of income TIP3 wallet is DEXConnecror Addr from current DEXCLient. For token income from Bridge
-    //         '0xe874c56af67b0c362ff8ac90912bae3bb137f693f84b3fa99056f081279c6246',
-    //         0,
-    //         0,
-    //         0,
-    //         5,
-    //         100,
-    //         '0x0000',
-    //         {
-    //             value: 0,
-    //         },
-    //     );
-    //
-    //     const {emitter} = notify.hash(hash);
-    //
-    //     emitter.on('txSent', console.log);
-    //     emitter.on('txPool', console.log);
-    //     emitter.on('txConfirmed', console.log);
-    //     emitter.on('txSpeedUp', console.log);
-    //     emitter.on('txCancel', console.log);
-    //     emitter.on('txFailed', console.log);
-    // };
+        let av = new BigNumber(curToken.balance / 10 ** curToken.decimals).shiftedBy(Number(curToken.decimals)).toFixed();
+        console.log('approveValue: ', av, "curToken", curToken, "daiContract", daiContract);
+
+        const res = await daiContract.approve(curToken.vault, av, {
+            value: 0,
+        });
+        console.log("hashhash", res)
+        const {emitter} = notify.hash(res.hash);
+        console.log("emitter", emitter)
+        emitter.on('txSent', (data) => {
+            console.log("txSent", data)
+        })
+        emitter.on('txPool', (data) => {
+            console.log("txPool", data)
+        })
+        emitter.on('txConfirmed', (data) => {
+            console.log("txConfirmed", data)
+        })
+        emitter.on('txSpeedUp', (data) => {
+            console.log("txSpeedUp", data)
+        });
+        emitter.on('txCancel', (data) => {
+                console.log("txCancel", data)
+            }
+        );
+
+        emitter.on('txFailed', (data) => {
+            console.log("txFailed", data)
+        });
+    };
+
+    const depositToVault = async () => {
+        console.log("on deposit", curToken)
+        if (!amountFrom) {
+            dispatch(
+                setTips({
+                    message: `Insufficient balance`,
+                    type: 'error',
+                }),
+            );
+            return;
+        }
+        const daiVaultContract = new ethers.Contract(
+            curToken.vaultWrapper,
+            daiVaultABI,
+            provider.getUncheckedSigner(),
+        );
+        console.log("amountFrom", amountFrom)
+        let av = new BigNumber(amountFrom).shiftedBy(Number(curToken.decimals)).toFixed();
+        console.log('approveValue: ', av);
+
+        const connetorAddress = tokenList.filter(it => it.symbol === curToken.symbol)
+        console.log("connetorAddress", connetorAddress)
+        // if (!toAddress) {
+        //   alert('An Ethereum address to send Eth to is required.')
+        //   return
+        // }
+        //
+        // const { hash } = await internalTransferContract.internalTransfer(
+        //   toAddress,
+        //   {
+        //     value: av
+        //   }
+        // )
+        console.log("clientData.address.replace(\":\",\"x\")", clientData.address.replace(":", "x"))
+        const gasPrice = () => provider.getGasPrice().then((res) => res.toString());
+
+        console.log("connetorAddress[0].owner_address", connetorAddress[0].owner_address.replace(":", "x"), "gasPrice", await gasPrice(), "avavav", av)
+        const {hash} = await daiVaultContract.depositToFactory(
+            av,
+            0,
+            // DEXClient Addr for TON from Bridge
+            clientData.address.replace(":", "x"),
+            '0x48b1daf7ff5c10ec590628e65702dcd01d947b36660a6348e5360f92c8b7bae5',
+            // owber of income TIP3 wallet is DEXConnecror Addr from current DEXCLient. For token income from Bridge
+            connetorAddress[0].owner_address.replace(":", "x"),
+            0,
+            0,
+            0,
+            5,
+            100,
+            `0x${Buffer.from('te6ccgEBAQEAAgAAAA==', 'base64').toString('hex')}`,
+            {
+                value: 0,
+            },
+        );
+        //
+        // const {emitter} = notify.hash(hash);
+        // emitter.on('txRequest', data=> console.log("txRequest",data));
+        // emitter.on('txAwaitingApproval', data=> console.log("txAwaitingApproval",data));
+        // emitter.on('txConfirmReminder', data=> console.log("txConfirmReminder",data));
+        // emitter.on("all", transaction => {
+        //     console.log("allllll",transaction)
+        //     // called on every event that doesn't have a listener defined on this transaction
+        // })
+        // emitter.on('txSent', data=> console.log("txSent",data));
+        // emitter.on('txPool', data=> console.log("txPool",data));
+        // emitter.on('txConfirmed', data=> console.log("txConfirmed",data));
+        // emitter.on('txSpeedUp', data=> console.log("txSpeedUp",data));
+        // emitter.on('txCancel', data=> console.log("txCancel",data));
+        // emitter.on('txFailed', data=> console.log("txFailed",data));
+    };
 
     // const sendTransaction = async () => {
     //     if (!toAddress) {
@@ -378,61 +545,172 @@ function Bridge() {
     // };
 
     // if (!onboard || !notify) return <div>Loading...</div>;
-    function handleShowBridgeAssets() {
-        console.log('handleShowBridgeAssets', address, "ens", ens, "network", network, "balance", balance, "wallet", wallet);
 
-        onboard.walletSelect();
+
+
+    async function handleShowBridgeAssets() {
+        console.log('handleShowBridgeAssets onboard',onboard,"address", address, "ens", ens, "network", network, "balance", balance, "wallet", wallet);
+
+        // if (!provider) {
+            const walletSelected = onboard.walletSelect();
+            console.log("walletSelected", walletSelected)
+            if (!walletSelected){
+                dispatch(
+                    setTips({
+                        message: `Please select wallet first`,
+                        type: 'error',
+                    }),
+                );
+            };
+        // }
+
+        const ready = await onboard.walletCheck();
+        console.log("ready", ready)
+        //
+        // return ready;
+
+
+        // onboard.walletSelect();
         // console.log('handleShowBridgeAssets');
         // setOnAssetsList(true);
     }
 
-    function handleShowBridgeAssetsTest() {
-        console.log('handleShowBridgeAssets', address, "ens", ens, "network", network, "balance", balance, "wallet", wallet);
-        setOnAssetsList(true);
-    }
-    useEffect(async ()=>{
-        if(!isEmpty(wallet)){
-            const re = await onboard.walletCheck()
-            console.log("rerere",re)
-        }
-
-    },[wallet])
-
-    function handleSetBridgeAsset(e) {
-        if (type === 'from') {
-            setFromTokenSetted(true);
-            setFromCurAsset(e);
-        } else {
-            setToTokenSetted(true);
-            setToCurAsset(e);
-        }
-        setOnAssetsList(false);
-    }
-
-    function handleCloseAseetsList() {
-        console.log("netw",network)
-        console.log("wallet",  wallet, "onboard.getState()",onboard.getState(),"onboard",onboard, "accountSelect",onboard.accountSelect().then(it=>console.log("ioioioi",it)) )
-        console.log("assets",  getBridgeAssetsForAddress(1,'0x25Beb76684EF0ba98347fE69E4D805be76f7942c').then(it=>console.log("assetsObj",it)) )
-//         let changeNet = onboard.config({ networkId: 1 })
-// setOnboard(changeNet)
-
-    }
-
 
     async function handleSetNetwork(e, t) {
-        console.log("chain changes",t)
-        // await onboard.config({ networkId: 1 })
+        console.log("chain changes", t)
+        let res = await onboard.config({networkId: t.chainID})
+        console.log("chain changes set new", res,"onboard")
         // await onboard.walletReset()
         // setNetwork(t.chainId)
         setChain(t)
         setOnNetworkChange(false)
     }
 
+    useEffect(async () => {
+        // console.log("walletStatewalletState",wallet,"walletState",walletState,"onboard",onboard)
+        if (isEmpty(wallet)) {
+            return
+        }
+
+        const r = await wallet.provider.isConnected()
+        console.log("wallet is here", r)
+        if (r) {
+            console.log("onboard.getState()", await onboard.getState())
+            setWalletSelected(r)
+
+            // setWalletState(await onboard.getState())
+        } else {
+            console.log("rtrt", r)
+        }
+
+
+    }, [wallet])
+
+    async function getTokens() {
+        setonFetchTokens(false)
+        let curNet = objc[onboard.getState().network]
+        let tokens = await getBridgeAssetsForAddress(onboard.getState().network, onboard.getState().address)
+        let res = tokens[curNet]
+        setTokensArr(res)
+        console.log("resres", res)
+        setonFetchTokens(true)
+    }
+
+    function handleSetToken(e, t) {
+        dispatch(setCurrentTokenForSend(t));
+        setCurToken(t)
+        console.log("ttt", t)
+        setFromCurAsset(t);
+        dispatch(setTokenSetted(true));
+        console.log("onAssetsList e,t", e, t)
+    }
+
+    async function handleOnConfirm() {
+        if (amountToSend > currentTokenForSend.balance) {
+            dispatch(
+                setTips({
+                    message: `Insufficient balance`,
+                    type: 'error',
+                }),
+            );
+            return
+        }
+
+        const approvedAmount = await getApproval(curToken.evmtoken, await onboard.getState().address, curToken.vault)
+        console.log("approvedAmount", approvedAmount, "amountFrom", amountFrom)
+
+        let amFrom = +amountFrom * 10 ** +curToken.decimals;
+
+        console.log("amFrom", amFrom)
+        if (approvedAmount > amFrom) {
+            setOnApprove(false)
+        } else {
+            setOnApprove(true)
+
+        }
+        setOnConfirmPopup(true)
+
+
+    }
+
+    async function getApproval(rootAddress, owner, spender) {
+        if(!rootAddress || !owner || !spender){
+            dispatch(
+                setTips({
+                    message: `Can not get approved value for your token, please try again`,
+                    type: 'error',
+                }),
+            );
+            return
+        }
+        const {daiABI} = daiData
+
+        const rootContract = new ethers.Contract(
+            rootAddress,
+            daiABI,
+            provider.getUncheckedSigner(),
+        );
+        const res = await rootContract.allowance(owner, spender, {
+            value: 0,
+        });
+        console.log("reeeee", Number(res))
+        return Number(res)
+
+    }
+
+
+    async function handleSendAssetToBridge() {
+        onApprove ? approveForWrapper() : depositToVault()
+        setOnConfirmPopup(false)
+
+
+    }
+
     return (
         <>
-            {/*{onAssetsList ? (*/}
-            {/*    <BridgeAssets />*/}
-            {/*) : (*/}
+            {onConfirmPopup ?
+                <SendConfirmPopup
+                    // showConfirmPopup={()=>handleSetSendPopupVisibility(false)}
+                    title={onApprove ? "Approve to vault" : "Send tokens"}
+                    hideConfirmPopup={() => setOnConfirmPopup(false)}
+                    addressToSend={onApprove ? curToken.vault : clientData.address}
+                    currentAsset={curToken}
+                    amountToSend={amountFrom}
+                    handleSend={() => handleSendAssetToBridge()}
+                />
+                : null
+            }
+            {onAssetsList ?
+                <SelectPopup
+                    loading={!onFetchTokens}
+                    onClose={() => setOnAssetsList(false)}
+                    onSelect={(e, t) => handleSetToken(e, t)}
+                    tokens={tokensArr}
+                    title={"Select a token"}
+                />
+                :
+                null
+            }
 
             {onNetworkChange ?
                 <SelectPopup
@@ -467,7 +745,7 @@ function Bridge() {
                                              display: "flex",
                                              width: "173px",
                                              justifyContent: "start",
-                                             cursor:"pointer"
+                                             cursor: "pointer"
                                          }}
                                     >
                                         <img
@@ -484,22 +762,11 @@ function Bridge() {
                                                 fontSize: '16px',
                                                 color: "var(--mainblock-title-color)",
                                                 backgroundColor: "transparent",
-                                                padding: "5px"
+                                                padding: "5px",
                                             }}
                                         >
                                             {chain.symbol}
-                                            <svg
-                                                width="12"
-                                                height="8"
-                                                viewBox="0 0 16 10"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                                <path
-                                                    d="M3.06066 0.93934C2.47487 0.353553 1.52513 0.353553 0.93934 0.93934C0.353553 1.52513 0.353553 2.47487 0.93934 3.06066L3.06066 0.93934ZM8 8L6.93934 9.06066C7.52513 9.64645 8.47487 9.64645 9.06066 9.06066L8 8ZM15.0607 3.06066C15.6464 2.47487 15.6464 1.52513 15.0607 0.93934C14.4749 0.353553 13.5251 0.353553 12.9393 0.93934L15.0607 3.06066ZM0.93934 3.06066L6.93934 9.06066L9.06066 6.93934L3.06066 0.93934L0.93934 3.06066ZM9.06066 9.06066L15.0607 3.06066L12.9393 0.93934L6.93934 6.93934L9.06066 9.06066Z"
-                                                    fill="white"
-                                                />
-                                            </svg>
+
                                         </button>
                                     </div>
                                     :
@@ -527,36 +794,55 @@ function Bridge() {
                                 <div className="select-item-wrapper"
                                      style={{
                                          display: "flex",
-                                         width: "173px",
+                                         // width: "173px",
                                          justifyContent: "start",
-                                         cursor:"pointer"
+                                         cursor: "pointer"
                                      }}
                                 >
-                                <button
-                                    onClick={() => handleShowBridgeAssets()}
-                                    disabled={!isEmpty(chain) ? "" : "disabled"}
-                                    // className="btn input-btn"
-                                    className={
-                                        !isEmpty(chain)
-                                            ? 'btn input-btn'
-                                            : 'btn input-btn btn--disabled'
+                                    {walletSelected ?
+                                        <button
+                                            onClick={handleShowBridgeAssets}
+                                            className="btn input-btn"
+                                            style={{
+                                                fontSize: '16px',
+                                                color: "var(--mainblock-title-color)",
+                                                backgroundColor: "transparent",
+                                                padding: "5px",
+                                                display: "flex",
+
+                                            }}
+                                        >
+                                            {address && address}
+
+                                        </button>
+                                        :
+                                        <button
+                                            onClick={handleShowBridgeAssets}
+                                            disabled={!isEmpty(chain) ? "" : "disabled"}
+                                            // className="btn input-btn"
+                                            className={
+                                                !isEmpty(chain)
+                                                    ? 'btn input-btn'
+                                                    : 'btn input-btn btn--disabled'
+                                            }
+                                            style={{fontSize: '12px', borderRadius: '13px'}}
+                                        >
+                                            Select wallet
+                                            <svg
+                                                width="12"
+                                                height="8"
+                                                viewBox="0 0 16 10"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    d="M3.06066 0.93934C2.47487 0.353553 1.52513 0.353553 0.93934 0.93934C0.353553 1.52513 0.353553 2.47487 0.93934 3.06066L3.06066 0.93934ZM8 8L6.93934 9.06066C7.52513 9.64645 8.47487 9.64645 9.06066 9.06066L8 8ZM15.0607 3.06066C15.6464 2.47487 15.6464 1.52513 15.0607 0.93934C14.4749 0.353553 13.5251 0.353553 12.9393 0.93934L15.0607 3.06066ZM0.93934 3.06066L6.93934 9.06066L9.06066 6.93934L3.06066 0.93934L0.93934 3.06066ZM9.06066 9.06066L15.0607 3.06066L12.9393 0.93934L6.93934 6.93934L9.06066 9.06066Z"
+                                                    fill="white"
+                                                />
+                                            </svg>
+                                        </button>
                                     }
-                                    style={{fontSize: '12px', borderRadius: '13px'}}
-                                >
-                                    Select wallet
-                                    <svg
-                                        width="12"
-                                        height="8"
-                                        viewBox="0 0 16 10"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M3.06066 0.93934C2.47487 0.353553 1.52513 0.353553 0.93934 0.93934C0.353553 1.52513 0.353553 2.47487 0.93934 3.06066L3.06066 0.93934ZM8 8L6.93934 9.06066C7.52513 9.64645 8.47487 9.64645 9.06066 9.06066L8 8ZM15.0607 3.06066C15.6464 2.47487 15.6464 1.52513 15.0607 0.93934C14.4749 0.353553 13.5251 0.353553 12.9393 0.93934L15.0607 3.06066ZM0.93934 3.06066L6.93934 9.06066L9.06066 6.93934L3.06066 0.93934L0.93934 3.06066ZM9.06066 9.06066L15.0607 3.06066L12.9393 0.93934L6.93934 6.93934L9.06066 9.06066Z"
-                                            fill="white"
-                                        />
-                                    </svg>
-                                </button>
+
                                 </div>
                             </Grid>
 
@@ -567,9 +853,9 @@ function Bridge() {
                                     <>
                                         <ShowBalance
                                             classWrapper={'send_balance center'}
-                                            balance={5}
+                                            balance={curToken.balance ? (curToken.balance / 10 ** curToken.decimals) : 0}
                                             label={true}
-                                            showBal={false}
+                                            showBal={true}
                                         />
                                         {/*<AddressPopup*/}
                                         {/*	netIcon={toCurAsset.icon}*/}
@@ -596,14 +882,26 @@ function Bridge() {
                                 }
 
                             />
-
+                            {amountValidate.error ? (
+                                    <FormHelperText
+                                        error={amountValidate.error}
+                                        style={{
+                                            marginLeft: "20px"
+                                        }} select-item-wrapper
+                                    >
+                                        {amountValidate.helperText}
+                                    </FormHelperText>
+                                )
+                                :
+                                <div style={{height: "19.91px", marginTop: "3px"}}/>
+                            }
 
                             <NextBtn
-                                curBtnStyles={'curBtnStyles'}
-                                btnsClass={'enterSPRegBox'}
-                                btnText={'Next'}
+                                curBtnStyles={`curBtnStyles ${amountValidate.error ? "disabled" : null}`}
+                                btnsClass={"enterSPRegBox"}
+                                btnText={'Submit'}
                                 errColor={null}
-                                handleClickNext={null}
+                                handleClickNext={amountValidate.error ? null : () => handleOnConfirm()}
                             />
                         </div>
                     }

@@ -1,7 +1,8 @@
 import Notify from 'bnc-notify';
 import Onboard from 'bnc-onboard';
+import {ethers} from "ethers";
 
-const networkId = 1;
+const networkId = 56;
 // eth, binance, polygon, phantom
 const rpcUrl = 'https://bsc-dataseed1.binance.org:443';
 const dappId = 'b5299606-953a-449b-932c-b04840ffdaa2';
@@ -68,7 +69,7 @@ export function initOnboard(subscriptions) {
         // { walletName: 'bitpie' },
         // { walletName: 'xdefi' },
         { walletName: 'binance' },
-        { walletName: 'tp' },
+        // { walletName: 'tp' },
       ],
     },
     walletCheck: [
@@ -89,3 +90,5 @@ export function initNotify() {
     onerror: (error) => console.log(`Notify error: ${error.message}`),
   });
 }
+
+

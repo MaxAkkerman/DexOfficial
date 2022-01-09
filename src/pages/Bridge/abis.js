@@ -615,18 +615,22 @@ const netwArray = [
     {
         symbol: 'Ethereum',
         chainID: 1,
+        rootAddress:1
     },
     {
         symbol: 'BSC',
         chainID: 56,
+        rootAddress:56
     },
     {
         symbol: 'Polygon',
         chainID: 137,
+        rootAddress:137
     },
     {
         symbol: 'Fantom',
         chainID: 250,
+        rootAddress:250
     }
 ]
 

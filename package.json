@@ -33,7 +33,7 @@
     "axios": "^0.24.0",
     "bignumber.js": "^9.0.1",
     "bnc-notify": "^1.9.2",
-    "bnc-onboard": "^1.36.0",
+    "bnc-onboard": "^1.37.0",
     "classnames": "^2.3.1",
     "core-js": "^3.12.1",
     "crypto-browserify": "^3.12.0",

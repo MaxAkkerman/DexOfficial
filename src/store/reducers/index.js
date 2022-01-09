@@ -14,6 +14,7 @@ import tonData from './tonData';
 import waitingPopup from './waitingPopup';
 import walletReducer from './wallet';
 import walletSeedReducer from './walletSeed';
+import bridgeReducer from "./bridge"
 
 export default combineReducers({
   appReducer,
@@ -30,4 +31,5 @@ export default combineReducers({
   waitingPopup,
   walletReducer,
   walletSeedReducer,
+  bridgeReducer
 });
