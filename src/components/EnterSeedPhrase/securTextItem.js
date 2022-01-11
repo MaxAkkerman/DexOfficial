@@ -30,10 +30,10 @@ function HintItem(props) {
         <Alert severity="warning">
           <AlertTitle>Security policy</AlertTitle>
           Your password is the key to decrypting the seed phrase! Please make
-          sure that this password is only used for this service. DefiSpace does
+          sure that this password is only used for this service. DeFiSpace does
           not store your password and seed phrase on the remote server. The
           encrypted string with the seed phrase is stored in your computer's
-          browser storage. DefiSpace service <strong>cannot decrypt</strong> it
+          browser storage. DeFiSpace service <strong>cannot decrypt</strong> it
           without knowing the password.
         </Alert>
       </Box>

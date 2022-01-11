@@ -20,108 +20,110 @@ function AssetsList(props) {
       onClick={() => console.log('props', props)}
     >
       {props.TokenAssetsArray
-      //     .sort(
-      //   (a, b) => (b.balance || 0) - (a.balance || 0),
-      // )
-          .map((item, i) => (
-        <div
-          className="assets_item_wrapper"
-          onClick={() => props.handleClickToken(item)}
-          key={i}
-        >
-          <div className={'assetsList__container'}>
-            <div className={'assetsList__item'}>
-              <div className={'assetList__item_meta'}>
-                <img
-                  className="arrow_icons2"
-                  src={item.icon}
-                  alt={'send assetsList'}
-                />
-                <div className="assetsList__meta_container">
-                  <div className={'assetsList__symbol'}>{item.symbol}</div>
-                  <div className={'assetList__token_name'}>
-                    {item.tokenName}
+        //     .sort(
+        //   (a, b) => (b.balance || 0) - (a.balance || 0),
+        // )
+        .map((item, i) => (
+          <div
+            className="assets_item_wrapper"
+            onClick={() => props.handleClickToken(item)}
+            key={i}
+          >
+            <div className={'assetsList__container'}>
+              <div className={'assetsList__item'}>
+                <div className={'assetList__item_meta'}>
+                  <img
+                    className="arrow_icons2"
+                    src={item.icon}
+                    alt={'send assetsList'}
+                  />
+                  <div className="assetsList__meta_container">
+                    <div className={'assetsList__symbol'}>{item.symbol}</div>
+                    <div className={'assetList__token_name'}>
+                      {item.tokenName}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div
-                className={
-                  props.isAssetsInspector
-                    ? 'assetList__token_balance wordBreak'
-                    : 'assetList__token_balance'
-                }
-              >
-                {item.balance === 0
-                  ? '0.0000'
-                  : item.balance < 0.0001
-                  ? parseFloat(item.balance).toFixed(8)
-                  : parseFloat(item.balance).toFixed(4)}
-              </div>
-            </div>
-            {item.showWrapMenu && props.showItBeShown && (
-              <div className="NFT_additional_data">
-                <div className="NFT_additional_block end">
-                  {/*    <div>*/}
-                  {/*        <div className="swap-confirm-wrap">*/}
-                  {/*            /!*<p className="mainblock-footer-value">{item.details.apyLockStake / 100}%</p>*!/*/}
-                  {/*            <p className="mainblock-footer-subtitle">APY</p>*/}
-                  {/*        </div>*/}
-                  {/*        <div className="swap-confirm-wrap">*/}
-                  {/*            /!*<p className="mainblock-footer-value">{getDurationFromSeconds(item.details.periodLockStake, "days")} days</p>*!/*/}
-                  {/*            <p className="mainblock-footer-subtitle">Period</p>*/}
-                  {/*        </div>*/}
-                  {/*        <div className="swap-confirm-wrap">*/}
-                  {/*            /!*<p className="mainblock-footer-value">{formatDate(Number(item.details.timeStartLockStake))}</p>*!/*/}
-                  {/*            <p className="mainblock-footer-subtitle">Start time</p>*/}
-                  {/*        </div>*/}
-
-                  {/*    </div>*/}
-                  {/*    <div>*/}
-                  {/*        <div className="swap-confirm-wrap">*/}
-                  {/*            /!*<p className="mainblock-footer-value fixFlex"><img style={{marginRight: "5px"}}*!/*/}
-                  {/*            /!*                                                   src={TON}*!/*/}
-                  {/*            /!*                                                   alt={"Ton Crystal"}/> {(Number(item.stakeTotal)) / 1000000000}*!/*/}
-                  {/*            /!*</p>*!/*/}
-                  {/*            <p className="mainblock-footer-subtitle">Stake</p>*/}
-                  {/*        </div>*/}
-                  {/*        <div className="swap-confirm-wrap">*/}
-                  {/*            /!*<p className="mainblock-footer-value fixFlex"><img style={{marginRight: "5px"}}*!/*/}
-                  {/*            /!*                                                   src={TON}*!/*/}
-                  {/*            /!*                                                   alt={"Ton Crystal"}/> {((calculateRate(item.stakeTotal, item.details.apyLockStake / 100, (item.details.periodLockStake / 30 / 60 / 60 / 24)) - Number(item.stakeTotal)) / 1000000000).toFixed(4)}*!/*/}
-                  {/*            /!*</p>*!/*/}
-                  {/*            <p className="mainblock-footer-subtitle">Profit</p>*/}
-                  {/*        </div>*/}
-                  {/*        <div className="swap-confirm-wrap">*/}
-                  {/*            /!*<p className="mainblock-footer-value fixFlex">*!/*/}
-                  {/*            /!*    <img style={{marginRight: "5px"}} src={TON}*!/*/}
-                  {/*            /!*         alt={"Ton Crystal"}/> {((calculateRate(item.stakeTotal, item.details.apyLockStake / 100, item.details.periodLockStake / 30 / 60 / 60 / 24)) / 1000000000).toFixed(4)}*!/*/}
-
-                  {/*            /!*</p>*!/*/}
-                  {/*            <p className="mainblock-footer-subtitle">Total income</p>*/}
-                  {/*        </div>*/}
-                  {/*    </div>*/}
-
-                  {/*<div className={"settings_btn_container"}>*/}
-                  <button
-                    className="settings_btn wrapUnwrap"
-                    style={{ marginRight: '5px' }}
-                    onClick={props.wrapTons ? () => props.wrapTons() : null}
-                  >
-                    Wrap
-                  </button>
-                  <button
-                    className="settings_btn wrapUnwrap"
-                    onClick={props.unWrapTons ? () => props.unWrapTons() : null}
-                  >
-                    Unwrap
-                  </button>
-                  {/*</div>*/}
+                <div
+                  className={
+                    props.isAssetsInspector
+                      ? 'assetList__token_balance wordBreak'
+                      : 'assetList__token_balance'
+                  }
+                >
+                  {item.balance === 0
+                    ? '0.0000'
+                    : item.balance < 0.0001
+                    ? parseFloat(item.balance).toFixed(8)
+                    : parseFloat(item.balance).toFixed(4)}
                 </div>
               </div>
-            )}
+              {item.showWrapMenu && props.showItBeShown && (
+                <div className="NFT_additional_data">
+                  <div className="NFT_additional_block end">
+                    {/*    <div>*/}
+                    {/*        <div className="swap-confirm-wrap">*/}
+                    {/*            /!*<p className="mainblock-footer-value">{item.details.apyLockStake / 100}%</p>*!/*/}
+                    {/*            <p className="mainblock-footer-subtitle">APY</p>*/}
+                    {/*        </div>*/}
+                    {/*        <div className="swap-confirm-wrap">*/}
+                    {/*            /!*<p className="mainblock-footer-value">{getDurationFromSeconds(item.details.periodLockStake, "days")} days</p>*!/*/}
+                    {/*            <p className="mainblock-footer-subtitle">Period</p>*/}
+                    {/*        </div>*/}
+                    {/*        <div className="swap-confirm-wrap">*/}
+                    {/*            /!*<p className="mainblock-footer-value">{formatDate(Number(item.details.timeStartLockStake))}</p>*!/*/}
+                    {/*            <p className="mainblock-footer-subtitle">Start time</p>*/}
+                    {/*        </div>*/}
+
+                    {/*    </div>*/}
+                    {/*    <div>*/}
+                    {/*        <div className="swap-confirm-wrap">*/}
+                    {/*            /!*<p className="mainblock-footer-value fixFlex"><img style={{marginRight: "5px"}}*!/*/}
+                    {/*            /!*                                                   src={TON}*!/*/}
+                    {/*            /!*                                                   alt={"Ton Crystal"}/> {(Number(item.stakeTotal)) / 1000000000}*!/*/}
+                    {/*            /!*</p>*!/*/}
+                    {/*            <p className="mainblock-footer-subtitle">Stake</p>*/}
+                    {/*        </div>*/}
+                    {/*        <div className="swap-confirm-wrap">*/}
+                    {/*            /!*<p className="mainblock-footer-value fixFlex"><img style={{marginRight: "5px"}}*!/*/}
+                    {/*            /!*                                                   src={TON}*!/*/}
+                    {/*            /!*                                                   alt={"Ton Crystal"}/> {((calculateRate(item.stakeTotal, item.details.apyLockStake / 100, (item.details.periodLockStake / 30 / 60 / 60 / 24)) - Number(item.stakeTotal)) / 1000000000).toFixed(4)}*!/*/}
+                    {/*            /!*</p>*!/*/}
+                    {/*            <p className="mainblock-footer-subtitle">Profit</p>*/}
+                    {/*        </div>*/}
+                    {/*        <div className="swap-confirm-wrap">*/}
+                    {/*            /!*<p className="mainblock-footer-value fixFlex">*!/*/}
+                    {/*            /!*    <img style={{marginRight: "5px"}} src={TON}*!/*/}
+                    {/*            /!*         alt={"Ton Crystal"}/> {((calculateRate(item.stakeTotal, item.details.apyLockStake / 100, item.details.periodLockStake / 30 / 60 / 60 / 24)) / 1000000000).toFixed(4)}*!/*/}
+
+                    {/*            /!*</p>*!/*/}
+                    {/*            <p className="mainblock-footer-subtitle">Total income</p>*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+
+                    {/*<div className={"settings_btn_container"}>*/}
+                    <button
+                      className="settings_btn wrapUnwrap"
+                      style={{ marginRight: '5px' }}
+                      onClick={props.wrapTons ? () => props.wrapTons() : null}
+                    >
+                      Wrap
+                    </button>
+                    <button
+                      className="settings_btn wrapUnwrap"
+                      onClick={
+                        props.unWrapTons ? () => props.unWrapTons() : null
+                      }
+                    >
+                      Unwrap
+                    </button>
+                    {/*</div>*/}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
       {props.NFTassetsArray &&
         props.NFTassetsArray.map((item) => (
           <div className="assets_item_wrapper" key={item._safeLockStake}>

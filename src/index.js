@@ -1,3 +1,4 @@
+import 'intro.js/introjs.css';
 import '@/index.scss';
 
 import { ApolloProvider } from '@apollo/client';

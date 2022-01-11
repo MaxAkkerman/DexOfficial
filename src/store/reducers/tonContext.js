@@ -15,11 +15,14 @@ const initialState = {
     tonClient: null,
   },
   functions: {
+    cancelLimitOrder() {},
     getAllClientWallets() {},
     getAllPairsWithoutProvider() {},
     makeLimitOrder() {},
     swap() {},
     takeLimitOrder() {},
+    transferLimitOrder() {},
+    updateLimitOrderPrice() {},
   },
   helperFunctions: {
     checkClientPairExists() {},
@@ -28,9 +31,10 @@ const initialState = {
     getClientWallet() {},
     getPair() {},
     getPairsTotalSupply() {},
-    getRouterAddress() {},
+    getRootFromWallet() {},
     getShardLimit() {},
     getTokenRouterAddress() {},
+    getWalletFromRoot() {},
   },
 };
 

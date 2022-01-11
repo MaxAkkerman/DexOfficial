@@ -1,83 +1,106 @@
-import './OrderPopupCancel.scss';
-
 import cls from 'classnames';
 import { useSnackbar } from 'notistack';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import useKeyPair from '../../hooks/useKeyPair';
-import { iconGenerator } from '../../iconGenerator';
-import miniSwap from '../../images/icons/mini-swap.png';
+import IconCross from '@/components-v2/IconCross';
+import MainBlock from '@/components-v2/MainBlock';
+import { CANCEL_LIMIT_ORDER } from '@/constants/commissions';
+import { iconGenerator } from '@/iconGenerator';
 import {
-  closeOrderCancelPopup,
-  closeOrderWaitPopup,
-  openOrderWaitPopup,
-} from '../../store/actions/limitOrder';
-import cancelLimitOrder from '../../utils/cancelLimitOrder';
-import truncateNum from '../../utils/truncateNum';
-import IconCross from '../IconCross/IconCross';
-import MainBlock from '../MainBlock/MainBlock';
-import classes from './OrderPopupCancel.module.scss';
+  closeLimitOrderCancelPopup,
+  resetLimitOrderPopupValues,
+} from '@/store/actions/limitOrder';
+import {
+  resetWaitingPopupValues,
+  setWaitingPopupValues,
+} from '@/store/actions/waitingPopup';
+import truncateNum from '@/utils/truncateNum';
 
-export default function OrderPopupCancel({ close, order }) {
-  const { addrOrder, fromSymbol, fromValue, price, toSymbol, toValue } = order;
+import classes from './index.module.scss';
 
+export default function LimitOrderCancelPopup() {
   const dispatch = useDispatch();
-
-  const appTheme = useSelector((state) => state.appReducer.appTheme);
-
-  const clientData = useSelector((state) => state.walletReducer.clientData);
-  const { keyPair } = useKeyPair();
-
   const { enqueueSnackbar } = useSnackbar();
 
+  const appTheme = useSelector((state) => state.appReducer.appTheme);
+  const values = useSelector((state) => state.limitOrderReducer.values);
+  const visible = useSelector(
+    (state) => state.limitOrderReducer.cancelPopupVisible,
+  );
+  const cancelLimitOrder = useSelector(
+    (state) => state.tonContext.functions.cancelLimitOrder,
+  );
+
+  if (!values || !visible) return null;
+
+  async function handleClose() {
+    dispatch(closeLimitOrderCancelPopup());
+  }
+
   async function handleConfirm() {
-    dispatch(closeOrderCancelPopup());
+    const { addrOrder, fromToken, fromValue, toToken, toValue } = values;
+
+    dispatch(closeLimitOrderCancelPopup());
     dispatch(
-      openOrderWaitPopup({
-        text: `Sending message to cancel limit order ${fromSymbol} - ${toSymbol}`,
+      setWaitingPopupValues({
+        hidable: true,
+        text: `Cancelling limit order ${truncateNum(fromValue)} ${
+          fromToken.symbol
+        } for ${truncateNum(toValue)} ${toToken.symbol}`,
+        title: 'Sending message to blockchain',
       }),
     );
 
-    const { cancelOrderStatus } = await cancelLimitOrder(addrOrder, {
-      clientAddress: clientData.address,
-      clientKeyPair: keyPair,
-    });
+    try {
+      const { cancelOrderStatus } = await cancelLimitOrder(addrOrder);
 
-    if (cancelOrderStatus)
+      if (cancelOrderStatus)
+        enqueueSnackbar({
+          message: `Canceling limit order ${fromToken.symbol} - ${toToken.symbol} ⏳`,
+          type: 'info',
+        });
+      else
+        enqueueSnackbar({
+          message: `Failed to cancel limit order ${fromToken.symbol} - ${toToken.symbol}`,
+          type: 'error',
+        });
+    } catch (e) {
       enqueueSnackbar({
-        type: 'info',
-        message: `Canceling limit order ${fromSymbol} - ${toSymbol} ⏳`,
-      });
-    else
-      enqueueSnackbar({
+        message: `Something went wrong, error code - ${e.code}`,
         type: 'error',
-        message: `Failed to cancel limit order ${fromSymbol} - ${toSymbol}`,
       });
+    }
 
-    dispatch(closeOrderWaitPopup());
+    dispatch(resetWaitingPopupValues());
+    dispatch(resetLimitOrderPopupValues());
+    dispatch(closeLimitOrderCancelPopup());
   }
+
+  const { fromToken, fromValue, toPrice, toToken, toValue } = values;
 
   return (
     <div className="popup-wrapper">
       <MainBlock
         button={
-          <button onClick={close} className={classes.btn}>
+          <button onClick={handleClose} className={classes.btn}>
             <IconCross
               fill="none"
               className={cls('close', classes.btn__icon)}
             />
           </button>
         }
-        title="Confirm Limit Order cancel"
+        title="Cancel limit order"
         content={
           <>
-            <div className="confirm-block swap-confirm-block">
+            <div
+              className={cls('confirm-block', classes['swap-confirm-block'])}
+            >
               <span className="confirm-token">
                 <img
                   className="confirm-icon"
-                  src={iconGenerator(fromSymbol)}
-                  alt={fromSymbol}
+                  src={iconGenerator(fromToken.symbol)}
+                  alt={fromToken.symbol}
                 />
                 {fromValue}
               </span>
@@ -140,8 +163,8 @@ export default function OrderPopupCancel({ close, order }) {
               <span className="confirm-token">
                 <img
                   className="confirm-icon"
-                  src={iconGenerator(toSymbol)}
-                  alt={toSymbol}
+                  src={iconGenerator(toToken.symbol)}
+                  alt={toToken.symbol}
                 />
                 {truncateNum(toValue)}
               </span>
@@ -150,24 +173,22 @@ export default function OrderPopupCancel({ close, order }) {
               className="btn popup-btn btn-error unlock"
               onClick={handleConfirm}
             >
-              Cancel order
+              Cancel
             </button>
           </>
         }
         footer={
           <div className="mainblock-footer">
             <div className="mainblock-footer-wrap">
-              {/*<div>*/}
-              <div className="swap-confirm-wrap">
+              <div className={classes['swap-confirm-wrap']}>
                 <p className="mainblock-footer-value">
-                  <img src={miniSwap} alt="" /> {truncateNum(price)}{' '}
-                  {fromSymbol}/{toSymbol}
+                  {toPrice} {toToken.symbol}
                 </p>
                 <p className="mainblock-footer-subtitle">Price</p>
               </div>
               <div className="swap-confirm-wrap">
                 <p className="mainblock-footer-value">
-                  {truncateNum((fromValue * 0.3) / 100)} {fromSymbol}
+                  {CANCEL_LIMIT_ORDER} EVER
                 </p>
                 <p className="mainblock-footer-subtitle">Fee</p>
               </div>

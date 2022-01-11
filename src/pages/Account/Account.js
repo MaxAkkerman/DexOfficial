@@ -224,9 +224,8 @@ function Account() {
 
   const [compltePass, setCompletedPass] = useState(false);
 
-  function handleCheckPin(pinArr, step, completed) {
-    const curEmptyPin = pinArr.filter((item) => !item.value.length);
-    if (!curEmptyPin.length) {
+  function handleCheckPin(pinArr, complete) {
+    if (complete) {
       setCompletedPass(true);
       let password = '';
       pin.map((item) => {
@@ -236,7 +235,7 @@ function Account() {
     } else {
       setCompletedPass(false);
     }
-    dispatch(setPin(pinArr));
+    dispatch(setPin(pinArr.map((v) => ({ value: v }))));
   }
 
   function passwordChange(event) {
@@ -260,8 +259,8 @@ function Account() {
             handleClickBack={() => setPasswordEnterPopup(false)}
             handleClose={null}
             handleClickNext={() => deployHandler()}
-            handleCheckPin={(pin, step, completed) =>
-              handleCheckPin(pin, step, completed)
+            handleCheckPin={({ complete, pin }) =>
+              handleCheckPin(pin, complete)
             }
           />
         </div>

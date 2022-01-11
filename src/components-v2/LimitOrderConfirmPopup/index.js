@@ -5,10 +5,13 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import IconCross from '@/components-v2/IconCross';
 import MainBlock from '@/components-v2/MainBlock';
+import { DEPLOY_LIMIT_ORDER } from '@/constants/commissions';
 import { AB_DIRECTION, BA_DIRECTION } from '@/constants/runtimeVariables';
 import { iconGenerator } from '@/iconGenerator';
-import miniSwap from '@/images/icons/mini-swap.png';
-import { resetLimitOrderPopupValues } from '@/store/actions/limitOrder';
+import {
+  closeLimitOrderDeployPopup,
+  resetLimitOrderPopupValues,
+} from '@/store/actions/limitOrder';
 import {
   resetWaitingPopupValues,
   setWaitingPopupValues,
@@ -22,6 +25,9 @@ export default function LimitOrderConfirmPopup() {
 
   const appTheme = useSelector((state) => state.appReducer.appTheme);
   const values = useSelector((state) => state.limitOrderReducer.values);
+  const visible = useSelector(
+    (state) => state.limitOrderReducer.deployPopupVisible,
+  );
   const makeLimitOrder = useSelector(
     (state) => state.tonContext.functions.makeLimitOrder,
   );
@@ -39,6 +45,7 @@ export default function LimitOrderConfirmPopup() {
   async function handleConfirm() {
     const { fromToken, fromValue, pair, toPrice, toToken, toValue } = values;
 
+    dispatch(closeLimitOrderDeployPopup());
     dispatch(
       setWaitingPopupValues({
         hidable: true,
@@ -48,7 +55,6 @@ export default function LimitOrderConfirmPopup() {
         title: 'Sending message to blockchain',
       }),
     );
-    dispatch(resetLimitOrderPopupValues());
 
     try {
       const res = await makeLimitOrder({
@@ -57,7 +63,6 @@ export default function LimitOrderConfirmPopup() {
         price: toPrice,
         qty: fromValue,
       });
-      // console.log("makeLimitOrder(A|B)->res", res);
 
       if (res.makeLimitOrderStatus)
         enqueueSnackbar({
@@ -78,15 +83,17 @@ export default function LimitOrderConfirmPopup() {
     }
 
     dispatch(resetWaitingPopupValues());
+    dispatch(resetLimitOrderPopupValues());
+    dispatch(closeLimitOrderDeployPopup());
   }
 
   function handleClose() {
     dispatch(resetLimitOrderPopupValues());
   }
 
-  console.log(values);
+  if (!visible || !values) return null;
 
-  if (!values) return null;
+  const { fromToken, fromValue, toPrice, toToken, toValue } = values;
 
   return (
     <div className="popup-wrapper">
@@ -106,10 +113,10 @@ export default function LimitOrderConfirmPopup() {
               <span className="confirm-token">
                 <img
                   className="confirm-icon"
-                  src={iconGenerator(values.fromToken.symbol)}
-                  alt={values.fromToken.symbol}
+                  src={iconGenerator(fromToken.symbol)}
+                  alt={fromToken.symbol}
                 />
-                {values.fromValue}
+                {fromValue}
               </span>
               {appTheme === 'light' ? (
                 <svg
@@ -170,32 +177,29 @@ export default function LimitOrderConfirmPopup() {
               <span className="confirm-token">
                 <img
                   className="confirm-icon"
-                  src={iconGenerator(values.toToken.symbol)}
-                  alt={values.toToken.symbol}
+                  src={iconGenerator(toToken.symbol)}
+                  alt={toToken.symbol}
                 />
-                {truncateNum(values.toValue)}
+                {truncateNum(toValue)}
               </span>
             </div>
             <button className="btn popup-btn" onClick={handleConfirm}>
-              Confirm Limit Order
+              Deploy
             </button>
           </>
         }
         footer={
           <div className="mainblock-footer">
             <div className="mainblock-footer-wrap">
-              {/*<div>*/}
               <div className="swap-confirm-wrap">
                 <p className="mainblock-footer-value">
-                  <img src={miniSwap} alt="" /> {truncateNum(values.toPrice)}{' '}
-                  {values.fromToken.symbol}/{values.toToken.symbol}
+                  {toPrice} {toToken.symbol}
                 </p>
                 <p className="mainblock-footer-subtitle">Price</p>
               </div>
               <div className="swap-confirm-wrap">
                 <p className="mainblock-footer-value">
-                  {truncateNum((values.fromValue * 0.3) / 100)}{' '}
-                  {values.fromToken.symbol}
+                  {DEPLOY_LIMIT_ORDER} EVER
                 </p>
                 <p className="mainblock-footer-subtitle">Fee</p>
               </div>

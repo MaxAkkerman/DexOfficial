@@ -93,11 +93,13 @@ function ExtensionsList() {
                   // }}
                   className="btn wallet-btn extBtns"
                   onClick={() => dispatch(handleOpenEnterSeed(true))}
+                  id="nav-login-seed-phrase"
                 >
                   Login using Seed Phrase
                 </button>
                 <button
                   // style={{fontSize: "16px", width: "100%"}}
+                  id="nav-register-seed-phrase"
                   className="btn wallet-btn extBtns"
                   onClick={() => setloginViaPinIsVisible(true)}
                 >

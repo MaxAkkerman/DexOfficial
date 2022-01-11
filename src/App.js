@@ -5,11 +5,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
 import { useMount } from 'react-use';
 
+import ChromePopup from '@/components-v2/ChromePopup';
+import LimitOrderCancelPopup from '@/components-v2/LimitOrderCancelPopup';
 import LimitOrderConfirmPopup from '@/components-v2/LimitOrderConfirmPopup';
 import LimitOrderPage from '@/components-v2/LimitOrderPage';
+import LimitOrderUpdatePopup from '@/components-v2/LimitOrderUpdatePopup';
 import SwapConfirmPopup from '@/components-v2/SwapConfirmPopup';
 import SwapPage from '@/components-v2/SwapPage';
+import TutorialSteps from '@/components-v2/TutorialSteps';
 import WaitingPopup from '@/components-v2/WaitingPopup';
+import { Farming } from '@/pages/Farming/Farming';
+import { TermsOfUse } from '@/pages/TermsOfUse/TermsOfUse';
 import {
   requestPairsFetch,
   requestTokensFetch,
@@ -62,12 +68,7 @@ import {
   getAllPairsAndSetToStore,
   getAllTokensAndSetToStore,
 } from './reactUtils/reactUtils';
-import {
-  changeTheme,
-  handleOpenEnterSeed,
-  hideTip,
-  showPopup,
-} from './store/actions/app';
+import { changeTheme, handleOpenEnterSeed, hideTip } from './store/actions/app';
 import {
   enterSeedPhraseEmptyStorage,
   setEncryptedSeedPhrase,
@@ -120,15 +121,6 @@ function App() {
   const { enqueueSnackbar } = useSnackbar();
 
   const [onloading, setonloading] = useState(false);
-
-  const chrome = localStorage.getItem('chrome');
-  if (chrome === null) showChromePopup();
-  else if (chrome === 'false') showChromePopup();
-
-  function showChromePopup() {
-    dispatch(showPopup({ type: 'chrome' }));
-    localStorage.setItem('chrome', 'true');
-  }
 
   useEffect(async () => {
     // await getAllPairsAndSetToStore()
@@ -372,6 +364,7 @@ function App() {
       </div>
       <Header />
       <Switch location={location}>
+        <Route exact path="/terms-of-use" component={TermsOfUse} />
         <Route exact path="/native-login" component={NativeLogin} />
         <Route exact path="/pool-explorer" component={PoolExplorer} />
         <Route exact path="/pool" component={Pool} />
@@ -386,6 +379,7 @@ function App() {
         <Route exact path="/bridge" component={Bridge} />
         <Route exact path="/wallet" component={Assets} />
         <Route exact path="/orders" component={LimitOrderPage} />
+        <Route exact path="/farming" component={Farming} />
         <Route exact path="/">
           <Redirect from="/" to="/wallet" />
         </Route>
@@ -426,7 +420,11 @@ function App() {
       {revealSeedPhraseIsVisible ? <RevealSeedPhrase /> : null}
       <SwapConfirmPopup />
       <LimitOrderConfirmPopup />
+      <LimitOrderCancelPopup />
+      <LimitOrderUpdatePopup />
       <WaitingPopup />
+      <ChromePopup />
+      <TutorialSteps />
     </>
   );
 }

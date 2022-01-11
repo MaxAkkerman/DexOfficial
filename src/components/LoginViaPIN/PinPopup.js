@@ -1,9 +1,8 @@
 import './PinPopup.scss';
 
 import { Grid } from '@material-ui/core';
-import isNumber from 'lodash/isNumber';
 import range from 'lodash/range';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useKey } from 'react-use';
 
@@ -16,27 +15,12 @@ import Steppers from './Steppers';
 function PinPopup(props) {
   const appTheme = useSelector((state) => state.appReducer.appTheme);
 
-  const { complete, handleBackspace, handleChange, value } = usePinInput();
-
-  // Intermediate variable to match api of previous code
-  const valueArr = useMemo(
-    () =>
-      value.split('').map((v, i) => ({
-        error: false,
-        focused: false,
-        id: i,
-        value: v,
-      })),
-    [value],
-  );
-
-  // Hook to match api of previous code
-  useEffect(() => {
-    props.handleCheckPin(valueArr, props.nextStep, complete);
-  }, [value]);
+  const { complete, handleBackspace, handleChange, value } = usePinInput({
+    handleEnter: handleNextClick,
+  });
 
   function handleNextClick() {
-    props.handleClickNext(valueArr, props.nextStep, complete);
+    props.handleClickNext({ complete, pin: value });
   }
 
   return (
@@ -61,14 +45,7 @@ function PinPopup(props) {
               ) : null}
               <div className="left_block boldFont fixMedia">{props.title}</div>
             </div>
-
-            {complete && !props.pinCorrect ? (
-              <Grid style={{ color: 'red', textAlign: 'center' }}>
-                PINS don't match!
-              </Grid>
-            ) : (
-              <div style={{ height: '23px' }}></div>
-            )}
+            <div style={{ height: '23px' }}></div>
             <Grid className="numsInputContainer">
               {range(4).map((i) => {
                 return (
@@ -87,7 +64,7 @@ function PinPopup(props) {
                     className="pinInput"
                     id={i}
                     maxLength={1}
-                    value={value[i] === ' ' ? '' : value[i]}
+                    value={value[i]}
                     disabled
                   />
                 );
@@ -100,7 +77,7 @@ function PinPopup(props) {
               }}
             />
 
-            <Steppers step={props.step} />
+            <Steppers step={props.step} lastStep={props.lastStep} />
             {!props.showTwoBtns ? (
               <div style={{ display: 'flex', width: '100%' }}>
                 <NextBtn
@@ -136,44 +113,48 @@ function PinPopup(props) {
   );
 }
 
-function usePinInput({ length = 4 } = {}) {
-  const [value, setValue] = useState(' '.repeat(length));
+function usePinInput({ handleEnter = () => {}, length = 4 } = {}) {
+  const [rawValue, setRawValue] = useState(' '.repeat(length));
 
-  const cursor = useMemo(() => value.trim().length, [value]);
-  const complete = useMemo(() => value.trim().length === length, [value]);
+  const cursor = useMemo(() => rawValue.trim().length, [rawValue]);
+  const complete = useMemo(() => rawValue.trim().length === length, [rawValue]);
+  const valueArr = useMemo(
+    () => rawValue.split('').map((v) => (v === ' ' ? '' : v)),
+    [rawValue],
+  );
 
   function handleChange(v) {
-    if (complete || /[^0-9]/.test(v)) return;
+    if (complete) return;
 
-    const arr = value.split('');
+    const arr = rawValue.split('');
     arr[cursor] = v;
     const str = arr.join('');
 
-    setValue(str);
+    setRawValue(str);
   }
 
   function handleBackspace() {
-    let str = value.trim().slice(0, -1);
+    let str = rawValue.trim().slice(0, -1);
     str = str.padEnd(length);
-    console.log({ str });
 
-    setValue(str);
+    setRawValue(str);
   }
 
-  useKey('Backspace', handleBackspace, {}, [value]);
-  useKey('Delete', handleBackspace, {}, [value]);
+  useKey('Enter', handleEnter, {}, [rawValue]);
+  useKey('Backspace', handleBackspace, {}, [rawValue]);
+  useKey('Delete', handleBackspace, {}, [rawValue]);
   useKey(
-    (event) => isNumber(+event.key),
+    (event) => /^[0-9]$/.test(event.key),
     () => handleChange(event.key),
     {},
-    [value],
+    [rawValue],
   );
 
   return {
     complete,
     handleBackspace,
     handleChange,
-    value,
+    value: valueArr,
   };
 }
 

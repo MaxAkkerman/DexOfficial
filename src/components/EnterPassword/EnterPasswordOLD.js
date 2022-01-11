@@ -219,7 +219,7 @@ function EnterPassword(props) {
               >
                 <Alert severity="info">
                   <AlertTitle>Security policy</AlertTitle>
-                  <strong>DefiSpace does not store your password.</strong>
+                  <strong>DeFiSpace does not store your password.</strong>
                   <br />
                   It is used exclusively for local decryption of the seed phrase
                   stored in the browser storage.

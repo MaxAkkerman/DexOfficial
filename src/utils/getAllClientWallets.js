@@ -4,9 +4,9 @@ import { NO_CONTEXT } from '@/constants/runtimeErrors';
 import { DEXClientContract } from '@/extensions/contracts/DEXClient';
 import { RootTokenContract } from '@/extensions/contracts/RootTokenContract';
 import { TONTokenWalletContract } from '@/extensions/contracts/TONTokenWallet';
+import { getReplacedSymbol } from '@/extensions/sdk_get/get';
 import { iconGenerator } from '@/iconGenerator';
 import { getDecimals, getFullName, hex2a } from '@/reactUtils/reactUtils';
-import {getReplacedSymbol} from "@/extensions/sdk_get/get";
 
 /**
  * @returns {Promise<{
@@ -62,11 +62,16 @@ export default async function getAllClientWallets() {
 
       // console.log("hereii", curWalletData)
       itemData.walletAddress = item[1];
-      console.log("hex2a(curRootData.decoded.output.value0.symbol)",hex2a(curRootData.decoded.output.value0.symbol))
-      itemData.symbol = getReplacedSymbol(hex2a(curRootData.decoded.output.value0.symbol))
-        // hex2a(curRootData.decoded.output.value0.symbol) === 'WTON'
-        //   ? 'wEVER'
-        //   : hex2a(curRootData.decoded.output.value0.symbol);
+      console.log(
+        'hex2a(curRootData.decoded.output.value0.symbol)',
+        hex2a(curRootData.decoded.output.value0.symbol),
+      );
+      itemData.symbol = getReplacedSymbol(
+        hex2a(curRootData.decoded.output.value0.symbol),
+      );
+      // hex2a(curRootData.decoded.output.value0.symbol) === 'WTON'
+      //   ? 'wEVER'
+      //   : hex2a(curRootData.decoded.output.value0.symbol);
       itemData.tokenName = getFullName(
         hex2a(curRootData.decoded.output.value0.symbol),
       );

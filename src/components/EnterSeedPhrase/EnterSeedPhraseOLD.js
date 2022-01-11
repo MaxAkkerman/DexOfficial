@@ -1214,10 +1214,10 @@ function EnterSeedPhrase(props) {
                       <AlertTitle>Security policy</AlertTitle>
                       Your password is the key to decrypting the seed phrase!
                       Please make sure that this password is only used for this
-                      service. DefiSpace does not store your password and seed
+                      service. DeFiSpace does not store your password and seed
                       phrase on the remote server. The encrypted string with the
                       seed phrase is stored in your computer's browser storage.
-                      DefiSpace service <strong>cannot decrypt</strong> it
+                      DeFiSpace service <strong>cannot decrypt</strong> it
                       without knowing the password.
                     </Alert>
                   </Box>
@@ -1555,7 +1555,7 @@ function EnterSeedPhrase(props) {
                     <Alert severity={'warning'} sx={{ width: '100%' }}>
                       <AlertTitle>Important information</AlertTitle>
                       It is very important to keep the seed phrase. It cannot be
-                      restored. The DefiSpace service does not store the seed
+                      restored. The DeFiSpace service does not store the seed
                       phrase, and will not be able to help if it is lost.
                       Remember this.
                     </Alert>

@@ -322,13 +322,13 @@ export function getFullName(name) {
     return 'Pool tokens of EVER/USDT pair';
   } else if (name === 'DS-WTON/USDC') {
     return 'Pool tokens of EVER/USDС pair';
-  }else if (name === 'DS-WTON/WETH') {
+  } else if (name === 'DS-WTON/WETH') {
     return 'Pool tokens of EVER/ETH pair';
   } else if (name === 'DS-WTON/BTC') {
     return 'Pool tokens of EVER/BTC pair';
   } else if (name === 'USDT') {
     return 'Tether';
-  }else if (name === 'DS-WTON/DAI') {
+  } else if (name === 'DS-WTON/DAI') {
     return 'Pool tokens of EVER/DAI pair';
   } else {
     return name;

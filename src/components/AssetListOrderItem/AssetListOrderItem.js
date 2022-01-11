@@ -1,61 +1,83 @@
 import { Box, Collapse, Stack, Tooltip, Typography } from '@mui/material';
 import cls from 'classnames';
-import React from 'react';
-import { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
+
 
 import { BA_DIRECTION_GRAPHQL } from '@/constants/runtimeVariables';
 import { iconGenerator } from '@/iconGenerator';
+
 import {
-  openOrderCancelPopup,
-  openOrderUpdatePopup,
-} from '../../store/actions/limitOrder';
+  openLimitOrderCancelPopup,
+  openLimitOrderUpdatePopup,
+  setLimitOrderPopupValues,
+} from '@/store/actions/limitOrder';
+
+import { AB_DIRECTION_GRAPHQL } from '@/constants/runtimeVariables';
 import truncateNum from '../../utils/truncateNum';
 import IconCross from '../IconCross/IconCross';
 import IconEdit from '../IconEdit/IconEdit';
 import classes from './AssetListOrderItem.module.scss';
 
 export default function AssetListOrderItem({ limitOrder }) {
-  const { addrOrder, amount, directionPair, pair, price } = limitOrder;
-  let { aRoot, aSymbol, bRoot, bSymbol } = pair;
-  if (directionPair === BA_DIRECTION_GRAPHQL)
-    [aSymbol, bSymbol] = [bSymbol, aSymbol];
+  const {
+    addrOrder,
+    amount,
+    directionPair,
+    pair: { aSymbol, bSymbol },
+    price,
+    walletOwnerFrom,
+    walletOwnerTo,
+  } = limitOrder;
+
+  const [fromSymbol, toSymbol] = useMemo(() => {
+    if (directionPair === AB_DIRECTION_GRAPHQL) return [aSymbol, bSymbol];
+    return [bSymbol, aSymbol];
+  }, [aSymbol, bSymbol]);
 
   const dispatch = useDispatch();
   const [fold, setFold] = useState(false);
 
   async function handleCancel(e) {
     e.stopPropagation();
+
     dispatch(
-      openOrderCancelPopup({
-        order: {
-          addrOrder,
-          fromSymbol: aSymbol,
-          toSymbol: bSymbol,
-          fromValue: amount,
-          toValue: amount * price,
-          price,
+      setLimitOrderPopupValues({
+        addrOrder,
+        fromToken: {
+          symbol: fromSymbol,
         },
+        fromValue: amount,
+        toPrice: price,
+        toToken: {
+          symbol: toSymbol,
+        },
+        toValue: amount * price,
       }),
     );
+    dispatch(openLimitOrderCancelPopup());
   }
 
   async function handleUpdate(e) {
     e.stopPropagation();
+
     dispatch(
-      openOrderUpdatePopup({
-        order: {
-          addrOrder,
-          fromSymbol: aSymbol,
-          toSymbol: bSymbol,
-          fromValue: amount,
-          toValue: amount * price,
-          fromRootAddr: aRoot,
-          toRootAddr: bRoot,
-          price,
+      setLimitOrderPopupValues({
+        addrOrder,
+        fromToken: {
+          symbol: fromSymbol,
+          walletAddress: walletOwnerFrom,
         },
+        fromValue: amount,
+        toPrice: price,
+        toToken: {
+          symbol: toSymbol,
+          walletAddress: walletOwnerTo,
+        },
+        toValue: amount * price,
       }),
     );
+    dispatch(openLimitOrderUpdatePopup());
   }
 
   return (
@@ -64,26 +86,26 @@ export default function AssetListOrderItem({ limitOrder }) {
         <Stack direction="row" className={classes.container}>
           <Box>
             <img
-              src={iconGenerator(aSymbol)}
-              alt={aSymbol}
+              src={iconGenerator(fromSymbol)}
+              alt={fromSymbol}
               className={cls(classes.icon, classes.icon_first)}
             />
             <img
-              src={iconGenerator(bSymbol)}
-              alt={bSymbol}
+              src={iconGenerator(toSymbol)}
+              alt={toSymbol}
               className={classes.icon}
             />
           </Box>
           <Stack alignItems="flex-start" className={classes.content}>
             <Typography className={classes.header} component="h2">
-              {aSymbol} - {bSymbol}
+              {fromSymbol} - {toSymbol}
             </Typography>
             <Typography className={classes.subheader} component="span">
               Limit order
             </Typography>
           </Stack>
           <Typography component="span" className={classes.amount}>
-            {truncateNum(amount)} {aSymbol}
+            {truncateNum(amount)} {fromSymbol}
           </Typography>
         </Stack>
         <Collapse in={fold}>
@@ -112,14 +134,14 @@ export default function AssetListOrderItem({ limitOrder }) {
             </Stack>
             <Stack alignItems="flex-start" className={classes.content}>
               <Typography component="span" className={classes.header}>
-                {truncateNum(price)} {bSymbol}
+                {truncateNum(price)} {toSymbol}
               </Typography>
               <Typography className={classes.subheader} component="span">
                 Price
               </Typography>
             </Stack>
             <Typography component="span" className={classes.amount}>
-              {truncateNum(amount * price)} {bSymbol}
+              {truncateNum(amount * price)} {toSymbol}
             </Typography>
           </Stack>
         </Collapse>
