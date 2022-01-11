@@ -25,6 +25,8 @@ import {setCurrentTokenForSend, setTokenSetted} from "@/store/actions/walletSeed
 import {setTips} from "@/store/actions/app";
 import SendConfirmPopup from "@/components/SendConfirmPopup/SendConfirmPopup";
 import {useUnmount} from "react-use";
+import {useHistory} from "react-router-dom";
+import {handleCutAddress} from "@/reactUtils/reactUtils";
 // import {
 //     setNotify, setOnboard} from "@/store/actions/bridge";
 
@@ -81,6 +83,8 @@ let objc = {
 
 function Bridge() {
     const dispatch = useDispatch();
+    const history = useHistory();
+
     const {
         daiVaultWrapperAddress,
         daiVaultAddress,
@@ -147,12 +151,12 @@ function Bridge() {
     async function clearState() {
         // notify.close()
         // notify.unsubscribe(await onboard.getState().address)
-        provider = null
+        // provider = null
         // setWallet({})
         // setChain({})
         // setNetwork(56)
-        setNotify(null)
-        setOnboard(null)
+        // setNotify(null)
+        // setOnboard(null)
         setFromTokenSetted(false)
         await onboard.walletReset()
         dispatch(setCurrentTokenForSend({}));
@@ -166,14 +170,50 @@ function Bridge() {
 
     });
 
-    function handleOnAssetsListOpen(type) {
-        getTokens()
-        setType(type);
+    async function handleOnAssetsListOpen(type) {
 
-        setOnAssetsList(true);
+
+        if (!wallet.provider) {
+            setTokensArr([])
+            setOnAssetsList(true)
+            setonFetchTokens(true)
+        } else {
+            // if (tokensArr.length) {
+            //     console.log("tokensArr", tokensArr, tokensArr.length)
+            //     setOnAssetsList(true);
+            //     // setType(type);
+            //     if (!isEmpty(curToken) && curToken.balance) {
+            //         changeAmountToSend(amountFrom, "from")
+            //     }
+            //     return
+            // }
+            setOnAssetsList(true);
+            console.log("should fetch")
+            setType(type);
+
+            setonFetchTokens(false)
+
+            let res = await getTokens()
+            setTokensArr(res)
+            setonFetchTokens(true)
+
+            if (!isEmpty(curToken) && curToken.balance) {
+                changeAmountToSend(amountFrom, "from")
+            }
+
+        }
+
     }
 
     function changeAmountToSend(am, type) {
+        console.log("curToken", curToken,"amountFrom",amountFrom)
+        if (isEmpty(curToken) || (curToken && (curToken.balance === 0))) {
+            console.log("I am here amountFrom",amountFrom)
+            setamountValidate({...amountValidate, error: true})
+            setAmountFrom(am);
+            return
+        }
+
         let tokenBalance = curToken.balance / 10 ** curToken.decimals
 
         if (type === 'from') {
@@ -193,7 +233,7 @@ function Bridge() {
 
 
     // useEffect(() => {
-    //     console.log("onboard changed",onboard,onboard.getState())
+    //     // console.log("onboard changed",onboard,onboard.getState())
     //     const previouslySelectedWallet =
     //         window.localStorage.getItem('selectedWallet');
     //
@@ -258,61 +298,6 @@ function Bridge() {
 
     }, []);
 
-    useEffect(() => {
-        console.log("onboard", onboard, "notify", notify, "wallet", wallet)
-        const onboard = initOnboard({
-            address: setAddress,
-            ens: setEns,
-            network: setNetwork,
-            balance: setBalance,
-            wallet: (wallet) => {
-                if (wallet.provider) {
-                    setWallet(wallet);
-
-                    provider = new ethers.providers.Web3Provider(wallet.provider, 'any');
-
-                    // internalTransferContract = new ethers.Contract(
-                    //     '0xb8c12850827ded46b9ded8c1b6373da0c4d60370',
-                    //     internalTransferABI,
-                    //     provider.getUncheckedSigner(),
-                    // );
-
-                    // daiContract = new ethers.Contract(
-                    //     daiBEP20Address,
-                    //     daiABI,
-                    //     provider.getUncheckedSigner(),
-                    // );
-
-                    // daiVaultContract = new ethers.Contract(
-                    //     daiVaultWrapperAddress,
-                    //     daiVaultABI,
-                    //     provider.getUncheckedSigner(),
-                    // );
-
-                    window.localStorage.setItem('selectedWallet', wallet.name);
-                } else {
-                    provider = null;
-                    setWallet({});
-                }
-            },
-        });
-        // if(!onboard){
-        console.log("onboard", onboard)
-        // dispatch(setOnboard(onboard))
-        setOnboard(onboard)
-        // }
-        // if(!notify){
-        console.log("notify", notify)
-
-        // dispatch(setNotify(initNotify()))
-        setNotify(initNotify())
-        // }
-        //
-        // setOnboard(onboard);
-        //     setNotify(initNotify());
-
-
-    }, [wallet]);
 
     const readyToTransact = async () => {
         if (!provider) {
@@ -376,10 +361,22 @@ function Bridge() {
     //     emitter.on('txCancel', console.log);
     //     emitter.on('txFailed', console.log);
     // };
+    useEffect(async () => {
+
+        let tokens = await getTokens()
+        setTokensArr(tokens)
+    }, [address])
+
     async function handleCloseAseetsList() {
-        console.log("ens", ens,"wallet", wallet, "onboard", onboard, "notify",notify)
-        console.log("curToken.evmtoken, await onboard.getState().address, curToken.vault", curToken.evmtoken, Object.keys(onboard.getState()), curToken.vault)
-        await getApproval(curToken.evmtoken, await onboard.getState().address, curToken.vault)
+        // console.log("curToken", curToken, wallet, "onboard", await onboard.getState().balance)
+        // console.log("curToken.evmtoken, await onboard.getState().address, curToken.vault", cur
+        // console.log("network",network)
+        //
+        //
+        //
+        // const approvedAmount = await getApproval(curToken.evmtoken, await onboard.getState().address, curToken.vault)
+        // console.log("approvedAmount", approvedAmount, "amountFrom", amountFrom)        // Token.evmtoken, "onboard.getState()",await onboard.getState(), curToken.vault)
+        // await getApproval(curToken.evmtoken, await onboard.getState().address, curToken.vault)
     }
 
     const approveForWrapper = async () => {
@@ -482,7 +479,7 @@ function Bridge() {
             },
         );
         //
-        // const {emitter} = notify.hash(hash);
+        const {emitter} = notify.hash(hash);
         // emitter.on('txRequest', data=> console.log("txRequest",data));
         // emitter.on('txAwaitingApproval', data=> console.log("txAwaitingApproval",data));
         // emitter.on('txConfirmReminder', data=> console.log("txConfirmReminder",data));
@@ -490,7 +487,14 @@ function Bridge() {
         //     console.log("allllll",transaction)
         //     // called on every event that doesn't have a listener defined on this transaction
         // })
-        // emitter.on('txSent', data=> console.log("txSent",data));
+        emitter.on('txSent', transaction =>
+            dispatch(
+                setTips({
+                    message: `Transaction link is ready`,
+                    link: `https://v2.tonbridge.io/transfer/evm-${network}/ton-1/${transaction.hash}/credit`,
+                    type: 'success',
+                }),
+            ));
         // emitter.on('txPool', data=> console.log("txPool",data));
         // emitter.on('txConfirmed', data=> console.log("txConfirmed",data));
         // emitter.on('txSpeedUp', data=> console.log("txSpeedUp",data));
@@ -547,24 +551,41 @@ function Bridge() {
     // if (!onboard || !notify) return <div>Loading...</div>;
 
 
-
     async function handleShowBridgeAssets() {
-        console.log('handleShowBridgeAssets onboard',onboard,"address", address, "ens", ens, "network", network, "balance", balance, "wallet", wallet);
+        console.log('handleShowBridgeAssets onboard', onboard, "address", address, "ens", ens, "network", network, "balance", balance, "wallet", wallet);
+        await onboard.walletReset()
 
         // if (!provider) {
-            const walletSelected = onboard.walletSelect();
-            console.log("walletSelected", walletSelected)
-            if (!walletSelected){
-                dispatch(
-                    setTips({
-                        message: `Please select wallet first`,
-                        type: 'error',
-                    }),
-                );
-            };
+        const walletSelected = await onboard.walletSelect();
+        console.log("walletSelected", walletSelected)
+        if (!walletSelected) {
+            // dispatch(
+            //     setTips({
+            //         message: `Please select wallet first`,
+            //         type: 'error',
+            //     }),
+            // );
+            return
+        }
+        ;
         // }
 
         const ready = await onboard.walletCheck();
+
+        // if(!ready){
+        dispatch(setTokenSetted(false));
+        dispatch(setCurrentTokenForSend({}));
+
+        // setWalletSelected(false)
+        setFromTokenSetted(false)
+        setFromCurAsset({});
+        setCurToken({})
+        if (!ready) {
+            setWalletSelected(false)
+        }
+
+
+        // }
         console.log("ready", ready)
         //
         // return ready;
@@ -576,10 +597,12 @@ function Bridge() {
     }
 
 
-    async function handleSetNetwork(e, t) {
+    async function setAppNetwork(e, t) {
         console.log("chain changes", t)
         let res = await onboard.config({networkId: t.chainID})
-        console.log("chain changes set new", res,"onboard")
+        await onboard.walletReset()
+        setWalletSelected(false)
+        console.log("chain changes set new", res, "onboard")
         // await onboard.walletReset()
         // setNetwork(t.chainId)
         setChain(t)
@@ -597,9 +620,12 @@ function Bridge() {
         if (r) {
             console.log("onboard.getState()", await onboard.getState())
             setWalletSelected(r)
-
+            // let tokens = await getTokens()
+            // setTokensArr(tokens)
             // setWalletState(await onboard.getState())
         } else {
+            setWalletSelected(false)
+
             console.log("rtrt", r)
         }
 
@@ -607,13 +633,9 @@ function Bridge() {
     }, [wallet])
 
     async function getTokens() {
-        setonFetchTokens(false)
-        let curNet = objc[onboard.getState().network]
-        let tokens = await getBridgeAssetsForAddress(onboard.getState().network, onboard.getState().address)
-        let res = tokens[curNet]
-        setTokensArr(res)
-        console.log("resres", res)
-        setonFetchTokens(true)
+        let curNet = objc[network]
+        let tokens = await getBridgeAssetsForAddress(network, address)
+        return tokens[curNet]
     }
 
     function handleSetToken(e, t) {
@@ -626,6 +648,7 @@ function Bridge() {
     }
 
     async function handleOnConfirm() {
+        console.log("amountToSend",amountToSend, "currentTokenForSend.balance",currentTokenForSend.balance)
         if (amountToSend > currentTokenForSend.balance) {
             dispatch(
                 setTips({
@@ -654,7 +677,7 @@ function Bridge() {
     }
 
     async function getApproval(rootAddress, owner, spender) {
-        if(!rootAddress || !owner || !spender){
+        if (!rootAddress || !owner || !spender) {
             dispatch(
                 setTips({
                     message: `Can not get approved value for your token, please try again`,
@@ -678,12 +701,71 @@ function Bridge() {
 
     }
 
+    const minBalances = {
+        USDT: 3,
+        DAI: 5,
+        USDC: 5,
+        WBTC: 0.000010,
+        WETH: 0.00012,
+
+    }
 
     async function handleSendAssetToBridge() {
-        onApprove ? approveForWrapper() : depositToVault()
+        if (network !== onboard.getState().appNetworkId) {
+            dispatch(
+                setTips({
+                    message: `Networks do not match, please select ${network} chain in app, or change your extension network to ${onboard.getState().appNetworkId}`,
+                    type: 'error',
+                }),
+            );
+            return
+        }
+        if (amountValidate.error) {
+            dispatch(
+                setTips({
+                    message: `Insufficient balance`,
+                    type: 'error',
+                }),
+            );
+            return
+        } else if (isEmpty(curToken)) {
+            dispatch(
+                setTips({
+                    message: `Please select token`,
+                    type: 'error',
+                }),
+            );
+            return
+        }
+
+
+        if (onApprove) {
+            approveForWrapper()
+            setOnConfirmPopup(false)
+
+        } else {
+            let shiftedBalance = curToken.balance / 10 ** curToken.decimals;
+            let minBalanceForCur = minBalances[curToken.symbol]
+
+            if (minBalanceForCur > shiftedBalance) {
+                dispatch(
+                    setTips({
+                        message: `Min balance for transfer ${minBalanceForCur} ${curToken.symbol}`,
+                        type: 'error',
+                    }),
+                );
+                return
+            }
+
+            depositToVault()
+        }
         setOnConfirmPopup(false)
 
 
+    }
+
+    function handlePushToLogin() {
+        history.push('/account');
     }
 
     return (
@@ -691,9 +773,10 @@ function Bridge() {
             {onConfirmPopup ?
                 <SendConfirmPopup
                     // showConfirmPopup={()=>handleSetSendPopupVisibility(false)}
+                    msgText={onApprove ? "First you need to approve to vault your token, just click Submit and follow the instructions in your wallet." : "Transfer to you Everscale wallet will take about 5-8 minuts, after you submit, you can track your transaction from account page"}
                     title={onApprove ? "Approve to vault" : "Send tokens"}
                     hideConfirmPopup={() => setOnConfirmPopup(false)}
-                    addressToSend={onApprove ? curToken.vault : clientData.address}
+                    addressToSend={onApprove ? curToken.vault : handleCutAddress(clientData.address)}
                     currentAsset={curToken}
                     amountToSend={amountFrom}
                     handleSend={() => handleSendAssetToBridge()}
@@ -716,7 +799,7 @@ function Bridge() {
                 <SelectPopup
                     loading={false}
                     onClose={() => setOnNetworkChange(false)}
-                    onSelect={(e, t) => handleSetNetwork(e, t)}
+                    onSelect={(e, t) => setAppNetwork(e, t)}
                     tokens={netwArray}
                     title={"Select a chain"}
                 />
@@ -899,9 +982,11 @@ function Bridge() {
                             <NextBtn
                                 curBtnStyles={`curBtnStyles ${amountValidate.error ? "disabled" : null}`}
                                 btnsClass={"enterSPRegBox"}
-                                btnText={'Submit'}
+                                btnText={walletIsConnected ? 'Submit' : (!clientData.status && clientData.address.length === 66)
+                                    ? 'Deploy wallet'
+                                    : 'Connect wallet'}
                                 errColor={null}
-                                handleClickNext={amountValidate.error ? null : () => handleOnConfirm()}
+                                handleClickNext={walletIsConnected ? (amountValidate.error ? null : () => handleOnConfirm()) : handlePushToLogin()}
                             />
                         </div>
                     }

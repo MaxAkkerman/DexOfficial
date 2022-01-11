@@ -24,7 +24,7 @@ function RightBlockBottom(props) {
   function handleTouchTokenModal2() {
     history.push('/wallet/send/send-modal');
   }
-
+console.log("wwwwww",props.tokenSetted,"tokenSetted",tokenSetted)
   return (
     <>
       {(props.tokenSetted ? props.tokenSetted : tokenSetted) ? (
