@@ -72,17 +72,19 @@ export default function SwapConfirmPopup() {
     );
     dispatch(resetSwapPopupValues());
 
+    const revDirectionPair =
+      directionPair === AB_DIRECTION ? BA_DIRECTION : AB_DIRECTION;
+
     const { data } = await apolloClient.query({
       fetchPolicy: 'no-cache',
       query: LimitOrdersForSwapQuery,
       variables: {
         addrPair: values.pair.pairAddress,
-        amount: values.toValue,
+        amountIn: values.toValue,
         directionPair:
-          directionPair === AB_DIRECTION
-            ? BA_DIRECTION_GRAPHQL
-            : AB_DIRECTION_GRAPHQL,
-        slippage: values.slippage,
+          revDirectionPair === AB_DIRECTION
+            ? AB_DIRECTION_GRAPHQL
+            : BA_DIRECTION_GRAPHQL,
       },
     });
     console.log('request->data', data);
@@ -91,17 +93,17 @@ export default function SwapConfirmPopup() {
 
     data.limitOrdersForSwap.limitOrders.forEach((limitOrder) => {
       const promise = takeLimitOrder({
-        directionPair,
+        directionPair: revDirectionPair,
         orderAddr: limitOrder.addrOrder,
         pairAddr: values.pair.pairAddress,
         price: limitOrder.priceRaw,
-        qty: limitOrder.amountRaw * limitOrder.price,
+        qty: limitOrder.oppositeAmountRaw,
       })
         .then(() => {
           enqueueSnackbar({
             message: `Taking limit order ${truncateNum(limitOrder.amount, 2)} ${
               values.toToken.symbol
-            } - ${truncateNum(limitOrder.amount * limitOrder.price, 2)} ${
+            } - ${truncateNum(limitOrder.oppositeAmount, 2)} ${
               values.fromToken.symbol
             } ⏳`,
             type: 'info',
@@ -114,7 +116,7 @@ export default function SwapConfirmPopup() {
               limitOrder.amount,
               2,
             )} ${values.toToken.symbol} - ${truncateNum(
-              limitOrder.amount * limitOrder.price,
+              limitOrder.oppositeAmount,
               2,
             )} ${values.fromToken.symbol} ⏳`,
             type: 'error',
