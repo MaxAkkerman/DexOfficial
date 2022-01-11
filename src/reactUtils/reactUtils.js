@@ -20,6 +20,7 @@ import {
 } from '../store/actions/wallet';
 
 const hex = require('ascii-hex');
+const converter = require('hex2dec');
 
 const { setLiquidityList } = require('../store/actions/wallet');
 const { setTokenList } = require('../store/actions/wallet');
@@ -184,6 +185,10 @@ export function hex2a(hex) {
     if (v) str += String.fromCharCode(v);
   }
   return str;
+}
+
+export function dec2hex(dec) {
+  return converter.decToHex(dec);
 }
 
 export function getRootSymbol(symbolA, symbolB) {

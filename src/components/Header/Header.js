@@ -29,10 +29,10 @@ export default function Header() {
   function handlePushToLogin() {
     history.push('/account');
   }
-
   function handleTutorialClick() {
     dispatch(resetTutorial());
   }
+
 
   return (
     <>
@@ -99,6 +99,17 @@ export default function Header() {
               }
             >
               Staking
+            </NavLink>
+            <NavLink
+                id="nav-bridge"
+                to="/bridge"
+                className={
+                  linkIsActive('/bridge')
+                      ? 'header-link header-link--active'
+                      : 'header-link'
+                }
+            >
+              Bridge
             </NavLink>
             <NavLink
               id="nav-farming"

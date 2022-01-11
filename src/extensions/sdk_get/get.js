@@ -5,6 +5,8 @@ import { signerKeys, signerNone } from '@tonclient/core';
 import { libWeb } from '@tonclient/lib-web';
 import memoize from 'lodash.memoize';
 
+import { ethers } from 'ethers'
+
 // import {reduxStore} from "../../index";
 import { reduxStore } from '@/lib/redux';
 
@@ -17,6 +19,7 @@ import {
   getFullName,
   hex2a,
   toHex,
+  dec2hex,
 } from '../../reactUtils/reactUtils';
 import { setTips } from '../../store/actions/app';
 import { setUpdatedBalance } from '../../store/actions/wallet';
@@ -36,12 +39,17 @@ import { NftRootContract } from '../contracts/NftRoot.js';
 import { RootTokenContract } from '../contracts/RootTokenContract.js';
 import { SafeMultisigWallet } from '../contracts/SafeMultisigWallet.js';
 import { TONTokenWalletContract } from '../contracts/TONTokenWallet.js';
+import { CreditEthereumEventConfigurationContract } from '../contracts/CreditEthereumEventConfiguration.js';
 import {
   checkMessagesAmountClient,
   decode,
   decodePayload,
   getShardThis,
 } from '../tonUtils';
+
+
+import daiData from "@/pages/Bridge/abis";
+
 
 const { ResponseType } = require('@tonclient/core/dist/bin');
 const { TonClient } = require('@tonclient/core');
@@ -53,12 +61,288 @@ const dexroot = Radiance.networks['2'].dexroot;
 const rootAddrNFT = Radiance.networks['2'].rootAddrNFT;
 const BroxusRootCodeHash = Radiance.networks['2'].BroxusRootCodeHash;
 
+const BridgeAssets = require('../BridgeAssets.json');
+const assetsObj = BridgeAssets.token;
+
 const DappServer = Radiance.networks['2'].DappServer;
 const limitRootAddress = Radiance.networks['2'].limitRootAddress;
 const limitOrderRouter = Radiance.networks['2'].limitOrderRouter;
 
 const client = new TonClient({ network: { endpoints: [DappServer] } });
 export default client;
+
+const provider = new ethers.providers.EtherscanProvider(null, '4MWT3NGZ9U5WECARAWYGZ1MGNMCM72PETF');
+const provider2 = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/', { name: 'binance', chainId: 56 });
+const provider3 = new ethers.providers.JsonRpcProvider('https://speedy-nodes-nyc.moralis.io/38abd3f2a52dd8e90041ee98/polygon/mainnet', { name: 'matic', chainId: 137 });
+const provider4 = new ethers.providers.JsonRpcProvider('https://speedy-nodes-nyc.moralis.io/38abd3f2a52dd8e90041ee98/fantom/mainnet', { name: 'fantom', chainId: 250 });
+
+const  vaultWrapperAbi = [
+  "function vault() external view returns (address)",
+];
+
+const  vaultAbi = [
+  "function token() external view returns (address)",
+];
+
+
+
+
+
+export async function getBridgeAssetsForAddress(chain, walletAddr) {
+console.log("getBridgeAssetsForAddress",chain, walletAddr)
+    let eth1 = [];
+    let bcs56 = [];
+    let polygon137 = [];
+    let phantom250 = [];
+
+    let walletAddrResult = {eth1:[],bcs56:[],polygon137:[],phantom250:[]};
+    let assetsArr = Object.keys(assetsObj);
+    let vaultsArr;
+
+    assetsArr.forEach((token) => {
+      vaultsArr = assetsObj[token].vaults;
+      vaultsArr.forEach((vault) => {
+        if(vault.depositType == "credit"){
+          if(vault.chainId == "1"){eth1.push({token:token,config:vault.ethereumConfiguration})}
+          else if (vault.chainId == "56"){bcs56.push({token:token,config:vault.ethereumConfiguration})}
+          else if (vault.chainId == "137"){polygon137.push({token:token,config:vault.ethereumConfiguration})}
+          else if (vault.chainId == "250"){phantom250.push({token:token,config:vault.ethereumConfiguration})}
+        }
+      });
+    });
+
+    let response;
+    let itemConfig =  {
+      token: '',
+      symbol: '',
+      config: '',
+      vaultWrapper: '',
+      vault: '',
+      evmtoken: '',
+      balance: '',
+      decimals: '',
+      name: '',
+      evmsymbol: '',
+      logo: '',
+      thumbnail: '',
+    };
+
+    if (chain == 1) {
+      for (const item of eth1) {
+      console.log('eth1', item.token);
+      itemConfig =  { token: item.token, symbol: '', config: '', vaultWrapper: '', vault: '', evmtoken: '', balance: '', decimals: '', name: '', evmsymbol: '', logo: '', thumbnail: ''};
+      const rootAcc = new Account(RootTokenContract, {address: item.token,client,});
+      response = await rootAcc.runLocal("symbol", {});
+      itemConfig.symbol = hex2a(response.decoded.output.symbol);
+      itemConfig.icon = iconGenerator(getReplacedSymbol(hex2a(response.decoded.output.symbol)))
+      itemConfig.config = item.config;
+      const configAcc = new Account(CreditEthereumEventConfigurationContract, {address: item.config,client,});
+      response = await configAcc.runLocal("getDetails", {answerId: 0});
+      let dec = response.decoded.output._networkConfiguration.eventEmitter;
+      let vaultWrapperAddr = dec2hex(dec);
+      itemConfig.vaultWrapper = vaultWrapperAddr;
+      const vaultWrapper = new ethers.Contract(vaultWrapperAddr, vaultWrapperAbi, provider);
+      const vaultAddr = await vaultWrapper.vault();
+      itemConfig.vault = vaultAddr;
+      const vault = new ethers.Contract(vaultAddr, vaultAbi, provider);
+      const tokenAddr = await vault.token();
+      itemConfig.evmtoken = tokenAddr;
+      response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=eth&token_addresses=${tokenAddr}`, {
+              headers: {
+                  'accept': 'application/json',
+                  'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
+              }
+          })
+      const data = await response.json();
+      console.log('eth1', data);
+      if (data.length > 0) {
+        itemConfig.balance = data[0].balance;
+        itemConfig.decimals = data[0].decimals;
+        itemConfig.name = data[0].name;
+        itemConfig.evmsymbol = data[0].symbol;
+        itemConfig.logo = data[0].logo;
+        itemConfig.thumbnail = data[0].thumbnail;
+      } else {
+        response = await fetch(`https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses=${tokenAddr}`, {
+                headers: {
+                    'accept': 'application/json',
+                    'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
+                }
+            })
+        const data = await response.json();
+        itemConfig.balance = 0;
+        itemConfig.decimals = 0;
+        itemConfig.name = data[0].name;
+        itemConfig.evmsymbol = data[0].symbol;
+        itemConfig.logo = data[0].logo;
+        itemConfig.thumbnail = data[0].thumbnail;
+      }
+      walletAddrResult.eth1.push(itemConfig);
+      }
+    } else if (chain == 56) {
+      for (const item of bcs56) {
+      console.log('bcs56', item.token);
+      itemConfig =  { token: item.token, symbol: '', config: '', vaultWrapper: '', vault: '', evmtoken: '', balance: '', decimals: '', name: '', evmsymbol: '', logo: '', thumbnail: ''};
+      const rootAcc = new Account(RootTokenContract, {address: item.token,client,});
+      response = await rootAcc.runLocal("symbol", {});
+      itemConfig.symbol = hex2a(response.decoded.output.symbol);
+        itemConfig.icon = iconGenerator(getReplacedSymbol(hex2a(response.decoded.output.symbol)))
+
+        itemConfig.config = item.config;
+      const configAcc = new Account(CreditEthereumEventConfigurationContract, {address: item.config,client,});
+      response = await configAcc.runLocal("getDetails", {answerId: 0});
+      let dec = response.decoded.output._networkConfiguration.eventEmitter;
+      let vaultWrapperAddr = dec2hex(dec);
+      itemConfig.vaultWrapper = vaultWrapperAddr;
+      const vaultWrapper = new ethers.Contract(vaultWrapperAddr, vaultWrapperAbi, provider2);
+      const vaultAddr = await vaultWrapper.vault();
+      itemConfig.vault = vaultAddr;
+      const vault = new ethers.Contract(vaultAddr, vaultAbi, provider2);
+      const tokenAddr = await vault.token();
+      itemConfig.evmtoken = tokenAddr;
+      response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=bsc&token_addresses=${tokenAddr}`, {
+              headers: {
+                  'accept': 'application/json',
+                  'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
+              }
+          })
+          const data = await response.json();
+          console.log('bcs56', data);
+          if (data.length > 0) {
+            itemConfig.balance = data[0].balance;
+            itemConfig.decimals = data[0].decimals;
+            itemConfig.name = data[0].name;
+            itemConfig.evmsymbol = data[0].symbol;
+            itemConfig.logo = data[0].logo;
+            itemConfig.thumbnail = data[0].thumbnail;
+          } else {
+            response = await fetch(`https://deep-index.moralis.io/api/v2/erc20/metadata?chain=bsc&addresses=${tokenAddr}`, {
+                    headers: {
+                        'accept': 'application/json',
+                        'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
+                    }
+                })
+            const data = await response.json();
+            itemConfig.balance = 0;
+            itemConfig.decimals = 0;
+            itemConfig.name = data[0].name;
+            itemConfig.evmsymbol = data[0].symbol;
+            itemConfig.logo = data[0].logo;
+            itemConfig.thumbnail = data[0].thumbnail;
+          }
+      walletAddrResult.bcs56.push(itemConfig);
+      }
+    } else if (chain = 137) {
+      for (const item of polygon137) {
+      console.log('polygon137', item.token);
+      itemConfig =  { token: item.token, symbol: '', config: '', vaultWrapper: '', vault: '', evmtoken: '', balance: '', decimals: '', name: '', evmsymbol: '', logo: '', thumbnail: ''};
+      const rootAcc = new Account(RootTokenContract, {address: item.token,client,});
+      response = await rootAcc.runLocal("symbol", {});
+      itemConfig.symbol = hex2a(response.decoded.output.symbol);
+        itemConfig.icon = iconGenerator(getReplacedSymbol(hex2a(response.decoded.output.symbol)))
+
+        itemConfig.config = item.config;
+      const configAcc = new Account(CreditEthereumEventConfigurationContract, {address: item.config,client,});
+      response = await configAcc.runLocal("getDetails", {answerId: 0});
+      let dec = response.decoded.output._networkConfiguration.eventEmitter;
+      let vaultWrapperAddr = dec2hex(dec);
+      itemConfig.vaultWrapper = vaultWrapperAddr;
+      const vaultWrapper = new ethers.Contract(vaultWrapperAddr, vaultWrapperAbi, provider3);
+      const vaultAddr = await vaultWrapper.vault();
+      itemConfig.vault = vaultAddr;
+      const vault = new ethers.Contract(vaultAddr, vaultAbi, provider3);
+      const tokenAddr = await vault.token();
+      itemConfig.evmtoken = tokenAddr;
+      response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=polygon&token_addresses=${tokenAddr}`, {
+              headers: {
+                  'accept': 'application/json',
+                  'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
+              }
+          })
+          const data = await response.json();
+          console.log('polygon137', data);
+          if (data.length > 0) {
+            itemConfig.balance = data[0].balance;
+            itemConfig.decimals = data[0].decimals;
+            itemConfig.name = data[0].name;
+            itemConfig.evmsymbol = data[0].symbol;
+            itemConfig.logo = data[0].logo;
+            itemConfig.thumbnail = data[0].thumbnail;
+          } else {
+            response = await fetch(`https://deep-index.moralis.io/api/v2/erc20/metadata?chain=polygon&addresses=${tokenAddr}`, {
+                    headers: {
+                        'accept': 'application/json',
+                        'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
+                    }
+                })
+            const data = await response.json();
+            itemConfig.balance = 0;
+            itemConfig.decimals = 0;
+            itemConfig.name = data[0].name;
+            itemConfig.evmsymbol = data[0].symbol;
+            itemConfig.logo = data[0].logo;
+            itemConfig.thumbnail = data[0].thumbnail;
+          }
+      walletAddrResult.polygon137.push(itemConfig);
+      }
+    } else if (chain == 250) {
+      for (const item of phantom250) {
+      console.log('phantom250', item.token);
+      itemConfig =  { token: item.token, symbol: '', config: '', vaultWrapper: '', vault: '', evmtoken: '', balance: '', decimals: '', name: '', evmsymbol: '', logo: '', thumbnail: ''};
+      const rootAcc = new Account(RootTokenContract, {address: item.token,client,});
+      response = await rootAcc.runLocal("symbol", {});
+      itemConfig.symbol = hex2a(response.decoded.output.symbol);
+        itemConfig.icon = iconGenerator(getReplacedSymbol(hex2a(response.decoded.output.symbol)))
+
+        itemConfig.config = item.config;
+      const configAcc = new Account(CreditEthereumEventConfigurationContract, {address: item.config,client,});
+      response = await configAcc.runLocal("getDetails", {answerId: 0});
+      let dec = response.decoded.output._networkConfiguration.eventEmitter;
+      let vaultWrapperAddr = dec2hex(dec);
+      itemConfig.vaultWrapper = vaultWrapperAddr;
+      const vaultWrapper = new ethers.Contract(vaultWrapperAddr, vaultWrapperAbi, provider4);
+      const vaultAddr = await vaultWrapper.vault();
+      itemConfig.vault = vaultAddr;
+      const vault = new ethers.Contract(vaultAddr, vaultAbi, provider4);
+      const tokenAddr = await vault.token();
+      itemConfig.evmtoken = tokenAddr;
+      response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=fantom&token_addresses=${tokenAddr}`, {
+              headers: {
+                  'accept': 'application/json',
+                  'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
+              }
+          })
+          const data = await response.json();
+          console.log('phantom250', data);
+          if (data.length > 0) {
+            itemConfig.balance = data[0].balance;
+            itemConfig.decimals = data[0].decimals;
+            itemConfig.name = data[0].name;
+            itemConfig.evmsymbol = data[0].symbol;
+            itemConfig.logo = data[0].logo;
+            itemConfig.thumbnail = data[0].thumbnail;
+          } else {
+            response = await fetch(`https://deep-index.moralis.io/api/v2/erc20/metadata?chain=fantom&addresses=${tokenAddr}`, {
+                    headers: {
+                        'accept': 'application/json',
+                        'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
+                    }
+                })
+            const data = await response.json();
+            itemConfig.balance = 0;
+            itemConfig.decimals = 0;
+            itemConfig.name = data[0].name;
+            itemConfig.evmsymbol = data[0].symbol;
+            itemConfig.logo = data[0].logo;
+            itemConfig.thumbnail = data[0].thumbnail;
+          }
+      walletAddrResult.phantom250.push(itemConfig);
+      }
+    }
+
+  return walletAddrResult;
+
+}
 
 export async function getShardLimit() {
   let response;
