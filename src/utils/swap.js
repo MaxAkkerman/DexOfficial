@@ -4,7 +4,7 @@ import { signerKeys } from '@tonclient/core';
 import { NO_CONTEXT } from '@/constants/runtimeErrors';
 import { AB_DIRECTION } from '@/constants/runtimeVariables';
 import { DEXClientContract } from '@/extensions/contracts/DEXClientMainNet';
-import convertToSafeNum from '@/utils/convertToSafeNum';
+import convertToSafeInt from '@/utils/convertToSafeInt';
 
 export default async function swap({
   directionPair,
@@ -44,17 +44,17 @@ export default async function swap({
     let res = null;
     if (directionPair === AB_DIRECTION)
       res = await clientAcc.run('processSwapA', {
-        maxQtyB: convertToSafeNum(maxTo * 10 ** tokenB.decimals),
-        minQtyB: convertToSafeNum(minTo * 10 ** tokenB.decimals),
+        maxQtyB: convertToSafeInt(maxTo * 10 ** tokenB.decimals),
+        minQtyB: convertToSafeInt(minTo * 10 ** tokenB.decimals),
         pairAddr: pairAddr,
-        qtyA: convertToSafeNum(qtyFrom * 10 ** tokenA.decimals),
+        qtyA: convertToSafeInt(qtyFrom * 10 ** tokenA.decimals),
       });
     else
       res = await clientAcc.run('processSwapB', {
-        maxQtyA: convertToSafeNum(maxTo * 10 ** tokenA.decimals),
-        minQtyA: convertToSafeNum(minTo * 10 ** tokenA.decimals),
+        maxQtyA: convertToSafeInt(maxTo * 10 ** tokenA.decimals),
+        minQtyA: convertToSafeInt(minTo * 10 ** tokenA.decimals),
         pairAddr: pairAddr,
-        qtyB: convertToSafeNum(qtyFrom * 10 ** tokenB.decimals),
+        qtyB: convertToSafeInt(qtyFrom * 10 ** tokenB.decimals),
       });
 
     return res.decoded.output;

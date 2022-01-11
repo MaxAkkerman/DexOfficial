@@ -30,19 +30,19 @@ export default async function transferLimitOrder({
     signer: signerKeys(dexClientKeyPair),
   });
 
-  const rootFrom = this.helperFunctions.getRootFromWallet(
+  const rootFrom = await this.helperFunctions.getRootFromWallet(
     this.context.dexClientAddress,
     walletOwnerFrom,
   );
-  const rootTo = this.helperFunctions.getRootFromWallet(
+  const rootTo = await this.helperFunctions.getRootFromWallet(
     this.context.dexClientAddress,
     walletOwnerTo,
   );
-  const walletNewOwnerFrom = this.helperFunctions.getWalletFromRoot(
+  const walletNewOwnerFrom = await this.helperFunctions.getWalletFromRoot(
     newOwnerAddress,
     rootFrom,
   );
-  const walletNewOwnerTo = this.helperFunctions.getWalletFromRoot(
+  const walletNewOwnerTo = await this.helperFunctions.getWalletFromRoot(
     newOwnerAddress,
     rootTo,
   );

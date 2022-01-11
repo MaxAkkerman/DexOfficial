@@ -1,4 +1,3 @@
-import { useLazyQuery } from '@apollo/client';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +7,7 @@ import { useMount } from 'react-use';
 import ChromePopup from '@/components-v2/ChromePopup';
 import LimitOrderCancelPopup from '@/components-v2/LimitOrderCancelPopup';
 import LimitOrderConfirmPopup from '@/components-v2/LimitOrderConfirmPopup';
+import LimitOrderNotifications from '@/components-v2/LimitOrderNotifications';
 import LimitOrderPage from '@/components-v2/LimitOrderPage';
 import LimitOrderUpdatePopup from '@/components-v2/LimitOrderUpdatePopup';
 import SwapConfirmPopup from '@/components-v2/SwapConfirmPopup';
@@ -36,26 +36,11 @@ import AssetsModal from './components/SendAssets/AssetsModal';
 import SendAssets from './components/SendAssets/SendAssets';
 import KeysBlock from './components/WalletSettings/KeysBlock';
 import WalletSettings from './components/WalletSettings/WalletSettings';
-import { LIMIT_ORDER_STATUS_UNKNOWN } from './constants/runtimeErrors';
-import {
-  APPLY_ORDER,
-  APPLY_ORDER_FAIL,
-  BA_DIRECTION,
-  CANCEL_ORDER,
-  CHANGE_OWNER,
-  CHANGE_PRICE,
-  CLOSE_ORDER,
-  DEPLOY_ORDER,
-  GIFT_ORDER,
-  PART_CLOSE_ORDER,
-} from './constants/runtimeVariables';
 import {
   agregateQueryNFTassets,
   getAllPairsWoithoutProvider,
   getAssetsForDeploy,
 } from './extensions/sdk_get/get';
-import { LimitOrdersForOwnerQuery } from './graphql/queries';
-import { LimitOrderUpdateSubscription } from './graphql/subscriptions';
 import Account from './pages/Account/Account';
 import AddLiquidity from './pages/AddLiquidity/AddLiquidity';
 import Assets from './pages/Assets/Assets';
@@ -176,7 +161,7 @@ function App() {
       tips.message === 'Sent message to blockchain' ||
       tips.message === 'Copied'
     ) {
-      enqueueSnackbar({ type: tips.type, message: tips.message });
+      enqueueSnackbar({ message: tips.message, type: tips.type });
       return;
     }
 
@@ -207,7 +192,7 @@ function App() {
       dispatch(requestPairsFetch());
       dispatch(requestTokensFetch());
     }
-    enqueueSnackbar({ type: tips.type, message: tips.message });
+    enqueueSnackbar({ message: tips.message, type: tips.type });
     newTransList.push(tips);
     dispatch(setSubscribeReceiveTokens(newTransList));
   }, [tips]);
@@ -220,120 +205,6 @@ function App() {
     const addrArray = await getAssetsForDeploy();
     dispatch(setAssetsFromGraphQL(addrArray));
   }, []);
-
-  const [getLimitOrders, { called, subscribeToMore }] = useLazyQuery(
-    LimitOrdersForOwnerQuery,
-  );
-
-  useEffect(async () => {
-    console.log(' useeffect getLimitOrders');
-    if (clientData && clientData.address && !called)
-      getLimitOrders({ variables: { addrOwner: clientData.address } });
-  }, [clientData]);
-
-  useEffect(() => {
-    if (subscribeToMore)
-      subscribeToMore({
-        document: LimitOrderUpdateSubscription,
-        variables: { addrOwner: clientData.address },
-        updateQuery(prev, { subscriptionData }) {
-          if (!subscriptionData.data) return prev;
-
-          const { limitOrder, status } = subscriptionData.data.updateLimitOrder;
-
-          let { aSymbol, bSymbol } = limitOrder.pair;
-          if (limitOrder.directionPair === BA_DIRECTION)
-            [aSymbol, bSymbol] = [bSymbol, aSymbol];
-
-          switch (status) {
-            case DEPLOY_ORDER:
-              enqueueSnackbar({
-                type: 'success',
-                message: `Created limit order ${aSymbol} - ${bSymbol}`,
-              });
-              return {
-                limitOrders: prev.limitOrders.concat(limitOrder),
-              };
-            case CANCEL_ORDER:
-              enqueueSnackbar({
-                type: 'success',
-                message: `Canceled limit order ${aSymbol} - ${bSymbol}`,
-              });
-              return {
-                limitOrders: prev.limitOrders.filter(
-                  (lo) => lo.addrOrder !== limitOrder.addrOrder,
-                ),
-              };
-            case CHANGE_PRICE:
-              enqueueSnackbar({
-                type: 'success',
-                message: `Updated price of limit order ${aSymbol} - ${bSymbol}`,
-              });
-              return {
-                limitOrders: prev.limitOrders.map((lo) =>
-                  lo.addrOrder === limitOrder.addrOrder ? limitOrder : lo,
-                ),
-              };
-            case CHANGE_OWNER:
-              enqueueSnackbar({
-                type: 'success',
-                message: `Transferred limit order ${aSymbol} - ${bSymbol}`,
-              });
-              return {
-                limitOrders: prev.limitOrders.filter(
-                  (lo) => lo.addrOrder !== limitOrder.addrOrder,
-                ),
-              };
-            case APPLY_ORDER:
-              enqueueSnackbar({
-                type: 'success',
-                message: `Applied limit order ${aSymbol} - ${bSymbol}`,
-              });
-              return {
-                limitOrders: prev.limitOrders.map((lo) =>
-                  lo.addrOrder === limitOrder.addrOrder ? limitOrder : lo,
-                ),
-              };
-            case APPLY_ORDER_FAIL:
-              enqueueSnackbar({
-                type: 'error',
-                message: `Failed limit order application process ${aSymbol} - ${bSymbol}`,
-              });
-              return prev;
-            case CLOSE_ORDER:
-              enqueueSnackbar({
-                type: 'success',
-                message: `Fully taken limit order ${aSymbol} - ${bSymbol}`,
-              });
-              return {
-                limitOrders: prev.limitOrders.filter(
-                  (lo) => lo.addrOrder !== limitOrder.addrOrder,
-                ),
-              };
-            case PART_CLOSE_ORDER:
-              enqueueSnackbar({
-                type: 'success',
-                message: `Partially taken limit order ${aSymbol} - ${bSymbol}`,
-              });
-              return {
-                limitOrders: prev.limitOrders.map((lo) =>
-                  lo.addrOrder === limitOrder.addrOrder ? limitOrder : lo,
-                ),
-              };
-            case GIFT_ORDER:
-              enqueueSnackbar({
-                type: 'success',
-                message: `Received limit order ${aSymbol} - ${bSymbol}`,
-              });
-              return {
-                limitOrders: prev.limitOrders.concat(limitOrder),
-              };
-            default:
-              throw new Error(LIMIT_ORDER_STATUS_UNKNOWN);
-          }
-        },
-      });
-  }, [subscribeToMore]);
 
   useEffect(() => {
     dispatch(requestPairsFetch());
@@ -425,6 +296,7 @@ function App() {
       <WaitingPopup />
       <ChromePopup />
       <TutorialSteps />
+      <LimitOrderNotifications />
     </>
   );
 }

@@ -41,6 +41,7 @@ export default function LimitOrderCancelPopup() {
   async function handleConfirm() {
     const { addrOrder, fromToken, fromValue, toToken, toValue } = values;
 
+    dispatch(resetLimitOrderPopupValues());
     dispatch(closeLimitOrderCancelPopup());
     dispatch(
       setWaitingPopupValues({
@@ -73,8 +74,6 @@ export default function LimitOrderCancelPopup() {
     }
 
     dispatch(resetWaitingPopupValues());
-    dispatch(resetLimitOrderPopupValues());
-    dispatch(closeLimitOrderCancelPopup());
   }
 
   const { fromToken, fromValue, toPrice, toToken, toValue } = values;
