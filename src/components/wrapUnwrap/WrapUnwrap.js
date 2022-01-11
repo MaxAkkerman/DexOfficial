@@ -84,7 +84,7 @@ function WrapUnwrap(props) {
     if (clientData.balance < 4) {
       dispatch(
         setTips({
-          message: `You need at least 4 EVERs on balance to deploy WTON wallet`,
+          message: `You need at least 4 EVERs on balance to deploy wEVER wallet`,
           type: 'error',
         }),
       );
@@ -107,6 +107,8 @@ function WrapUnwrap(props) {
       console.log('deployRes', deployRes);
       setdeployWTONisVisible(false);
       setmainIsVisible(true);
+      props.handleShow(false);
+      // dispatch(setAmountForSend(0));
     }
   }
 
