@@ -130,8 +130,8 @@ export default function SwapConfirmPopup() {
         const res = await swap({
           directionPair,
           pairAddr: pair.pairAddress,
-          qtyFrom: data.limitOrdersForSwap.leftoverSwap,
-          qtyTo: data.limitOrdersForSwap.leftoverSwap * (toValue / fromValue),
+          qtyFrom: data.limitOrdersForSwap.leftoverSwap * (fromValue / toValue),
+          qtyTo: data.limitOrdersForSwap.leftoverSwap,
           slippage: slippage,
         });
         console.log('swap(A|B)->res', res);
