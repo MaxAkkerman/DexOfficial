@@ -1,3 +1,11 @@
+// bridge
+export const SET_ONBOARD = 'SET_ONBOARD';
+export const SET_NOTIFY = 'SET_NOTIFY';
+export const SET_ADDRESS = 'SET_ADDRESS';
+export const SET_ENS = 'SET_ENS';
+export const SET_NET = 'SET_NET';
+export const SET_BALANCE = 'SET_BALANCE';
+
 // app
 export const CHANGE_THEME = 'CHANGE_THEME';
 

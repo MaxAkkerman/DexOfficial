@@ -15,22 +15,20 @@ export const LimitOrdersForSwapQuery = gql`
   query LimitOrdersForSwap(
     $addrPair: String!
     $directionPair: DirectionPair!
-    $amount: Float!
-    $slippage: Float!
+    $amountIn: Float!
   ) {
     limitOrdersForSwap(
       addrPair: $addrPair
       directionPair: $directionPair
-      amount: $amount
-      slippage: $slippage
+      amountIn: $amountIn
     ) {
       leftoverSwap
       limitOrders {
         addrOrder
         amount
-        price
         priceRaw
-        amountRaw
+        oppositeAmount
+        oppositeAmountRaw
       }
     }
   }

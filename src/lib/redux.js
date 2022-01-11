@@ -25,8 +25,8 @@ import getWalletFromRoot from '@/utils/getWalletFromRoot';
 import makeLimitOrder from '@/utils/makeLimitOrder';
 import swap from '@/utils/swap';
 import takeLimitOrder from '@/utils/takeLimitOrder';
+import transferLimitOrder from '@/utils/transferLimitOrder';
 import updateLimitOrderPrice from '@/utils/updateLimitOrderPrice';
-import transferLimitOrder from '@/utils/updateLimitOrderPrice';
 
 TonClient.useBinaryLibrary(libWeb);
 

@@ -12,7 +12,7 @@ import includesTextInToken from '@/utils/includesTextInToken';
 
 import classes from './index.module.scss';
 
-export default function SelectPopup({ loading, onClose, onSelect, tokens }) {
+export default function SelectPopup({ loading, onClose, onSelect, tokens,title }) {
   const [searchWord, setSearchWord] = useState('');
   console.log('tokens', tokens);
   const filteredTokens = useMemo(
@@ -33,7 +33,7 @@ export default function SelectPopup({ loading, onClose, onSelect, tokens }) {
       <div className={classes['select-wrapper']}>
         <ClickAwayListener onClickAway={onClose}>
           <MainBlock
-            title="Select a token"
+            title={title}
             button={<CloseBtn onClick={onClose} />}
             content={
               loading ? (
@@ -77,4 +77,5 @@ SelectPopup.defaultProps = {
   onClose: () => {},
   onSelect: () => {},
   tokens: [],
+    title: "Select a token"
 };

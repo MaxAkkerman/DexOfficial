@@ -406,6 +406,16 @@ function Account() {
                   transArr.map((i, index) => (
                     <li className="account-footer-list-item" key={index}>
                       <span>{i.message}</span>
+                      {i.link ?
+                          <a target="_blank"
+                             href={`${i.link}`}
+                             style={{color:"var(--accent)"}}
+                             >
+                            Link
+                          </a>
+                          :
+                          null
+                      }
                       <svg
                         width="20"
                         height="20"

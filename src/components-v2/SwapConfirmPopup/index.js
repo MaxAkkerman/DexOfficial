@@ -1,25 +1,18 @@
 import './index.scss';
 
+import { useApolloClient } from '@apollo/client';
 import { useSnackbar } from 'notistack';
-/*
-import {useApolloClient} from "@apollo/client";
-import {useSnackbar} from "notistack";
-*/
 import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import MainBlock from '@/components-v2/MainBlock';
 import {
   AB_DIRECTION,
+  AB_DIRECTION_GRAPHQL,
   BA_DIRECTION,
-  /*
-	AB_DIRECTION_GRAPHQL,
-	BA_DIRECTION_GRAPHQL,
-	*/
+  BA_DIRECTION_GRAPHQL,
 } from '@/constants/runtimeVariables';
-/*
-import {LimitOrdersForSwapQuery} from "@/graphql/queries";
-*/
+import { LimitOrdersForSwapQuery } from '@/graphql/queries';
 import { iconGenerator } from '@/iconGenerator';
 import miniSwap from '@/images/icons/mini-swap.png';
 import { resetSwapPopupValues } from '@/store/actions/swap';
@@ -31,18 +24,14 @@ import truncateNum from '@/utils/truncateNum';
 
 export default function SwapConfirmPopup() {
   const dispatch = useDispatch();
-  /*
-	const apolloClient = useApolloClient();
-	*/
+  const apolloClient = useApolloClient();
 
   const appTheme = useSelector((state) => state.appReducer.appTheme);
   const values = useSelector((state) => state.swapReducer.values);
   const swap = useSelector((state) => state.tonContext.functions.swap);
-  /*
-	const takeLimitOrder = useSelector(
-		(state) => state.tonContext.functions.takeLimitOrder,
-	);
-	*/
+  const takeLimitOrder = useSelector(
+    (state) => state.tonContext.functions.takeLimitOrder,
+  );
 
   const directionPair = useMemo(() => {
     if (!values) return;
@@ -83,101 +72,101 @@ export default function SwapConfirmPopup() {
     );
     dispatch(resetSwapPopupValues());
 
-    /*
-		const {data} = await apolloClient.query({
-			fetchPolicy: "no-cache",
-			query: LimitOrdersForSwapQuery,
-			variables: {
-				addrPair: values.pair.pairAddress,
-				amount: values.toValue,
-				directionPair:
-					directionPair === AB_DIRECTION
-						? AB_DIRECTION_GRAPHQL
-						: BA_DIRECTION_GRAPHQL,
-				slippage: values.slippage,
-			},
-		});
-		console.log("request->data", data);
+    const revDirectionPair =
+      directionPair === AB_DIRECTION ? BA_DIRECTION : AB_DIRECTION;
 
-		const processing = [];
+    const { data } = await apolloClient.query({
+      fetchPolicy: 'no-cache',
+      query: LimitOrdersForSwapQuery,
+      variables: {
+        addrPair: values.pair.pairAddress,
+        amountIn: values.toValue,
+        directionPair:
+          revDirectionPair === AB_DIRECTION
+            ? AB_DIRECTION_GRAPHQL
+            : BA_DIRECTION_GRAPHQL,
+      },
+    });
+    console.log('request->data', data);
 
-		data.limitOrdersForSwap.limitOrders.forEach((limitOrder) => {
-			const promise = takeLimitOrder({
-				directionPair,
-				orderAddr: limitOrder.addrOrder,
-				pairAddr: values.pair.pairAddress,
-				price: limitOrder.priceRaw,
-				qty: limitOrder.amountRaw * limitOrder.price,
-			})
-				.then(() => {
-					enqueueSnackbar({
-						message: `Taking limit order ${truncateNum(limitOrder.amount, 2)} ${
-							values.toToken.symbol
-						} - ${truncateNum(limitOrder.amount * limitOrder.price, 2)} ${
-							values.fromToken.symbol
-						} ⏳`,
-						type: "info",
-					});
-				})
-				.catch(() => {
-					enqueueSnackbar({
-						message: `Failed limit order take ${truncateNum(
-							limitOrder.amount,
-							2,
-						)} ${values.toToken.symbol} - ${truncateNum(
-							values.limitOrder.amount * limitOrder.price,
-							2,
-						)} ${values.fromToken.symbol} ⏳`,
-						type: "error",
-					});
-				});
-			processing.push(promise);
-		});
+    const processing = [];
 
-		await Promise.all(processing);
-
-		if (data.limitOrdersForSwap.leftoverSwap !== 0)
-		*/
-
-    try {
-      const res = await swap({
-        directionPair,
-        pairAddr: pair.pairAddress,
-        qtyFrom: fromValue,
-        qtyTo: toValue,
-        slippage: slippage,
-      });
-      console.log('swap(A|B)->res', res);
-
-      if (!res.code)
-        enqueueSnackbar({
-          message: 'Sent message to blockchain',
-          type: 'info',
-        });
-      else
-        enqueueSnackbar({
-          message: `Something goes wrong - error code ${res.code}`,
-          type: 'error',
-        });
-    } catch (e) {
-      console.log('swap->error', e);
-
-      switch (e.text) {
-        case 'Canceled by user.':
-        case 'Rejected by user':
+    data.limitOrdersForSwap.limitOrders.forEach((limitOrder) => {
+      const promise = takeLimitOrder({
+        directionPair: revDirectionPair,
+        orderAddr: limitOrder.addrOrder,
+        pairAddr: values.pair.pairAddress,
+        price: limitOrder.priceRaw,
+        qty: limitOrder.oppositeAmountRaw,
+      })
+        .then(() => {
           enqueueSnackbar({
-            message: 'Operation canceled.',
+            message: `Taking limit order ${truncateNum(limitOrder.amount, 2)} ${
+              values.toToken.symbol
+            } - ${truncateNum(limitOrder.oppositeAmount, 2)} ${
+              values.fromToken.symbol
+            } ⏳`,
+            type: 'info',
+          });
+        })
+        .catch((e) => {
+          console.error('takeLimitOrder->fail', e);
+          enqueueSnackbar({
+            message: `Failed limit order take ${truncateNum(
+              limitOrder.amount,
+              2,
+            )} ${values.toToken.symbol} - ${truncateNum(
+              limitOrder.oppositeAmount,
+              2,
+            )} ${values.fromToken.symbol} ⏳`,
             type: 'error',
           });
-          break;
-        default:
+        });
+      processing.push(promise);
+    });
+
+    await Promise.all(processing);
+
+    if (data.limitOrdersForSwap.leftoverSwap !== 0)
+      try {
+        const res = await swap({
+          directionPair,
+          pairAddr: pair.pairAddress,
+          qtyFrom: data.limitOrdersForSwap.leftoverSwap * (fromValue / toValue),
+          qtyTo: data.limitOrdersForSwap.leftoverSwap,
+          slippage: slippage,
+        });
+        console.log('swap(A|B)->res', res);
+
+        if (!res.code)
           enqueueSnackbar({
-            message: 'Oops, something went wrong. Please try again.',
+            message: 'Sent message to blockchain',
+            type: 'info',
+          });
+        else
+          enqueueSnackbar({
+            message: `Something goes wrong - error code ${res.code}`,
             type: 'error',
           });
-          break;
+      } catch (e) {
+        console.log('swap->error', e);
+
+        switch (e.text) {
+          case 'Canceled by user.':
+          case 'Rejected by user':
+            enqueueSnackbar({
+              message: 'Operation canceled.',
+              type: 'error',
+            });
+            break;
+          default:
+            enqueueSnackbar({
+              message: 'Oops, something went wrong. Please try again.',
+              type: 'error',
+            });
+            break;
+        }
       }
-    }
 
     dispatch(resetWaitingPopupValues());
   }

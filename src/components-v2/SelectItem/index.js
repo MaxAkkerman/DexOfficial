@@ -18,10 +18,10 @@ export default function SelectItem({ onClick, token }) {
         />
         <div>
           <p className="select-item-title">{token.symbol}</p>
-          <p className="select-item-descr">{token.tokenName}</p>
+          <p className="select-item-descr">{token.tokenName ? token.tokenName : ""}</p>
         </div>
       </div>
-      <span className="select-item-balance">{truncateNum(token.balance)}</span>
+      <span className="select-item-balance">{token.balance ? truncateNum(token.balance) : ""}</span>
     </div>
   );
 }
@@ -29,10 +29,10 @@ export default function SelectItem({ onClick, token }) {
 SelectItem.propTypes = {
   onClick: PropTypes.func,
   token: PropTypes.exact({
-    balance: PropTypes.number.isRequired,
+    // balance: PropTypes.number.isRequired,
     symbol: PropTypes.string.isRequired,
-    tokenName: PropTypes.string.isRequired,
-  }).isRequired,
+    // tokenName: PropTypes.string.isRequired,
+  }),
 };
 
 SelectItem.defaultProps = {
