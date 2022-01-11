@@ -24,6 +24,7 @@ function AssetsListForDeploy() {
   const assetsFromGraphQL = useSelector(
     (state) => state.walletReducer.assetsFromGraphQL,
   );
+  const tokens = useSelector((state) => state.tonData.tokens);
 
   const { keyPair } = useKeyPair();
 
@@ -41,8 +42,22 @@ function AssetsListForDeploy() {
   }
 
   function handleSetAssetForDeploy(item) {
-    showConfirmAssetDeployPopup(true);
-    setcurAssetForDeploy(item);
+    let x = tokens.filter(it=>it.rootAddress === item.rootAddress)
+    console.log("xxx",x)
+    if(x.length){
+      dispatch(
+          setTips({
+            message: `Нou already have a ${item.symbol} wallet`,
+            type: 'error',
+          }),
+      );
+
+    }else{
+      showConfirmAssetDeployPopup(true);
+      setcurAssetForDeploy(item);
+    }
+
+
   }
 
   function hideConfirm() {
@@ -54,6 +69,8 @@ function AssetsListForDeploy() {
   }
 
   async function handleDeployAsset() {
+
+
     if (clientData.balance < 4) {
       dispatch(
         setTips({
@@ -80,7 +97,6 @@ function AssetsListForDeploy() {
     );
     console.log('deployRes', deployRes);
     setdeployWalletIsWaiting(false);
-    // showConfirmAssetDeployPopup(false);
   }
 
   function handleClose() {

@@ -35,6 +35,7 @@ import {
   setStackingPeriod,
 } from '../../store/actions/staking';
 import { hideStackingConfirmPopup } from '../../store/actions/wallet';
+import {setTips} from "@/store/actions/app";
 
 function Stacking() {
   const history = useHistory();
@@ -129,7 +130,16 @@ function Stacking() {
 
   function handlestake(show) {
     if (!valid) return;
-
+    console.log("Number(values.stake)",Number(values.stake))
+    if(Number(values.stake)<=50){
+      dispatch(
+          setTips({
+            message: `Minimal stake 50 EVERs`,
+            type: 'error',
+          }),
+      );
+      return;
+    }
     let periodInSeconds = 0;
     if (period === 1 / 30) {
       periodInSeconds = 86400;
