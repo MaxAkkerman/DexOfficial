@@ -3,17 +3,14 @@ import cls from 'classnames';
 import React, { useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-
-import { BA_DIRECTION_GRAPHQL } from '@/constants/runtimeVariables';
+import { AB_DIRECTION_GRAPHQL } from '@/constants/runtimeVariables';
 import { iconGenerator } from '@/iconGenerator';
-
 import {
   openLimitOrderCancelPopup,
   openLimitOrderUpdatePopup,
   setLimitOrderPopupValues,
 } from '@/store/actions/limitOrder';
 
-import { AB_DIRECTION_GRAPHQL } from '@/constants/runtimeVariables';
 import truncateNum from '../../utils/truncateNum';
 import IconCross from '../IconCross/IconCross';
 import IconEdit from '../IconEdit/IconEdit';
