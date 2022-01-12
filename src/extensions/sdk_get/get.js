@@ -3,9 +3,8 @@
 */
 import { signerKeys, signerNone } from '@tonclient/core';
 import { libWeb } from '@tonclient/lib-web';
+import { ethers } from 'ethers';
 import memoize from 'lodash.memoize';
-
-import { ethers } from 'ethers'
 
 // import {reduxStore} from "../../index";
 import { reduxStore } from '@/lib/redux';
@@ -14,15 +13,16 @@ import { iconGenerator } from '../../iconGenerator';
 import salary from '../../images/salary.svg';
 import { saveLog } from '../../logging/logging';
 import {
+  dec2hex,
   getDecimals,
   getFixedNums,
   getFullName,
   hex2a,
   toHex,
-  dec2hex,
 } from '../../reactUtils/reactUtils';
 import { setTips } from '../../store/actions/app';
 import { setUpdatedBalance } from '../../store/actions/wallet';
+import { CreditEthereumEventConfigurationContract } from '../contracts/CreditEthereumEventConfiguration.js';
 /*
     NFT contracts
 */
@@ -39,17 +39,12 @@ import { NftRootContract } from '../contracts/NftRoot.js';
 import { RootTokenContract } from '../contracts/RootTokenContract.js';
 import { SafeMultisigWallet } from '../contracts/SafeMultisigWallet.js';
 import { TONTokenWalletContract } from '../contracts/TONTokenWallet.js';
-import { CreditEthereumEventConfigurationContract } from '../contracts/CreditEthereumEventConfiguration.js';
 import {
   checkMessagesAmountClient,
   decode,
   decodePayload,
   getShardThis,
 } from '../tonUtils';
-
-
-import daiData from "@/pages/Bridge/abis";
-
 
 const { ResponseType } = require('@tonclient/core/dist/bin');
 const { TonClient } = require('@tonclient/core');
@@ -71,88 +66,137 @@ const limitOrderRouter = Radiance.networks['2'].limitOrderRouter;
 const client = new TonClient({ network: { endpoints: [DappServer] } });
 export default client;
 
-const provider = new ethers.providers.EtherscanProvider(null, '4MWT3NGZ9U5WECARAWYGZ1MGNMCM72PETF');
-const provider2 = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/', { name: 'binance', chainId: 56 });
-const provider3 = new ethers.providers.JsonRpcProvider('https://speedy-nodes-nyc.moralis.io/38abd3f2a52dd8e90041ee98/polygon/mainnet', { name: 'matic', chainId: 137 });
-const provider4 = new ethers.providers.JsonRpcProvider('https://speedy-nodes-nyc.moralis.io/38abd3f2a52dd8e90041ee98/fantom/mainnet', { name: 'fantom', chainId: 250 });
+const provider = new ethers.providers.EtherscanProvider(
+  null,
+  '4MWT3NGZ9U5WECARAWYGZ1MGNMCM72PETF',
+);
+const provider2 = new ethers.providers.JsonRpcProvider(
+  'https://bsc-dataseed.binance.org/',
+  { chainId: 56, name: 'binance' },
+);
+const provider3 = new ethers.providers.JsonRpcProvider(
+  'https://speedy-nodes-nyc.moralis.io/38abd3f2a52dd8e90041ee98/polygon/mainnet',
+  { chainId: 137, name: 'matic' },
+);
+const provider4 = new ethers.providers.JsonRpcProvider(
+  'https://speedy-nodes-nyc.moralis.io/38abd3f2a52dd8e90041ee98/fantom/mainnet',
+  { chainId: 250, name: 'fantom' },
+);
 
-const  vaultWrapperAbi = [
-  "function vault() external view returns (address)",
-];
+const vaultWrapperAbi = ['function vault() external view returns (address)'];
 
-const  vaultAbi = [
-  "function token() external view returns (address)",
-];
-
-
-
-
+const vaultAbi = ['function token() external view returns (address)'];
 
 export async function getBridgeAssetsForAddress(chain, walletAddr) {
-console.log("getBridgeAssetsForAddress",chain, walletAddr)
-    let eth1 = [];
-    let bcs56 = [];
-    let polygon137 = [];
-    let phantom250 = [];
+  console.log('getBridgeAssetsForAddress', chain, walletAddr);
+  let eth1 = [];
+  let bcs56 = [];
+  let polygon137 = [];
+  let phantom250 = [];
 
-    let walletAddrResult = {eth1:[],bcs56:[],polygon137:[],phantom250:[]};
-    let assetsArr = Object.keys(assetsObj);
-    let vaultsArr;
+  let walletAddrResult = {
+    bcs56: [],
+    eth1: [],
+    phantom250: [],
+    polygon137: [],
+  };
+  let assetsArr = Object.keys(assetsObj);
+  let vaultsArr;
 
-    assetsArr.forEach((token) => {
-      vaultsArr = assetsObj[token].vaults;
-      vaultsArr.forEach((vault) => {
-        if(vault.depositType == "credit"){
-          if(vault.chainId == "1"){eth1.push({token:token,config:vault.ethereumConfiguration})}
-          else if (vault.chainId == "56"){bcs56.push({token:token,config:vault.ethereumConfiguration})}
-          else if (vault.chainId == "137"){polygon137.push({token:token,config:vault.ethereumConfiguration})}
-          else if (vault.chainId == "250"){phantom250.push({token:token,config:vault.ethereumConfiguration})}
+  assetsArr.forEach((token) => {
+    vaultsArr = assetsObj[token].vaults;
+    vaultsArr.forEach((vault) => {
+      if (vault.depositType == 'credit') {
+        if (vault.chainId == '1') {
+          eth1.push({ config: vault.ethereumConfiguration, token: token });
+        } else if (vault.chainId == '56') {
+          bcs56.push({ config: vault.ethereumConfiguration, token: token });
+        } else if (vault.chainId == '137') {
+          polygon137.push({
+            config: vault.ethereumConfiguration,
+            token: token,
+          });
+        } else if (vault.chainId == '250') {
+          phantom250.push({
+            config: vault.ethereumConfiguration,
+            token: token,
+          });
         }
-      });
+      }
     });
+  });
 
-    let response;
-    let itemConfig =  {
-      token: '',
-      symbol: '',
-      config: '',
-      vaultWrapper: '',
-      vault: '',
-      evmtoken: '',
-      balance: '',
-      decimals: '',
-      name: '',
-      evmsymbol: '',
-      logo: '',
-      thumbnail: '',
-    };
+  let response;
+  let itemConfig = {
+    balance: '',
+    config: '',
+    decimals: '',
+    evmsymbol: '',
+    evmtoken: '',
+    logo: '',
+    name: '',
+    symbol: '',
+    thumbnail: '',
+    token: '',
+    vault: '',
+    vaultWrapper: '',
+  };
 
-    if (chain == 1) {
-      for (const item of eth1) {
+  if (chain == 1) {
+    for (const item of eth1) {
       console.log('eth1', item.token);
-      itemConfig =  { token: item.token, symbol: '', config: '', vaultWrapper: '', vault: '', evmtoken: '', balance: '', decimals: '', name: '', evmsymbol: '', logo: '', thumbnail: ''};
-      const rootAcc = new Account(RootTokenContract, {address: item.token,client,});
-      response = await rootAcc.runLocal("symbol", {});
+      itemConfig = {
+        balance: '',
+        config: '',
+        decimals: '',
+        evmsymbol: '',
+        evmtoken: '',
+        logo: '',
+        name: '',
+        symbol: '',
+        thumbnail: '',
+        token: item.token,
+        vault: '',
+        vaultWrapper: '',
+      };
+      const rootAcc = new Account(RootTokenContract, {
+        address: item.token,
+        client,
+      });
+      response = await rootAcc.runLocal('symbol', {});
       itemConfig.symbol = hex2a(response.decoded.output.symbol);
-      itemConfig.icon = iconGenerator(getReplacedSymbol(hex2a(response.decoded.output.symbol)))
+      itemConfig.icon = iconGenerator(
+        getReplacedSymbol(hex2a(response.decoded.output.symbol)),
+      );
       itemConfig.config = item.config;
-      const configAcc = new Account(CreditEthereumEventConfigurationContract, {address: item.config,client,});
-      response = await configAcc.runLocal("getDetails", {answerId: 0});
+      const configAcc = new Account(CreditEthereumEventConfigurationContract, {
+        address: item.config,
+        client,
+      });
+      response = await configAcc.runLocal('getDetails', { answerId: 0 });
       let dec = response.decoded.output._networkConfiguration.eventEmitter;
       let vaultWrapperAddr = dec2hex(dec);
       itemConfig.vaultWrapper = vaultWrapperAddr;
-      const vaultWrapper = new ethers.Contract(vaultWrapperAddr, vaultWrapperAbi, provider);
+      const vaultWrapper = new ethers.Contract(
+        vaultWrapperAddr,
+        vaultWrapperAbi,
+        provider,
+      );
       const vaultAddr = await vaultWrapper.vault();
       itemConfig.vault = vaultAddr;
       const vault = new ethers.Contract(vaultAddr, vaultAbi, provider);
       const tokenAddr = await vault.token();
       itemConfig.evmtoken = tokenAddr;
-      response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=eth&token_addresses=${tokenAddr}`, {
-              headers: {
-                  'accept': 'application/json',
-                  'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
-              }
-          })
+      response = await fetch(
+        `https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=eth&token_addresses=${tokenAddr}`,
+        {
+          headers: {
+            'X-API-Key':
+              '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi',
+            accept: 'application/json',
+          },
+        },
+      );
       const data = await response.json();
       console.log('eth1', data);
       if (data.length > 0) {
@@ -163,12 +207,16 @@ console.log("getBridgeAssetsForAddress",chain, walletAddr)
         itemConfig.logo = data[0].logo;
         itemConfig.thumbnail = data[0].thumbnail;
       } else {
-        response = await fetch(`https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses=${tokenAddr}`, {
-                headers: {
-                    'accept': 'application/json',
-                    'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
-                }
-            })
+        response = await fetch(
+          `https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses=${tokenAddr}`,
+          {
+            headers: {
+              'X-API-Key':
+                '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi',
+              accept: 'application/json',
+            },
+          },
+        );
         const data = await response.json();
         itemConfig.balance = 0;
         itemConfig.decimals = 0;
@@ -178,170 +226,268 @@ console.log("getBridgeAssetsForAddress",chain, walletAddr)
         itemConfig.thumbnail = data[0].thumbnail;
       }
       walletAddrResult.eth1.push(itemConfig);
-      }
-    } else if (chain == 56) {
-      for (const item of bcs56) {
+    }
+  } else if (chain == 56) {
+    for (const item of bcs56) {
       console.log('bcs56', item.token);
-      itemConfig =  { token: item.token, symbol: '', config: '', vaultWrapper: '', vault: '', evmtoken: '', balance: '', decimals: '', name: '', evmsymbol: '', logo: '', thumbnail: ''};
-      const rootAcc = new Account(RootTokenContract, {address: item.token,client,});
-      response = await rootAcc.runLocal("symbol", {});
+      itemConfig = {
+        balance: '',
+        config: '',
+        decimals: '',
+        evmsymbol: '',
+        evmtoken: '',
+        logo: '',
+        name: '',
+        symbol: '',
+        thumbnail: '',
+        token: item.token,
+        vault: '',
+        vaultWrapper: '',
+      };
+      const rootAcc = new Account(RootTokenContract, {
+        address: item.token,
+        client,
+      });
+      response = await rootAcc.runLocal('symbol', {});
       itemConfig.symbol = hex2a(response.decoded.output.symbol);
-        itemConfig.icon = iconGenerator(getReplacedSymbol(hex2a(response.decoded.output.symbol)))
+      itemConfig.icon = iconGenerator(
+        getReplacedSymbol(hex2a(response.decoded.output.symbol)),
+      );
 
-        itemConfig.config = item.config;
-      const configAcc = new Account(CreditEthereumEventConfigurationContract, {address: item.config,client,});
-      response = await configAcc.runLocal("getDetails", {answerId: 0});
+      itemConfig.config = item.config;
+      const configAcc = new Account(CreditEthereumEventConfigurationContract, {
+        address: item.config,
+        client,
+      });
+      response = await configAcc.runLocal('getDetails', { answerId: 0 });
       let dec = response.decoded.output._networkConfiguration.eventEmitter;
       let vaultWrapperAddr = dec2hex(dec);
       itemConfig.vaultWrapper = vaultWrapperAddr;
-      const vaultWrapper = new ethers.Contract(vaultWrapperAddr, vaultWrapperAbi, provider2);
+      const vaultWrapper = new ethers.Contract(
+        vaultWrapperAddr,
+        vaultWrapperAbi,
+        provider2,
+      );
       const vaultAddr = await vaultWrapper.vault();
       itemConfig.vault = vaultAddr;
       const vault = new ethers.Contract(vaultAddr, vaultAbi, provider2);
       const tokenAddr = await vault.token();
       itemConfig.evmtoken = tokenAddr;
-      response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=bsc&token_addresses=${tokenAddr}`, {
-              headers: {
-                  'accept': 'application/json',
-                  'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
-              }
-          })
-          const data = await response.json();
-          console.log('bcs56', data);
-          if (data.length > 0) {
-            itemConfig.balance = data[0].balance;
-            itemConfig.decimals = data[0].decimals;
-            itemConfig.name = data[0].name;
-            itemConfig.evmsymbol = data[0].symbol;
-            itemConfig.logo = data[0].logo;
-            itemConfig.thumbnail = data[0].thumbnail;
-          } else {
-            response = await fetch(`https://deep-index.moralis.io/api/v2/erc20/metadata?chain=bsc&addresses=${tokenAddr}`, {
-                    headers: {
-                        'accept': 'application/json',
-                        'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
-                    }
-                })
-            const data = await response.json();
-            itemConfig.balance = 0;
-            itemConfig.decimals = 0;
-            itemConfig.name = data[0].name;
-            itemConfig.evmsymbol = data[0].symbol;
-            itemConfig.logo = data[0].logo;
-            itemConfig.thumbnail = data[0].thumbnail;
-          }
-      walletAddrResult.bcs56.push(itemConfig);
+      response = await fetch(
+        `https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=bsc&token_addresses=${tokenAddr}`,
+        {
+          headers: {
+            'X-API-Key':
+              '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi',
+            accept: 'application/json',
+          },
+        },
+      );
+      const data = await response.json();
+      console.log('bcs56', data);
+      if (data.length > 0) {
+        itemConfig.balance = data[0].balance;
+        itemConfig.decimals = data[0].decimals;
+        itemConfig.name = data[0].name;
+        itemConfig.evmsymbol = data[0].symbol;
+        itemConfig.logo = data[0].logo;
+        itemConfig.thumbnail = data[0].thumbnail;
+      } else {
+        response = await fetch(
+          `https://deep-index.moralis.io/api/v2/erc20/metadata?chain=bsc&addresses=${tokenAddr}`,
+          {
+            headers: {
+              'X-API-Key':
+                '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi',
+              accept: 'application/json',
+            },
+          },
+        );
+        const data = await response.json();
+        itemConfig.balance = 0;
+        itemConfig.decimals = 0;
+        itemConfig.name = data[0].name;
+        itemConfig.evmsymbol = data[0].symbol;
+        itemConfig.logo = data[0].logo;
+        itemConfig.thumbnail = data[0].thumbnail;
       }
-    } else if (chain = 137) {
-      for (const item of polygon137) {
+      walletAddrResult.bcs56.push(itemConfig);
+    }
+  } else if (chain === 137) {
+    for (const item of polygon137) {
       console.log('polygon137', item.token);
-      itemConfig =  { token: item.token, symbol: '', config: '', vaultWrapper: '', vault: '', evmtoken: '', balance: '', decimals: '', name: '', evmsymbol: '', logo: '', thumbnail: ''};
-      const rootAcc = new Account(RootTokenContract, {address: item.token,client,});
-      response = await rootAcc.runLocal("symbol", {});
+      itemConfig = {
+        balance: '',
+        config: '',
+        decimals: '',
+        evmsymbol: '',
+        evmtoken: '',
+        logo: '',
+        name: '',
+        symbol: '',
+        thumbnail: '',
+        token: item.token,
+        vault: '',
+        vaultWrapper: '',
+      };
+      const rootAcc = new Account(RootTokenContract, {
+        address: item.token,
+        client,
+      });
+      response = await rootAcc.runLocal('symbol', {});
       itemConfig.symbol = hex2a(response.decoded.output.symbol);
-        itemConfig.icon = iconGenerator(getReplacedSymbol(hex2a(response.decoded.output.symbol)))
+      itemConfig.icon = iconGenerator(
+        getReplacedSymbol(hex2a(response.decoded.output.symbol)),
+      );
 
-        itemConfig.config = item.config;
-      const configAcc = new Account(CreditEthereumEventConfigurationContract, {address: item.config,client,});
-      response = await configAcc.runLocal("getDetails", {answerId: 0});
+      itemConfig.config = item.config;
+      const configAcc = new Account(CreditEthereumEventConfigurationContract, {
+        address: item.config,
+        client,
+      });
+      response = await configAcc.runLocal('getDetails', { answerId: 0 });
       let dec = response.decoded.output._networkConfiguration.eventEmitter;
       let vaultWrapperAddr = dec2hex(dec);
       itemConfig.vaultWrapper = vaultWrapperAddr;
-      const vaultWrapper = new ethers.Contract(vaultWrapperAddr, vaultWrapperAbi, provider3);
+      const vaultWrapper = new ethers.Contract(
+        vaultWrapperAddr,
+        vaultWrapperAbi,
+        provider3,
+      );
       const vaultAddr = await vaultWrapper.vault();
       itemConfig.vault = vaultAddr;
       const vault = new ethers.Contract(vaultAddr, vaultAbi, provider3);
       const tokenAddr = await vault.token();
       itemConfig.evmtoken = tokenAddr;
-      response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=polygon&token_addresses=${tokenAddr}`, {
-              headers: {
-                  'accept': 'application/json',
-                  'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
-              }
-          })
-          const data = await response.json();
-          console.log('polygon137', data);
-          if (data.length > 0) {
-            itemConfig.balance = data[0].balance;
-            itemConfig.decimals = data[0].decimals;
-            itemConfig.name = data[0].name;
-            itemConfig.evmsymbol = data[0].symbol;
-            itemConfig.logo = data[0].logo;
-            itemConfig.thumbnail = data[0].thumbnail;
-          } else {
-            response = await fetch(`https://deep-index.moralis.io/api/v2/erc20/metadata?chain=polygon&addresses=${tokenAddr}`, {
-                    headers: {
-                        'accept': 'application/json',
-                        'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
-                    }
-                })
-            const data = await response.json();
-            itemConfig.balance = 0;
-            itemConfig.decimals = 0;
-            itemConfig.name = data[0].name;
-            itemConfig.evmsymbol = data[0].symbol;
-            itemConfig.logo = data[0].logo;
-            itemConfig.thumbnail = data[0].thumbnail;
-          }
-      walletAddrResult.polygon137.push(itemConfig);
+      response = await fetch(
+        `https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=polygon&token_addresses=${tokenAddr}`,
+        {
+          headers: {
+            'X-API-Key':
+              '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi',
+            accept: 'application/json',
+          },
+        },
+      );
+      const data = await response.json();
+      console.log('polygon137', data);
+      if (data.length > 0) {
+        itemConfig.balance = data[0].balance;
+        itemConfig.decimals = data[0].decimals;
+        itemConfig.name = data[0].name;
+        itemConfig.evmsymbol = data[0].symbol;
+        itemConfig.logo = data[0].logo;
+        itemConfig.thumbnail = data[0].thumbnail;
+      } else {
+        response = await fetch(
+          `https://deep-index.moralis.io/api/v2/erc20/metadata?chain=polygon&addresses=${tokenAddr}`,
+          {
+            headers: {
+              'X-API-Key':
+                '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi',
+              accept: 'application/json',
+            },
+          },
+        );
+        const data = await response.json();
+        itemConfig.balance = 0;
+        itemConfig.decimals = 0;
+        itemConfig.name = data[0].name;
+        itemConfig.evmsymbol = data[0].symbol;
+        itemConfig.logo = data[0].logo;
+        itemConfig.thumbnail = data[0].thumbnail;
       }
-    } else if (chain == 250) {
-      for (const item of phantom250) {
+      walletAddrResult.polygon137.push(itemConfig);
+    }
+  } else if (chain == 250) {
+    for (const item of phantom250) {
       console.log('phantom250', item.token);
-      itemConfig =  { token: item.token, symbol: '', config: '', vaultWrapper: '', vault: '', evmtoken: '', balance: '', decimals: '', name: '', evmsymbol: '', logo: '', thumbnail: ''};
-      const rootAcc = new Account(RootTokenContract, {address: item.token,client,});
-      response = await rootAcc.runLocal("symbol", {});
+      itemConfig = {
+        balance: '',
+        config: '',
+        decimals: '',
+        evmsymbol: '',
+        evmtoken: '',
+        logo: '',
+        name: '',
+        symbol: '',
+        thumbnail: '',
+        token: item.token,
+        vault: '',
+        vaultWrapper: '',
+      };
+      const rootAcc = new Account(RootTokenContract, {
+        address: item.token,
+        client,
+      });
+      response = await rootAcc.runLocal('symbol', {});
       itemConfig.symbol = hex2a(response.decoded.output.symbol);
-        itemConfig.icon = iconGenerator(getReplacedSymbol(hex2a(response.decoded.output.symbol)))
+      itemConfig.icon = iconGenerator(
+        getReplacedSymbol(hex2a(response.decoded.output.symbol)),
+      );
 
-        itemConfig.config = item.config;
-      const configAcc = new Account(CreditEthereumEventConfigurationContract, {address: item.config,client,});
-      response = await configAcc.runLocal("getDetails", {answerId: 0});
+      itemConfig.config = item.config;
+      const configAcc = new Account(CreditEthereumEventConfigurationContract, {
+        address: item.config,
+        client,
+      });
+      response = await configAcc.runLocal('getDetails', { answerId: 0 });
       let dec = response.decoded.output._networkConfiguration.eventEmitter;
       let vaultWrapperAddr = dec2hex(dec);
       itemConfig.vaultWrapper = vaultWrapperAddr;
-      const vaultWrapper = new ethers.Contract(vaultWrapperAddr, vaultWrapperAbi, provider4);
+      const vaultWrapper = new ethers.Contract(
+        vaultWrapperAddr,
+        vaultWrapperAbi,
+        provider4,
+      );
       const vaultAddr = await vaultWrapper.vault();
       itemConfig.vault = vaultAddr;
       const vault = new ethers.Contract(vaultAddr, vaultAbi, provider4);
       const tokenAddr = await vault.token();
       itemConfig.evmtoken = tokenAddr;
-      response = await fetch(`https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=fantom&token_addresses=${tokenAddr}`, {
-              headers: {
-                  'accept': 'application/json',
-                  'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
-              }
-          })
-          const data = await response.json();
-          console.log('phantom250', data);
-          if (data.length > 0) {
-            itemConfig.balance = data[0].balance;
-            itemConfig.decimals = data[0].decimals;
-            itemConfig.name = data[0].name;
-            itemConfig.evmsymbol = data[0].symbol;
-            itemConfig.logo = data[0].logo;
-            itemConfig.thumbnail = data[0].thumbnail;
-          } else {
-            response = await fetch(`https://deep-index.moralis.io/api/v2/erc20/metadata?chain=fantom&addresses=${tokenAddr}`, {
-                    headers: {
-                        'accept': 'application/json',
-                        'X-API-Key': '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi'
-                    }
-                })
-            const data = await response.json();
-            itemConfig.balance = 0;
-            itemConfig.decimals = 0;
-            itemConfig.name = data[0].name;
-            itemConfig.evmsymbol = data[0].symbol;
-            itemConfig.logo = data[0].logo;
-            itemConfig.thumbnail = data[0].thumbnail;
-          }
-      walletAddrResult.phantom250.push(itemConfig);
+      response = await fetch(
+        `https://deep-index.moralis.io/api/v2/${walletAddr}/erc20?chain=fantom&token_addresses=${tokenAddr}`,
+        {
+          headers: {
+            'X-API-Key':
+              '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi',
+            accept: 'application/json',
+          },
+        },
+      );
+      const data = await response.json();
+      console.log('phantom250', data);
+      if (data.length > 0) {
+        itemConfig.balance = data[0].balance;
+        itemConfig.decimals = data[0].decimals;
+        itemConfig.name = data[0].name;
+        itemConfig.evmsymbol = data[0].symbol;
+        itemConfig.logo = data[0].logo;
+        itemConfig.thumbnail = data[0].thumbnail;
+      } else {
+        response = await fetch(
+          `https://deep-index.moralis.io/api/v2/erc20/metadata?chain=fantom&addresses=${tokenAddr}`,
+          {
+            headers: {
+              'X-API-Key':
+                '7TXcjOlWFSvDpCkWRlXKUF2MsM8V6ECHJD5xWZ6Pf9hFPLDmBJTaNn3vSA4vceDi',
+              accept: 'application/json',
+            },
+          },
+        );
+        const data = await response.json();
+        itemConfig.balance = 0;
+        itemConfig.decimals = 0;
+        itemConfig.name = data[0].name;
+        itemConfig.evmsymbol = data[0].symbol;
+        itemConfig.logo = data[0].logo;
+        itemConfig.thumbnail = data[0].thumbnail;
       }
+      walletAddrResult.phantom250.push(itemConfig);
     }
+  }
 
   return walletAddrResult;
-
 }
 
 export async function getShardLimit() {
@@ -379,9 +525,9 @@ export async function getShardLimit() {
 
 export async function getWalletAddress(clientPubkey, pairAddress, rootAddress) {
   const rootAcc = new Account(DEXRootContract, {
+    client,
     address: dexroot,
     signer: signerNone(),
-    client,
   });
   const RTacc = new Account(RootTokenContract, {
     address: rootAddress,
@@ -398,9 +544,9 @@ export async function getWalletAddress(clientPubkey, pairAddress, rootAddress) {
   while (!status) {
     res = await rootAcc.runLocal('getConnectorAddress', {
       _answer_id: 0,
+      connectorCommander: pairAddress,
       connectorPubKey: pubk,
       connectorSoArg: n,
-      connectorCommander: pairAddress,
     });
     let connectorAddr = res.decoded.output.value0;
     let shardC = getShardThis(connectorAddr);
@@ -409,8 +555,8 @@ export async function getWalletAddress(clientPubkey, pairAddress, rootAddress) {
       console.log('getConnectorAddress:', connectorAddr);
       res = await RTacc.runLocal('getWalletAddress', {
         _answer_id: 0,
-        wallet_public_key_: 0,
         owner_address_: connectorAddr,
+        wallet_public_key_: 0,
       });
       let walletAddr = res.decoded.output.value0;
       let shardW = getShardThis(walletAddr);
@@ -448,11 +594,11 @@ export async function getRootTokenAddress(clientPubkey, rootName, decimals) {
     while (!status) {
       res = await rootAcc.runLocal('getRootTokenAddress', {
         _answer_id: 0,
+        rootDecimals: decimals,
+        rootName: toHex(rootName),
         rootPubKey: pubk,
         rootSoArg: n,
-        rootName: toHex(rootName),
         rootSymbol: toHex(rootName),
-        rootDecimals: decimals,
       });
       console.log('targetShard', targetShard, n);
       rootABaddress = res.decoded.output.value0;
@@ -468,7 +614,7 @@ export async function getRootTokenAddress(clientPubkey, rootName, decimals) {
       }
       n++;
     }
-    return { rootABsouint: rootABsouint, rootABaddress: rootABaddress };
+    return { rootABaddress: rootABaddress, rootABsouint: rootABsouint };
   } catch (e) {
     console.log('e', e);
     return e;
@@ -484,8 +630,8 @@ export async function getPairAddress(
 ) {
   const rootAcc = new Account(DEXRootContract, {
     address: dexroot,
-    signer: signerNone(),
     client,
+    signer: signerNone(),
   });
   let pubk = '0x' + clientPubkey;
 
@@ -498,12 +644,12 @@ export async function getPairAddress(
   while (!status) {
     res = await rootAcc.runLocal('getPairAddress', {
       _answer_id: 0,
-      pairPubKey: pubk,
-      pairSoArg: n,
       pairCreator: clientAddr,
+      pairPubKey: pubk,
       pairRootA: rootAddrA,
-      pairRootB: rootAddrB,
       pairRootAB: rootABaddress,
+      pairRootB: rootAddrB,
+      pairSoArg: n,
     });
     pairAddress = res.decoded.output.value0;
     let shard = getShardThis(pairAddress);
@@ -527,16 +673,16 @@ export async function queryRoots(minBalance) {
       await client.net.query_collection({
         collection: 'accounts',
         filter: {
-          code_hash: {
-            eq: BroxusRootCodeHash,
-          },
           balance: {
             gt: minBalance,
           },
+          code_hash: {
+            eq: BroxusRootCodeHash,
+          },
         },
         order_by: {
-          path: 'balance',
           direction: 'DESC',
+          path: 'balance',
         },
         result: 'id balance',
       })
@@ -584,8 +730,8 @@ export async function transferFromGiver(addr, count) {
 
   const curGiverContract = new Account(GContract, {
     address: GiverAd,
-    signer: gSigner,
     client,
+    signer: gSigner,
   });
   return await curGiverContract.run('pay', {
     addr,
@@ -636,8 +782,8 @@ export async function getShardConnectPairQUERY(
       console.log('sharding--------', n, shardC, targetShard);
       let resp = await RootTknContract.runLocal('getWalletAddress', {
         _answer_id: 0,
-        wallet_public_key_: 0,
         owner_address_: connectorAddr,
+        wallet_public_key_: 0,
       });
       walletAddr = resp.decoded.output.value0;
       shardW = getShardThis(walletAddr);
@@ -696,10 +842,6 @@ export async function getRootCreators() {
   });
   const RootCreators = await RootContract.runLocal('creators', {});
   return RootCreators.decoded.output;
-  // } catch (e) {
-  //     console.log("catch E", e);
-  //     return e
-  // }
 }
 
 export async function getRootBalanceOF() {
@@ -1086,10 +1228,10 @@ export async function getDetailsFromTokenRoot(address) {
   // console.log("rootDetailsNorm", rootDetailsNorm)
 
   return {
+    decimals: rootDetails.decoded.output.value0.decimals,
     name: rootDetails.decoded.output.value0.name,
     symbol: rootDetails.decoded.output.value0.symbol,
     total_supply: rootDetails.decoded.output.value0.total_supply,
-    decimals: rootDetails.decoded.output.value0.decimals,
   };
 }
 
@@ -1101,8 +1243,8 @@ export async function getExpectedWalletAddressByOwner(rootAddress, toAddress) {
 
   let walletAddress = await rootAcc.runLocal('getWalletAddress', {
     _answer_id: 0,
-    wallet_public_key_: 0,
     owner_address_: toAddress,
+    wallet_public_key_: 0,
   });
   console.log(
     'walletAddress.decoded.output.value0.address',
@@ -1163,46 +1305,44 @@ export async function getDetailsFromTONtokenWallet(address) {
 }
 
 export async function subscribeClientBalance(address) {
-  let subscribeID = (
-    await client.net.subscribe_collection(
-      {
-        collection: 'accounts',
-        filter: {
-          id: { eq: address },
-        },
-        result: 'balance',
+  await client.net.subscribe_collection(
+    {
+      collection: 'accounts',
+      filter: {
+        id: { eq: address },
       },
-      async (params, responseType) => {
-        if (!params.result) return;
-        // if(!checkMessagesAmountClient({tonLiveID:params.result.id}))return
+      result: 'balance',
+    },
+    async (params) => {
+      if (!params.result) return;
+      // if(!checkMessagesAmountClient({tonLiveID:params.result.id}))return
 
-        reduxStore.dispatch(
-          setUpdatedBalance(Number(params.result.balance) / 1000000000),
-        );
+      reduxStore.dispatch(
+        setUpdatedBalance(Number(params.result.balance) / 1000000000),
+      );
 
-        let checkedDuple = {
-          name: 'UpdateBalanceTONs',
-          created_at: params.result.created_at || 'default',
-          tonLiveID: params.result.id || 'default',
-        };
+      let checkedDuple = {
+        created_at: params.result.created_at || 'default',
+        name: 'UpdateBalanceTONs',
+        tonLiveID: params.result.id || 'default',
+      };
 
-        let transactionData = {
-          amount: Number(params.result.value) || 'default',
-          src: params.result.src || 'default',
-        };
-        reduxStore.dispatch(
-          setTips({
-            message: `Your balance updated ${
-              Number(params.result.balance) / 1000000000
-            }`,
-            type: 'info',
-            ...checkedDuple,
-            ...transactionData,
-          }),
-        );
-      },
-    )
-  ).handle;
+      let transactionData = {
+        amount: Number(params.result.value) || 'default',
+        src: params.result.src || 'default',
+      };
+      reduxStore.dispatch(
+        setTips({
+          message: `Your balance updated ${
+            Number(params.result.balance) / 1000000000
+          }`,
+          type: 'info',
+          ...checkedDuple,
+          ...transactionData,
+        }),
+      );
+    },
+  );
   console.log('status subscribedAddress: address');
 }
 
@@ -1211,793 +1351,687 @@ const transactionTypes = {
 };
 
 export async function subscribeClient(address) {
-  let subscribeID = (
-    await client.net.subscribe_collection(
-      {
-        collection: 'messages',
-        filter: {
-          dst: { eq: address },
-        },
-        limit: 1,
-        order: [{ path: 'created_at', direction: 'DESC' }],
-        result: 'id boc created_at body dst src',
+  await client.net.subscribe_collection(
+    {
+      collection: 'messages',
+      filter: {
+        dst: { eq: address },
       },
-      async (params, responseType) => {
-        console.log('client params ONLY', params);
-        if (responseType === ResponseType.Custom) {
-          let decoded = await decode.message(
-            DEXRootContract.abi,
+      limit: 1,
+      order: [{ direction: 'DESC', path: 'created_at' }],
+      result: 'id boc created_at body dst src',
+    },
+    async (params, responseType) => {
+      console.log('client params ONLY', params);
+      if (responseType === ResponseType.Custom) {
+        let decoded = await decode.message(
+          DEXRootContract.abi,
+          params.result.boc,
+        );
+        if (decoded === 304) {
+          decoded = await decode.message(
+            RootTokenContract.abi,
             params.result.boc,
           );
-          if (decoded === 304) {
-            decoded = await decode.message(
-              RootTokenContract.abi,
-              params.result.boc,
-            );
-          }
-          if (decoded === 304) {
-            decoded = await decode.message(
-              TONTokenWalletContract.abi,
-              params.result.boc,
-            );
-          }
-          if (decoded === 304) {
-            decoded = await decode.message(
-              SafeMultisigWallet.abi,
-              params.result.boc,
-            );
-          }
-          if (decoded === 304) {
-            decoded = await decode.message(
-              DEXPairContract.abi,
-              params.result.boc,
-            );
-          }
-          if (decoded === 304) {
-            decoded = await decode.message(
-              DEXClientContract.abi,
-              params.result.boc,
-            );
-          }
-          if (decoded === 304) {
-            decoded = await decode.message(
-              DEXConnectorContract.abi,
-              params.result.boc,
-            );
-          }
-          if (decoded === 304) {
-            decoded = await decode.message(
-              NftRootContract.abi,
-              params.result.boc,
-            );
-          }
-          if (decoded === 304) {
-            decoded = await decode.message(
-              LockStakeSafeContract.abi,
-              params.result.boc,
-            );
-          }
-          if (decoded === 304) {
-            decoded = await decode.message(DataContract.abi, params.result.boc);
-          }
-          console.log('client params22222', params, 'decoded22222', decoded);
+        }
+        if (decoded === 304) {
+          decoded = await decode.message(
+            TONTokenWalletContract.abi,
+            params.result.boc,
+          );
+        }
+        if (decoded === 304) {
+          decoded = await decode.message(
+            SafeMultisigWallet.abi,
+            params.result.boc,
+          );
+        }
+        if (decoded === 304) {
+          decoded = await decode.message(
+            DEXPairContract.abi,
+            params.result.boc,
+          );
+        }
+        if (decoded === 304) {
+          decoded = await decode.message(
+            DEXClientContract.abi,
+            params.result.boc,
+          );
+        }
+        if (decoded === 304) {
+          decoded = await decode.message(
+            DEXConnectorContract.abi,
+            params.result.boc,
+          );
+        }
+        if (decoded === 304) {
+          decoded = await decode.message(
+            NftRootContract.abi,
+            params.result.boc,
+          );
+        }
+        if (decoded === 304) {
+          decoded = await decode.message(
+            LockStakeSafeContract.abi,
+            params.result.boc,
+          );
+        }
+        if (decoded === 304) {
+          decoded = await decode.message(DataContract.abi, params.result.boc);
+        }
+        console.log('client params22222', params, 'decoded22222', decoded);
 
-          // if (decoded.name === "getTons") {
-          //
-          //     let checkedDuple = {
-          //         name: decoded.name,
-          //         created_at: params.result.created_at || "default",
-          //         tonLiveID: params.result.id || "default",
-          //     }
-          //
-          //     let transactionData = {
-          //         amount: Number(params.result.value) || "default",
-          //         src: params.result.src || "default"
-          //     }
-          //     store.dispatch(setTips(
-          //         {
-          //             message: `You get ${transactionData.amount} TONs`,
-          //             type: "info",
-          //             ...checkedDuple,
-          //             ...transactionData
-          //         }
-          //     ))
-          // }
+        if (decoded.name === 'connectRoot') {
+          const rootData = await getDetailsFromTokenRoot(decoded.value.root);
 
-          if (decoded.name === 'connectRoot') {
-            const rootData = await getDetailsFromTokenRoot(decoded.value.root);
-
-            let checkedDuple = {
+          let checkedDuple = {
+            created_at: params.result.created_at || 'default',
+            name: decoded.name,
+            tonLiveID: params.result.id || 'default',
+          };
+          let transactionData = {
+            token_name: hex2a(rootData.name) || 'default',
+            token_symbol: hex2a(rootData.symbol) || 'default',
+          };
+          reduxStore.dispatch(
+            setTips({
+              message: `You deployed ${transactionData.token_name} wallet`,
+              type: 'info',
+              ...checkedDuple,
+              ...transactionData,
+            }),
+          );
+          saveLog(
+            {
+              clientAddress: params.result.dst,
+              created_at: (Date.now() + 10800000) / 1000,
               name: decoded.name,
-              created_at: params.result.created_at || 'default',
+              rootAddress: decoded.value.root,
+              tokenName: hex2a(rootData.name) || 'default',
+              tokenSymbol: hex2a(rootData.symbol) || 'default',
               tonLiveID: params.result.id || 'default',
-            };
-            let transactionData = {
-              token_name: hex2a(rootData.name) || 'default',
-              token_symbol: hex2a(rootData.symbol) || 'default',
-            };
+            },
+            'connectRoot',
+          );
+        }
+        if (decoded.name === 'sendTransaction') {
+          if (!checkMessagesAmountClient({ tonLiveID: params.result.id }))
+            return;
+          let checkedDuple = {
+            created_at: params.result.created_at || 'default',
+            name: decoded.name,
+            tonLiveID: params.result.id || 'default',
+          };
+          let transactionData = {
+            dest: decoded.value.dest,
+            value: decoded.value.value,
+          };
+          reduxStore.dispatch(
+            setTips({
+              message: `You send ${
+                Number(transactionData.value) / 1000000000
+              } EVERs`,
+              type: 'info',
+              ...checkedDuple,
+              ...transactionData,
+            }),
+          );
+          saveLog(
+            {
+              amount: decoded.value.value,
+              clientAddress: params.result.dst,
+              created_at: (Date.now() + 10800000) / 1000,
+              dst: decoded.value.dest,
+              name: decoded.name,
+              tonLiveID: params.result.id || 'default',
+            },
+            'sendTransaction',
+          );
+        }
+
+        if (decoded.name === 'sendTokens') {
+          console.log('send tokens callback');
+          const rootData = await getDetailsFromTokenRoot(
+            decoded.value.tokenRoot,
+          );
+
+          let callbackData = {
+            amount:
+              +decoded.value.tokens / getDecimals(rootData.decimals) ||
+              'default',
+            created_at: params.result.created_at || 'default',
+            dst: decoded.value.to || 'default',
+            name: decoded.name,
+            token_name: hex2a(rootData.name) || 'default',
+            token_root: decoded.value.tokenRoot || 'default',
+            token_symbol: hex2a(rootData.symbol) || 'default',
+            tonLiveID: params.result.id || 'default',
+            updated_balance: decoded.value.updated_balance || 'default',
+          };
+
+          console.log('send callbackData', callbackData);
+          reduxStore.dispatch(
+            setTips({
+              message: `You send ${callbackData.amount.toFixed(4)} ${
+                callbackData.token_name
+              }`,
+              type: 'info',
+              ...callbackData,
+            }),
+          );
+          saveLog(
+            {
+              amount: decoded.value.tokens,
+              clientAddress: params.result.dst,
+              created_at: (Date.now() + 10800000) / 1000,
+              decimals: getDecimals(rootData.decimals),
+              dst: callbackData.dst,
+              name: decoded.name,
+              tokenName: callbackData.token_name,
+              tokenSymbol: callbackData.token_symbol,
+              tonLiveID: callbackData.tonLiveID,
+            },
+            'sendTokens',
+          );
+        }
+
+        if (decoded.name === 'deployLockStakeSafeCallback') {
+          let checkedDuple = {
+            amount: decoded.value.amount || 'default',
+            created_at: params.result.created_at || 'default',
+            name: decoded.name,
+            payload: 'default',
+            sender_address: decoded.value.sender_address || 'default',
+            sender_wallet: decoded.value.sender_wallet || 'default',
+            token_root: decoded.value.token_root || 'default',
+            token_wallet: decoded.value.token_wallet || 'default',
+            tonLiveID: params.result.id || 'default',
+            updated_balance: decoded.value.updated_balance || 'default',
+          };
+          reduxStore.dispatch(
+            setTips({
+              message: `You stake to dePool ${
+                Number(checkedDuple.amount) / 1000000000
+              } EVERs`,
+              type: 'info',
+              ...checkedDuple,
+            }),
+          );
+        }
+
+        if (decoded.name === 'returnLiquidityCallback') {
+          let checkedDuple = {
+            created_at: params.result.created_at || 'default',
+            name: decoded.name,
+            tonLiveID: params.result.id || 'default',
+          };
+
+          const rootAaddress = await getDetailsFromTONtokenWallet(
+            decoded.value.walletA,
+          );
+          const rootBaddress = await getDetailsFromTONtokenWallet(
+            decoded.value.walletB,
+          );
+          const rootABaddress = await getDetailsFromTONtokenWallet(
+            decoded.value.walletAB,
+          );
+
+          const rootAdetails = await getDetailsFromTokenRoot(rootAaddress);
+          const rootBdetails = await getDetailsFromTokenRoot(rootBaddress);
+          const rootABdetails = await getDetailsFromTokenRoot(rootABaddress);
+
+          const provideData = {
+            burnAB: Number(decoded.value.burnAB) / 1000000000,
+            returnA:
+              Number(decoded.value.returnA) /
+              getDecimals(rootAdetails.decimals),
+            returnB:
+              Number(decoded.value.returnB) /
+              getDecimals(rootBdetails.decimals),
+            tokenABname: hex2a(rootABdetails.name),
+            tokenABsymbol: hex2a(rootABdetails.symbol),
+            tokenAname: hex2a(rootAdetails.name),
+            tokenAsymbol: hex2a(rootAdetails.symbol),
+            tokenBname: hex2a(rootBdetails.name),
+            tokenBsymbol: hex2a(rootBdetails.symbol),
+            walletA: decoded.value.walletA,
+            walletAB: decoded.value.walletAB,
+            walletB: decoded.value.walletB,
+          };
+          reduxStore.dispatch(
+            setTips({
+              message: `You return ${provideData.returnA.toFixed(4)} ${
+                provideData.tokenAname || 'def'
+              } and ${provideData.returnB.toFixed(4)} ${
+                provideData.tokenBname || 'def'
+              } payed ${provideData.burnAB.toFixed(6)} ${
+                provideData.tokenABname || 'def'
+              }`,
+              type: 'info',
+              ...checkedDuple,
+              ...provideData,
+            }),
+          );
+          saveLog(
+            {
+              burnAB: Number(decoded.value.burnAB),
+              clientAddress: params.result.dst,
+              created_at: (Date.now() + 10800000) / 1000,
+              decimalsA: getDecimals(rootAdetails.decimals),
+              decimalsB: getDecimals(rootBdetails.decimals),
+              name: 'removeLiquidity',
+              returnA: Number(decoded.value.returnA),
+              returnB: Number(decoded.value.returnB),
+              tokenABnameR: hex2a(rootABdetails.name),
+              tokenABsymbolR: hex2a(rootABdetails.symbol),
+              tokenAsymbolR: provideData.tokenAsymbol,
+              tokenBsymbolR: provideData.tokenBsymbol,
+              tonLiveID: checkedDuple.tonLiveID,
+            },
+            'removeLiquidity',
+          );
+        }
+
+        if (decoded.name === 'processLiquidityCallback') {
+          let checkedDuple = {
+            created_at: params.result.created_at || 'default',
+            name: decoded.name,
+            tonLiveID: params.result.id || 'default',
+          };
+
+          const rootAaddress = await getDetailsFromTONtokenWallet(
+            decoded.value.walletA,
+          );
+          const rootBaddress = await getDetailsFromTONtokenWallet(
+            decoded.value.walletB,
+          );
+          const rootABaddress = await getDetailsFromTONtokenWallet(
+            decoded.value.walletAB,
+          );
+
+          const rootAdetails = await getDetailsFromTokenRoot(rootAaddress);
+          const rootBdetails = await getDetailsFromTokenRoot(rootBaddress);
+          const rootABdetails = await getDetailsFromTokenRoot(rootABaddress);
+
+          //
+          // // console.log("hereii", curWalletData)
+          //                 itemData.walletAddress = item[1];
+          //                 itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
+          //                 itemData.tokenName = getFullName(itemData.symbol)
+          //                 itemData.type = "PureToken"
+          //                 itemData.owner_address = curWalletData.decoded.output.value0.owner_address
+          //                 itemData.decimals = curRootData.decoded.output.value0.decimals
+          //                 itemData.icon = iconGenerator(itemData.symbol)
+          //                 itemData.rootAddress = curWalletData.decoded.output.value0.root_address;
+          //                 itemData.balance = +curWalletData.decoded.output.value0.balance / getDecimals(curRootData.decoded.output.value0.decimals);
+
+          const provideData = {
+            amountA:
+              Number(decoded.value.amountA) /
+              getDecimals(rootAdetails.decimals),
+            amountAB: Number(decoded.value.mintAB) / 1000000000,
+            amountB:
+              Number(decoded.value.amountB) /
+              getDecimals(rootBdetails.decimals),
+            provideA:
+              Number(decoded.value.provideA) /
+              getDecimals(rootAdetails.decimals),
+            provideB:
+              Number(decoded.value.provideB) /
+              getDecimals(rootBdetails.decimals),
+            tokenABname: hex2a(rootABdetails.name),
+            tokenABsymbol: hex2a(rootABdetails.symbol),
+            tokenAname: hex2a(rootAdetails.name),
+            tokenAsymbol: hex2a(rootAdetails.symbol),
+            tokenBname: hex2a(rootBdetails.name),
+            tokenBsymbol: hex2a(rootBdetails.symbol),
+            unusedReturnA:
+              Number(decoded.value.unusedReturnA) /
+              getDecimals(rootAdetails.decimals),
+            unusedReturnB:
+              Number(decoded.value.unusedReturnB) /
+              getDecimals(rootBdetails.decimals),
+            walletA: decoded.value.walletA,
+            walletAB: decoded.value.walletAB,
+            walletB: decoded.value.walletB,
+          };
+          reduxStore.dispatch(
+            setTips({
+              message: `You provided ${provideData.amountA.toFixed(4)} ${
+                provideData.tokenAname || 'def'
+              } and ${provideData.amountB.toFixed(4)} ${
+                provideData.tokenBname || 'def'
+              } for ${provideData.amountAB.toFixed(6)} ${
+                provideData.tokenABname || 'def'
+              }`,
+              type: 'info',
+              ...checkedDuple,
+              ...provideData,
+            }),
+          );
+          saveLog(
+            {
+              clientAddress: params.result.dst,
+              created_at: (Date.now() + 10800000) / 1000,
+              decimalsA: getDecimals(rootAdetails.decimals),
+              decimalsB: getDecimals(rootBdetails.decimals),
+              gotAB: Number(decoded.value.mintAB),
+              name: 'addLiquidity',
+              provideA: Number(decoded.value.provideA),
+              provideB: Number(decoded.value.provideB),
+              tokenAsymbolP: provideData.tokenAsymbol,
+              tokenBsymbolP: provideData.tokenBsymbol,
+              tonLiveID: checkedDuple.tonLiveID,
+            },
+            'addLiquidity',
+          );
+        }
+
+        if (decoded.name === 'transferOwnershipCallback') {
+          let checkedDuple = {
+            created_at: params.result.created_at || 'default',
+            name: decoded.name,
+            tonLiveID: params.result.id || 'default',
+          };
+          const lockStakeData = await getDetailsFromDataContract(
+            params.result.src,
+          );
+          if (lockStakeData.addrOwner === address) {
             reduxStore.dispatch(
               setTips({
-                message: `You deployed ${transactionData.token_name} wallet`,
-                type: 'info',
-                ...checkedDuple,
-                ...transactionData,
-              }),
-            );
-            saveLog(
-              {
-                name: decoded.name,
-                clientAddress: params.result.dst,
-
-                // created_at: +checkedDuple.created_at,
-                created_at: (Date.now() + 10800000) / 1000,
-                tonLiveID: params.result.id || 'default',
-                tokenName: hex2a(rootData.name) || 'default',
-                tokenSymbol: hex2a(rootData.symbol) || 'default',
-                rootAddress: decoded.value.root,
-              },
-              'connectRoot',
-            );
-          }
-          if (decoded.name === 'sendTransaction') {
-            if (!checkMessagesAmountClient({ tonLiveID: params.result.id }))
-              return;
-            let checkedDuple = {
-              name: decoded.name,
-              created_at: params.result.created_at || 'default',
-              tonLiveID: params.result.id || 'default',
-            };
-            let transactionData = {
-              dest: decoded.value.dest,
-              value: decoded.value.value,
-            };
-            reduxStore.dispatch(
-              setTips({
-                message: `You send ${
-                  Number(transactionData.value) / 1000000000
+                message: `You get lock stake ${
+                  +lockStakeData.amountLockStake / 1000000000
                 } EVERs`,
                 type: 'info',
                 ...checkedDuple,
-                ...transactionData,
+                ...lockStakeData,
               }),
-            );
-            saveLog(
-              {
-                name: decoded.name,
-                clientAddress: params.result.dst,
-
-                // created_at: +checkedDuple.created_at,
-                created_at: (Date.now() + 10800000) / 1000,
-                tonLiveID: params.result.id || 'default',
-                dst: decoded.value.dest,
-                amount: decoded.value.value,
-              },
-              'sendTransaction',
             );
           }
 
-          if (decoded.name === 'sendTokens') {
-            console.log('send tokens callback');
-            const rootData = await getDetailsFromTokenRoot(
-              decoded.value.tokenRoot,
-            );
-
-            let callbackData = {
-              name: decoded.name,
-              token_root: decoded.value.tokenRoot || 'default',
-              updated_balance: decoded.value.updated_balance || 'default',
-              amount:
-                +decoded.value.tokens / getDecimals(rootData.decimals) ||
-                'default',
-              dst: decoded.value.to || 'default',
-              created_at: params.result.created_at || 'default',
-              tonLiveID: params.result.id || 'default',
-              token_name: hex2a(rootData.name) || 'default',
-              token_symbol: hex2a(rootData.symbol) || 'default',
-            };
-
-            console.log('send callbackData', callbackData);
+          if (lockStakeData.addrOwner !== address) {
             reduxStore.dispatch(
               setTips({
-                message: `You send ${callbackData.amount.toFixed(4)} ${
-                  callbackData.token_name
-                }`,
-                type: 'info',
-                ...callbackData,
-              }),
-            );
-            saveLog(
-              {
-                name: decoded.name,
-                clientAddress: params.result.dst,
-                decimals: getDecimals(rootData.decimals),
-
-                amount: decoded.value.tokens,
-                dst: callbackData.dst,
-                tokenSymbol: callbackData.token_symbol,
-                tokenName: callbackData.token_name,
-                // created_at: +checkedDuple.created_at,
-                created_at: (Date.now() + 10800000) / 1000,
-                tonLiveID: callbackData.tonLiveID,
-              },
-              'sendTokens',
-            );
-          }
-
-          if (decoded.name === 'deployLockStakeSafeCallback') {
-            let checkedDuple = {
-              name: decoded.name,
-              payload: 'default',
-              sender_address: decoded.value.sender_address || 'default',
-              sender_wallet: decoded.value.sender_wallet || 'default',
-              token_wallet: decoded.value.token_wallet || 'default',
-              token_root: decoded.value.token_root || 'default',
-              updated_balance: decoded.value.updated_balance || 'default',
-              amount: decoded.value.amount || 'default',
-              created_at: params.result.created_at || 'default',
-              tonLiveID: params.result.id || 'default',
-              // token_name: hex2a(rootD.name) || "default",
-              // token_symbol: hex2a(rootD.symbol) || "default"
-            };
-            reduxStore.dispatch(
-              setTips({
-                message: `You stake to dePool ${
-                  Number(checkedDuple.amount) / 1000000000
+                message: `You send lock stake ${
+                  +lockStakeData.amountLockStake / 1000000000
                 } EVERs`,
                 type: 'info',
                 ...checkedDuple,
+                ...lockStakeData,
               }),
             );
-          }
-
-          if (decoded.name === 'returnLiquidityCallback') {
-            let checkedDuple = {
-              name: decoded.name,
-              created_at: params.result.created_at || 'default',
-              tonLiveID: params.result.id || 'default',
-            };
-
-            const rootAaddress = await getDetailsFromTONtokenWallet(
-              decoded.value.walletA,
-            );
-            const rootBaddress = await getDetailsFromTONtokenWallet(
-              decoded.value.walletB,
-            );
-            const rootABaddress = await getDetailsFromTONtokenWallet(
-              decoded.value.walletAB,
-            );
-
-            const rootAdetails = await getDetailsFromTokenRoot(rootAaddress);
-            const rootBdetails = await getDetailsFromTokenRoot(rootBaddress);
-            const rootABdetails = await getDetailsFromTokenRoot(rootABaddress);
-
-            const provideData = {
-              returnA:
-                Number(decoded.value.returnA) /
-                getDecimals(rootAdetails.decimals),
-              returnB:
-                Number(decoded.value.returnB) /
-                getDecimals(rootBdetails.decimals),
-              burnAB: Number(decoded.value.burnAB) / 1000000000,
-              walletA: decoded.value.walletA,
-              tokenAsymbol: hex2a(rootAdetails.symbol),
-              tokenAname: hex2a(rootAdetails.name),
-              walletB: decoded.value.walletB,
-              tokenBsymbol: hex2a(rootBdetails.symbol),
-              tokenBname: hex2a(rootBdetails.name),
-              walletAB: decoded.value.walletAB,
-              tokenABsymbol: hex2a(rootABdetails.symbol),
-              tokenABname: hex2a(rootABdetails.name),
-            };
-            reduxStore.dispatch(
-              setTips({
-                message: `You return ${provideData.returnA.toFixed(4)} ${
-                  provideData.tokenAname || 'def'
-                } and ${provideData.returnB.toFixed(4)} ${
-                  provideData.tokenBname || 'def'
-                } payed ${provideData.burnAB.toFixed(6)} ${
-                  provideData.tokenABname || 'def'
-                }`,
-                type: 'info',
-                ...checkedDuple,
-                ...provideData,
-              }),
-            );
-            saveLog(
-              {
-                name: 'removeLiquidity',
-                clientAddress: params.result.dst,
-                tokenAsymbolR: provideData.tokenAsymbol,
-                decimalsA: getDecimals(rootAdetails.decimals),
-
-                // tokenAname:provideData.tokenAname,
-                returnA: Number(decoded.value.returnA),
-                tokenBsymbolR: provideData.tokenBsymbol,
-                decimalsB: getDecimals(rootBdetails.decimals),
-
-                // tokenBname:provideData.tokenBname,
-                returnB: Number(decoded.value.returnB),
-                tokenABsymbolR: hex2a(rootABdetails.symbol),
-                tokenABnameR: hex2a(rootABdetails.name),
-                burnAB: Number(decoded.value.burnAB),
-                // created_at: +checkedDuple.created_at,
-                created_at: (Date.now() + 10800000) / 1000,
-                tonLiveID: checkedDuple.tonLiveID,
-              },
-              'removeLiquidity',
-            );
-          }
-
-          if (decoded.name === 'processLiquidityCallback') {
-            let checkedDuple = {
-              name: decoded.name,
-              created_at: params.result.created_at || 'default',
-              tonLiveID: params.result.id || 'default',
-            };
-
-            const rootAaddress = await getDetailsFromTONtokenWallet(
-              decoded.value.walletA,
-            );
-            const rootBaddress = await getDetailsFromTONtokenWallet(
-              decoded.value.walletB,
-            );
-            const rootABaddress = await getDetailsFromTONtokenWallet(
-              decoded.value.walletAB,
-            );
-
-            const rootAdetails = await getDetailsFromTokenRoot(rootAaddress);
-            const rootBdetails = await getDetailsFromTokenRoot(rootBaddress);
-            const rootABdetails = await getDetailsFromTokenRoot(rootABaddress);
-
-            //
-            // // console.log("hereii", curWalletData)
-            //                 itemData.walletAddress = item[1];
-            //                 itemData.symbol = hex2a(curRootData.decoded.output.value0.symbol);
-            //                 itemData.tokenName = getFullName(itemData.symbol)
-            //                 itemData.type = "PureToken"
-            //                 itemData.owner_address = curWalletData.decoded.output.value0.owner_address
-            //                 itemData.decimals = curRootData.decoded.output.value0.decimals
-            //                 itemData.icon = iconGenerator(itemData.symbol)
-            //                 itemData.rootAddress = curWalletData.decoded.output.value0.root_address;
-            //                 itemData.balance = +curWalletData.decoded.output.value0.balance / getDecimals(curRootData.decoded.output.value0.decimals);
-
-            const provideData = {
-              amountA:
-                Number(decoded.value.amountA) /
-                getDecimals(rootAdetails.decimals),
-              amountB:
-                Number(decoded.value.amountB) /
-                getDecimals(rootBdetails.decimals),
-              amountAB: Number(decoded.value.mintAB) / 1000000000,
-              provideA:
-                Number(decoded.value.provideA) /
-                getDecimals(rootAdetails.decimals),
-              provideB:
-                Number(decoded.value.provideB) /
-                getDecimals(rootBdetails.decimals),
-              unusedReturnA:
-                Number(decoded.value.unusedReturnA) /
-                getDecimals(rootAdetails.decimals),
-              unusedReturnB:
-                Number(decoded.value.unusedReturnB) /
-                getDecimals(rootBdetails.decimals),
-              walletA: decoded.value.walletA,
-              tokenAsymbol: hex2a(rootAdetails.symbol),
-              tokenAname: hex2a(rootAdetails.name),
-              walletB: decoded.value.walletB,
-              tokenBsymbol: hex2a(rootBdetails.symbol),
-              tokenBname: hex2a(rootBdetails.name),
-              walletAB: decoded.value.walletAB,
-              tokenABsymbol: hex2a(rootABdetails.symbol),
-              tokenABname: hex2a(rootABdetails.name),
-            };
-            reduxStore.dispatch(
-              setTips({
-                message: `You provided ${provideData.amountA.toFixed(4)} ${
-                  provideData.tokenAname || 'def'
-                } and ${provideData.amountB.toFixed(4)} ${
-                  provideData.tokenBname || 'def'
-                } for ${provideData.amountAB.toFixed(6)} ${
-                  provideData.tokenABname || 'def'
-                }`,
-                type: 'info',
-                ...checkedDuple,
-                ...provideData,
-              }),
-            );
-            saveLog(
-              {
-                name: 'addLiquidity',
-                clientAddress: params.result.dst,
-                tokenAsymbolP: provideData.tokenAsymbol,
-                decimalsA: getDecimals(rootAdetails.decimals),
-                // tokenAname:provideData.tokenAname,
-                // amountA:Number(decoded.value.amountA),
-                provideA: Number(decoded.value.provideA),
-                tokenBsymbolP: provideData.tokenBsymbol,
-                decimalsB: getDecimals(rootBdetails.decimals),
-
-                // tokenBname:provideData.tokenBname,
-                // amountB:Number(decoded.value.amountB),
-                provideB: Number(decoded.value.provideB),
-                gotAB: Number(decoded.value.mintAB),
-                // created_at: +checkedDuple.created_at,
-                created_at: (Date.now() + 10800000) / 1000,
-                tonLiveID: checkedDuple.tonLiveID,
-              },
-              'addLiquidity',
-            );
-          }
-
-          if (decoded.name === 'transferOwnershipCallback') {
-            let checkedDuple = {
-              name: decoded.name,
-              created_at: params.result.created_at || 'default',
-              tonLiveID: params.result.id || 'default',
-            };
-            const lockStakeData = await getDetailsFromDataContract(
-              params.result.src,
-            );
-            if (lockStakeData.addrOwner === address) {
-              reduxStore.dispatch(
-                setTips({
-                  message: `You get lock stake ${
-                    +lockStakeData.amountLockStake / 1000000000
-                  } EVERs`,
-                  type: 'info',
-                  ...checkedDuple,
-                  ...lockStakeData,
-                }),
-              );
-            }
-
-            if (lockStakeData.addrOwner !== address) {
-              reduxStore.dispatch(
-                setTips({
-                  message: `You send lock stake ${
-                    +lockStakeData.amountLockStake / 1000000000
-                  } EVERs`,
-                  type: 'info',
-                  ...checkedDuple,
-                  ...lockStakeData,
-                }),
-              );
-            }
-          }
-
-          if (decoded.name === 'tokensReceivedCallback') {
-            console.log('client para', params, 'decoded22222', decoded);
-            const decodedPayl = await decodePayload(decoded.value.payload);
-
-            const payloadFlag = Number(decodedPayl.arg0);
-            // console.log("fkn payload", decodedPayl.arg0);
-            if (!checkMessagesAmountClient({ tonLiveID: params.result.id }))
-              return;
-            const rootD = await getDetailsFromTokenRoot(
-              decoded.value.token_root,
-            );
-            console.log('rootD', rootD);
-
-            let checkedDuple = {
-              name: decoded.name,
-              payload: decodedPayl,
-              sender_address: decoded.value.sender_address || 'default',
-              sender_wallet: decoded.value.sender_wallet || 'default',
-              token_wallet: decoded.value.token_wallet || 'default',
-              token_root: decoded.value.token_root || 'default',
-              updated_balance: decoded.value.updated_balance || 'default',
-              amount:
-                decoded.value.amount / getDecimals(rootD.decimals) || 'default',
-              created_at: params.result.created_at || 'default',
-              tonLiveID: params.result.id || 'default',
-              token_name: hex2a(rootD.name) || 'default',
-              token_symbol: hex2a(rootD.symbol) || 'default',
-            };
-
-            if (payloadFlag === 0) {
-              const rootAddressA = await getDetailsFromTONtokenWallet(
-                decodedPayl.arg1,
-              );
-              const rootAddressB = await getDetailsFromTONtokenWallet(
-                decodedPayl.arg2,
-              );
-
-              const rootAdet = await getDetailsFromTokenRoot(rootAddressA);
-              const rootBdet = await getDetailsFromTokenRoot(rootAddressB);
-
-              const transactionData = {
-                transactionType: transactionTypes[0],
-                tokenAsymbol: hex2a(rootAdet.symbol),
-                tokenAname: hex2a(rootAdet.name),
-                amountA:
-                  +decodedPayl.arg3 / getDecimals(Number(rootAdet.decimals)),
-                tokenBsymbol: hex2a(rootBdet.symbol),
-                tokenBname: hex2a(rootBdet.name),
-                amountB:
-                  +decodedPayl.arg4 / getDecimals(Number(rootBdet.decimals)),
-              };
-              reduxStore.dispatch(
-                setTips({
-                  message: `You swapped ${transactionData.amountA.toFixed(4)} ${
-                    transactionData.tokenAname
-                  } for ${transactionData.amountB.toFixed(4)} ${
-                    transactionData.tokenBname
-                  }`,
-                  type: 'info',
-                  ...checkedDuple,
-                  ...transactionData,
-                }),
-              );
-              saveLog(
-                {
-                  name: 'swap',
-                  clientAddress: params.result.dst,
-                  decimalsA: getDecimals(Number(rootAdet.decimals)),
-                  swapAsymbol: transactionData.tokenAsymbol,
-                  // tokenAname:transactionData.tokenAname,
-                  amountAswap: +decodedPayl.arg3,
-                  swapBsymbol: transactionData.tokenBsymbol,
-                  decimalsB: getDecimals(Number(rootBdet.decimals)),
-                  // tokenBname:transactionData.tokenBname,
-                  amountBswap: +decodedPayl.arg4,
-                  // created_at: +checkedDuple.created_at,
-                  created_at: (Date.now() + 10800000) / 1000,
-
-                  tonLiveID: checkedDuple.tonLiveID,
-                },
-                'swap',
-              );
-            } else if (payloadFlag === 8) {
-              reduxStore.dispatch(
-                setTips({
-                  message: `Something went wrong, swap failed`,
-                  type: 'error',
-                  ...checkedDuple,
-                }),
-              );
-            } else if (payloadFlag === 1) {
-              console.log('decodedPayl.arg0 === 1');
-
-              reduxStore.dispatch(
-                setTips({
-                  message: `Someone send y ${checkedDuple.amount} ${hex2a(
-                    rootD.name,
-                  )}`,
-                  type: 'info',
-                  ...checkedDuple,
-                }),
-              );
-            } else if (payloadFlag === 2) {
-              console.log('decodedPayl.arg0 === 2');
-
-              reduxStore.dispatch(
-                setTips({
-                  message: `This one was your change ${
-                    checkedDuple.amount
-                  } ${hex2a(rootD.name)}`,
-                  type: 'info',
-                  ...checkedDuple,
-                }),
-              );
-            }
-            // else if(payloadFlag ===7) {
-            //         console.log("decodedPayl.arg0 === 3")
-            //
-            //         store.dispatch(setTips(
-            //                 {
-            //                     message: `You provide liquidity`,
-            //                     type: "info",
-            //                     ...checkedDuple
-            //                 }
-            //             ))
-            //
-            //     }
-            else if (payloadFlag === 9) {
-              console.log('decodedPayl.arg0 === 3');
-
-              reduxStore.dispatch(
-                setTips({
-                  message: `Provide liquidity was unsuccessful`,
-                  type: 'info',
-                  ...checkedDuple,
-                }),
-              );
-            }
-            // else if(payloadFlag ===6) {
-            //         console.log("decodedPayl.arg0 === 3")
-            //
-            //         store.dispatch(setTips(
-            //             {
-            //                 message: `You return liquidity and get ${(Number(decoded.value.amount) / 1000000000).toFixed(4)} ${hex2a(rootD.name)}`,
-            //                 type: "info",
-            //                 ...checkedDuple
-            //             }
-            //         ))
-            //
-            //     }
-            else if (payloadFlag === 4) {
-              console.log('decodedPayl.arg0 === 3');
-
-              reduxStore.dispatch(
-                setTips({
-                  message: `You receive ${checkedDuple.amount.toFixed(
-                    4,
-                  )} ${hex2a(rootD.name)}`,
-                  type: 'info',
-                  ...checkedDuple,
-                }),
-              );
-            }
-
-            // {body_type: 'Input', name: 'transferOwnershipCallback', value: {…}, header: null}
-            // body_type: "Input"
-            // header: null
-            // name: "transferOwnershipCallback"
-            // value:
-            //     addrFrom: "0:18d4d2924826306634e811344ec217d621bafc55376d9653bbba2e59c2f5914d"
-            // addrTo: "0:13bf1c036e1114ed956beb5014d383f81f5b559783c1d3b88220168659fd46bf"
-
-            // store.dispatch(setSubscribeReceiveTokens(data))
           }
         }
-      },
-    )
-  ).handle;
+
+        if (decoded.name === 'tokensReceivedCallback') {
+          console.log('client para', params, 'decoded22222', decoded);
+          const decodedPayl = await decodePayload(decoded.value.payload);
+
+          const payloadFlag = Number(decodedPayl.arg0);
+          // console.log("fkn payload", decodedPayl.arg0);
+          if (!checkMessagesAmountClient({ tonLiveID: params.result.id }))
+            return;
+          const rootD = await getDetailsFromTokenRoot(decoded.value.token_root);
+          console.log('rootD', rootD);
+
+          let checkedDuple = {
+            amount:
+              decoded.value.amount / getDecimals(rootD.decimals) || 'default',
+            created_at: params.result.created_at || 'default',
+            name: decoded.name,
+            payload: decodedPayl,
+            sender_address: decoded.value.sender_address || 'default',
+            sender_wallet: decoded.value.sender_wallet || 'default',
+            token_name: hex2a(rootD.name) || 'default',
+            token_root: decoded.value.token_root || 'default',
+            token_symbol: hex2a(rootD.symbol) || 'default',
+            token_wallet: decoded.value.token_wallet || 'default',
+            tonLiveID: params.result.id || 'default',
+            updated_balance: decoded.value.updated_balance || 'default',
+          };
+
+          if (payloadFlag === 0) {
+            const rootAddressA = await getDetailsFromTONtokenWallet(
+              decodedPayl.arg1,
+            );
+            const rootAddressB = await getDetailsFromTONtokenWallet(
+              decodedPayl.arg2,
+            );
+
+            const rootAdet = await getDetailsFromTokenRoot(rootAddressA);
+            const rootBdet = await getDetailsFromTokenRoot(rootAddressB);
+
+            const transactionData = {
+              amountA:
+                +decodedPayl.arg3 / getDecimals(Number(rootAdet.decimals)),
+              amountB:
+                +decodedPayl.arg4 / getDecimals(Number(rootBdet.decimals)),
+              tokenAname: hex2a(rootAdet.name),
+              tokenAsymbol: hex2a(rootAdet.symbol),
+              tokenBname: hex2a(rootBdet.name),
+              tokenBsymbol: hex2a(rootBdet.symbol),
+              transactionType: transactionTypes[0],
+            };
+            reduxStore.dispatch(
+              setTips({
+                message: `You swapped ${transactionData.amountA.toFixed(4)} ${
+                  transactionData.tokenAname
+                } for ${transactionData.amountB.toFixed(4)} ${
+                  transactionData.tokenBname
+                }`,
+                type: 'info',
+                ...checkedDuple,
+                ...transactionData,
+              }),
+            );
+            saveLog(
+              {
+                amountAswap: +decodedPayl.arg3,
+                amountBswap: +decodedPayl.arg4,
+                clientAddress: params.result.dst,
+                created_at: (Date.now() + 10800000) / 1000,
+                decimalsA: getDecimals(Number(rootAdet.decimals)),
+                decimalsB: getDecimals(Number(rootBdet.decimals)),
+                name: 'swap',
+                swapAsymbol: transactionData.tokenAsymbol,
+                swapBsymbol: transactionData.tokenBsymbol,
+                tonLiveID: checkedDuple.tonLiveID,
+              },
+              'swap',
+            );
+          } else if (payloadFlag === 8) {
+            reduxStore.dispatch(
+              setTips({
+                message: `Something went wrong, swap failed`,
+                type: 'error',
+                ...checkedDuple,
+              }),
+            );
+          } else if (payloadFlag === 1) {
+            console.log('decodedPayl.arg0 === 1');
+
+            reduxStore.dispatch(
+              setTips({
+                message: `Someone send y ${checkedDuple.amount} ${hex2a(
+                  rootD.name,
+                )}`,
+                type: 'info',
+                ...checkedDuple,
+              }),
+            );
+          } else if (payloadFlag === 2) {
+            console.log('decodedPayl.arg0 === 2');
+
+            reduxStore.dispatch(
+              setTips({
+                message: `This one was your change ${
+                  checkedDuple.amount
+                } ${hex2a(rootD.name)}`,
+                type: 'info',
+                ...checkedDuple,
+              }),
+            );
+          }
+          // else if(payloadFlag ===7) {
+          //         console.log("decodedPayl.arg0 === 3")
+          //
+          //         store.dispatch(setTips(
+          //                 {
+          //                     message: `You provide liquidity`,
+          //                     type: "info",
+          //                     ...checkedDuple
+          //                 }
+          //             ))
+          //
+          //     }
+          else if (payloadFlag === 9) {
+            console.log('decodedPayl.arg0 === 3');
+
+            reduxStore.dispatch(
+              setTips({
+                message: `Provide liquidity was unsuccessful`,
+                type: 'info',
+                ...checkedDuple,
+              }),
+            );
+          }
+          // else if(payloadFlag ===6) {
+          //         console.log("decodedPayl.arg0 === 3")
+          //
+          //         store.dispatch(setTips(
+          //             {
+          //                 message: `You return liquidity and get ${(Number(decoded.value.amount) / 1000000000).toFixed(4)} ${hex2a(rootD.name)}`,
+          //                 type: "info",
+          //                 ...checkedDuple
+          //             }
+          //         ))
+          //
+          //     }
+          else if (payloadFlag === 4) {
+            console.log('decodedPayl.arg0 === 3');
+
+            reduxStore.dispatch(
+              setTips({
+                message: `You receive ${checkedDuple.amount.toFixed(4)} ${hex2a(
+                  rootD.name,
+                )}`,
+                type: 'info',
+                ...checkedDuple,
+              }),
+            );
+          }
+
+          // {body_type: 'Input', name: 'transferOwnershipCallback', value: {…}, header: null}
+          // body_type: "Input"
+          // header: null
+          // name: "transferOwnershipCallback"
+          // value:
+          //     addrFrom: "0:18d4d2924826306634e811344ec217d621bafc55376d9653bbba2e59c2f5914d"
+          // addrTo: "0:13bf1c036e1114ed956beb5014d383f81f5b559783c1d3b88220168659fd46bf"
+
+          // store.dispatch(setSubscribeReceiveTokens(data))
+        }
+      }
+    },
+  );
   console.log('SUBSCRIBED TO client', address);
   return { status: 'success', subscribedAddress: address };
 }
 
 export async function subscribe(address) {
-  let subscribeID = (
-    await client.net.subscribe_collection(
-      {
-        collection: 'messages',
-        filter: {
-          dst: { eq: address },
-        },
-        limit: 1,
-        order: [{ path: 'created_at', direction: 'DESC' }],
-        result: 'id boc created_at body dst src',
+  await client.net.subscribe_collection(
+    {
+      collection: 'messages',
+      filter: {
+        dst: { eq: address },
       },
-      async (params, responseType) => {
-        if (responseType === ResponseType.Custom) {
-          let decoded = await decode.message(
-            DEXRootContract.abi,
+      limit: 1,
+      order: [{ direction: 'DESC', path: 'created_at' }],
+      result: 'id boc created_at body dst src',
+    },
+    async (params, responseType) => {
+      if (responseType === ResponseType.Custom) {
+        let decoded = await decode.message(
+          DEXRootContract.abi,
+          params.result.boc,
+        );
+        if (decoded === 304) {
+          decoded = await decode.message(
+            RootTokenContract.abi,
             params.result.boc,
           );
-          if (decoded === 304) {
-            decoded = await decode.message(
-              RootTokenContract.abi,
-              params.result.boc,
-            );
-          }
-          if (decoded === 304) {
-            decoded = await decode.message(
-              TONTokenWalletContract.abi,
-              params.result.boc,
-            );
-          }
-          if (decoded === 304) {
-            decoded = await decode.message(
-              SafeMultisigWallet.abi,
-              params.result.boc,
-            );
-          }
-          if (decoded === 304) {
-            decoded = await decode.message(
-              DEXPairContract.abi,
-              params.result.boc,
-            );
-          }
-          if (decoded === 304) {
-            decoded = await decode.message(
-              DEXClientContract.abi,
-              params.result.boc,
-            );
-          }
-          // if (decoded === 304) {
-          //     decoded = await decode.message(DEXConnectorContract.abi, params.result.boc)
-          // }
-          // if (decoded === 304) {
-          //     decoded = await decode.message(NftRootContract.abi, params.result.boc)
-          // }
-          // if (decoded === 304) {
-          //     decoded = await decode.message(LockStakeSafeContract.abi, params.result.boc)
-          // }
-          // if (decoded === 304) {
-          //     decoded = await decode.message(DataContract.abi, params.result.boc)
-          // }
-          console.log('client params22', params, 'decoded22', decoded);
-
-          // body_type: "Input"
-          // header: null
-          // name: "transfer"
-          // value:
-          //     grams: "0"
-          // notify_receiver: true
-          // payload: "te6ccgEBAQEARgAAhwSAHaw4JyVB1BdbgVqmpdqgp7/SDOXmgqzuWQfcXG0XarVQA5xIn49B62ipBB9eE+yKa8oneTD6IEzagGU0ErBurcKi"
-          // send_gas_to: "0:ed61c1392a0ea0badc0ad5352ed5053dfe90672f34156772c83ee2e368bb55aa"
-          // to: "0:e4f70a93edaab31c123ef543ae18879c083b850c4e4bcd91e3ec95eac9df36de"
-
-          if (decoded.name === 'transfer') {
-            if (!checkMessagesAmountClient({ tonLiveID: params.result.id }))
-              return;
-
-            const rootAddress = await getDetailsFromTONtokenWallet(
-              decoded.value.to,
-            );
-            console.log('rootAddress', rootAddress);
-            const rootD = await getDetailsFromTokenRoot(rootAddress);
-            console.log('rootD', rootD);
-            let checkedDuple = {
-              name: decoded.name,
-              dst: decoded.value.to || 'default',
-              token_root: rootAddress || 'default',
-              amount: decoded.value.tokens || 'default',
-              created_at: params.result.created_at || 'default',
-              tonLiveID: params.result.id || 'default',
-              token_name: hex2a(rootD.name) || 'default',
-              token_symbol: hex2a(rootD.symbol) || 'default',
-            };
-            // const data = JSON.parse(localStorage.getItem("setSubscribeReceiveTokens"))
-            // // const transactionsLast = JSON.parse(JSON.stringify(transListReceiveTokens))
-            // // const toState = checkMessagesAmountClient(checkedDuple)
-            // data.push(checkedDuple)
-
-            // store.dispatch(setSubscribeReceiveTokens(data))
-            // store.dispatch(setTips(
-            //     {
-            //         message: `you send ${Number(decoded.value.tokens) / 1000000000} ${hex2a(rootD.symbol)}`,
-            //         type: "info",
-            //         ...checkedDuple
-            //     }
-            // ))
-          }
-
-          if (decoded.name === 'accept') {
-            if (params.result.src !== Radiance.networks[2].rootWTONAddr) return;
-            if (!checkMessagesAmountClient({ tonLiveID: params.result.id }))
-              return;
-
-            console.log('I am wton and i am here');
-            let d = await getDetailsFromTokenRoot(params.result.src);
-
-            const acceptedPairTokens = {
-              name: 'acceptedPairTokens',
-              transactionID: params.result.id,
-              src: params.result.src,
-              dst: params.result.dst,
-              created_at: params.result.created_at,
-              amount: Number(decoded.value.tokens) / getDecimals(d.decimals),
-              token_name: hex2a(d.name),
-              token_symbol: hex2a(d.symbol),
-            };
-            // const dataFromStorage = JSON.parse(localStorage.getItem("acceptedPairTokens")) || []
-            // dataFromStorage.push(acceptedPairTokens)
-            // store.dispatch(setAcceptedPairTokens(dataFromStorage))
-
-            console.log('acceptedPairTokens', acceptedPairTokens);
-            reduxStore.dispatch(
-              setTips({
-                message: `You get ${acceptedPairTokens.amount.toFixed(
-                  4,
-                )} ${hex2a(d.name)}`,
-                type: 'info',
-                ...acceptedPairTokens,
-              }),
-            );
-          }
-          // console.log("decoded",decoded,"params",params)
-          //
-          //             if(decoded.value && decoded.value.grams){
-          //                 return null
-          //             }
-          //             let caseID = await checkMessagesAmount({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
-          //             if(caseID && caseID.dst) store.dispatch(setSubscribeData(caseID));
         }
-      },
-    )
-  ).handle;
+        if (decoded === 304) {
+          decoded = await decode.message(
+            TONTokenWalletContract.abi,
+            params.result.boc,
+          );
+        }
+        if (decoded === 304) {
+          decoded = await decode.message(
+            SafeMultisigWallet.abi,
+            params.result.boc,
+          );
+        }
+        if (decoded === 304) {
+          decoded = await decode.message(
+            DEXPairContract.abi,
+            params.result.boc,
+          );
+        }
+        if (decoded === 304) {
+          decoded = await decode.message(
+            DEXClientContract.abi,
+            params.result.boc,
+          );
+        }
+        console.log('client params22', params, 'decoded22', decoded);
+
+        if (decoded.name === 'transfer') {
+          if (!checkMessagesAmountClient({ tonLiveID: params.result.id }))
+            return;
+
+          const rootAddress = await getDetailsFromTONtokenWallet(
+            decoded.value.to,
+          );
+          console.log('rootAddress', rootAddress);
+          const rootD = await getDetailsFromTokenRoot(rootAddress);
+          console.log('rootD', rootD);
+        }
+
+        if (decoded.name === 'accept') {
+          if (params.result.src !== Radiance.networks[2].rootWTONAddr) return;
+          if (!checkMessagesAmountClient({ tonLiveID: params.result.id }))
+            return;
+
+          console.log('I am wton and i am here');
+          let d = await getDetailsFromTokenRoot(params.result.src);
+
+          const acceptedPairTokens = {
+            amount: Number(decoded.value.tokens) / getDecimals(d.decimals),
+            created_at: params.result.created_at,
+            dst: params.result.dst,
+            name: 'acceptedPairTokens',
+            src: params.result.src,
+            token_name: hex2a(d.name),
+            token_symbol: hex2a(d.symbol),
+            transactionID: params.result.id,
+          };
+
+          console.log('acceptedPairTokens', acceptedPairTokens);
+          reduxStore.dispatch(
+            setTips({
+              message: `You get ${acceptedPairTokens.amount.toFixed(4)} ${hex2a(
+                d.name,
+              )}`,
+              type: 'info',
+              ...acceptedPairTokens,
+            }),
+          );
+        }
+      }
+    },
+  );
   console.log({ status: 'success', subscribedAddress: address });
   return { status: 'success', subscribedAddress: address };
 }
@@ -2132,21 +2166,21 @@ export async function checkSouint(clientAddress) {
     DEV
 */
 const secretKeys = {
-  '0:8ed631b2691e55ddc65065e0475d82a0b776307797b31a2683a3af7b5c26b984': {
-    public: '0ce403a4a20165155788f0517d1a455b4f1e82899f3782fadcf07413b2a56730',
-    secret: 'e91e2e4e61d35d882a478bb21f77184b9aca6f93faedf6ed24be9e9bf032ef55',
-  },
-  '0:d214d4779f63e062569a39d414a98c9891cf5e97cc790a3e6c62ce5fd0a5e1c9': {
-    public: 'cdc97359b239a115d61364526052da837a85d396fa7cca76da015942657c9fad',
-    secret: 'f5a05c6211db62ff076fb25a7c349033123f2a0b9aea97b673f2b83e378b3824',
-  },
   '0:0fa9e2a9993f55f41c90b050468f2f7909a391b7de3cb1b3df74bf449b4dae4c': {
     public: 'f574ac4095a3d3d8b267e4300bac4825ece723ed2569238a860149b683201a5c',
     secret: '96975ca89e99116a97a4850f0cc962e8d2630a80e4568d76b8e2f94a7addf312',
   },
+  '0:8ed631b2691e55ddc65065e0475d82a0b776307797b31a2683a3af7b5c26b984': {
+    public: '0ce403a4a20165155788f0517d1a455b4f1e82899f3782fadcf07413b2a56730',
+    secret: 'e91e2e4e61d35d882a478bb21f77184b9aca6f93faedf6ed24be9e9bf032ef55',
+  },
   '0:d1828255dc48d7db45e9e36c6ef5852319ecb6376bf95bf4e7c1a77d9f3590e0': {
     public: '04a88959a0b1b1655894343714ce7bc7c516c8195407ab6c8de8b64c92e7f172',
     secret: 'cd69d372dacd5f8fd0f8e6db120205bb128507df76b02064f6d01d90e8e3be04',
+  },
+  '0:d214d4779f63e062569a39d414a98c9891cf5e97cc790a3e6c62ce5fd0a5e1c9': {
+    public: 'cdc97359b239a115d61364526052da837a85d396fa7cca76da015942657c9fad',
+    secret: 'f5a05c6211db62ff076fb25a7c349033123f2a0b9aea97b673f2b83e378b3824',
   },
 };
 
@@ -2155,7 +2189,7 @@ export async function mintTokens(walletAddress, clientAddress) {
   const rootData = await getAllDataPreparation(clientAddress.dexclient);
   let rootAddress = '';
   for (let walletId in rootData) {
-    if (rootData.hasOwnProperty(walletId)) {
+    if (Object.prototype.hasOwnProperty.call(rootData, walletId)) {
       let wallet = rootData[walletId];
       if (wallet === walletAddress) rootAddress = walletId;
     }
@@ -2165,8 +2199,8 @@ export async function mintTokens(walletAddress, clientAddress) {
 
   const curRootContract = new Account(RootTokenContract, {
     address: rootAddress,
-    signer,
     client,
+    signer,
   });
   let usersGiver = [];
   if (localStorage.getItem('usersGiver') === null) {
@@ -2181,8 +2215,8 @@ export async function mintTokens(walletAddress, clientAddress) {
 
   let resf = await curRootContract
     .run('mint', {
-      tokens: countToken * 1e9,
       to: rootData[rootAddress],
+      tokens: countToken * 1e9,
     })
     .catch((e) => {
       console.log('token giver error', e);
@@ -2194,32 +2228,7 @@ export async function mintTokens(walletAddress, clientAddress) {
 /*
  **** WALLET****
  */
-const RootCodeHash =
-  '5020feaf723931a07921b97696fba4212ce3c60d70ca18a8b7ede24a33313aae';
-
-let RootCodeHashmyCode =
-  'te6ccgECPAEAEAgABCSK7VMg4wMgwP/jAiDA/uMC8gs5BAE7AQACBP6NCGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT4aSHbPNMAAY4dgQIA1xgg+QEB0wABlNP/AwGTAvhC4iD4ZfkQ8qiV0wAB8nri0z8B+EMhufK0IPgjgQPoqIIIG3dAoLnytPhj0x8B+CO88rnTHwHbPPhHbo6AMAcFAwAC3gNwItDTA/pAMPhpqTgA+ER/b3GCCJiWgG9ybW9zcG90+GSOgOAhxwDcIdcNH/K8Id0B2zz4R26OgN42BwUBBlvbPAYCDvhCbuMA2zw4NwIoIIIQVbOp+7vjAiCCEH/3pHy74wIUCAIoIIIQeYWz9LvjAiCCEH/3pHy64wILCQK2MPhCbuMA0x/4RFhvdfhk0fhEcG9ycG9xgEBvdPhk+Ev4TPhN+FD4UfhPbwYhjiwj0NMB+kAwMcjPhyDOcc8LYQHIz5P/3pHyAW8mXlDMzMsHy//Oy3/NyXD7ADgKAZCOQPhEIG8TIW8S+ElVAm8RyHLPQMoAc89AzgH6AvQAcc8LaQHI+ERvFc8LHwFvJl5QzMzLB8v/zst/zcn4RG8U+wDi4wB/+Gc3BFAgghBmIRxvuuMCIIIQcj3EzrrjAiCCEHJuk3+64wIgghB5hbP0uuMCDw4NDAFQMNHbPPhLIY4bjQRwAAAAAAAAAAAAAAAAPmFs/SDIzszJcPsA3n/4ZzgBUjDR2zz4UiGOHI0EcAAAAAAAAAAAAAAAADybpN/gyM7Lf8lw+wDef/hnOAL+MPhCbuMA1w1/ldTR0NN/3/pBldTR0PpA39H4UfpCbxPXC//DACCXMPhR+EnHBd4gjhQw+FDDACCcMPhQ+EUgbpIwcN663t/y4GT4AFzIz4WIzo0FTmJaAAAAAAAAAAAAAAAAAAAFn+erwM8Wy3/JcPsAMPhPoLV/+G/bPH/4Zzg3AuIw+EJu4wDXDX+V1NHQ03/f1w1/ldTR0NN/39cN/5XU0dDT/9/6QZXU0dD6QN/6QZXU0dD6QN/RjQhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE+FH6Qm8T1wv/wwAglzD4UfhJxwXeIDgQAfyOFDD4UMMAIJww+FD4RSBukjBw3rre3/LgZCXC//LgZCL6Qm8T1wv/wwAglDAjwADeII4SMCL6Qm8T1wv/wAAglDAjwwDe3/LgZ/hR+kJvE9cL/8AAkvgAjhL4UvgnbxBopv5gobV/tgly+wLibSTIy/9wWIBA9EP4KHFYgEARAab0FvhOcliAQPQXJMjL/3NYgED0QyN0WIBA9BbI9ADJ+E7Iz4SA9AD0AM+ByY0IYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABCbCABIB/I48UxH5APgo+kJvEsjPhkDKB8v/ydABU4HIz4WIzgH6AovQAAAAAAAAAAAAAAAAB88WzM+Q0Wq+f8lx+wAxnTAg+QDIz4oAQMv/ydDiU3DIz4WIzo0FTmJaAAAAAAAAAAAAAAAAAAAFn+erwM8Wy3/JcPsA+E8ooLV/+G/4URMB1vpCbxPXC/+OMCP6Qm8T1wv/wwCOECPIz4WIzoBvz0DJgQCA+wCOEfhJyM+FiM6Ab89AyYEAgPsA4t4gbBNZW2xRIY4fI9DTAfpAMDHIz4cgznHPC2EByM+TmIRxvs7NyXD7AJEw4ts8f/hnNwRQIIIQBpoI+LvjAiCCECDrx2274wIgghAzH1Gku+MCIIIQVbOp+7vjAiokHhUEUCCCEDgoJhq64wIgghBFs739uuMCIIIQVCsWcrrjAiCCEFWzqfu64wIcGxgWAvow+EJu4wDXDf+V1NHQ0//f+kGV1NHQ+kDf+kGV1NHQ+kDf0fgnbxBopv5gobV/cvsCXyJtIsjL/3BYgED0Q/gocViAQPQW+E5yWIBA9BciyMv/c1iAQPRDIXRYgED0Fsj0AMn4TsjPhID0APQAz4HJ+QDIz4oAQMv/ydBsITgXAVZUcjAkyM+FiM5xzwtuVSDIz5BFzeVyzsv/AcjOzc3JgQCA+wBfBNs8f/hnNwL8MPhCbuMA1w1/ldTR0NN/39cN/5XU0dDT/9/6QZXU0dD6QN/6QZXU0dD6QN/RIfpCbxPXC//DACCUMCLAAN4gjhIwIfpCbxPXC//AACCUMCLDAN7f8uBn+CdvEGim/mChtX9y+wJtI8jL/3BYgED0Q/gocViAQPQW+E5yWIBAOBkB5vQXI8jL/3NYgED0QyJ0WIBA9BbI9ADJ+E7Iz4SA9AD0AM+BySD5AMjPigBAy//J0AFTUcjPhYjOAfoCi9AAAAAAAAAAAAAAAAAHzxbMz5DRar5/yXH7ACH6Qm8T1wv/wwCOECHIz4WIzoBvz0DJgQCA+wAaAYCOEfhJyM+FiM6Ab89AyYEAgPsA4mxBIY4fI9DTAfpAMDHIz4cgznHPC2EByM+TUKxZys7NyXD7AJEw4ts8f/hnNwFQMNHbPPhMIY4bjQRwAAAAAAAAAAAAAAAAMWzvf2DIzszJcPsA3n/4ZzgD/DD4Qm7jANcN/5XU0dDT/9/6QZXU0dD6QN/R+FH6Qm8T1wv/wwAglzD4UfhJxwXeII4UMPhQwwAgnDD4UPhFIG6SMHDeut7f8uBkIcMAIJswIPpCbxPXC//AAN4gjhIwIcAAIJswIPpCbxPXC//DAN7f8uBn+AAB+HD4cds8fzg3HQAE+GcEUCCCEC2pTS+64wIgghAuKIiquuMCIIIQMI1m0brjAiCCEDMfUaS64wIjISAfAv4w+EJu4wDTH/hEWG91+GTR+ERwb3Jwb3GAQG90+GT4TyGOKCPQ0wH6QDAxyM+HIM6NBAAAAAAAAAAAAAAAAAsx9RpIzxbLf8lw+wCOMfhEIG8TIW8S+ElVAm8RyHLPQMoAc89AzgH6AvQAgGrPQPhEbxXPCx/Lf8n4RG8U+wDiOC0BUjDR2zz4UyGOHI0EcAAAAAAAAAAAAAAAACwjWbRgyM7KAMlw+wDef/hnOAL8MPhCbuMA1w1/ldTR0NN/39cN/5XU0dDT/9/6QZXU0dD6QN/6QZXU0dD6QN/6QZXU0dD6QN/U0fhT8tBoXyRtIsjL/3BYgED0Q/gocViAQPQW+E5yWIBA9BciyMv/c1iAQPRDIXRYgED0Fsj0AMn4TsjPhID0APQAz4HJ+QDIOCIB+M+KAEDL/8nQbCH4SSHHBfLgZvgnbxBopv5gobV/cvsC+E8nobV/+G8i+kJvE9cL/8AAjhAjyM+FiM6Ab89AyYEAgPsAji5UcwRUeEkoyM+FiM5xzwtuVVDIz5DzJED6y3/My//OWcjOAcjOzc3NyYEAgPsA4l8H2zx/+Gc3AeAw0x/4RFhvdfhk0XQhjigj0NMB+kAwMcjPhyDOjQQAAAAAAAAAAAAAAAAK2pTS+M8Wyx/JcPsAjjH4RCBvEyFvEvhJVQJvEchyz0DKAHPPQM4B+gL0AIBqz0D4RG8Vzwsfyx/J+ERvFPsA4uMAf/hnNwRQIIIQDVr8crrjAiCCEBUAWwe64wIgghAd+GipuuMCIIIQIOvHbbrjAikoJiUCrDD4Qm7jAPpBldTR0PpA39H4UfpCbxPXC//DACCXMPhR+EnHBd7y4GT4UnL7AiDIz4WIzo0EgAAAAAAAAAAAAAAAAAAHdtZ+QM8WyYEAgPsAMNs8f/hnODcC/DD4Qm7jANcNf5XU0dDTf9/6QZXU0dD6QN/6QZXU0dD6QN/6QZXU0dD6QN/U0fhR+kJvE9cL/8MAIJcw+FH4SccF3vLgZPgnbxBopv5gobV/cvsCInAlbSLIy/9wWIBA9EP4KHFYgED0FvhOcliAQPQXIsjL/3NYgED0QyF0WDgnAbaAQPQWyPQAyfhOyM+EgPQA9ADPgcn5AMjPigBAy//J0GwhJPpCbxPXC/+SJTLfVHIxU5PIz4WIznHPC25VMMjPkDC/yDbLf85ZyM7Mzc3JgQCA+wBfB9s8f/hnNwFSMNHbPPhNIY4cjQRwAAAAAAAAAAAAAAAAJUAWweDIzssHyXD7AN5/+Gc4AoQw+EJu4wDSANH4UfpCbxPXC//DACCXMPhR+EnHBd4gjhQw+FDDACCcMPhQ+EUgbpIwcN663t/y4GT4APhz2zx/+Gc4NwRKIIIJfDNZuuMCIIIJ1T0duuMCIIIJ9RpmuuMCIIIQBpoI+LrjAjQvLisC/jD4Qm7jANMf+ERYb3X4ZNcN/5XU0dDT/9/6QZXU0dD6QN/RIPpCbxPXC//DACCUMCHAAN4gjhIwIPpCbxPXC//AACCUMCHDAN7f8uBn+ERwb3Jwb3GAQG90+GRcbSLIy/9wWIBA9EP4KHFYgED0FvhOcliAQPQXIsjL/3NYgEA4LAH+9EMhdFiAQPQWyPQAyfhOyM+EgPQA9ADPgcn5AMjPigBAy//J0GxBIY4fI9DTAfpAMDHIz4cgznHPC2EByM+SGmgj4s7NyXD7AI4z+EQgbxMhbxL4SVUCbxHIcs9AygBzz0DOAfoC9ABxzwtpAcj4RG8Vzwsfzs3J+ERvFPsA4i0BCuMAf/hnNwKgMPhCbuMA0z/6QZXU0dD6QN/R+CdvEGim/mChtX9y+wL4U18iyM+FiM6NBIAAAAAAAAAAAAAAAAAAOcN4dEDPFss/ygDJgQCA+wBb2zx/+Gc4NwLKMPhCbuMA+Ebyc3/4ZtcN/5XU0dDT/9/6QZXU0dD6QN/RIcMAIJswIPpCbxPXC//AAN4gjhIwIcAAIJswIPpCbxPXC//DAN7f8uBn+AAh+HAg+HFw+G9w+HP4J28Q+HJb2zx/+GcwNwIW7UTQ10nCAYqOgOI4MQT6cO1E0PQFcSGAQPQOk9cL/5Fw4vhqciGAQPQPjoDf+GtzIYBA9A+OgN/4bHQhgED0DpPXCweRcOL4bXUhgED0D46A3/hucPhvcPhwjQhgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE+HFw+HJw+HOAQPQO8r0zMzMyABbXC//4YnD4Y3D4ZgECiDsD/jD4Qm7jANMf+ERYb3X4ZNH4RHBvcnBvcYBAb3T4ZPhOIY4nI9DTAfpAMDHIz4cgzo0EAAAAAAAAAAAAAAAACBfDNZjPFszJcPsAjjD4RCBvEyFvEvhJVQJvEchyz0DKAHPPQM4B+gL0AIBqz0D4RG8VzwsfzMn4RG8U+wDi4wA4NzUABn/4ZwJOIdYfMfhCbuMA+AAg0x8yIIIQCz/PV7qbIdN/M/hPorV/+G/eW9s8ODcAcPhT+FL4UfhQ+E/4TvhN+Ez4S/hK+Eb4Q/hCyMv/yz/KAMv/zMzLB8zLf8v/VSDIzst/ygDNye1UAHDtRNDT/9M/0gDT/9TU0wfU03/T/9TR0PpA03/SANH4c/hy+HH4cPhv+G74bfhs+Gv4avhm+GP4YgIK9KQg9KE7OgAUc29sIDAuNDcuMAAA';
-
 export const getAssetsForDeploy = memoize(async () => {
-  // const rootAddresses = [];
-  // let minBalance = 0
-  // const arrPart = await queryRoots(minBalance.toString())
-  // const arrPart2 = await queryRoots(arrPart[49].balance.toString())
-  // const arrPart3 = await queryRoots(arrPart2[49].balance.toString())
-  // const arrPart4 = await queryRoots(arrPart3[49].balance.toString())
-  // const arrPart5 = await queryRoots(arrPart4[49].balance.toString())
-  // const arrPart6 = await queryRoots(arrPart5[49].balance.toString())
-  // rootAddresses.push(...arrPart,...arrPart2,...arrPart3,...arrPart4,...arrPart5,...arrPart6)
-
-  // let rootAddresses = [
-  // 	{id: "0:b129553a53652983183374f5beb4652268641325726eccbb81feb5e98be0eef6"},
-  // 	{id: "0:dccb2920d677e2587c79cb9b479d28d8ddd2bbfe0202dc7dc537b5406d32569a"},
-  // 	{id: "0:2397e4d02332dd23108974e6103d56864ae0571db86cb195f542159ea5754344"},
-  // 	{id: "0:e887fbbf4ba3f0c06b7a9ca6d2bf097a6a85affedd1610c5c0a8d159bfd7d049"},
-  // 	{id: "0:6f45817be9283ae9828181dd454ea73a3330d9e2ba4610a6623dbbcdf6552995"},
-  // 	{id: "0:7d58a33a03bfdb2aac393b15a2c9767ea194006c53278fd63046a946f437b81b"},
-  // ]
-
   /*
         DONT DELETE
             // wton 0:0ee39330eddb680ce731cd6a443c71d9069db06d149a9bec9569d1eb8d04eb37
@@ -2291,7 +2300,6 @@ export async function queryByCode(code) {
           code_hash: {
             eq: code,
           },
-          // order: [{path: "created_at", direction: 'DESC'}],
         },
 
         result: 'id',
@@ -2310,7 +2318,6 @@ export async function getCodeHashFromNFTRoot() {
   try {
     const response = await acc.runLocal('resolveCodeHashData', {});
 
-    // return response.decoded.output.codeHashData;
     console.log(
       'response.decoded.output.codeHashData.slice(2)',
       response.decoded.output.codeHashData.slice(2),
@@ -2450,9 +2457,9 @@ export async function getClientKeys(phrase) {
   //todo change with only pubkey returns
   try {
     return await client.crypto.mnemonic_derive_sign_keys({
-      phrase,
-      path: HD_PATH,
       dictionary: SEED_PHRASE_DICTIONARY_ENGLISH,
+      path: HD_PATH,
+      phrase,
       word_count: SEED_PHRASE_WORD_COUNT,
     });
   } catch (e) {
