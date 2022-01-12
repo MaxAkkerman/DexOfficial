@@ -41,8 +41,10 @@ function LoginViaPin(props) {
     props.handleCloseLogin();
   }
 
+
   function handleSignAgreement() {
     setAgreementSigned(!agreementSigned);
+
   }
 
   function handleAgreement() {
@@ -242,7 +244,7 @@ function LoginViaPin(props) {
         <PinPopup
           title={'Set PIN for quick login'}
           step={'1'}
-          showArrow={false}
+          showArrow={true}
           handleLogOut={null}
           showTwoBtns={true}
           nextStep={'step3'}

@@ -1435,7 +1435,7 @@ export async function subscribeClient(address) {
           };
           reduxStore.dispatch(
             setTips({
-              message: `You deployed ${transactionData.token_name} wallet`,
+              message: `You deployed ${getFullName(transactionData.token_symbol)} wallet`,
               type: 'info',
               ...checkedDuple,
               ...transactionData,
@@ -1739,9 +1739,11 @@ export async function subscribeClient(address) {
           if (lockStakeData.addrOwner === address) {
             reduxStore.dispatch(
               setTips({
+
                 message: `You get lock stake ${
                   +lockStakeData.amountLockStake / 1000000000
                 } EVERs`,
+
                 type: 'info',
                 ...checkedDuple,
                 ...lockStakeData,
@@ -1814,10 +1816,12 @@ export async function subscribeClient(address) {
             };
             reduxStore.dispatch(
               setTips({
+
                 message: `You swapped ${transactionData.amountA.toFixed(4)} ${
                   transactionData.tokenAname
                 } for ${transactionData.amountB.toFixed(4)} ${
                   transactionData.tokenBname
+
                 }`,
                 type: 'info',
                 ...checkedDuple,
@@ -1920,15 +1924,6 @@ export async function subscribeClient(address) {
               }),
             );
           }
-
-          // {body_type: 'Input', name: 'transferOwnershipCallback', value: {…}, header: null}
-          // body_type: "Input"
-          // header: null
-          // name: "transferOwnershipCallback"
-          // value:
-          //     addrFrom: "0:18d4d2924826306634e811344ec217d621bafc55376d9653bbba2e59c2f5914d"
-          // addrTo: "0:13bf1c036e1114ed956beb5014d383f81f5b559783c1d3b88220168659fd46bf"
-
           // store.dispatch(setSubscribeReceiveTokens(data))
         }
       }
@@ -2278,8 +2273,10 @@ export const getAssetsForDeploy = memoize(async () => {
 
   rootAddresses.map(async (item) => {
     const curRootData = await getDetailsFromTokenRoot(item.id);
-    curRootData.tokenName = hex2a(curRootData.name);
-    curRootData.symbol = hex2a(curRootData.symbol);
+    curRootData.tokenName = getFullName(hex2a(curRootData.symbol));
+    curRootData.symbol = hex2a(curRootData.symbol) === 'WTON'
+        ? 'wEVER'
+        : hex2a(curRootData.symbol);
     curRootData.balance = curRootData.total_supply / 1000000000;
     curRootData.icon = iconGenerator(curRootData.symbol);
     curRootData.rootAddress = item.id;

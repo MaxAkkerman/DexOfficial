@@ -30,6 +30,9 @@ import {handleCutAddress} from "@/reactUtils/reactUtils";
 // import {
 //     setNotify, setOnboard} from "@/store/actions/bridge";
 
+const APPROVE_HELPER_TEXT = "First we need to request a permission to access your desired amount of tokens from your wallet. Choose the token, the amount and then click the button below. After approval in your wallet is done you will be able to send up to this amount (or less) through the bridge on the next step."
+const SEND_HELPER_TEXT = "Bridge fee: ~1.5 USD, transfer to you Everscale wallet will take about 5-8 minuts, after you submit, you can track your transaction from account page."
+const APPROVE_CONFIRM_HEPLER_TEXT = "Please review the amount of tokens you wish to grant access to, click \"Confirm\" and follow the instructions in your wallet. You will set approve to vault address to store your tokens"
 const assetsBridge = [
     {
         name: 'DAI Stablecoin',
@@ -214,7 +217,7 @@ function Bridge() {
             return
         }
 
-        let tokenBalance = curToken.balance / 10 ** curToken.decimals
+        let tokenBalance = curToken.balance
 
         if (type === 'from') {
             console.log("amamam", am, "tokenBalance", tokenBalance)
@@ -361,16 +364,16 @@ function Bridge() {
     //     emitter.on('txCancel', console.log);
     //     emitter.on('txFailed', console.log);
     // };
-    useEffect(async () => {
-
-        let tokens = await getTokens()
-        setTokensArr(tokens)
-    }, [address])
+    // useEffect(async () => {
+    //
+    //     let tokens = await getTokens()
+    //     setTokensArr(tokens)
+    // }, [address])
 
     async function handleCloseAseetsList() {
         // console.log("curToken", curToken, wallet, "onboard", await onboard.getState().balance)
         // console.log("curToken.evmtoken, await onboard.getState().address, curToken.vault", cur
-        // console.log("network",network)
+        console.log("onApprove",onApprove)
         //
         //
         //
@@ -392,35 +395,43 @@ function Bridge() {
         );
         console.log('approveValue: ', amountFrom, "curToken", curToken);
 
-        let av = new BigNumber(curToken.balance / 10 ** curToken.decimals).shiftedBy(Number(curToken.decimals)).toFixed();
+        let av = new BigNumber(curToken.balance).shiftedBy(Number(curToken.decimals)).toFixed();
         console.log('approveValue: ', av, "curToken", curToken, "daiContract", daiContract);
 
-        const res = await daiContract.approve(curToken.vault, av, {
+        const {hash} = await daiContract.approve(curToken.vault, av, {
             value: 0,
         });
-        console.log("hashhash", res)
-        const {emitter} = notify.hash(res.hash);
-        console.log("emitter", emitter)
-        emitter.on('txSent', (data) => {
-            console.log("txSent", data)
-        })
-        emitter.on('txPool', (data) => {
-            console.log("txPool", data)
-        })
-        emitter.on('txConfirmed', (data) => {
-            console.log("txConfirmed", data)
-        })
-        emitter.on('txSpeedUp', (data) => {
-            console.log("txSpeedUp", data)
-        });
-        emitter.on('txCancel', (data) => {
-                console.log("txCancel", data)
-            }
-        );
-
-        emitter.on('txFailed', (data) => {
-            console.log("txFailed", data)
-        });
+        console.log("hashhash", hash)
+        const {emitter} = notify.hash(hash);
+        emitter.on('txSent', transaction =>
+            dispatch(
+                setTips({
+                    message: `Permission request link is ready`,
+                    link: `https://v2.tonbridge.io/transfer/evm-${network}/ton-1/${transaction.hash}/credit`,
+                    type: 'success',
+                }),
+            ));
+        // console.log("emitter", emitter)
+        // emitter.on('txSent', (data) => {
+        //     console.log("txSent", data)
+        // })
+        // emitter.on('txPool', (data) => {
+        //     console.log("txPool", data)
+        // })
+        // emitter.on('txConfirmed', (data) => {
+        //     console.log("txConfirmed", data)
+        // })
+        // emitter.on('txSpeedUp', (data) => {
+        //     console.log("txSpeedUp", data)
+        // });
+        // emitter.on('txCancel', (data) => {
+        //         console.log("txCancel", data)
+        //     }
+        // );
+        //
+        // emitter.on('txFailed', (data) => {
+        //     console.log("txFailed", data)
+        // });
     };
 
     const depositToVault = async () => {
@@ -490,7 +501,7 @@ function Bridge() {
         emitter.on('txSent', transaction =>
             dispatch(
                 setTips({
-                    message: `Transaction link is ready`,
+                    message: `Send tokens transaction link is ready`,
                     link: `https://v2.tonbridge.io/transfer/evm-${network}/ton-1/${transaction.hash}/credit`,
                     type: 'success',
                 }),
@@ -635,7 +646,20 @@ function Bridge() {
     async function getTokens() {
         let curNet = objc[network]
         let tokens = await getBridgeAssetsForAddress(network, address)
-        return tokens[curNet]
+        let curNetTokens = tokens[curNet]
+        console.log("tokenstokens",tokens)
+        if(!curNetTokens.length)return []
+
+
+        curNetTokens.map(it=> {
+            if(it.balance !== 0){
+                it.balance = Number(it.balance) / 10 ** Number(it.decimals)
+            }
+
+        })
+
+        console.log("curNetTokens",curNetTokens)
+        return curNetTokens
     }
 
     function handleSetToken(e, t) {
@@ -659,23 +683,38 @@ function Bridge() {
             return
         }
 
-        const approvedAmount = await getApproval(curToken.evmtoken, await onboard.getState().address, curToken.vault)
-        console.log("approvedAmount", approvedAmount, "amountFrom", amountFrom)
-
-        let amFrom = +amountFrom * 10 ** +curToken.decimals;
-
-        console.log("amFrom", amFrom)
-        if (approvedAmount > amFrom) {
-            setOnApprove(false)
-        } else {
-            setOnApprove(true)
-
-        }
+        // const approvedAmount = await getApproval(curToken.evmtoken, await onboard.getState().address, curToken.vault)
+        // console.log("approvedAmount", approvedAmount, "amountFrom", amountFrom)
+        //
+        // let amFrom = +amountFrom * 10 ** +curToken.decimals;
+        //
+        // console.log("amFrom", amFrom)
+        // if (approvedAmount > amFrom) {
+        //     setOnApprove(false)
+        // } else {
+        //     setOnApprove(true)
+        //
+        // }
         setOnConfirmPopup(true)
 
 
     }
+    useEffect(async ()=>{
+        if(!isEmpty(curToken)){
+            console.log("onApprove",!isEmpty(curToken), curToken)
 
+            const approvedAmount = await getApproval(curToken.evmtoken, await onboard.getState().address, curToken.vault)
+            let amFrom = +amountFrom * 10 ** +curToken.decimals;
+            if (approvedAmount > amFrom) {
+                setOnApprove(false)
+            } else {
+                setOnApprove(true)
+
+            }
+        }
+
+
+    },[curToken])
     async function getApproval(rootAddress, owner, spender) {
         if (!rootAddress || !owner || !spender) {
             dispatch(
@@ -702,7 +741,7 @@ function Bridge() {
     }
 
     const minBalances = {
-        USDT: 3,
+        USDT: 5,
         DAI: 5,
         USDC: 5,
         WBTC: 0.000010,
@@ -744,7 +783,7 @@ function Bridge() {
             setOnConfirmPopup(false)
 
         } else {
-            let shiftedBalance = curToken.balance / 10 ** curToken.decimals;
+            let shiftedBalance = curToken.balance;
             let minBalanceForCur = minBalances[curToken.symbol]
 
             if (minBalanceForCur > shiftedBalance) {
@@ -773,11 +812,12 @@ function Bridge() {
             {onConfirmPopup ?
                 <SendConfirmPopup
                     // showConfirmPopup={()=>handleSetSendPopupVisibility(false)}
-                    msgText={onApprove ? "First you need to approve to vault your token, just click Submit and follow the instructions in your wallet." : "Transfer to you Everscale wallet will take about 5-8 minuts, after you submit, you can track your transaction from account page"}
-                    title={onApprove ? "Approve to vault" : "Send tokens"}
+                    msgText={onApprove ? APPROVE_CONFIRM_HEPLER_TEXT : SEND_HELPER_TEXT}
+                    title={"Confirm request"}
                     hideConfirmPopup={() => setOnConfirmPopup(false)}
                     addressToSend={onApprove ? curToken.vault : handleCutAddress(clientData.address)}
                     currentAsset={curToken}
+                    btnText={onApprove ? "Confirm request" : "Confirm"}
                     amountToSend={amountFrom}
                     handleSend={() => handleSendAssetToBridge()}
                 />
@@ -785,6 +825,7 @@ function Bridge() {
             }
             {onAssetsList ?
                 <SelectPopup
+                    type={"bridge"}
                     loading={!onFetchTokens}
                     onClose={() => setOnAssetsList(false)}
                     onSelect={(e, t) => handleSetToken(e, t)}
@@ -936,7 +977,7 @@ function Bridge() {
                                     <>
                                         <ShowBalance
                                             classWrapper={'send_balance center'}
-                                            balance={curToken.balance ? (curToken.balance / 10 ** curToken.decimals) : 0}
+                                            balance={curToken.balance ? curToken.balance : 0}
                                             label={true}
                                             showBal={true}
                                         />
@@ -976,13 +1017,24 @@ function Bridge() {
                                     </FormHelperText>
                                 )
                                 :
+
                                 <div style={{height: "19.91px", marginTop: "3px"}}/>
+                            }
+                            {
+                                onApprove ? <FormHelperText style={{
+                                    marginLeft: "20px"
+                                }} select-item-wrapper
+                                    >
+                                    {APPROVE_HELPER_TEXT}
+                                </FormHelperText>
+                                    :
+                                    null
                             }
 
                             <NextBtn
                                 curBtnStyles={`curBtnStyles ${amountValidate.error ? "disabled" : null}`}
                                 btnsClass={"enterSPRegBox"}
-                                btnText={walletIsConnected ? 'Submit' : (!clientData.status && clientData.address.length === 66)
+                                btnText={walletIsConnected ? (onApprove ? "Request permission" : 'Submit') : (!clientData.status && clientData.address.length === 66)
                                     ? 'Deploy wallet'
                                     : 'Connect wallet'}
                                 errColor={null}

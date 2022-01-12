@@ -12,7 +12,7 @@ import includesTextInToken from '@/utils/includesTextInToken';
 
 import classes from './index.module.scss';
 
-export default function SelectPopup({ loading, onClose, onSelect, tokens,title }) {
+export default function SelectPopup({ loading, onClose, onSelect, tokens,title,type }) {
   const [searchWord, setSearchWord] = useState('');
   console.log('tokens', tokens);
   const filteredTokens = useMemo(
@@ -37,7 +37,10 @@ export default function SelectPopup({ loading, onClose, onSelect, tokens,title }
             button={<CloseBtn onClick={onClose} />}
             content={
               loading ? (
+                  <>
                 <Loader className={classes.loader} />
+                {type === "bridge" ? <div className={classes.bridgeLoaderText}><p>Loading token list, please wait...</p></div> : null}
+                </>
               ) : (
                 <>
                   <SearchInput

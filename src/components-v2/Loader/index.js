@@ -7,10 +7,12 @@ import classes from './index.module.scss';
 export default function Loader({ className }) {
   return (
     <div className={cls(classes.loader, className)}>
+
       <div></div>
       <div></div>
       <div></div>
       <div></div>
+
     </div>
   );
 }

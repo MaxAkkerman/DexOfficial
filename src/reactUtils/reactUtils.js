@@ -256,6 +256,7 @@ export function getFraction(num) {
 }
 
 export function handleCutAddress(address) {
+  if(!address)return ""
   //todo add validation
   let spliced = address.slice(0, 7);
   let splicedpart2 = address.slice(59);
@@ -320,6 +321,8 @@ export function getFullName(name) {
     return 'Wrapped Bitcoin';
   } else if (name === 'DS-WTON/USDT') {
     return 'Pool tokens of EVER/USDT pair';
+  } else if (name === 'DS-WTON/UNI') {
+    return 'Pool tokens of EVER/UNI pair';
   } else if (name === 'DS-WTON/USDC') {
     return 'Pool tokens of EVER/USDС pair';
   } else if (name === 'DS-WTON/WETH') {

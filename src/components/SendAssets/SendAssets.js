@@ -426,7 +426,7 @@ function SendAssets() {
         <FormHelperText
           style={{ marginLeft: '27px', marginTop: '4px' }}
           error
-        >{`${NOT_ENOUGH_CAUSE_COMMISSION} (Commission = ${SEND_TOKEN} TON)`}</FormHelperText>
+        >{`${NOT_ENOUGH_CAUSE_COMMISSION} (Commission = ${SEND_TOKEN} EVERs)`}</FormHelperText>
       )}
     </div>
   );

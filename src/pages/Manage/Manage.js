@@ -177,7 +177,7 @@ function Manage() {
                 {fromToken.symbol}
               </p>
               <button
-                onClick={handleRemove}
+                onClick={rangeValue !== 0 ? handleRemove : null}
                 className={
                   rangeValue !== 0
                     ? 'btn mainblock-btn'

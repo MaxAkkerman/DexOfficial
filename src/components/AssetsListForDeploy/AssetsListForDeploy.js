@@ -47,7 +47,7 @@ function AssetsListForDeploy() {
     if(x.length){
       dispatch(
           setTips({
-            message: `Нou already have a ${item.symbol} wallet`,
+            message: `You already have a ${item.symbol} wallet`,
             type: 'error',
           }),
       );
