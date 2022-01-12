@@ -59,7 +59,7 @@ function ErrorIcon() {
 function CloseIcon() {
   return React.createElement(
     BaseIcon,
-    { color: '#000000', pushRight: false },
+    { color: 'var(--primary-color)', pushRight: false },
     React.createElement('line', { x1: '18', y1: '6', x2: '6', y2: '18' }),
     React.createElement('line', { x1: '6', y1: '6', x2: '18', y2: '18' }),
   );

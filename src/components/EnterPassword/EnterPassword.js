@@ -1,5 +1,7 @@
 import './EnterPassword.scss';
 
+import constant from 'lodash/constant';
+import times from 'lodash/times';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -33,6 +35,12 @@ function EnterPassword() {
   const [loadingUserDataIsWaiting, setloadingUserDataIsWaiting] =
     useState(false);
 
+  const [pin, setPin] = useState(times(4, constant('')));
+
+  function resetPin() {
+    setPin(times(4, constant('')));
+  }
+
   async function handleLogIn(pin, complete) {
     if (!complete) {
       dispatch(
@@ -55,6 +63,7 @@ function EnterPassword() {
 
     let decrypted = await decrypt(esp, seedPhrasePassword);
     if (!decrypted.valid) {
+      resetPin();
       dispatch(
         setTips({
           message: `Wrong PIN, please try again`,
@@ -170,6 +179,8 @@ function EnterPassword() {
           handleClickBack={null}
           handleClose={null}
           handleClickNext={({ complete, pin }) => handleLogIn(pin, complete)}
+          onSetPin={setPin}
+          pin={pin}
         />
         // </div>
       )}

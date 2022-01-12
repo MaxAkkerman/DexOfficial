@@ -41,8 +41,8 @@ function LoginViaPin(props) {
     props.handleCloseLogin();
   }
 
-  function handleSignAgreement(bl) {
-    if (bl) setAgreementSigned(bl);
+  function handleSignAgreement() {
+    setAgreementSigned(!agreementSigned);
   }
 
   function handleAgreement() {
@@ -224,7 +224,7 @@ function LoginViaPin(props) {
           btnText={'Next'}
           handleGetBack={handleAgreement().backward}
           agreementSigned={agreementSigned}
-          handleSignAgreement={(bl) => handleSignAgreement(bl)}
+          handleSignAgreement={handleSignAgreement}
           handleClose={() => handleClose()}
           handleClickNext={handleAgreement().forward}
         />
@@ -265,7 +265,7 @@ function LoginViaPin(props) {
           btnText={'Great!'}
           agreementSigned={agreementSigned}
           handleGetBack={handleFinish().backward}
-          handleSignAgreement={(bl) => handleSignAgreement(bl)}
+          handleSignAgreement={handleSignAgreement}
           handleClose={() => handleClose()}
           handleClickNext={handleFinish().forward}
         />

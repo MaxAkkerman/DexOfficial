@@ -40,62 +40,56 @@ export default async function getAllClientWallets() {
     response.decoded.output.rootWallet,
   );
   let normalizeWallets = [];
-  try {
-    for (const item of Object.entries(response.decoded.output.rootWallet)) {
-      const curWalletContract = new Account(TONTokenWalletContract, {
-        address: item[1],
-        client: this.context.tonClient,
-      });
-      const curRootContract = new Account(RootTokenContract, {
-        address: item[0],
-        client: this.context.tonClient,
-      });
-      console.log('item[1]', item[1], 'item[0]', item[0]);
+  for (const item of Object.entries(response.decoded.output.rootWallet)) {
+    const curWalletContract = new Account(TONTokenWalletContract, {
+      address: item[1],
+      client: this.context.tonClient,
+    });
+    const curRootContract = new Account(RootTokenContract, {
+      address: item[0],
+      client: this.context.tonClient,
+    });
+    console.log('item[1]', item[1], 'item[0]', item[0]);
 
-      let curWalletData = await curWalletContract.runLocal('getDetails', {
-        _answer_id: 0,
-      });
-      let curRootData = await curRootContract.runLocal('getDetails', {
-        _answer_id: 0,
-      });
-      let itemData = {};
+    let curWalletData = await curWalletContract.runLocal('getDetails', {
+      _answer_id: 0,
+    });
+    let curRootData = await curRootContract.runLocal('getDetails', {
+      _answer_id: 0,
+    });
+    let itemData = {};
 
-      // console.log("hereii", curWalletData)
-      itemData.walletAddress = item[1];
-      console.log(
-        'hex2a(curRootData.decoded.output.value0.symbol)',
-        hex2a(curRootData.decoded.output.value0.symbol),
-      );
-      itemData.symbol = getReplacedSymbol(
-        hex2a(curRootData.decoded.output.value0.symbol),
-      );
-      // hex2a(curRootData.decoded.output.value0.symbol) === 'WTON'
-      //   ? 'wEVER'
-      //   : hex2a(curRootData.decoded.output.value0.symbol);
-      itemData.tokenName = getFullName(
-        hex2a(curRootData.decoded.output.value0.symbol),
-      );
-      itemData.type = 'PureToken';
-      itemData.owner_address =
-        curWalletData.decoded.output.value0.owner_address;
-      itemData.decimals = +curRootData.decoded.output.value0.decimals;
-      itemData.icon = iconGenerator(itemData.symbol);
-      itemData.rootAddress = curWalletData.decoded.output.value0.root_address;
-      itemData.balance =
-        +curWalletData.decoded.output.value0.balance /
-        getDecimals(curRootData.decoded.output.value0.decimals);
+    // console.log("hereii", curWalletData)
+    itemData.walletAddress = item[1];
+    console.log(
+      'hex2a(curRootData.decoded.output.value0.symbol)',
+      hex2a(curRootData.decoded.output.value0.symbol),
+    );
+    itemData.symbol = getReplacedSymbol(
+      hex2a(curRootData.decoded.output.value0.symbol),
+    );
+    // hex2a(curRootData.decoded.output.value0.symbol) === 'WTON'
+    //   ? 'wEVER'
+    //   : hex2a(curRootData.decoded.output.value0.symbol);
+    itemData.tokenName = getFullName(
+      hex2a(curRootData.decoded.output.value0.symbol),
+    );
+    itemData.type = 'PureToken';
+    itemData.owner_address = curWalletData.decoded.output.value0.owner_address;
+    itemData.decimals = +curRootData.decoded.output.value0.decimals;
+    itemData.icon = iconGenerator(itemData.symbol);
+    itemData.rootAddress = curWalletData.decoded.output.value0.root_address;
+    itemData.balance =
+      +curWalletData.decoded.output.value0.balance /
+      getDecimals(curRootData.decoded.output.value0.decimals);
 
-      if (
-        itemData.walletAddress !==
-        '0:eac2a309de0d777b820bd5b5fbfcb07733be5c068234333bd83ad35f610fe82d'
-      ) {
-        normalizeWallets.push(itemData);
-      }
+    if (
+      itemData.walletAddress !==
+      '0:eac2a309de0d777b820bd5b5fbfcb07733be5c068234333bd83ad35f610fe82d'
+    ) {
+      normalizeWallets.push(itemData);
     }
-    console.log('normalizeWallets', normalizeWallets);
-    return normalizeWallets;
-  } catch (e) {
-    console.log('catch E', e);
-    return e;
   }
+  console.log('normalizeWallets', normalizeWallets);
+  return normalizeWallets;
 }

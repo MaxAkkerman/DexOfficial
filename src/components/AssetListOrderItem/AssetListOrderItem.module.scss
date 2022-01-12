@@ -1,5 +1,5 @@
 @mixin for-phone-only {
-  @media (max-width: 400px) {
+  @media (max-width: 650px) {
     @content;
   }
 }
@@ -59,7 +59,7 @@
   line-height: normal;
 
   @include for-phone-only {
-    font-size: 16px;
+    font-size: 15px;
   }
 }
 
@@ -78,7 +78,7 @@
   word-break: break-all;
 
   @include for-phone-only {
-    font-size: 16px;
+    font-size: 15px;
   }
 }
 
