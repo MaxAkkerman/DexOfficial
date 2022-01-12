@@ -1,8 +1,15 @@
 import './PinPopup.scss';
 
 import { Grid } from '@material-ui/core';
+import clone from 'lodash/clone';
+import constant from 'lodash/constant';
+import fill from 'lodash/fill';
 import range from 'lodash/range';
-import React, { useMemo, useState } from 'react';
+import times from 'lodash/times';
+import without from 'lodash/without';
+import PropTypes from 'prop-types';
+import React, { useMemo } from 'react';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useKey } from 'react-use';
 
@@ -12,15 +19,22 @@ import { NextBtn } from './NextBtn';
 import PinKeyboard from './PinKeyboard';
 import Steppers from './Steppers';
 
-function PinPopup(props) {
+export default function PinPopup(props) {
   const appTheme = useSelector((state) => state.appReducer.appTheme);
 
-  const { complete, handleBackspace, handleChange, value } = usePinInput({
+  const [pin, setPin] = useState(times(4, constant('')));
+
+  const curSetPin = props.onSetPin ? props.onSetPin : setPin;
+  const curPin = props.pin ? props.pin : pin;
+
+  const { complete, handleBackspace, handleChange } = usePinInput({
     handleEnter: handleNextClick,
+    handleSetValue: curSetPin,
+    value: curPin,
   });
 
   function handleNextClick() {
-    props.handleClickNext({ complete, pin: value });
+    props.handleClickNext({ complete, pin: curPin });
   }
 
   return (
@@ -29,9 +43,8 @@ function PinPopup(props) {
       style={{ backdropFilter: appTheme === 'light' ? null : 'blur(130px)' }}
     >
       <MainBlock
-        // title={props.title ? props.title : "default"}
-        classHeader={'fixFontSize'}
-        classTitle={'fixFontSize'}
+        classHeader="fixFontSize"
+        classTitle="fixFontSize"
         content={
           <>
             <div className="pin_head_wrapper">
@@ -64,7 +77,7 @@ function PinPopup(props) {
                     className="pinInput"
                     id={i}
                     maxLength={1}
-                    value={value[i]}
+                    value={curPin[i]}
                     disabled
                   />
                 );
@@ -76,7 +89,6 @@ function PinPopup(props) {
                 else handleChange(v + 1);
               }}
             />
-
             <Steppers step={props.step} lastStep={props.lastStep} />
             {!props.showTwoBtns ? (
               <div style={{ display: 'flex', width: '100%' }}>
@@ -86,7 +98,7 @@ function PinPopup(props) {
                   btnsWrapper={'btnsWrapper'}
                   btnText={'Log out'}
                   errColor={true}
-                  handleClickNext={() => props.handleLogOut()}
+                  handleClickNext={props.handleLogOut}
                 />
                 <NextBtn
                   curBtnStyles={'curBtnStylesLogin'}
@@ -113,49 +125,48 @@ function PinPopup(props) {
   );
 }
 
-function usePinInput({ handleEnter = () => {}, length = 4 } = {}) {
-  const [rawValue, setRawValue] = useState(' '.repeat(length));
+PinPopup.propTypes = {
+  onSetPin: PropTypes.func,
+  pin: PropTypes.array,
+};
 
-  const cursor = useMemo(() => rawValue.trim().length, [rawValue]);
-  const complete = useMemo(() => rawValue.trim().length === length, [rawValue]);
-  const valueArr = useMemo(
-    () => rawValue.split('').map((v) => (v === ' ' ? '' : v)),
-    [rawValue],
+function usePinInput({ handleEnter, handleSetValue, value }) {
+  const cursor = useMemo(() => without(value, '').length, [value]);
+  const complete = useMemo(
+    () => without(value, '').length === value.length,
+    [value],
   );
 
   function handleChange(v) {
     if (complete) return;
 
-    const arr = rawValue.split('');
-    arr[cursor] = v;
-    const str = arr.join('');
-
-    setRawValue(str);
+    const cloneValue = clone(value);
+    cloneValue[cursor] = v;
+    handleSetValue(cloneValue);
   }
 
   function handleBackspace() {
-    let str = rawValue.trim().slice(0, -1);
-    str = str.padEnd(length);
-
-    setRawValue(str);
+    const stripArr = without(value, '');
+    stripArr.pop();
+    const oldLength = stripArr.length;
+    stripArr.length = value.length;
+    const filled = fill(stripArr, '', oldLength);
+    handleSetValue(filled);
   }
 
-  useKey('Enter', handleEnter, {}, [rawValue]);
-  useKey('Backspace', handleBackspace, {}, [rawValue]);
-  useKey('Delete', handleBackspace, {}, [rawValue]);
+  useKey('Enter', handleEnter, {}, [value]);
+  useKey('Backspace', handleBackspace, {}, [value]);
+  useKey('Delete', handleBackspace, {}, [value]);
   useKey(
     (event) => /^[0-9]$/.test(event.key),
     () => handleChange(event.key),
     {},
-    [rawValue],
+    [value],
   );
 
   return {
     complete,
     handleBackspace,
     handleChange,
-    value: valueArr,
   };
 }
-
-export default PinPopup;
