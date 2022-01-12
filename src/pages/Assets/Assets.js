@@ -155,8 +155,6 @@ function Assets() {
     console.log('item', item);
   }
 
-  console.log('$strange-error', tokenList, liquidityList);
-
   return (
     <>
       {showWrapMenu && !showWithdrawMenu && (
