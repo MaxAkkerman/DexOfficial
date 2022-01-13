@@ -1,4 +1,4 @@
-@import "../../../Mixins";
+@import '../../../Mixins';
 
 .Card {
   display: flex;
@@ -27,7 +27,7 @@
 .Card__icon {
   width: 50px;
   height: 50px;
-  border: 1px solid #C4C4C4;
+  border: 1px solid #c4c4c4;
   border-radius: 200px;
   margin-right: 8px;
 }
@@ -83,9 +83,8 @@
 }
 
 .Card__button {
-
-  background: #3569F0;
-  border: 1px solid #3569F0;
+  background: #3569f0;
+  border: 1px solid #3569f0;
   box-sizing: border-box;
   border-radius: 50px;
   height: 51px;
@@ -102,7 +101,7 @@
 
   letter-spacing: 0.05em;
 
-  color: #FFFDFD;
+  color: #fffdfd;
   width: 130px;
   @include m() {
     width: 100%;
@@ -127,8 +126,7 @@
 
   letter-spacing: 0.05em;
 
-  color: #000000;
-
+  color: var(--mainblock-title-color);
 }
 
 .Card__earned_block {
@@ -161,7 +159,6 @@
     letter-spacing: 0.02em;
 
     color: var(--mainblock-title-color);
-
   }
 }
 
@@ -182,7 +179,6 @@
     display: flex;
   }
 }
-
 
 .Card__none_inverse {
   display: flex;
