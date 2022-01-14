@@ -1468,7 +1468,7 @@ export async function subscribeClient(address) {
           };
           reduxStore.dispatch(
             setTips({
-              message: `You send ${
+              message: `You sent ${
                 Number(transactionData.value) / 1000000000
               } EVERs`,
               type: 'info',
@@ -1512,7 +1512,7 @@ export async function subscribeClient(address) {
           console.log('send callbackData', callbackData);
           reduxStore.dispatch(
             setTips({
-              message: `You send ${callbackData.amount.toFixed(4)} ${
+              message: `You sent ${callbackData.amount.toFixed(4)} ${
                 callbackData.token_name
               }`,
               type: 'info',
@@ -1752,7 +1752,7 @@ export async function subscribeClient(address) {
           if (lockStakeData.addrOwner !== address) {
             reduxStore.dispatch(
               setTips({
-                message: `You send lock stake ${
+                message: `You sent lock stake ${
                   +lockStakeData.amountLockStake / 1000000000
                 } EVERs`,
                 type: 'info',
@@ -1912,9 +1912,9 @@ export async function subscribeClient(address) {
 
             reduxStore.dispatch(
               setTips({
-                message: `You receive ${checkedDuple.amount.toFixed(4)} ${hex2a(
-                  rootD.name,
-                )}`,
+                message: `You received ${checkedDuple.amount.toFixed(
+                  4,
+                )} ${hex2a(rootD.name)}`,
                 type: 'info',
                 ...checkedDuple,
               }),
