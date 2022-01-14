@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "webpack serve --mode development --open --hot",
+    "start": "webpack serve --mode development --hot",
     "build": "webpack --mode production",
     "test": "jest",
     "prepare": "husky install",

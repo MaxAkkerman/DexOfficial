@@ -256,6 +256,16 @@ export const steps = [
       'Staking allows you to make your EVER coins work for you. You also get an NFT certificate for your stake that you can transfer, sell or use as a collateral for instant liquidity!',
   },
   {
+    element: '#nav-bridge',
+    intro:
+      'Bridge allows you to easily and quickly transfer your assets from other chains to EVERSCALE blockchain. You can use Metamask and other wallets to transfer your tokens to DefiSpace wallet.',
+  },
+  {
+    element: '#nav-farming',
+    intro:
+      ' Farming is coming soon to DefiSpace to allow Liquidity Providers to earn additional profits by putting their Liquidity Tokens into Farming pools.',
+  },
+  {
     element: '#nav-connect-wallet',
     intro: "First let's connect a wallet to start using DeFiSpace",
   },

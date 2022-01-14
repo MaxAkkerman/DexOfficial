@@ -191,3 +191,7 @@ export const HIDE_CHROME_POPUP = 'HIDE_CHROME_POPUP';
 // tutorial
 export const RESET_TUTORIAL = 'RESET_TUTORIAL';
 export const FINISH_TUTORIAL = 'FINISH_TUTORIAL';
+
+// deploy popup
+export const SHOW_DEPLOY_POPUP = 'SHOW_DEPLOY_POPUP';
+export const HIDE_DEPLOY_POPUP = 'HIDE_DEPLOY_POPUP';

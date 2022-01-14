@@ -33,7 +33,6 @@ export default function Header() {
     dispatch(resetTutorial());
   }
 
-
   return (
     <>
       <header className="header">
@@ -101,13 +100,13 @@ export default function Header() {
               Staking
             </NavLink>
             <NavLink
-                id="nav-bridge"
-                to="/bridge"
-                className={
-                  linkIsActive('/bridge')
-                      ? 'header-link header-link--active'
-                      : 'header-link'
-                }
+              id="nav-bridge"
+              to="/bridge"
+              className={
+                linkIsActive('/bridge')
+                  ? 'header-link header-link--active'
+                  : 'header-link'
+              }
             >
               Bridge
             </NavLink>

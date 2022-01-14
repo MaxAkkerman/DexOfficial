@@ -1,8 +1,10 @@
 import { combineReducers } from 'redux';
 
 import appReducer from './app';
+import bridgeReducer from './bridge';
 import chromePopup from './chromePopup';
 import clientWallets from './clientWallets';
+import deployPopup from './deployPopup';
 import enterSeedPhrase from './enterSeedPhrase';
 import limitOrderReducer from './limitOrder';
 import manageReducer from './manage';
@@ -16,12 +18,13 @@ import tutorialReducer from './tutorial';
 import waitingPopup from './waitingPopup';
 import walletReducer from './wallet';
 import walletSeedReducer from './walletSeed';
-import bridgeReducer from "./bridge"
 
 export default combineReducers({
   appReducer,
+  bridgeReducer,
   chromePopup,
   clientWallets,
+  deployPopup,
   enterSeedPhrase,
   limitOrderReducer,
   manageReducer,
@@ -35,5 +38,4 @@ export default combineReducers({
   waitingPopup,
   walletReducer,
   walletSeedReducer,
-  bridgeReducer
 });
