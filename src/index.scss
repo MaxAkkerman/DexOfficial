@@ -74,11 +74,11 @@ input:focus {
     #3569f0 0%,
     rgba(69, 88, 255, 0.8) 57.82%
   );
-  --earned-bg: #E9E9EA;
+  --earned-bg: #e9e9ea;
 }
 
 html[data-theme='dark'] {
-  --earned-bg: #E9E9EA;
+  --earned-bg: #e9e9ea;
   --text-color: #ffffff;
   --arrow-back: invert(1);
   --invert: invert(0);
@@ -146,13 +146,11 @@ html[data-theme='dark'] {
   background-color: var(--tooltip-bg-color);
   border: 1px solid var(--mainblock-border-color);
   box-shadow: none;
-  font-family: "Gilroy", sans-serif !important;
+  font-family: 'Gilroy', sans-serif !important;
   border-radius: 15px;
   .introjs-skipbutton {
-    color: var(--accent);
-    &:hover {
-      color:  var(--accent-hover);
-    }
+    font-size: 40px;
+    padding: 14px 10px 7px;
   }
   .introjs-tooltipbuttons {
     a {
@@ -194,15 +192,12 @@ html[data-theme='dark'] {
           background-color: var(--error-hover);
         }
       }
-
-
     }
   }
-
 }
 
 .introjs-tooltipReferenceLayer * {
-  font-family: "Gilroy", sans-serif !important;
+  font-family: 'Gilroy', sans-serif !important;
 }
 
 .introjs-disabled {
