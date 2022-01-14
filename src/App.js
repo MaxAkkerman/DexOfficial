@@ -65,6 +65,7 @@ import {
   setSubscribeReceiveTokens,
 } from './store/actions/wallet';
 import { setNFTassets } from './store/actions/walletSeed';
+import DeployConfirmPopup from '@/components/DeployConfirmPopup';
 
 function App() {
   const dispatch = useDispatch();
@@ -297,6 +298,7 @@ function App() {
       <ChromePopup />
       <TutorialSteps />
       <LimitOrderNotifications />
+      <DeployConfirmPopup />
     </>
   );
 }

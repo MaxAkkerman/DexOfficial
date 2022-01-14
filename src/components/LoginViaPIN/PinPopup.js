@@ -90,7 +90,15 @@ export default function PinPopup(props) {
               }}
             />
             <Steppers step={props.step} lastStep={props.lastStep} />
-            {!props.showTwoBtns ? (
+            {props.showTwoBtns ? (
+              <NextBtn
+                curBtnStyles={'curBtnStyles'}
+                btnsClass={'enterSPRegBox'}
+                btnText={props.btnText}
+                errColor={null}
+                handleClickNext={handleNextClick}
+              />
+            ) : (
               <div style={{ display: 'flex', width: '100%' }}>
                 <NextBtn
                   curBtnStyles={'curBtnStylesLogin'}
@@ -109,14 +117,6 @@ export default function PinPopup(props) {
                   handleClickNext={handleNextClick}
                 />
               </div>
-            ) : (
-              <NextBtn
-                curBtnStyles={'curBtnStyles'}
-                btnsClass={'enterSPRegBox'}
-                btnText={props.btnText}
-                errColor={null}
-                handleClickNext={handleNextClick}
-              />
             )}
           </>
         }
