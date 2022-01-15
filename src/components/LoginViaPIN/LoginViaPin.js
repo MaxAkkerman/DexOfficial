@@ -70,8 +70,16 @@ function LoginViaPin(props) {
 
   function handleSetPin() {
     return {
-      // backward() {
-      //   setTempPin('');
+      backward() {
+        setTempPin('');
+        setStep(
+                produce(steps, (draft) => {
+                  draft[1].weAreHere = true;
+                  draft[0].weAreHere = false;
+                }),
+        )
+        props.handleCloseLogin()
+
       //   setAgreementSigned(false);
       //   setStep(
       //     produce(steps, (draft) => {
@@ -79,7 +87,7 @@ function LoginViaPin(props) {
       //       draft[0].weAreHere = true;
       //     }),
       //   );
-      // },
+      },
       forward({ complete, pin }) {
         if (!complete) {
           dispatch(
@@ -240,7 +248,7 @@ function LoginViaPin(props) {
           nextStep={'step3'}
           prevStep={'step1'}
           btnText={'Next'}
-          handleClickBack={null}
+          handleClickBack={handleSetPin().backward}
           handleClickNext={handleSetPin().forward}
         />
       ) : null}
