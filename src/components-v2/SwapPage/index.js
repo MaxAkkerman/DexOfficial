@@ -112,7 +112,7 @@ export default function SwapPage() {
         find(leftTokens, { rootAddress: p.rootA }) ||
         find(leftTokens, { rootAddress: p.rootB }),
     );
-
+console.log("fromTokens",leftTokens)
     return compact(leftTokens);
   }, [pairTokens, values.toToken]);
 
@@ -131,6 +131,7 @@ export default function SwapPage() {
         find(leftTokens, { rootAddress: p.rootA }) ||
         find(leftTokens, { rootAddress: p.rootB }),
     );
+    console.log("toTokens",leftTokens)
 
     return compact(leftTokens);
   }, [pairTokens, values.fromToken]);
