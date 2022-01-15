@@ -48,7 +48,7 @@ export default function PinPopup(props) {
         content={
           <>
             <div className="pin_head_wrapper">
-              {props.showTwoBtns ? (
+              {props.showTwoBtns && props.showArrow ? (
                 <button
                   className="arrow_back"
                   onClick={() => props.handleClickBack(props.prevStep)}

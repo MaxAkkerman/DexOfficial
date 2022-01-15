@@ -234,6 +234,7 @@ function LoginViaPin(props) {
         <PinPopup
           title={'Set PIN for quick login'}
           step={'1'}
+          showArrow={false}
           handleLogOut={null}
           showTwoBtns={true}
           nextStep={'step3'}
@@ -247,6 +248,7 @@ function LoginViaPin(props) {
         <PinPopup
           title={'Repeat PIN'}
           step={'2'}
+          showArrow={true}
           nextStep={'step4'}
           prevStep={'step2'}
           showTwoBtns={true}
