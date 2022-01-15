@@ -897,8 +897,8 @@ function Bridge() {
 
                                     <button
                                         onClick={() => setOnNetworkChange(true)}
-                                        className="btn input-btn"
-                                        style={{fontSize: '12px', borderRadius: '13px'}}
+                                        className="btn"
+                                        style={{fontSize: '12px', borderRadius: '13px', padding: "14px 20px" }}
                                     >
                                         Select Chain
                                         <svg
@@ -973,6 +973,7 @@ function Bridge() {
                             <BlockItem
                                 leftTitle={'You send'}
                                 // currentToken={currentToken}
+                                className="fixMediaForBridge"
                                 rightTopBlock={
                                     <>
                                         <ShowBalance
