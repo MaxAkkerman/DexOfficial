@@ -31,8 +31,8 @@ function LoginViaPin(props) {
   const [tempPin, setTempPin] = useState('');
 
   const [steps, setStep] = useState([
-    { name: 'step1', weAreHere: true },
-    { name: 'step2', weAreHere: false },
+    { name: 'step1', weAreHere: false },
+    { name: 'step2', weAreHere: true },
     { name: 'step3', weAreHere: false },
     { name: 'step4', weAreHere: false },
   ]);
@@ -70,16 +70,16 @@ function LoginViaPin(props) {
 
   function handleSetPin() {
     return {
-      backward() {
-        setTempPin('');
-        setAgreementSigned(false);
-        setStep(
-          produce(steps, (draft) => {
-            draft[1].weAreHere = false;
-            draft[0].weAreHere = true;
-          }),
-        );
-      },
+      // backward() {
+      //   setTempPin('');
+      //   setAgreementSigned(false);
+      //   setStep(
+      //     produce(steps, (draft) => {
+      //       draft[1].weAreHere = false;
+      //       draft[0].weAreHere = true;
+      //     }),
+      //   );
+      // },
       forward({ complete, pin }) {
         if (!complete) {
           dispatch(
@@ -215,38 +215,38 @@ function LoginViaPin(props) {
 
   return ReactDOM.createPortal(
     <>
-      {steps[0].weAreHere ? (
-        <WelcomePopup
-          nextStep={'step2'}
-          step={'1'}
-          showCloseBtn={true}
-          showTwoBtns={false}
-          btnText={'Next'}
-          handleGetBack={handleAgreement().backward}
-          agreementSigned={agreementSigned}
-          handleSignAgreement={handleSignAgreement}
-          handleClose={() => handleClose()}
-          handleClickNext={handleAgreement().forward}
-        />
-      ) : null}
+      {/*{steps[0].weAreHere ? (*/}
+      {/*  <WelcomePopup*/}
+      {/*    nextStep={'step2'}*/}
+      {/*    step={'1'}*/}
+      {/*    showCloseBtn={true}*/}
+      {/*    showTwoBtns={false}*/}
+      {/*    btnText={'Next'}*/}
+      {/*    handleGetBack={handleAgreement().backward}*/}
+      {/*    agreementSigned={agreementSigned}*/}
+      {/*    handleSignAgreement={handleSignAgreement}*/}
+      {/*    handleClose={() => handleClose()}*/}
+      {/*    handleClickNext={handleAgreement().forward}*/}
+      {/*  />*/}
+      {/*) : null}*/}
 
       {steps[1].weAreHere ? (
         <PinPopup
           title={'Set PIN for quick login'}
-          step={'2'}
+          step={'1'}
           handleLogOut={null}
           showTwoBtns={true}
           nextStep={'step3'}
           prevStep={'step1'}
           btnText={'Next'}
-          handleClickBack={handleSetPin().backward}
+          handleClickBack={null}
           handleClickNext={handleSetPin().forward}
         />
       ) : null}
       {steps[2].weAreHere ? (
         <PinPopup
           title={'Repeat PIN'}
-          step={'3'}
+          step={'2'}
           nextStep={'step4'}
           prevStep={'step2'}
           showTwoBtns={true}
@@ -260,10 +260,10 @@ function LoginViaPin(props) {
         <WelcomePopup
           nextStep={'goInToApp'}
           prevStep={'step3'}
-          step={'4'}
+          step={'3'}
           closeBtn={false}
           btnText={'Great!'}
-          agreementSigned={agreementSigned}
+          agreementSigned={true}
           handleGetBack={handleFinish().backward}
           handleSignAgreement={handleSignAgreement}
           handleClose={() => handleClose()}

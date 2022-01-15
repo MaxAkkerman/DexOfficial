@@ -25,5 +25,5 @@ Steppers.propTypes = {
 };
 
 Steppers.defaultProps = {
-  lastStep: '4',
+  lastStep: '3',
 };
