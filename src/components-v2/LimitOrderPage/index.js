@@ -1,7 +1,11 @@
 import cls from 'classnames';
 import { useFormik } from 'formik';
-import differenceBy from 'lodash/differenceBy';
+import compact from 'lodash/compact';
+import every from 'lodash/every';
 import find from 'lodash/find';
+import reject from 'lodash/reject';
+import uniq from 'lodash/uniq';
+import { useSnackbar } from 'notistack';
 import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -13,17 +17,31 @@ import SelectPopup from '@/components-v2/SelectPopup';
 import SmallInput from '@/components-v2/SmallInput';
 import SwapButton from '@/components-v2/SwapButton';
 import { AB_DIRECTION, BA_DIRECTION } from '@/constants/runtimeVariables';
+// TODO: Remove when returning to storybook
+import {
+  connectToPair,
+  connectToPairStep2DeployWallets,
+  getClientForConnect,
+} from '@/extensions/sdk_run/run';
+// TODO: Remove when returning to storybook
+import useKeyPair from '@/hooks/useKeyPair';
 import useSelectPopup from '@/hooks/useSelectPopup';
 import {
   openLimitOrderDeployPopup,
   setLimitOrderPopupValues,
 } from '@/store/actions/limitOrder';
+import { requestPairsFetch } from '@/store/actions/ton';
+import {
+  resetWaitingPopupValues,
+  setWaitingPopupValues,
+} from '@/store/actions/waitingPopup';
 import truncateNum from '@/utils/truncateNum';
 
 import classes from './index.module.scss';
 
 export default function LimitOrderPage() {
   const history = useHistory();
+  const { enqueueSnackbar } = useSnackbar();
 
   const dispatch = useDispatch();
   const walletConnected = useSelector(
@@ -32,6 +50,33 @@ export default function LimitOrderPage() {
   const tokens = useSelector((state) => state.tonData.tokens);
   const pairs = useSelector((state) => state.tonData.pairs);
   const clientData = useSelector((state) => state.walletReducer.clientData);
+  // TODO: Remove when returning to storybook
+  const { keyPair } = useKeyPair();
+  // TODO: Remove when returning to storybook
+  const allTokens = useSelector(
+    (state) => state.walletReducer.assetsFromGraphQL,
+  );
+  // TODO: Remove when returning to storybook
+  const pairTokens = useMemo(() => {
+    let tokenList = [];
+
+    pairs.forEach((p) => {
+      tokenList.push(find(allTokens, { rootAddress: p.rootA }));
+      tokenList.push(find(allTokens, { rootAddress: p.rootB }));
+    });
+
+    tokenList = uniq(tokenList);
+    tokenList = tokenList.map((t) => {
+      t.balance = 0;
+      return t;
+    });
+    tokenList = tokenList.map((t) => {
+      const clientToken = find(tokens, { rootAddress: t.rootAddress });
+      return clientToken || t;
+    });
+
+    return tokenList;
+  }, [pairs, allTokens]);
 
   const {
     errors,
@@ -55,15 +100,43 @@ export default function LimitOrderPage() {
     validate,
   });
 
-  const leftTokens = useMemo(
-    () =>
-      differenceBy(
-        tokens,
-        [values.fromToken, values.toToken],
-        (t) => t && t.rootAddress,
-      ),
-    [tokens, values.fromToken, values.toToken],
-  );
+  const fromTokens = useMemo(() => {
+    let leftTokens = pairTokens.filter((t) => !t.symbol.startsWith('DS-'));
+    if (!values.toToken) return leftTokens;
+    leftTokens = reject(leftTokens, values.toToken);
+
+    const leftPairs = pairs.filter(
+      (p) =>
+        p.rootA === values.toToken.rootAddress ||
+        p.rootB === values.toToken.rootAddress,
+    );
+    leftTokens = leftPairs.map(
+      (p) =>
+        find(leftTokens, { rootAddress: p.rootA }) ||
+        find(leftTokens, { rootAddress: p.rootB }),
+    );
+
+    return compact(leftTokens);
+  }, [pairTokens, values.toToken]);
+
+  const toTokens = useMemo(() => {
+    let leftTokens = pairTokens.filter((t) => !t.symbol.startsWith('DS-'));
+    if (!values.fromToken) return leftTokens;
+    leftTokens = reject(leftTokens, values.fromToken);
+
+    const leftPairs = pairs.filter(
+      (p) =>
+        p.rootA === values.fromToken.rootAddress ||
+        p.rootB === values.fromToken.rootAddress,
+    );
+    leftTokens = leftPairs.map(
+      (p) =>
+        find(leftTokens, { rootAddress: p.rootA }) ||
+        find(leftTokens, { rootAddress: p.rootB }),
+    );
+
+    return compact(leftTokens);
+  }, [pairTokens, values.fromToken]);
 
   // Find the pair
   useEffect(() => {
@@ -105,14 +178,76 @@ export default function LimitOrderPage() {
     dispatch(openLimitOrderDeployPopup());
   }
 
-  function handleConnectPair() {
-    /**
-     * Handle pair connect
-     */
-  }
+  async function handleConnectPair() {
+    if (clientData.balance < 15) {
+      enqueueSnackbar({
+        message: `You need at least 15 TONs to connect pair`,
+        type: 'error',
+      });
+      return;
+    }
 
-  function handleMaxClick() {
-    setFieldValue('fromValue', values.fromToken.balance);
+    dispatch(
+      setWaitingPopupValues({
+        text: 'Getting data from pair',
+      }),
+    );
+
+    try {
+      let res = await connectToPair(values.pair.pairAddress, keyPair);
+      if (
+        !res ||
+        (res && (res.code === 1000 || res.code === 3 || res.code === 2))
+      ) {
+        dispatch(resetWaitingPopupValues());
+        enqueueSnackbar({
+          message: `Some error, please try again, ${res.code}`,
+          type: 'error',
+        });
+        return;
+      }
+
+      dispatch(
+        setWaitingPopupValues({
+          text: 'Preparing client data',
+        }),
+      );
+
+      res = await getClientForConnect(res, clientData.address);
+      if (res.code) {
+        dispatch(resetWaitingPopupValues());
+        enqueueSnackbar({
+          message: `Some error, please try again, ${res.code}`,
+          type: 'error',
+        });
+        return;
+      }
+
+      dispatch(
+        setWaitingPopupValues({
+          text: 'Computing the best shard for your wallets and deploying',
+        }),
+      );
+
+      res = await connectToPairStep2DeployWallets(res, keyPair);
+      if (res.code) {
+        dispatch(resetWaitingPopupValues());
+        enqueueSnackbar({
+          message: `Some error, please try again, ${res.code}`,
+          type: 'error',
+        });
+        return;
+      }
+
+      dispatch(requestPairsFetch());
+      dispatch(resetWaitingPopupValues());
+    } catch (e) {
+      dispatch(resetWaitingPopupValues());
+      enqueueSnackbar({
+        message: `Some error, please try again, ${e.code}`,
+        type: 'error',
+      });
+    }
   }
 
   function handleConnectWallet() {
@@ -122,39 +257,73 @@ export default function LimitOrderPage() {
   function handleTokensInvert() {
     setFieldValue('fromToken', values.toToken);
     setFieldValue('toToken', values.fromToken);
+    setFieldValue('fromValue', values.toValue);
+    setFieldValue('toValue', values.fromValue);
+  }
+
+  function handleMaxClick() {
+    setFieldValue('fromValue', values.fromToken.balance);
   }
 
   function handleSetToMarket() {
-    const SELECT_PAIR = 'You must select pair';
-    if (!rate) setFieldError('pair', SELECT_PAIR);
+    if (!rate) setFieldError('pair', 'You must select pair');
     else setFieldValue('toPrice', rate);
   }
+
+  const currentState = useMemo(() => {
+    if (!walletConnected) return 'CONNECT_WALLET';
+    else if (
+      values.fromToken &&
+      values.toToken &&
+      values.pair &&
+      !every(values.pair.walletExists, 'status')
+    )
+      return 'CONNECT_PAIR';
+    else return 'DO_SWAP';
+  });
 
   const CurrentButton = useMemo(() => {
     const props = {
       className: 'mainblock-btn',
     };
 
-    if (!walletConnected) {
-      props.children =
-        !clientData.status && clientData.address.length === 66
-          ? 'Deploy wallet'
-          : 'Connect wallet';
-      props.onClick = handleConnectWallet;
-      props.type = 'button';
-    } else if (values.fromToken && values.toToken && !values.pair) {
-      props.children = 'Connect pair';
-      props.onClick = handleConnectPair;
-      props.type = 'button';
-    } else {
-      props.children = 'Create limit order';
-      props.type = 'submit';
+    switch (currentState) {
+      case 'CONNECT_WALLET':
+        props.children =
+          !clientData.status && clientData.address.length === 66
+            ? 'Deploy wallet'
+            : 'Connect wallet';
+        props.onClick = handleConnectWallet;
+        props.type = 'button';
+        break;
+      case 'CONNECT_PAIR':
+        props.children = 'Connect pair';
+        props.onClick = handleConnectPair;
+        props.type = 'button';
+        break;
+      default:
+        props.children = 'Create limit order';
+        props.type = 'submit';
     }
 
     return function CurrentButton(p) {
       return <Button {...props} {...p} />;
     };
   }, [walletConnected, values.pair, values.fromToken, values.toToken]);
+
+  // Update selected token balance after creating a limit order
+  useEffect(() => {
+    if (values.fromToken)
+      setFieldValue(
+        'fromToken',
+        find(pairTokens, { rootAddress: values.fromToken.rootAddress }),
+      );
+    if (values.toToken)
+      setFieldValue(
+        'toToken',
+        find(pairTokens, { rootAddress: values.toToken.rootAddress }),
+      );
+  }, [pairTokens]);
 
   const selectFromPopup = useSelectPopup((t) => setFieldValue('fromToken', t));
   const selectToPopup = useSelectPopup((t) => setFieldValue('toToken', t));
@@ -254,14 +423,14 @@ export default function LimitOrderPage() {
       </div>
       {selectFromPopup.open && (
         <SelectPopup
-          tokens={leftTokens}
+          tokens={fromTokens}
           onClose={selectFromPopup.handleClose}
           onSelect={selectFromPopup.handleSelect}
         />
       )}
       {selectToPopup.open && (
         <SelectPopup
-          tokens={leftTokens}
+          tokens={toTokens}
           onClose={selectToPopup.handleClose}
           onSelect={selectToPopup.handleSelect}
         />
