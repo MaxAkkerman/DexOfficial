@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
 import { useMount } from 'react-use';
 
+import DeployConfirmPopup from '@/components/DeployConfirmPopup';
 import ChromePopup from '@/components-v2/ChromePopup';
 import LimitOrderCancelPopup from '@/components-v2/LimitOrderCancelPopup';
 import LimitOrderConfirmPopup from '@/components-v2/LimitOrderConfirmPopup';
@@ -65,7 +66,6 @@ import {
   setSubscribeReceiveTokens,
 } from './store/actions/wallet';
 import { setNFTassets } from './store/actions/walletSeed';
-import DeployConfirmPopup from '@/components/DeployConfirmPopup';
 
 function App() {
   const dispatch = useDispatch();
