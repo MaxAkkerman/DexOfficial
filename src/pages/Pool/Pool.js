@@ -1,6 +1,6 @@
 import './Pool.scss';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 
@@ -14,7 +14,32 @@ function Pool() {
   const walletIsConnected = useSelector(
     (state) => state.appReducer.walletIsConnected,
   );
-  const liquidityList = useSelector((state) => state.tonData.tokens);
+  const tokens = useSelector((state) => state.tonData.tokens);
+  const pairs = useSelector((state) => state.tonData.pairs);
+
+  const pairsWithBalance = useMemo(() => {
+    const dsTokens = tokens.filter((t) => t.symbol.startsWith('DS'));
+    return pairs.map((p) => {
+      const token = dsTokens.find((t) => {
+        const onlySymbols = t.symbol.replace(/^DS-/, '');
+        const [symbolA, symbolB] = onlySymbols.split('/');
+
+        if (symbolA === p.symbolA && symbolB === p.symbolB) return t;
+      });
+
+      if (token)
+        return {
+          ...p,
+          balance: token.balance,
+        };
+
+      return {
+        ...p,
+        balance: 0,
+      };
+    });
+  }, [tokens, pairs]);
+
   function handleClickCreatePair() {
     history.push('/create-pair');
   }
@@ -23,7 +48,7 @@ function Pool() {
     <div className="container">
       <MainBlock
         class={'pool'}
-        title={'Your liquidity'}
+        title="Liquidity pools"
         button={
           <Link
             onClick={walletIsConnected ? () => handleClickCreatePair() : null}
@@ -47,17 +72,15 @@ function Pool() {
             </button>
           ) : (
             <div className="pool-wrapper">
-              {!liquidityList.length
+              {!pairs.length
                 ? 'You don’t have liquidity pairs yet'
-                : liquidityList
-                    .filter((it) => it.symbol.includes('DS'))
-                    .map((i) => (
-                      <LiquidityItem
-                        symbol={i.symbol}
-                        balance={i.balance}
-                        key={i.walletAddress}
-                      />
-                    ))}
+                : pairsWithBalance.map((p) => (
+                    <LiquidityItem
+                      symbols={[p.symbolA, p.symbolB]}
+                      balance={p.balance}
+                      key={p.walletAddress}
+                    />
+                  ))}
             </div>
           )
         }
