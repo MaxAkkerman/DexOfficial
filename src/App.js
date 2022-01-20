@@ -66,6 +66,7 @@ import {
   setSubscribeReceiveTokens,
 } from './store/actions/wallet';
 import { setNFTassets } from './store/actions/walletSeed';
+import FarmingDetail from "@/pages/Farming/FarmingDetail/FarmingDetail";
 
 function App() {
   const dispatch = useDispatch();
@@ -252,6 +253,7 @@ function App() {
         <Route exact path="/wallet" component={Assets} />
         <Route exact path="/orders" component={LimitOrderPage} />
         <Route exact path="/farming" component={Farming} />
+        <Route exact path="/farming/:id" component={FarmingDetail} />
         <Route exact path="/">
           <Redirect from="/" to="/wallet" />
         </Route>

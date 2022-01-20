@@ -16,6 +16,10 @@
   }
 }
 
+.Card:hover {
+  background-color: rgba($color: #3569f0, $alpha: 0.4);
+}
+
 .Card__meta {
   display: flex;
   align-items: center;
@@ -126,7 +130,7 @@
 
   letter-spacing: 0.05em;
 
-  color: var(--mainblock-title-color);
+  color: #000000;
 }
 
 .Card__earned_block {

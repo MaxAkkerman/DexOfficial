@@ -5,7 +5,6 @@ import { BigNumber } from 'bignumber.js';
 import { ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
 
-// import { version, dependencies } from '../package.json'
 import avatarPlaceholder from './avatar-placeholder.png';
 import networkEnum from './networkEnum';
 import { initNotify, initOnboard } from './services';
