@@ -263,15 +263,15 @@ console.log("fromTokens",leftTokens)
   }
 
   const currentState = useMemo(() => {
-    if (!walletConnected) return 'connectWallet';
+    if (!walletConnected) return 'CONNECT_WALLET';
     else if (
       values.fromToken &&
       values.toToken &&
       values.pair &&
       !every(values.pair.walletExists, 'status')
     )
-      return 'connectPair';
-    else return 'doSwap';
+      return 'CONNECT_PAIR';
+    else return 'DO_SWAP';
   });
 
   const CurrentButton = useMemo(() => {
@@ -280,7 +280,7 @@ console.log("fromTokens",leftTokens)
     };
 
     switch (currentState) {
-      case 'connectWallet':
+      case 'CONNECT_WALLET':
         props.children =
           !clientData.status && clientData.address.length === 66
             ? 'Deploy wallet'
@@ -288,7 +288,7 @@ console.log("fromTokens",leftTokens)
         props.onClick = handleConnectWallet;
         props.type = 'button';
         break;
-      case 'connectPair':
+      case 'CONNECT_PAIR':
         props.children = 'Connect pair';
         props.onClick = handleConnectPair;
         props.type = 'button';

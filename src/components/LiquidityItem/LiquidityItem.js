@@ -14,18 +14,16 @@ import {
   setManageToToken,
 } from '../../store/actions/manage';
 
-function LiquidityItem({ balance, symbol }) {
+function LiquidityItem({ balance, symbols }) {
   const tokenList = useSelector((state) => state.walletReducer.tokenList);
 
   const liquidityList = useSelector(
     (state) => state.walletReducer.liquidityList,
   );
-  console.log('symbol', symbol);
 
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const symbols = symbol.split('/');
   const pairsList = useSelector((state) => state.walletReducer.pairsList);
   console.log('symbols', symbols);
   const handleClick = () => {

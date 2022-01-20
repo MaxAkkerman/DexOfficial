@@ -3,6 +3,8 @@ import './SendAssets.scss';
 import { FormHelperText } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import cls from 'classnames';
+import { useFormik } from 'formik';
+import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -49,6 +51,8 @@ import WaitingPopup from '../WaitingPopup/WaitingPopup';
 function SendAssets() {
   const dispatch = useDispatch();
   const history = useHistory();
+  const { enqueueSnackbar } = useSnackbar();
+
   const amountToSend = useSelector(
     (state) => state.walletSeedReducer.amountToSend,
   );
@@ -70,6 +74,13 @@ function SendAssets() {
   const seedPhrasePassword = useSelector(
     (state) => state.enterSeedPhrase.seedPhrasePassword,
   );
+
+  const { handleBlur, handleChange, values } = useFormik({
+    initialValues: {
+      // TODO: Move rest of the state to the formik
+      addressToSend: '',
+    },
+  });
 
   const [sendConfirmPopupIsVisible, setsendConfirmPopupIsVisible] =
     useState(false);
@@ -118,10 +129,10 @@ function SendAssets() {
     //todo set block border red case error
     setsendConfirmPopupIsVisible(false);
   }
-  function handleChangeAddress(e) {
-    console.log('e.currentTarget.value)', e.currentTarget.value);
+  function handleChangeAddress(address) {
+    console.log('e.currentTarget.value)', address);
     // setaddressToSendView(e.currentTarget.value);
-    dispatch(setAddressForSend(e.currentTarget.value));
+    dispatch(setAddressForSend(address));
   }
   useEffect(() => {
     console.log('addressToSendView', addressToSendView, addressToSend);
@@ -129,6 +140,10 @@ function SendAssets() {
     if (!addressToSend) return;
     handleSetView();
   }, [addressToSend]);
+
+  useEffect(() => {
+    handleChangeAddress(values.addressToSend);
+  }, [values]);
 
   function handleSetView() {
     if (addressToSend.length === 66) {
@@ -143,7 +158,21 @@ function SendAssets() {
   }
 
   async function handleSendAsset() {
-    if (!addressToSend) {
+    if (!values.addressToSend) {
+      enqueueSnackbar({
+        message: 'Please, enter a recipient address',
+        type: 'error',
+      });
+      setsendConfirmPopupIsVisible(false);
+      return;
+    }
+
+    if (!+amountToSend) {
+      enqueueSnackbar({
+        message: 'Please, enter a positive amount',
+        type: 'error',
+      });
+      setsendConfirmPopupIsVisible(false);
       return;
     }
 
@@ -319,10 +348,12 @@ function SendAssets() {
                 <div onBlur={() => handleSetView()}>
                   <div className="send_inputs">
                     <input
-                      onChange={(e) => handleChangeAddress(e)}
-                      value={addressToSendView}
+                      name="addressToSend"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      value={values.addressToSend}
                       className="recipient_input"
-                      placeholder={'0:...'}
+                      placeholder="0:..."
                     />
                     <CloseIcon
                       fontSize="medium"
